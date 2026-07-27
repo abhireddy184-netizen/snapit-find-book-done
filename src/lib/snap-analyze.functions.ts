@@ -19,6 +19,8 @@ export type SnapAnalysis = {
   urgency: "low" | "medium" | "high" | "emergency";
   urgencyReason: string;
   recommendedActions: string[];
+  possibleCauses?: string[];
+  nextSteps?: string[];
 };
 
 const SYSTEM = `You are SnapIt's AI diagnostic assistant for a local home & personal services marketplace.
@@ -33,7 +35,10 @@ Urgency scale:
 - low: cosmetic or convenience
 
 Return ONLY valid minified JSON, no markdown, matching this TypeScript type exactly:
-{"category":string,"categorySlug":string,"confidence":number(0-1),"problem":string,"estimatedCostLow":number,"estimatedCostHigh":number,"estimatedDurationMinutes":number,"urgency":"low"|"medium"|"high"|"emergency","urgencyReason":string,"recommendedActions":string[]}`;
+{"category":string,"categorySlug":string,"confidence":number(0-1),"problem":string,"estimatedCostLow":number,"estimatedCostHigh":number,"estimatedDurationMinutes":number,"urgency":"low"|"medium"|"high"|"emergency","urgencyReason":string,"recommendedActions":string[],"possibleCauses":string[],"nextSteps":string[]}
+
+possibleCauses: 2-4 short root-cause hypotheses ranked most→least likely.
+nextSteps: 2-4 short suggested next actions for the customer (e.g. "Turn off water at the shutoff valve", "Book a same-day plumber").`;
 
 export const analyzeSnap = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => Input.parse(input))
@@ -76,10 +81,14 @@ export const analyzeSnap = createServerFn({ method: "POST" })
         urgency: "medium",
         urgencyReason: "Defaulted — please add more detail or try another photo.",
         recommendedActions: ["Add a note describing the issue", "Try a clearer, well-lit photo"],
+        possibleCauses: ["Image was unclear or partially obstructed", "Problem is not fully visible in frame"],
+        nextSteps: ["Retake the photo in better lighting", "Book a handyman for an in-person diagnosis"],
       };
     }
     if (!parsed.estimatedDurationMinutes || parsed.estimatedDurationMinutes < 15) {
       parsed.estimatedDurationMinutes = 60;
     }
+    if (!Array.isArray(parsed.possibleCauses)) parsed.possibleCauses = [];
+    if (!Array.isArray(parsed.nextSteps)) parsed.nextSteps = [];
     return parsed;
   });

@@ -228,8 +228,9 @@ function SnapPage() {
 
 function ScanningOverlay({ image }: { image: string }) {
   const steps = [
-    "Analyzing image…",
-    "Identifying the problem…",
+    "Uploading image…",
+    "AI is analyzing the problem…",
+    "Identifying the service…",
     "Estimating repair cost…",
     "Finding nearby professionals…",
   ];
@@ -238,7 +239,7 @@ function ScanningOverlay({ image }: { image: string }) {
   useEffect(() => {
     const stepTimer = setInterval(() => {
       setStepIndex((i) => (i < steps.length - 1 ? i + 1 : i));
-    }, 1400);
+    }, 1200);
     const progressTimer = setInterval(() => {
       setProgress((p) => (p < 94 ? p + Math.max(1, Math.round((96 - p) * 0.08)) : p));
     }, 180);
@@ -248,21 +249,42 @@ function ScanningOverlay({ image }: { image: string }) {
     };
   }, [steps.length]);
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-md animate-fade-in">
-      <div className="mx-4 w-full max-w-sm rounded-3xl border border-border/60 bg-card p-6 shadow-2xl">
-        <div className="relative overflow-hidden rounded-2xl">
-          <img src={image} alt="Analyzing" className="h-56 w-full object-cover" />
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 animate-[scanline_1.8s_ease-in-out_infinite]" style={{ background: "var(--gradient-primary)", boxShadow: "0 0 24px rgba(124,58,237,0.8)" }} />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-primary/20 mix-blend-overlay" />
-          <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden animate-fade-in">
+      {/* Ambient blurred image + gradient wash */}
+      <div
+        className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl opacity-60"
+        style={{ backgroundImage: `url(${image})` }}
+      />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(15,10,40,0.85), rgba(88,28,180,0.75) 60%, rgba(20,10,50,0.9))" }} />
+      {/* Floating orbs */}
+      <div className="absolute -left-24 top-1/4 h-80 w-80 rounded-full bg-primary/30 blur-3xl animate-pulse" />
+      <div className="absolute -right-24 bottom-1/4 h-96 w-96 rounded-full bg-fuchsia-500/20 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+
+      <div className="relative mx-4 w-full max-w-md rounded-[28px] border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-2xl animate-scale-in">
+        <div className="relative overflow-hidden rounded-2xl border border-white/20">
+          <img src={image} alt="Analyzing" className="h-64 w-full object-cover" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 animate-[scanline_1.8s_ease-in-out_infinite]" style={{ background: "var(--gradient-primary)", boxShadow: "0 0 32px rgba(168,85,247,0.9)" }} />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-primary/30 mix-blend-overlay" />
+          {/* Corner brackets */}
+          <div className="absolute left-2 top-2 h-5 w-5 border-l-2 border-t-2 border-white/70 rounded-tl-md" />
+          <div className="absolute right-2 top-2 h-5 w-5 border-r-2 border-t-2 border-white/70 rounded-tr-md" />
+          <div className="absolute left-2 bottom-2 h-5 w-5 border-l-2 border-b-2 border-white/70 rounded-bl-md" />
+          <div className="absolute right-2 bottom-2 h-5 w-5 border-r-2 border-b-2 border-white/70 rounded-br-md" />
+          <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
             <ScanLine className="h-3 w-3 animate-pulse" /> AI scanning
           </div>
-          <div className="absolute bottom-3 right-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-primary shadow">
+          <div className="absolute bottom-3 right-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-black text-primary shadow">
             {progress}%
           </div>
         </div>
         <div className="mt-5">
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+          <div className="text-center">
+            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white/80">
+              <Sparkles className="h-3.5 w-3.5" /> SnapIt AI
+            </div>
+            <div className="mt-1 text-lg font-black text-white">Diagnosing your problem</div>
+          </div>
+          <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white/15">
             <div
               className="h-full rounded-full transition-[width] duration-200 ease-out"
               style={{ width: `${progress}%`, background: "var(--gradient-primary)" }}
@@ -275,19 +297,19 @@ function ScanningOverlay({ image }: { image: string }) {
               return (
                 <div
                   key={s}
-                  className="flex items-center gap-2.5 text-sm transition-opacity"
-                  style={{ opacity: done || active ? 1 : 0.4 }}
+                  className="flex items-center gap-2.5 text-sm text-white/90 transition-opacity"
+                  style={{ opacity: done || active ? 1 : 0.45 }}
                 >
                   {done ? (
                     <div className="grid h-4 w-4 place-items-center rounded-full bg-primary text-white">
                       <Check className="h-2.5 w-2.5" strokeWidth={4} />
                     </div>
                   ) : active ? (
-                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                    <Loader2 className="h-4 w-4 animate-spin text-white" />
                   ) : (
-                    <div className="h-4 w-4 rounded-full border border-border" />
+                    <div className="h-4 w-4 rounded-full border border-white/40" />
                   )}
-                  <span className={done ? "text-muted-foreground line-through" : "text-foreground/90"}>{s}</span>
+                  <span className={done ? "text-white/50 line-through" : ""}>{s}</span>
                 </div>
               );
             })}
@@ -464,6 +486,43 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {((analysis.possibleCauses?.length ?? 0) > 0 || (analysis.nextSteps?.length ?? 0) > 0) && (
+        <div className="grid gap-3 md:grid-cols-2">
+          {(analysis.possibleCauses?.length ?? 0) > 0 && (
+            <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-primary/5 to-card p-5 shadow-sm">
+              <div className="mb-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                <Sparkles className="h-3.5 w-3.5" /> Possible causes
+              </div>
+              <ol className="space-y-2 text-sm">
+                {analysis.possibleCauses!.map((c, i) => (
+                  <li key={c} className="flex gap-2.5">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary/10 text-[10px] font-black text-primary">
+                      {i + 1}
+                    </span>
+                    <span className="text-foreground/90">{c}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+          {(analysis.nextSteps?.length ?? 0) > 0 && (
+            <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
+              <div className="mb-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                <ArrowRight className="h-3.5 w-3.5" /> Suggested next steps
+              </div>
+              <ul className="space-y-2 text-sm">
+                {analysis.nextSteps!.map((s) => (
+                  <li key={s} className="flex gap-2.5">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span className="text-foreground/90">{s}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
