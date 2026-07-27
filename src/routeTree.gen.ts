@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as BookRouteImport } from './routes/book'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProviderIdRouteImport } from './routes/provider.$id'
 
@@ -22,6 +23,11 @@ const SearchRoute = SearchRouteImport.update({
 const CategoriesRoute = CategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BookRoute = BookRouteImport.update({
+  id: '/book',
+  path: '/book',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +43,14 @@ const ProviderIdRoute = ProviderIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
   '/search': typeof SearchRoute
   '/provider/$id': typeof ProviderIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
   '/search': typeof SearchRoute
   '/provider/$id': typeof ProviderIdRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
   '/search': typeof SearchRoute
   '/provider/$id': typeof ProviderIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/categories' | '/search' | '/provider/$id'
+  fullPaths: '/' | '/book' | '/categories' | '/search' | '/provider/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/categories' | '/search' | '/provider/$id'
-  id: '__root__' | '/' | '/categories' | '/search' | '/provider/$id'
+  to: '/' | '/book' | '/categories' | '/search' | '/provider/$id'
+  id: '__root__' | '/' | '/book' | '/categories' | '/search' | '/provider/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BookRoute: typeof BookRoute
   CategoriesRoute: typeof CategoriesRoute
   SearchRoute: typeof SearchRoute
   ProviderIdRoute: typeof ProviderIdRoute
@@ -85,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/book': {
+      id: '/book'
+      path: '/book'
+      fullPath: '/book'
+      preLoaderRoute: typeof BookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BookRoute: BookRoute,
   CategoriesRoute: CategoriesRoute,
   SearchRoute: SearchRoute,
   ProviderIdRoute: ProviderIdRoute,
