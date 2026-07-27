@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Camera,
@@ -19,10 +19,18 @@ import {
   Timer,
   ScanLine,
   CheckCircle2,
+  MessageCircle,
+  Phone,
+  Award,
+  Send,
+  Check,
+  X,
+  History as HistoryIcon,
 } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
-import { providers, categories } from "@/lib/snapit-data";
+import { providers, categories, type Provider } from "@/lib/snapit-data";
+import { saveHistoryEntry } from "@/lib/snap-history";
 
 export const Route = createFileRoute("/snap")({
   head: () => ({
