@@ -111,25 +111,37 @@
 }
 
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
+  /* SnapIt dark: deep navy, not pure black. Keeps blue identity. */
+  --background: oklch(0.16 0.04 265);
+  --foreground: oklch(0.98 0.005 250);
+  --card: oklch(0.23 0.04 262);
+  --card-foreground: oklch(0.98 0.005 250);
+  --popover: oklch(0.25 0.04 262);
+  --popover-foreground: oklch(0.98 0.005 250);
+  --primary: oklch(0.66 0.19 256);
+  --primary-foreground: oklch(1 0 0);
+  --primary-glow: oklch(0.75 0.16 232);
+  --secondary: oklch(0.75 0.16 220);
+  --secondary-foreground: oklch(0.16 0.04 265);
+  --muted: oklch(0.27 0.04 262);
+  --muted-foreground: oklch(0.74 0.03 250);
+  --accent: oklch(0.75 0.19 45);
+  --accent-foreground: oklch(0.16 0.04 265);
+  --destructive: oklch(0.68 0.22 25);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.35 0.03 260);
+  --input: oklch(0.32 0.03 260);
+  --ring: oklch(0.66 0.19 256);
+  --gradient-primary: linear-gradient(135deg, oklch(0.66 0.19 256), oklch(0.75 0.16 220));
+  --gradient-secondary: linear-gradient(135deg, oklch(0.72 0.15 195), oklch(0.66 0.19 256));
+  --gradient-accent: linear-gradient(135deg, oklch(0.75 0.19 45), oklch(0.78 0.18 25));
+  --gradient-hero: linear-gradient(135deg, oklch(0.66 0.19 256) 0%, oklch(0.70 0.17 220) 50%, oklch(0.75 0.16 195) 100%);
+  --gradient-soft: linear-gradient(180deg, oklch(0.19 0.04 265), oklch(0.16 0.04 265));
+  --gradient-mesh: radial-gradient(at 20% 0%, oklch(0.66 0.19 256 / 0.22) 0px, transparent 50%), radial-gradient(at 90% 10%, oklch(0.75 0.19 45 / 0.14) 0px, transparent 50%), radial-gradient(at 40% 100%, oklch(0.72 0.15 195 / 0.18) 0px, transparent 50%);
+  --shadow-card: 0 1px 2px oklch(0 0 0 / 0.4), 0 8px 24px -12px oklch(0 0 0 / 0.5);
+  --shadow-elevated: 0 4px 12px -4px oklch(0 0 0 / 0.5), 0 24px 48px -20px oklch(0.66 0.19 256 / 0.25);
+  --shadow-elegant: 0 20px 50px -20px oklch(0.66 0.19 256 / 0.55);
+  --shadow-glow: 0 0 0 1px oklch(1 0 0 / 0.08) inset, 0 20px 60px -20px oklch(0.66 0.19 256 / 0.55);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -156,6 +168,7 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     letter-spacing: -0.01em;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   h1, h2, h3, h4 {
@@ -164,16 +177,16 @@
 }
 
 @utility glass-card {
-  background: color-mix(in oklab, white 72%, transparent);
+  background: color-mix(in oklab, var(--card) 72%, transparent);
   backdrop-filter: saturate(160%) blur(18px);
-  border: 1px solid color-mix(in oklab, white 60%, var(--color-border));
+  border: 1px solid color-mix(in oklab, var(--foreground) 8%, transparent);
   box-shadow: var(--shadow-card);
 }
 
 @utility glass-strong {
-  background: color-mix(in oklab, white 85%, transparent);
+  background: color-mix(in oklab, var(--card) 88%, transparent);
   backdrop-filter: saturate(180%) blur(24px);
-  border: 1px solid color-mix(in oklab, white 50%, var(--color-border));
+  border: 1px solid color-mix(in oklab, var(--foreground) 10%, transparent);
   box-shadow: var(--shadow-elevated);
 }
 
@@ -194,4 +207,22 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+@utility fade-up {
+  animation: fade-up 0.6s ease-out both;
+}
+
+@utility pulse-soft {
+  animation: pulse-soft 2.8s ease-in-out infinite;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { box-shadow: 0 16px 40px -12px rgba(37,99,235,0.55), 0 0 0 0 rgba(37,99,235,0.35); }
+  50% { box-shadow: 0 16px 40px -12px rgba(37,99,235,0.55), 0 0 0 14px rgba(37,99,235,0); }
 }
