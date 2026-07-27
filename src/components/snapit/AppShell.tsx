@@ -84,18 +84,21 @@ export function GradientButton({
   onClick,
   className,
   type = "button",
+  disabled = false,
 }: {
   children: ReactNode;
   onClick?: () => void;
   className?: string;
   type?: "button" | "submit";
+  disabled?: boolean;
 }) {
   return (
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]",
+        "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100",
         className
       )}
       style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}
