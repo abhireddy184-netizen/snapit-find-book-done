@@ -468,7 +468,14 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
       )}
 
       {/* Pros section header + quote toolbar */}
-      <div>
+      <GradientButton
+        onClick={() => document.getElementById("pros-list")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+        className="w-full justify-center py-4 text-base"
+      >
+        <ShieldCheck className="h-5 w-5" /> View Verified Professionals
+      </GradientButton>
+
+      <div id="pros-list" className="scroll-mt-20">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
             <h2 className="text-lg font-black">Top 5 verified pros nearby</h2>
@@ -864,3 +871,94 @@ function extractVideoFrame(file: File): Promise<string> {
 
 // Placeholder so ArrowRight import isn't unused when adjusting the layout later.
 void ArrowRight;
+
+function TrustBadges() {
+  const items = [
+    { icon: Sparkles, label: "AI Powered Diagnosis" },
+    { icon: BadgeCheck, label: "Verified Professionals" },
+    { icon: Tag, label: "Upfront Pricing" },
+    { icon: Lock, label: "Secure Payments" },
+    { icon: HandHeart, label: "Satisfaction Guaranteed" },
+  ];
+  return (
+    <div className="mt-6 rounded-3xl border border-border/60 bg-gradient-to-br from-primary/5 via-card to-card p-4 backdrop-blur-xl">
+      <div className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        <Users className="h-3.5 w-3.5 text-primary" /> Trusted by thousands
+      </div>
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+        {items.map(({ icon: Icon, label }) => (
+          <div
+            key={label}
+            className="flex flex-col items-center gap-2 rounded-2xl border border-border/40 bg-background/60 p-3 text-center transition-transform hover:-translate-y-0.5"
+          >
+            <div
+              className="grid h-9 w-9 place-items-center rounded-xl text-white shadow-sm"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              <Icon className="h-4 w-4" />
+            </div>
+            <div className="text-[11px] font-semibold leading-tight">{label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function RecentDiagnoses({ entries }: { entries: SnapHistoryEntry[] }) {
+  return (
+    <div className="mt-6 animate-fade-in">
+      <div className="mb-3 flex items-end justify-between gap-3">
+        <div>
+          <h2 className="text-lg font-black">Recent AI Diagnoses</h2>
+          <p className="text-xs text-muted-foreground">Your latest scans, saved on this device.</p>
+        </div>
+        <Link
+          to="/history"
+          className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-[11px] font-semibold hover:bg-muted"
+        >
+          View all <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {entries.map((entry) => {
+          const cat = categories.find((c) => c.slug === entry.analysis.categorySlug);
+          const u = urgencyStyles[entry.analysis.urgency] ?? urgencyStyles.medium;
+          return (
+            <Link
+              key={entry.id}
+              to="/history"
+              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            >
+              <div className="relative shrink-0">
+                <img src={entry.thumbnail} alt="" className="h-14 w-14 rounded-xl object-cover" />
+                {cat && (
+                  <div
+                    className={`absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br ${cat.color} text-white shadow ring-2 ring-card`}
+                  >
+                    <cat.icon className="h-3 w-3" />
+                  </div>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="line-clamp-1 text-sm font-semibold">{entry.analysis.problem}</div>
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
+                  <span className="font-semibold text-foreground/80">
+                    ${entry.analysis.estimatedCostLow}–${entry.analysis.estimatedCostHigh}
+                  </span>
+                  <span>·</span>
+                  <span>{formatRelative(entry.createdAt)}</span>
+                </div>
+              </div>
+              <span
+                className={`inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${u.chip}`}
+              >
+                {u.label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
