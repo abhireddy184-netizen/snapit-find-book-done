@@ -4,6 +4,7 @@ import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCi
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
 import { categories, providers, testimonials } from "@/lib/snapit-data";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   head: () => ({
