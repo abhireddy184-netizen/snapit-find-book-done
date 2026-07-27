@@ -30,7 +30,14 @@ import {
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
 import { providers, categories, type Provider } from "@/lib/snapit-data";
-import { saveHistoryEntry } from "@/lib/snap-history";
+import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
+import {
+  BadgeCheck,
+  Lock,
+  HandHeart,
+  Tag,
+  Users,
+} from "lucide-react";
 
 export const Route = createFileRoute("/snap")({
   head: () => ({
@@ -62,19 +69,30 @@ function SnapPage() {
   const cameraRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
+  const [recent, setRecent] = useState<SnapHistoryEntry[]>([]);
+  useEffect(() => {
+    setRecent(loadHistory().slice(0, 4));
+  }, [analysis]);
 
   const handleFile = async (file: File, kind: "photo" | "video" | "upload") => {
     setError(null);
     setAnalysis(null);
     // For videos, capture a thumbnail frame; for images use directly
-    if (file.type.startsWith("video/")) {
-      const dataUrl = await extractVideoFrame(file);
-      setImage(dataUrl);
-    } else {
-      const dataUrl = await fileToDataUrl(file);
-      setImage(dataUrl);
-    }
+    const dataUrl = file.type.startsWith("video/")
+      ? await extractVideoFrame(file)
+      : await fileToDataUrl(file);
+    setImage(dataUrl);
     setMediaKind(kind);
+    // Immediately kick off AI analysis — premium instant feel
+    setLoading(true);
+    try {
+      const result = await analyze({ data: { imageDataUrl: dataUrl, note: "" } });
+      setAnalysis(result);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const runAnalysis = async () => {
@@ -157,6 +175,9 @@ function SnapPage() {
             />
           </div>
         )}
+
+        {!image && <TrustBadges />}
+        {!image && recent.length > 0 && <RecentDiagnoses entries={recent} />}
 
         {image && !analysis && (
           <div className="mt-6 space-y-4">
