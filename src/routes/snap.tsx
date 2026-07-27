@@ -489,6 +489,43 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
         </div>
       )}
 
+      {((analysis.possibleCauses?.length ?? 0) > 0 || (analysis.nextSteps?.length ?? 0) > 0) && (
+        <div className="grid gap-3 md:grid-cols-2">
+          {(analysis.possibleCauses?.length ?? 0) > 0 && (
+            <div className="rounded-2xl border border-border/60 bg-gradient-to-br from-primary/5 to-card p-5 shadow-sm">
+              <div className="mb-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                <Sparkles className="h-3.5 w-3.5" /> Possible causes
+              </div>
+              <ol className="space-y-2 text-sm">
+                {analysis.possibleCauses!.map((c, i) => (
+                  <li key={c} className="flex gap-2.5">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary/10 text-[10px] font-black text-primary">
+                      {i + 1}
+                    </span>
+                    <span className="text-foreground/90">{c}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+          {(analysis.nextSteps?.length ?? 0) > 0 && (
+            <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
+              <div className="mb-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                <ArrowRight className="h-3.5 w-3.5" /> Suggested next steps
+              </div>
+              <ul className="space-y-2 text-sm">
+                {analysis.nextSteps!.map((s) => (
+                  <li key={s} className="flex gap-2.5">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span className="text-foreground/90">{s}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Pros section header + quote toolbar */}
       <GradientButton
         onClick={() => document.getElementById("pros-list")?.scrollIntoView({ behavior: "smooth", block: "start" })}
