@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Home, Search, CalendarDays, MessageCircle, User } from "lucide-react";
+import { Home, Search, CalendarDays, User, Camera, ShieldAlert } from "lucide-react";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +20,12 @@ function TopBar() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Logo />
         <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
+          <Link to="/snap" className="inline-flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors font-semibold">
+            <Camera className="h-4 w-4" /> Snap AI
+          </Link>
+          <Link to="/emergency" className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 transition-colors font-semibold">
+            <ShieldAlert className="h-4 w-4" /> Emergency
+          </Link>
           <Link to="/categories" className="hover:text-foreground transition-colors">Services</Link>
           <Link to="/search" className="hover:text-foreground transition-colors">Find a Pro</Link>
           <Link to="/provider-dashboard" className="hover:text-foreground transition-colors">For Providers</Link>
@@ -50,8 +56,8 @@ function BottomNav() {
   const items = [
     { to: "/", label: "Home", icon: Home },
     { to: "/search", label: "Search", icon: Search },
+    { to: "/snap", label: "Snap AI", icon: Camera, highlight: true },
     { to: "/dashboard", label: "Bookings", icon: CalendarDays },
-    { to: "/dashboard", label: "Messages", icon: MessageCircle, hash: "messages" },
     { to: "/dashboard", label: "Profile", icon: User, hash: "profile" },
   ];
   return (
@@ -60,6 +66,23 @@ function BottomNav() {
         {items.map((it, i) => {
           const active = pathname === it.to && (i === 0 ? pathname === "/" : true);
           const Icon = it.icon;
+          if (it.highlight) {
+            return (
+              <Link
+                key={i}
+                to={it.to}
+                className="-mt-6 flex flex-col items-center gap-1"
+              >
+                <span
+                  className="grid h-14 w-14 place-items-center rounded-full text-white shadow-xl ring-4 ring-background"
+                  style={{ background: "var(--gradient-primary)" }}
+                >
+                  <Icon className="h-6 w-6" />
+                </span>
+                <span className="text-[10px] font-bold text-primary">{it.label}</span>
+              </Link>
+            );
+          }
           return (
             <Link
               key={i}
@@ -84,18 +107,21 @@ export function GradientButton({
   onClick,
   className,
   type = "button",
+  disabled = false,
 }: {
   children: ReactNode;
   onClick?: () => void;
   className?: string;
   type?: "button" | "submit";
+  disabled?: boolean;
 }) {
   return (
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98]",
+        "inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100",
         className
       )}
       style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}

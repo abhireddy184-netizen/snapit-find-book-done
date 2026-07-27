@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2 } from "lucide-react";
+import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, ShieldAlert, Zap, Droplet, Wind, Lock } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
 import { categories, providers, testimonials } from "@/lib/snapit-data";
@@ -174,6 +174,9 @@ function Landing() {
         </div>
       </section>
 
+      {/* Emergency Services */}
+      <EmergencySection />
+
       {/* Become a provider */}
       <section className="mt-16 overflow-hidden rounded-3xl px-6 py-12 text-white md:px-12 md:py-16" style={{ background: "var(--gradient-primary)" }}>
         <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-center">
@@ -201,7 +204,87 @@ function Landing() {
       </section>
 
       <Footer />
+      <FloatingSnapButton />
     </AppShell>
+  );
+}
+
+function EmergencySection() {
+  const items = [
+    { label: "Burst pipe", icon: Droplet, color: "from-blue-500 to-cyan-500" },
+    { label: "No power", icon: Zap, color: "from-amber-500 to-orange-500" },
+    { label: "No heat / AC", icon: Wind, color: "from-sky-500 to-indigo-500" },
+    { label: "Lockout", icon: Lock, color: "from-rose-500 to-red-500" },
+  ];
+  return (
+    <section className="mt-16 overflow-hidden rounded-3xl border border-red-200 bg-gradient-to-br from-red-50 via-white to-orange-50 p-6 md:p-10">
+      <div className="grid gap-6 md:grid-cols-[1.2fr_1fr] md:items-center">
+        <div>
+          <div className="inline-flex items-center gap-2 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">
+            <ShieldAlert className="h-3.5 w-3.5" /> 24/7 Emergency
+          </div>
+          <h2 className="mt-3 text-3xl font-black tracking-tight md:text-4xl">
+            When it can't wait,{" "}
+            <span className="text-red-600">we dispatch fast.</span>
+          </h2>
+          <p className="mt-2 max-w-lg text-sm text-muted-foreground md:text-base">
+            On-call verified pros for burst pipes, power outages, lockouts and more. Average arrival under 20 minutes.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Link
+              to="/emergency"
+              className="inline-flex items-center gap-2 rounded-full bg-red-600 px-5 py-3 text-sm font-bold text-white shadow-lg hover:bg-red-700"
+            >
+              <ShieldAlert className="h-4 w-4" /> Get emergency help
+            </Link>
+            <Link
+              to="/snap"
+              className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-white px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-50"
+            >
+              <Camera className="h-4 w-4" /> Snap the problem
+            </Link>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {items.map((it) => (
+            <Link
+              key={it.label}
+              to="/emergency"
+              className="group flex items-center gap-3 rounded-2xl border border-red-100 bg-white p-3 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all"
+            >
+              <div className={`grid h-11 w-11 place-items-center rounded-xl bg-gradient-to-br ${it.color} text-white shadow-md`}>
+                <it.icon className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-sm font-bold">{it.label}</div>
+                <div className="text-[11px] text-muted-foreground">Dispatch now</div>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FloatingSnapButton() {
+  return (
+    <Link
+      to="/snap"
+      aria-label="Snap a problem for AI diagnosis"
+      className="fixed bottom-24 right-4 z-50 flex items-center gap-2 rounded-full py-3.5 pl-4 pr-5 text-sm font-bold text-white shadow-2xl transition-transform hover:scale-105 active:scale-95 md:bottom-6 md:right-6"
+      style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-elegant)" }}
+    >
+      <span className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
+        <span className="absolute inset-0 animate-ping rounded-full bg-white/30" />
+        <Camera className="relative h-5 w-5" />
+      </span>
+      <span className="hidden xs:inline">Snap a Problem</span>
+      <span className="xs:hidden">Snap</span>
+      <span className="ml-1 hidden items-center gap-1 rounded-full bg-white/25 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider sm:inline-flex">
+        <Sparkles className="h-3 w-3" /> AI
+      </span>
+    </Link>
   );
 }
 
