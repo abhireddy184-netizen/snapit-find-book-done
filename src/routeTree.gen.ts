@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SnapRouteImport } from './routes/snap'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProviderDashboardRouteImport } from './routes/provider-dashboard'
@@ -19,6 +20,11 @@ import { Route as BookRouteImport } from './routes/book'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProviderIdRouteImport } from './routes/provider.$id'
 
+const SnapRoute = SnapRouteImport.update({
+  id: '/snap',
+  path: '/snap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
+  '/snap': typeof SnapRoute
   '/provider/$id': typeof ProviderIdRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
+  '/snap': typeof SnapRoute
   '/provider/$id': typeof ProviderIdRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
+  '/snap': typeof SnapRoute
   '/provider/$id': typeof ProviderIdRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/provider-dashboard'
     | '/register'
     | '/search'
+    | '/snap'
     | '/provider/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/provider-dashboard'
     | '/register'
     | '/search'
+    | '/snap'
     | '/provider/$id'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/provider-dashboard'
     | '/register'
     | '/search'
+    | '/snap'
     | '/provider/$id'
   fileRoutesById: FileRoutesById
 }
@@ -144,11 +156,19 @@ export interface RootRouteChildren {
   ProviderDashboardRoute: typeof ProviderDashboardRoute
   RegisterRoute: typeof RegisterRoute
   SearchRoute: typeof SearchRoute
+  SnapRoute: typeof SnapRoute
   ProviderIdRoute: typeof ProviderIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/snap': {
+      id: '/snap'
+      path: '/snap'
+      fullPath: '/snap'
+      preLoaderRoute: typeof SnapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProviderDashboardRoute: ProviderDashboardRoute,
   RegisterRoute: RegisterRoute,
   SearchRoute: SearchRoute,
+  SnapRoute: SnapRoute,
   ProviderIdRoute: ProviderIdRoute,
 }
 export const routeTree = rootRouteImport
