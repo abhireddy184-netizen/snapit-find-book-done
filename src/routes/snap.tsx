@@ -228,10 +228,10 @@ function SnapPage() {
 
 function ScanningOverlay({ image }: { image: string }) {
   const steps = [
-    "Enhancing image…",
-    "Detecting service category…",
+    "Analyzing image…",
+    "Identifying the problem…",
     "Estimating repair cost…",
-    "Matching verified pros nearby…",
+    "Finding nearby professionals…",
   ];
   const [stepIndex, setStepIndex] = useState(0);
   const [progress, setProgress] = useState(6);
