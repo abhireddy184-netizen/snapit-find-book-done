@@ -18,20 +18,26 @@ export type Category = {
   description: string;
   icon: LucideIcon;
   color: string;
+  accent: string; // solid tailwind class (bg-<accent>-500) for chips/dots
+  hex: string;    // brand hex for glow/tint
 };
 
 export const categories: Category[] = [
-  { slug: "plumbing", name: "Plumbing", description: "Leaks, drains, water heaters and installs.", icon: Wrench, color: "from-blue-500 to-indigo-500" },
-  { slug: "electrical", name: "Electrical", description: "Wiring, outlets, lighting and safety checks.", icon: Zap, color: "from-amber-500 to-orange-500" },
-  { slug: "hvac", name: "HVAC", description: "Heating, cooling, tune-ups and repair.", icon: Wind, color: "from-cyan-500 to-sky-500" },
-  { slug: "house-cleaning", name: "House Cleaning", description: "Deep cleans, recurring and move-outs.", icon: Sparkles, color: "from-fuchsia-500 to-purple-500" },
-  { slug: "handyman", name: "Handyman", description: "Small repairs, mounting and assembly.", icon: Hammer, color: "from-rose-500 to-red-500" },
-  { slug: "lawn-care", name: "Lawn Care", description: "Mowing, trimming and yard cleanups.", icon: Trees, color: "from-emerald-500 to-green-500" },
-  { slug: "appliance-repair", name: "Appliance Repair", description: "Fridge, washer, dryer and dishwasher fixes.", icon: Refrigerator, color: "from-slate-500 to-zinc-600" },
-  { slug: "beauty-spa", name: "Beauty & Spa", description: "In-home beauty, massage and wellness.", icon: Scissors, color: "from-pink-500 to-rose-500" },
-  { slug: "moving-help", name: "Moving Help", description: "Loaders, movers and packing pros.", icon: Truck, color: "from-violet-500 to-purple-600" },
-  { slug: "auto-services", name: "Auto Services", description: "Mobile mechanics and detailing.", icon: Car, color: "from-indigo-500 to-blue-600" },
+  { slug: "plumbing", name: "Plumbing", description: "Leaks, drains, water heaters and installs.", icon: Wrench, color: "from-blue-500 to-blue-600", accent: "blue", hex: "#2563EB" },
+  { slug: "electrical", name: "Electrical", description: "Wiring, outlets, lighting and safety checks.", icon: Zap, color: "from-orange-400 to-orange-600", accent: "orange", hex: "#F97316" },
+  { slug: "hvac", name: "HVAC", description: "Heating, cooling, tune-ups and repair.", icon: Wind, color: "from-cyan-400 to-cyan-600", accent: "cyan", hex: "#06B6D4" },
+  { slug: "house-cleaning", name: "House Cleaning", description: "Deep cleans, recurring and move-outs.", icon: Sparkles, color: "from-purple-500 to-purple-700", accent: "purple", hex: "#8B5CF6" },
+  { slug: "handyman", name: "Handyman", description: "Small repairs, mounting and assembly.", icon: Hammer, color: "from-red-500 to-red-600", accent: "red", hex: "#EF4444" },
+  { slug: "lawn-care", name: "Lawn Care", description: "Mowing, trimming and yard cleanups.", icon: Trees, color: "from-emerald-500 to-green-600", accent: "emerald", hex: "#10B981" },
+  { slug: "appliance-repair", name: "Appliance Repair", description: "Fridge, washer, dryer and dishwasher fixes.", icon: Refrigerator, color: "from-slate-500 to-slate-700", accent: "slate", hex: "#64748B" },
+  { slug: "beauty-spa", name: "Beauty & Spa", description: "In-home beauty, massage and wellness.", icon: Scissors, color: "from-pink-400 to-pink-600", accent: "pink", hex: "#EC4899" },
+  { slug: "moving-help", name: "Moving Help", description: "Loaders, movers and packing pros.", icon: Truck, color: "from-indigo-500 to-indigo-700", accent: "indigo", hex: "#6366F1" },
+  { slug: "auto-services", name: "Auto Services", description: "Mobile mechanics and detailing.", icon: Car, color: "from-blue-600 to-blue-800", accent: "blue", hex: "#1D4ED8" },
 ];
+
+export function getCategory(slug: string) {
+  return categories.find((c) => c.slug === slug);
+}
 
 export type Provider = {
   id: string;
