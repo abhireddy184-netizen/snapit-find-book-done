@@ -14,10 +14,12 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProviderDashboardRouteImport } from './routes/provider-dashboard'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TrackingIdRouteImport } from './routes/tracking.$id'
 import { Route as ProviderIdRouteImport } from './routes/provider.$id'
 
 const SnapRoute = SnapRouteImport.update({
@@ -45,6 +47,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmergencyRoute = EmergencyRouteImport.update({
+  id: '/emergency',
+  path: '/emergency',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -65,6 +72,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TrackingIdRoute = TrackingIdRouteImport.update({
+  id: '/tracking/$id',
+  path: '/tracking/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProviderIdRoute = ProviderIdRouteImport.update({
   id: '/provider/$id',
   path: '/provider/$id',
@@ -76,24 +88,28 @@ export interface FileRoutesByFullPath {
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/emergency': typeof EmergencyRoute
   '/login': typeof LoginRoute
   '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/snap': typeof SnapRoute
   '/provider/$id': typeof ProviderIdRoute
+  '/tracking/$id': typeof TrackingIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/emergency': typeof EmergencyRoute
   '/login': typeof LoginRoute
   '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/snap': typeof SnapRoute
   '/provider/$id': typeof ProviderIdRoute
+  '/tracking/$id': typeof TrackingIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -101,12 +117,14 @@ export interface FileRoutesById {
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/emergency': typeof EmergencyRoute
   '/login': typeof LoginRoute
   '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/snap': typeof SnapRoute
   '/provider/$id': typeof ProviderIdRoute
+  '/tracking/$id': typeof TrackingIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -115,36 +133,42 @@ export interface FileRouteTypes {
     | '/book'
     | '/categories'
     | '/dashboard'
+    | '/emergency'
     | '/login'
     | '/provider-dashboard'
     | '/register'
     | '/search'
     | '/snap'
     | '/provider/$id'
+    | '/tracking/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/book'
     | '/categories'
     | '/dashboard'
+    | '/emergency'
     | '/login'
     | '/provider-dashboard'
     | '/register'
     | '/search'
     | '/snap'
     | '/provider/$id'
+    | '/tracking/$id'
   id:
     | '__root__'
     | '/'
     | '/book'
     | '/categories'
     | '/dashboard'
+    | '/emergency'
     | '/login'
     | '/provider-dashboard'
     | '/register'
     | '/search'
     | '/snap'
     | '/provider/$id'
+    | '/tracking/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -152,12 +176,14 @@ export interface RootRouteChildren {
   BookRoute: typeof BookRoute
   CategoriesRoute: typeof CategoriesRoute
   DashboardRoute: typeof DashboardRoute
+  EmergencyRoute: typeof EmergencyRoute
   LoginRoute: typeof LoginRoute
   ProviderDashboardRoute: typeof ProviderDashboardRoute
   RegisterRoute: typeof RegisterRoute
   SearchRoute: typeof SearchRoute
   SnapRoute: typeof SnapRoute
   ProviderIdRoute: typeof ProviderIdRoute
+  TrackingIdRoute: typeof TrackingIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -197,6 +223,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/emergency': {
+      id: '/emergency'
+      path: '/emergency'
+      fullPath: '/emergency'
+      preLoaderRoute: typeof EmergencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -225,6 +258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tracking/$id': {
+      id: '/tracking/$id'
+      path: '/tracking/$id'
+      fullPath: '/tracking/$id'
+      preLoaderRoute: typeof TrackingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/provider/$id': {
       id: '/provider/$id'
       path: '/provider/$id'
@@ -240,12 +280,14 @@ const rootRouteChildren: RootRouteChildren = {
   BookRoute: BookRoute,
   CategoriesRoute: CategoriesRoute,
   DashboardRoute: DashboardRoute,
+  EmergencyRoute: EmergencyRoute,
   LoginRoute: LoginRoute,
   ProviderDashboardRoute: ProviderDashboardRoute,
   RegisterRoute: RegisterRoute,
   SearchRoute: SearchRoute,
   SnapRoute: SnapRoute,
   ProviderIdRoute: ProviderIdRoute,
+  TrackingIdRoute: TrackingIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
