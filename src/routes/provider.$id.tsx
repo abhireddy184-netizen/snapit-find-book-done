@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { Star, ShieldCheck, MapPin, Clock, Calendar as CalendarIcon } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { getProvider } from "@/lib/snapit-data";
+import { getProvider, type Provider } from "@/lib/snapit-data";
 
 export const Route = createFileRoute("/provider/$id")({
   loader: ({ params }) => {
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/provider/$id")({
 });
 
 function ProviderPage() {
-  const { provider: p } = Route.useLoaderData();
+  const { provider: p } = Route.useLoaderData() as { provider: Provider };
   const [selectedDay, setSelectedDay] = useState(0);
   const days = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date();
