@@ -44,8 +44,8 @@ export const analyzeSnap = createServerFn({ method: "POST" })
 
     const { text } = await generateText({
       model: gateway("openai/gpt-5.5"),
+      system: SYSTEM,
       messages: [
-        { role: "system", content: SYSTEM },
         {
           role: "user",
           content: [
