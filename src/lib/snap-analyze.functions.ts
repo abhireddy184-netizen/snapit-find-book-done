@@ -15,6 +15,7 @@ export type SnapAnalysis = {
   problem: string;
   estimatedCostLow: number;
   estimatedCostHigh: number;
+  estimatedDurationMinutes: number;
   urgency: "low" | "medium" | "high" | "emergency";
   urgencyReason: string;
   recommendedActions: string[];
@@ -32,7 +33,7 @@ Urgency scale:
 - low: cosmetic or convenience
 
 Return ONLY valid minified JSON, no markdown, matching this TypeScript type exactly:
-{"category":string,"categorySlug":string,"confidence":number(0-1),"problem":string,"estimatedCostLow":number,"estimatedCostHigh":number,"urgency":"low"|"medium"|"high"|"emergency","urgencyReason":string,"recommendedActions":string[]}`;
+{"category":string,"categorySlug":string,"confidence":number(0-1),"problem":string,"estimatedCostLow":number,"estimatedCostHigh":number,"estimatedDurationMinutes":number,"urgency":"low"|"medium"|"high"|"emergency","urgencyReason":string,"recommendedActions":string[]}`;
 
 export const analyzeSnap = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => Input.parse(input))
@@ -71,10 +72,14 @@ export const analyzeSnap = createServerFn({ method: "POST" })
         problem: "Unable to fully analyze the image. A local handyman can take a closer look.",
         estimatedCostLow: 75,
         estimatedCostHigh: 200,
+        estimatedDurationMinutes: 60,
         urgency: "medium",
         urgencyReason: "Defaulted — please add more detail or try another photo.",
         recommendedActions: ["Add a note describing the issue", "Try a clearer, well-lit photo"],
       };
+    }
+    if (!parsed.estimatedDurationMinutes || parsed.estimatedDurationMinutes < 15) {
+      parsed.estimatedDurationMinutes = 60;
     }
     return parsed;
   });
