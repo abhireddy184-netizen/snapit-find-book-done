@@ -212,6 +212,20 @@ function ScanningOverlay({ image }: { image: string }) {
     "Estimating repair cost…",
     "Matching verified pros nearby…",
   ];
+  const [stepIndex, setStepIndex] = useState(0);
+  const [progress, setProgress] = useState(6);
+  useEffect(() => {
+    const stepTimer = setInterval(() => {
+      setStepIndex((i) => (i < steps.length - 1 ? i + 1 : i));
+    }, 1400);
+    const progressTimer = setInterval(() => {
+      setProgress((p) => (p < 94 ? p + Math.max(1, Math.round((96 - p) * 0.08)) : p));
+    }, 180);
+    return () => {
+      clearInterval(stepTimer);
+      clearInterval(progressTimer);
+    };
+  }, [steps.length]);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-md animate-fade-in">
       <div className="mx-4 w-full max-w-sm rounded-3xl border border-border/60 bg-card p-6 shadow-2xl">
@@ -222,18 +236,41 @@ function ScanningOverlay({ image }: { image: string }) {
           <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
             <ScanLine className="h-3 w-3 animate-pulse" /> AI scanning
           </div>
+          <div className="absolute bottom-3 right-3 rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-bold text-primary shadow">
+            {progress}%
+          </div>
         </div>
-        <div className="mt-5 space-y-2.5">
-          {steps.map((s, i) => (
+        <div className="mt-5">
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
             <div
-              key={s}
-              className="flex items-center gap-2.5 text-sm animate-fade-in"
-              style={{ animationDelay: `${i * 350}ms`, animationFillMode: "both" }}
-            >
-              <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-              <span className="text-foreground/80">{s}</span>
-            </div>
-          ))}
+              className="h-full rounded-full transition-[width] duration-200 ease-out"
+              style={{ width: `${progress}%`, background: "var(--gradient-primary)" }}
+            />
+          </div>
+          <div className="mt-4 space-y-2">
+            {steps.map((s, i) => {
+              const done = i < stepIndex;
+              const active = i === stepIndex;
+              return (
+                <div
+                  key={s}
+                  className="flex items-center gap-2.5 text-sm transition-opacity"
+                  style={{ opacity: done || active ? 1 : 0.4 }}
+                >
+                  {done ? (
+                    <div className="grid h-4 w-4 place-items-center rounded-full bg-primary text-white">
+                      <Check className="h-2.5 w-2.5" strokeWidth={4} />
+                    </div>
+                  ) : active ? (
+                    <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                  ) : (
+                    <div className="h-4 w-4 rounded-full border border-border" />
+                  )}
+                  <span className={done ? "text-muted-foreground line-through" : "text-foreground/90"}>{s}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
         <style>{`@keyframes scanline{0%{transform:translateY(0)}50%{transform:translateY(216px)}100%{transform:translateY(0)}}`}</style>
       </div>
