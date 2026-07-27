@@ -21,7 +21,7 @@ function TopBar() {
         <Logo />
         <nav className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
           <Link to="/snap" className="inline-flex items-center gap-1.5 text-primary hover:text-primary/80 transition-colors font-semibold">
-            <Camera className="h-4 w-4" /> Snap AI
+            <Camera className="h-4 w-4" /> Snap
           </Link>
           <Link to="/emergency" className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 transition-colors font-semibold">
             <ShieldAlert className="h-4 w-4" /> Emergency
@@ -56,7 +56,7 @@ function BottomNav() {
   const items = [
     { to: "/", label: "Home", icon: Home },
     { to: "/search", label: "Search", icon: Search },
-    { to: "/snap", label: "Snap AI", icon: Camera, highlight: true },
+    { to: "/snap", label: "Snap", icon: Camera, highlight: true },
     { to: "/dashboard", label: "Bookings", icon: CalendarDays },
     { to: "/dashboard", label: "Profile", icon: User, hash: "profile" },
   ];
