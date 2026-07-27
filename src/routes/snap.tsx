@@ -308,76 +308,128 @@ function CaptureTile({
   );
 }
 
+type MatchedProvider = Provider & { eta: number };
+
 function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; image: string; onReset: () => void }) {
   const navigate = useNavigate();
   const u = urgencyStyles[analysis.urgency] ?? urgencyStyles.medium;
   const UrgencyIcon = u.icon;
   const category = categories.find((c) => c.slug === analysis.categorySlug);
-  const matched = providers
-    .filter((p) => p.category === analysis.categorySlug)
-    .concat(providers.filter((p) => p.category !== analysis.categorySlug))
-    .slice(0, 4)
-    .map((p, i) => ({ ...p, eta: [8, 14, 22, 35][i] ?? 40 }));
+  const duration = analysis.estimatedDurationMinutes ?? 60;
+  const durationLabel =
+    duration >= 60 ? `${(duration / 60).toFixed(duration % 60 === 0 ? 0 : 1)} hr` : `${duration} min`;
   const confidencePct = Math.round((analysis.confidence ?? 0.7) * 100);
+
+  const matched: MatchedProvider[] = useMemo(() => {
+    const inCat = providers.filter((p) => p.category === analysis.categorySlug);
+    const others = providers.filter((p) => p.category !== analysis.categorySlug);
+    const merged = [...inCat, ...others];
+    // Sort in-category first by rating desc then distance asc, then top up with adjacent pros
+    const sorted = merged
+      .slice()
+      .sort((a, b) => {
+        const catA = a.category === analysis.categorySlug ? 0 : 1;
+        const catB = b.category === analysis.categorySlug ? 0 : 1;
+        if (catA !== catB) return catA - catB;
+        if (b.rating !== a.rating) return b.rating - a.rating;
+        return a.distance - b.distance;
+      })
+      .slice(0, 5);
+    return sorted.map((p, i) => ({ ...p, eta: [7, 12, 18, 26, 34][i] ?? 40 }));
+  }, [analysis.categorySlug]);
+
   const recommended = matched[0];
   const others = matched.slice(1);
-  const duration = analysis.estimatedDurationMinutes ?? 60;
-  const durationLabel = duration >= 60 ? `${(duration / 60).toFixed(duration % 60 === 0 ? 0 : 1)} hr` : `${duration} min`;
+
+  // Save to history exactly once per analysis
+  const savedRef = useRef(false);
+  useEffect(() => {
+    if (savedRef.current) return;
+    savedRef.current = true;
+    try {
+      saveHistoryEntry({ thumbnail: image, analysis });
+    } catch {
+      /* ignore */
+    }
+  }, [analysis, image]);
+
+  const [quoteMode, setQuoteMode] = useState(false);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [sent, setSent] = useState(false);
+  const [messagingId, setMessagingId] = useState<string | null>(null);
+  const [callingId, setCallingId] = useState<string | null>(null);
+
+  const toggleSelect = (id: string) => {
+    setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : s.length >= 5 ? s : [...s, id]));
+  };
+
+  const sendQuoteRequests = () => {
+    if (selected.length === 0) return;
+    setSent(true);
+    setTimeout(() => {
+      setSent(false);
+      setQuoteMode(false);
+      setSelected([]);
+    }, 2400);
+  };
 
   return (
     <div className="mt-6 space-y-5 animate-fade-in">
-      <div className="grid gap-4 md:grid-cols-[220px_1fr]">
+      <div className="grid gap-4 md:grid-cols-[240px_1fr]">
         <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
-          <img src={image} alt="Diagnosed" className="h-full max-h-[220px] w-full object-cover" />
+          <img src={image} alt="Diagnosed" className="h-full max-h-[240px] w-full object-cover" />
         </div>
         <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
           <div className="flex flex-wrap items-center gap-2">
             {category && (
-              <span className={`inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br ${category.color} px-3 py-1 text-xs font-semibold text-white`}>
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br ${category.color} px-3 py-1 text-xs font-semibold text-white`}
+              >
                 <category.icon className="h-3.5 w-3.5" /> {analysis.category}
               </span>
             )}
-            <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${u.chip}`}>
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${u.chip}`}
+            >
               <UrgencyIcon className="h-3.5 w-3.5" /> {u.label}
             </span>
+            <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground">
+              <HistoryIcon className="h-3 w-3" /> Saved to history
+            </span>
           </div>
-          <p className="mt-3 text-sm text-foreground">{analysis.problem}</p>
+          <div className="mt-3">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Detected problem</div>
+            <p className="mt-1 text-sm text-foreground">{analysis.problem}</p>
+          </div>
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs">
               <span className="font-semibold text-muted-foreground">AI confidence</span>
               <span className="font-bold text-primary">{confidencePct}%</span>
             </div>
             <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-muted">
-              <div className="h-full rounded-full" style={{ width: `${confidencePct}%`, background: "var(--gradient-primary)" }} />
+              <div
+                className="h-full rounded-full transition-[width] duration-700"
+                style={{ width: `${confidencePct}%`, background: "var(--gradient-primary)" }}
+              />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat
           icon={DollarSign}
           label="Estimated cost"
           value={`$${analysis.estimatedCostLow}–$${analysis.estimatedCostHigh}`}
           hint="Typical range in your area"
         />
-        <Stat
-          icon={Timer}
-          label="Repair duration"
-          value={durationLabel}
-          hint="Estimated on-site time"
-        />
-        <Stat
-          icon={UrgencyIcon}
-          label="Suggested urgency"
-          value={u.label}
-          hint={analysis.urgencyReason}
-        />
+        <Stat icon={Timer} label="Repair time" value={durationLabel} hint="Estimated on-site" />
+        <Stat icon={UrgencyIcon} label="Urgency" value={u.label} hint={analysis.urgencyReason} />
         <Stat
           icon={Clock}
-          label="Fastest arrival"
+          label="Fastest ETA"
           value={`~${recommended?.eta ?? 10} min`}
-          hint={`${matched.length} verified pros nearby`}
+          hint={`${matched.length} pros nearby`}
         />
       </div>
 
@@ -394,98 +446,89 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
         </div>
       )}
 
-      {recommended && (
-        <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-card p-5 shadow-lg">
-          <div className="absolute inset-x-0 top-0 h-1" style={{ background: "var(--gradient-primary)" }} />
-          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
-            <CheckCircle2 className="h-4 w-4" /> Recommended for you
-          </div>
-          <div className="mt-3 flex items-center gap-4">
-            <Avatar initials={recommended.initials} gradient={recommended.gradient} size={64} />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <div className="truncate text-base font-black">{recommended.name}</div>
-                {recommended.verified && <ShieldCheck className="h-4 w-4 text-primary" />}
-              </div>
-              <div className="truncate text-xs text-muted-foreground">{recommended.business}</div>
-              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-                <span className="inline-flex items-center gap-1 font-semibold">
-                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {recommended.rating}
-                  <span className="ml-1 font-normal text-muted-foreground">· {recommended.reviews}</span>
-                </span>
-                <span className="inline-flex items-center gap-1 text-muted-foreground">
-                  <MapPin className="h-3 w-3" /> {recommended.distance} mi
-                </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-bold text-primary">
-                  <Clock className="h-3 w-3" /> {recommended.eta} min
-                </span>
-              </div>
-            </div>
-          </div>
-          <div className="mt-4 flex gap-2">
-            <Link
-              to="/provider/$id"
-              params={{ id: recommended.id }}
-              className="rounded-full border border-border px-4 py-2.5 text-xs font-semibold hover:bg-muted"
-            >
-              View profile
-            </Link>
-            <GradientButton
-              onClick={() => navigate({ to: "/tracking/$id", params: { id: recommended.id } })}
-              className="flex-1 justify-center py-2.5 text-sm"
-            >
-              Book Now <ArrowRight className="h-4 w-4" />
-            </GradientButton>
-          </div>
-        </div>
-      )}
-
+      {/* Pros section header + quote toolbar */}
       <div>
-        <div className="mb-3 flex items-end justify-between">
-          <h2 className="text-lg font-black">Other pros nearby</h2>
-          <span className="text-xs text-muted-foreground">Sorted by ETA</span>
+        <div className="mb-3 flex items-end justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-black">Top 5 verified pros nearby</h2>
+            <p className="text-xs text-muted-foreground">Sorted by rating and distance</p>
+          </div>
+          <button
+            onClick={() => {
+              setQuoteMode((v) => !v);
+              setSelected([]);
+            }}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${
+              quoteMode ? "border-primary bg-primary/10 text-primary" : "border-border text-foreground hover:bg-muted"
+            }`}
+          >
+            {quoteMode ? (
+              <>
+                <X className="h-3.5 w-3.5" /> Cancel
+              </>
+            ) : (
+              <>
+                <Send className="h-3.5 w-3.5" /> Request quotes
+              </>
+            )}
+          </button>
         </div>
-        <div className="grid gap-3 md:grid-cols-2">
-          {others.map((p) => (
-            <div key={p.id} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
-              <div className="flex items-center gap-3">
-                <Avatar initials={p.initials} gradient={p.gradient} />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <div className="truncate text-sm font-bold">{p.name}</div>
-                    {p.verified && <ShieldCheck className="h-3.5 w-3.5 text-primary" />}
-                  </div>
-                  <div className="truncate text-xs text-muted-foreground">{p.business}</div>
-                </div>
-                <div className="text-right">
-                  <div className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
-                    <Clock className="h-3 w-3" /> {p.eta} min
-                  </div>
-                </div>
-              </div>
-              <div className="mt-3 flex items-center justify-between text-xs">
-                <span className="inline-flex items-center gap-1 font-semibold">
-                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating}
-                  <span className="ml-1 font-normal text-muted-foreground">· {p.reviews} reviews</span>
-                </span>
-                <span className="inline-flex items-center gap-1 text-muted-foreground">
-                  <MapPin className="h-3 w-3" /> {p.distance} mi
-                </span>
-              </div>
-              <div className="mt-3 flex gap-2">
-                <Link to="/provider/$id" params={{ id: p.id }} className="flex-1 rounded-full border border-border py-2 text-center text-xs font-semibold hover:bg-muted">
-                  View profile
-                </Link>
-                <button
-                  onClick={() => navigate({ to: "/tracking/$id", params: { id: p.id } })}
-                  className="flex-1 rounded-full py-2 text-center text-xs font-semibold text-white shadow-sm"
-                  style={{ background: "var(--gradient-primary)" }}
-                >
-                  Book & track
-                </button>
-              </div>
+
+        {quoteMode && (
+          <div className="mb-3 flex items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3 text-xs animate-fade-in">
+            <div className="flex items-center gap-2 font-semibold text-primary">
+              <Sparkles className="h-4 w-4" /> Select up to 5 pros to request quotes
             </div>
-          ))}
+            <div className="flex items-center gap-2">
+              <span className="rounded-full bg-primary/10 px-2 py-1 font-bold text-primary">
+                {selected.length}/5
+              </span>
+              <GradientButton
+                onClick={sendQuoteRequests}
+                disabled={selected.length === 0 || sent}
+                className="px-4 py-2 text-xs"
+              >
+                {sent ? (
+                  <>
+                    <Check className="h-3.5 w-3.5" /> Sent!
+                  </>
+                ) : (
+                  <>
+                    <Send className="h-3.5 w-3.5" /> Send ({selected.length})
+                  </>
+                )}
+              </GradientButton>
+            </div>
+          </div>
+        )}
+
+        <div className="grid gap-3">
+          {recommended && (
+            <ProCard
+              pro={recommended}
+              recommended
+              quoteMode={quoteMode}
+              selected={selected.includes(recommended.id)}
+              onToggle={() => toggleSelect(recommended.id)}
+              onBook={() => navigate({ to: "/tracking/$id", params: { id: recommended.id } })}
+              onMessage={() => setMessagingId(recommended.id)}
+              onCall={() => setCallingId(recommended.id)}
+            />
+          )}
+          <div className="grid gap-3 md:grid-cols-2">
+            {others.map((p) => (
+              <ProCard
+                key={p.id}
+                pro={p}
+                quoteMode={quoteMode}
+                selected={selected.includes(p.id)}
+                onToggle={() => toggleSelect(p.id)}
+                onBook={() => navigate({ to: "/tracking/$id", params: { id: p.id } })}
+                onMessage={() => setMessagingId(p.id)}
+                onCall={() => setCallingId(p.id)}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -493,16 +536,252 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
         <div className="text-xs text-muted-foreground">
           Diagnosis is an estimate — the final price is confirmed by your pro after inspection.
         </div>
-        <div className="flex gap-2">
-          <button onClick={onReset} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold hover:bg-muted">
+        <div className="flex flex-wrap gap-2">
+          <Link
+            to="/history"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold hover:bg-muted"
+          >
+            <HistoryIcon className="h-3.5 w-3.5" /> View history
+          </Link>
+          <button
+            onClick={onReset}
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold hover:bg-muted"
+          >
             <RotateCcw className="h-3.5 w-3.5" /> Snap another
           </button>
-          <Link to="/emergency" className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700">
+          <Link
+            to="/emergency"
+            className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-xs font-semibold text-white hover:bg-red-700"
+          >
             <ShieldAlert className="h-3.5 w-3.5" /> Emergency help
           </Link>
         </div>
       </div>
+
+      {messagingId && (
+        <MessageProSheet
+          pro={matched.find((p) => p.id === messagingId)!}
+          problem={analysis.problem}
+          onClose={() => setMessagingId(null)}
+        />
+      )}
+      {callingId && (
+        <CallProSheet
+          pro={matched.find((p) => p.id === callingId)!}
+          onClose={() => setCallingId(null)}
+        />
+      )}
     </div>
+  );
+}
+
+function ProCard({
+  pro,
+  recommended = false,
+  quoteMode,
+  selected,
+  onToggle,
+  onBook,
+  onMessage,
+  onCall,
+}: {
+  pro: MatchedProvider;
+  recommended?: boolean;
+  quoteMode: boolean;
+  selected: boolean;
+  onToggle: () => void;
+  onBook: () => void;
+  onMessage: () => void;
+  onCall: () => void;
+}) {
+  const clickable = quoteMode;
+  return (
+    <div
+      onClick={clickable ? onToggle : undefined}
+      className={`relative overflow-hidden rounded-3xl border bg-card p-4 shadow-sm transition-all ${
+        recommended ? "border-primary/30 shadow-lg md:p-5" : "border-border/60 hover:shadow-md"
+      } ${clickable ? "cursor-pointer hover:-translate-y-0.5" : ""} ${
+        selected ? "ring-2 ring-primary/60" : ""
+      }`}
+    >
+      {recommended && (
+        <div className="absolute inset-x-0 top-0 h-1" style={{ background: "var(--gradient-primary)" }} />
+      )}
+      {recommended && (
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+          <CheckCircle2 className="h-3 w-3" /> Recommended for you
+        </div>
+      )}
+      {quoteMode && (
+        <div
+          className={`absolute right-3 top-3 grid h-6 w-6 place-items-center rounded-full border-2 transition-all ${
+            selected ? "border-primary bg-primary text-white" : "border-border bg-background"
+          }`}
+        >
+          {selected && <Check className="h-3.5 w-3.5" strokeWidth={4} />}
+        </div>
+      )}
+
+      <div className="flex items-center gap-3">
+        <Avatar initials={pro.initials} gradient={pro.gradient} size={recommended ? 60 : 48} />
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1.5">
+            <div className="truncate text-sm font-black">{pro.name}</div>
+            {pro.verified && (
+              <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
+                <ShieldCheck className="h-2.5 w-2.5" /> Verified
+              </span>
+            )}
+          </div>
+          <div className="truncate text-[11px] text-muted-foreground">{pro.business}</div>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px]">
+            <span className="inline-flex items-center gap-1 font-semibold">
+              <Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {pro.rating}
+              <span className="ml-1 font-normal text-muted-foreground">· {pro.reviews}</span>
+            </span>
+            <span className="inline-flex items-center gap-1 text-muted-foreground">
+              <MapPin className="h-3 w-3" /> {pro.distance} mi
+            </span>
+            <span className="inline-flex items-center gap-1 text-muted-foreground">
+              <Award className="h-3 w-3" /> {pro.yearsExperience}y
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          <div className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
+            <Clock className="h-3 w-3" /> {pro.eta} min
+          </div>
+          <div className="text-[11px] font-bold text-foreground">
+            from <span className="text-primary">${pro.startingPrice}</span>
+          </div>
+        </div>
+      </div>
+
+      {!quoteMode && (
+        <div className="mt-4 grid grid-cols-[1fr_auto_auto] gap-2">
+          <button
+            onClick={onBook}
+            className="inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-xs font-bold text-white shadow-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            style={{ background: "var(--gradient-primary)" }}
+          >
+            Book Now <ArrowRight className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={onMessage}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted"
+            aria-label="Message pro"
+          >
+            <MessageCircle className="h-4 w-4" />
+          </button>
+          <button
+            onClick={onCall}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted"
+            aria-label="Call pro"
+          >
+            <Phone className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Sheet({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center">
+      <div
+        onClick={onClose}
+        className="absolute inset-0 animate-fade-in"
+        aria-hidden="true"
+      />
+      <div
+        role="dialog"
+        className="relative w-full max-w-md rounded-t-3xl border border-border/60 bg-background p-5 shadow-2xl animate-scale-in sm:rounded-3xl"
+      >
+        <button
+          onClick={onClose}
+          className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+          aria-label="Close"
+        >
+          <X className="h-4 w-4" />
+        </button>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function MessageProSheet({ pro, problem, onClose }: { pro: MatchedProvider; problem: string; onClose: () => void }) {
+  const [text, setText] = useState(`Hi ${pro.name.split(" ")[0]}, I just used SnapIt AI. Here's what it flagged: "${problem}". Are you available to help?`);
+  const [sent, setSent] = useState(false);
+  return (
+    <Sheet onClose={onClose}>
+      <div className="flex items-center gap-3">
+        <Avatar initials={pro.initials} gradient={pro.gradient} size={48} />
+        <div>
+          <div className="text-sm font-black">Message {pro.name.split(" ")[0]}</div>
+          <div className="text-[11px] text-muted-foreground">Typically replies in a few minutes</div>
+        </div>
+      </div>
+      {sent ? (
+        <div className="mt-6 flex flex-col items-center justify-center gap-2 py-4">
+          <div className="grid h-14 w-14 place-items-center rounded-full bg-primary/10 text-primary">
+            <Check className="h-7 w-7" strokeWidth={3} />
+          </div>
+          <div className="text-sm font-bold">Message sent</div>
+          <div className="text-xs text-muted-foreground">You'll get a notification when {pro.name.split(" ")[0]} replies.</div>
+        </div>
+      ) : (
+        <>
+          <textarea
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={5}
+            className="mt-4 w-full resize-none rounded-2xl border border-border/60 bg-card p-3 text-sm outline-none focus:border-primary"
+          />
+          <GradientButton
+            onClick={() => setSent(true)}
+            disabled={!text.trim()}
+            className="mt-3 w-full justify-center py-2.5 text-sm"
+          >
+            <Send className="h-4 w-4" /> Send message
+          </GradientButton>
+        </>
+      )}
+    </Sheet>
+  );
+}
+
+function CallProSheet({ pro, onClose }: { pro: MatchedProvider; onClose: () => void }) {
+  return (
+    <Sheet onClose={onClose}>
+      <div className="flex flex-col items-center py-3 text-center">
+        <div className="relative">
+          <Avatar initials={pro.initials} gradient={pro.gradient} size={88} />
+          <span className="absolute inset-0 -z-10 animate-ping rounded-full bg-primary/20" />
+        </div>
+        <div className="mt-4 text-lg font-black">{pro.name}</div>
+        <div className="text-xs text-muted-foreground">{pro.business}</div>
+        <div className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
+          <Phone className="h-3 w-3" /> {pro.phone}
+        </div>
+        <div className="mt-6 flex w-full gap-2">
+          <button
+            onClick={onClose}
+            className="flex-1 rounded-full border border-border py-3 text-sm font-semibold hover:bg-muted"
+          >
+            Cancel
+          </button>
+          <a
+            href={`tel:${pro.phone.replace(/[^+\d]/g, "")}`}
+            className="flex-1 inline-flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white shadow"
+            style={{ background: "var(--gradient-primary)" }}
+          >
+            <Phone className="h-4 w-4" /> Call now
+          </a>
+        </div>
+      </div>
+    </Sheet>
   );
 }
 
