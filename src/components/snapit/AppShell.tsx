@@ -1,7 +1,8 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Home, Search, CalendarDays, User, Camera, ShieldAlert, History } from "lucide-react";
 import { Logo } from "./Logo";
+import { ThemeToggle } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children, hideBottomNav = false }: { children: ReactNode; hideBottomNav?: boolean }) {
@@ -15,9 +16,23 @@ export function AppShell({ children, hideBottomNav = false }: { children: ReactN
 }
 
 function TopBar() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
   return (
-    <header className="sticky top-0 z-40 border-b border-border/50 bg-background/70 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+    <header
+      className={cn(
+        "sticky top-0 z-40 border-b transition-all duration-300 backdrop-blur-xl supports-[backdrop-filter]:bg-background/55",
+        scrolled
+          ? "border-border/60 bg-background/80 shadow-[0_4px_24px_-12px_rgba(15,23,42,0.15)] dark:shadow-[0_4px_24px_-8px_rgba(0,0,0,0.55)]"
+          : "border-transparent bg-background/60"
+      )}
+    >
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <Logo />
         <nav className="hidden items-center gap-1 text-sm font-medium text-muted-foreground md:flex">
           <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-primary hover:bg-primary/5 transition-colors">
@@ -35,6 +50,7 @@ function TopBar() {
           <Link to="/dashboard" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Dashboard</Link>
         </nav>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <Link
             to="/login"
             className="hidden rounded-full px-4 py-2 text-sm font-medium text-foreground hover:bg-muted md:inline-flex"
