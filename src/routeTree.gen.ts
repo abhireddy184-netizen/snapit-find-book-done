@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as ProviderDashboardRouteImport } from './routes/provider-dashboard'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as BookRouteImport } from './routes/book'
@@ -19,6 +20,11 @@ import { Route as ProviderIdRouteImport } from './routes/provider.$id'
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProviderDashboardRoute = ProviderDashboardRouteImport.update({
+  id: '/provider-dashboard',
+  path: '/provider-dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/provider-dashboard': typeof ProviderDashboardRoute
   '/search': typeof SearchRoute
   '/provider/$id': typeof ProviderIdRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/provider-dashboard': typeof ProviderDashboardRoute
   '/search': typeof SearchRoute
   '/provider/$id': typeof ProviderIdRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
+  '/provider-dashboard': typeof ProviderDashboardRoute
   '/search': typeof SearchRoute
   '/provider/$id': typeof ProviderIdRoute
 }
@@ -79,16 +88,25 @@ export interface FileRouteTypes {
     | '/book'
     | '/categories'
     | '/dashboard'
+    | '/provider-dashboard'
     | '/search'
     | '/provider/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/book' | '/categories' | '/dashboard' | '/search' | '/provider/$id'
+  to:
+    | '/'
+    | '/book'
+    | '/categories'
+    | '/dashboard'
+    | '/provider-dashboard'
+    | '/search'
+    | '/provider/$id'
   id:
     | '__root__'
     | '/'
     | '/book'
     | '/categories'
     | '/dashboard'
+    | '/provider-dashboard'
     | '/search'
     | '/provider/$id'
   fileRoutesById: FileRoutesById
@@ -98,6 +116,7 @@ export interface RootRouteChildren {
   BookRoute: typeof BookRoute
   CategoriesRoute: typeof CategoriesRoute
   DashboardRoute: typeof DashboardRoute
+  ProviderDashboardRoute: typeof ProviderDashboardRoute
   SearchRoute: typeof SearchRoute
   ProviderIdRoute: typeof ProviderIdRoute
 }
@@ -109,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/provider-dashboard': {
+      id: '/provider-dashboard'
+      path: '/provider-dashboard'
+      fullPath: '/provider-dashboard'
+      preLoaderRoute: typeof ProviderDashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -154,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   BookRoute: BookRoute,
   CategoriesRoute: CategoriesRoute,
   DashboardRoute: DashboardRoute,
+  ProviderDashboardRoute: ProviderDashboardRoute,
   SearchRoute: SearchRoute,
   ProviderIdRoute: ProviderIdRoute,
 }
