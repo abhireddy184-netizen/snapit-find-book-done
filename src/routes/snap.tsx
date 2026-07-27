@@ -16,6 +16,9 @@ import {
   ArrowRight,
   RotateCcw,
   Zap,
+  Timer,
+  ScanLine,
+  CheckCircle2,
 } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
@@ -117,8 +120,8 @@ function SnapPage() {
             />
             <CaptureTile
               icon={Upload}
-              label="Upload from device"
-              hint="Image or video"
+              label="Upload from Gallery"
+              hint="Choose an image"
               onClick={() => uploadRef.current?.click()}
             />
             <input
@@ -176,18 +179,14 @@ function SnapPage() {
                 <RotateCcw className="h-4 w-4" /> Retake
               </button>
               <GradientButton onClick={runAnalysis} disabled={loading} className="flex-1 justify-center">
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Analyzing with AI…
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4" /> Diagnose with AI
-                  </>
-                )}
+                <Sparkles className="h-4 w-4" /> Diagnose with AI
               </GradientButton>
             </div>
           </div>
+        )}
+
+        {loading && image && (
+          <ScanningOverlay image={image} />
         )}
 
         {analysis && image && (
@@ -195,6 +194,42 @@ function SnapPage() {
         )}
       </div>
     </AppShell>
+  );
+}
+
+function ScanningOverlay({ image }: { image: string }) {
+  const steps = [
+    "Enhancing image…",
+    "Detecting service category…",
+    "Estimating repair cost…",
+    "Matching verified pros nearby…",
+  ];
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur-md animate-fade-in">
+      <div className="mx-4 w-full max-w-sm rounded-3xl border border-border/60 bg-card p-6 shadow-2xl">
+        <div className="relative overflow-hidden rounded-2xl">
+          <img src={image} alt="Analyzing" className="h-56 w-full object-cover" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 animate-[scanline_1.8s_ease-in-out_infinite]" style={{ background: "var(--gradient-primary)", boxShadow: "0 0 24px rgba(124,58,237,0.8)" }} />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-primary/20 mix-blend-overlay" />
+          <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
+            <ScanLine className="h-3 w-3 animate-pulse" /> AI scanning
+          </div>
+        </div>
+        <div className="mt-5 space-y-2.5">
+          {steps.map((s, i) => (
+            <div
+              key={s}
+              className="flex items-center gap-2.5 text-sm animate-fade-in"
+              style={{ animationDelay: `${i * 350}ms`, animationFillMode: "both" }}
+            >
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+              <span className="text-foreground/80">{s}</span>
+            </div>
+          ))}
+        </div>
+        <style>{`@keyframes scanline{0%{transform:translateY(0)}50%{transform:translateY(216px)}100%{transform:translateY(0)}}`}</style>
+      </div>
+    </div>
   );
 }
 
@@ -239,9 +274,13 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
     .slice(0, 4)
     .map((p, i) => ({ ...p, eta: [8, 14, 22, 35][i] ?? 40 }));
   const confidencePct = Math.round((analysis.confidence ?? 0.7) * 100);
+  const recommended = matched[0];
+  const others = matched.slice(1);
+  const duration = analysis.estimatedDurationMinutes ?? 60;
+  const durationLabel = duration >= 60 ? `${(duration / 60).toFixed(duration % 60 === 0 ? 0 : 1)} hr` : `${duration} min`;
 
   return (
-    <div className="mt-6 space-y-5">
+    <div className="mt-6 space-y-5 animate-fade-in">
       <div className="grid gap-4 md:grid-cols-[220px_1fr]">
         <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
           <img src={image} alt="Diagnosed" className="h-full max-h-[220px] w-full object-cover" />
@@ -270,12 +309,18 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
         <Stat
           icon={DollarSign}
           label="Estimated cost"
           value={`$${analysis.estimatedCostLow}–$${analysis.estimatedCostHigh}`}
           hint="Typical range in your area"
+        />
+        <Stat
+          icon={Timer}
+          label="Repair duration"
+          value={durationLabel}
+          hint="Estimated on-site time"
         />
         <Stat
           icon={UrgencyIcon}
@@ -286,7 +331,7 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
         <Stat
           icon={Clock}
           label="Fastest arrival"
-          value={`~${matched[0]?.eta ?? 10} min`}
+          value={`~${recommended?.eta ?? 10} min`}
           hint={`${matched.length} verified pros nearby`}
         />
       </div>
@@ -304,13 +349,59 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
         </div>
       )}
 
+      {recommended && (
+        <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-card p-5 shadow-lg">
+          <div className="absolute inset-x-0 top-0 h-1" style={{ background: "var(--gradient-primary)" }} />
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
+            <CheckCircle2 className="h-4 w-4" /> Recommended for you
+          </div>
+          <div className="mt-3 flex items-center gap-4">
+            <Avatar initials={recommended.initials} gradient={recommended.gradient} size={64} />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <div className="truncate text-base font-black">{recommended.name}</div>
+                {recommended.verified && <ShieldCheck className="h-4 w-4 text-primary" />}
+              </div>
+              <div className="truncate text-xs text-muted-foreground">{recommended.business}</div>
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                <span className="inline-flex items-center gap-1 font-semibold">
+                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {recommended.rating}
+                  <span className="ml-1 font-normal text-muted-foreground">· {recommended.reviews}</span>
+                </span>
+                <span className="inline-flex items-center gap-1 text-muted-foreground">
+                  <MapPin className="h-3 w-3" /> {recommended.distance} mi
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 font-bold text-primary">
+                  <Clock className="h-3 w-3" /> {recommended.eta} min
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 flex gap-2">
+            <Link
+              to="/provider/$id"
+              params={{ id: recommended.id }}
+              className="rounded-full border border-border px-4 py-2.5 text-xs font-semibold hover:bg-muted"
+            >
+              View profile
+            </Link>
+            <GradientButton
+              onClick={() => navigate({ to: "/tracking/$id", params: { id: recommended.id } })}
+              className="flex-1 justify-center py-2.5 text-sm"
+            >
+              Book Now <ArrowRight className="h-4 w-4" />
+            </GradientButton>
+          </div>
+        </div>
+      )}
+
       <div>
         <div className="mb-3 flex items-end justify-between">
-          <h2 className="text-lg font-black">Nearby verified professionals</h2>
+          <h2 className="text-lg font-black">Other pros nearby</h2>
           <span className="text-xs text-muted-foreground">Sorted by ETA</span>
         </div>
         <div className="grid gap-3 md:grid-cols-2">
-          {matched.map((p) => (
+          {others.map((p) => (
             <div key={p.id} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
               <div className="flex items-center gap-3">
                 <Avatar initials={p.initials} gradient={p.gradient} />
