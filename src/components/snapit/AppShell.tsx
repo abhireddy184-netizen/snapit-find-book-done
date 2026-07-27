@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { Home, Search, CalendarDays, User, Camera, ShieldAlert } from "lucide-react";
+import { Home, Search, CalendarDays, User, Camera, ShieldAlert, History } from "lucide-react";
 import { Logo } from "./Logo";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +25,9 @@ function TopBar() {
           </Link>
           <Link to="/emergency" className="inline-flex items-center gap-1.5 text-red-600 hover:text-red-700 transition-colors font-semibold">
             <ShieldAlert className="h-4 w-4" /> Emergency
+          </Link>
+          <Link to="/history" className="hover:text-foreground transition-colors inline-flex items-center gap-1.5">
+            <History className="h-4 w-4" /> History
           </Link>
           <Link to="/categories" className="hover:text-foreground transition-colors">Services</Link>
           <Link to="/search" className="hover:text-foreground transition-colors">Find a Pro</Link>
@@ -57,7 +60,7 @@ function BottomNav() {
     { to: "/", label: "Home", icon: Home },
     { to: "/search", label: "Search", icon: Search },
     { to: "/snap", label: "Snap", icon: Camera, highlight: true },
-    { to: "/dashboard", label: "Bookings", icon: CalendarDays },
+    { to: "/history", label: "History", icon: History },
     { to: "/dashboard", label: "Profile", icon: User, hash: "profile" },
   ];
   return (

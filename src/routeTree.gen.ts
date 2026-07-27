@@ -14,6 +14,7 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProviderDashboardRouteImport } from './routes/provider-dashboard'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as HistoryRouteImport } from './routes/history'
 import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CategoriesRouteImport } from './routes/categories'
@@ -45,6 +46,11 @@ const ProviderDashboardRoute = ProviderDashboardRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HistoryRoute = HistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmergencyRoute = EmergencyRouteImport.update({
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByTo {
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
@@ -118,6 +126,7 @@ export interface FileRoutesById {
   '/categories': typeof CategoriesRoute
   '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
+  '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
   '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
@@ -134,6 +143,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/dashboard'
     | '/emergency'
+    | '/history'
     | '/login'
     | '/provider-dashboard'
     | '/register'
@@ -148,6 +158,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/dashboard'
     | '/emergency'
+    | '/history'
     | '/login'
     | '/provider-dashboard'
     | '/register'
@@ -162,6 +173,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/dashboard'
     | '/emergency'
+    | '/history'
     | '/login'
     | '/provider-dashboard'
     | '/register'
@@ -177,6 +189,7 @@ export interface RootRouteChildren {
   CategoriesRoute: typeof CategoriesRoute
   DashboardRoute: typeof DashboardRoute
   EmergencyRoute: typeof EmergencyRoute
+  HistoryRoute: typeof HistoryRoute
   LoginRoute: typeof LoginRoute
   ProviderDashboardRoute: typeof ProviderDashboardRoute
   RegisterRoute: typeof RegisterRoute
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/history': {
+      id: '/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof HistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/emergency': {
@@ -281,6 +301,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoriesRoute: CategoriesRoute,
   DashboardRoute: DashboardRoute,
   EmergencyRoute: EmergencyRoute,
+  HistoryRoute: HistoryRoute,
   LoginRoute: LoginRoute,
   ProviderDashboardRoute: ProviderDashboardRoute,
   RegisterRoute: RegisterRoute,
