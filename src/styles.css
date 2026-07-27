@@ -62,31 +62,39 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.18 0.03 265);
+  --radius: 1.25rem;
+  /* Soft White background, Charcoal text, Electric Blue primary,
+     Emerald secondary, Vibrant Orange accent */
+  --background: oklch(0.985 0.003 265);
+  --foreground: oklch(0.21 0.03 265);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.03 265);
+  --card-foreground: oklch(0.21 0.03 265);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.03 265);
-  --primary: oklch(0.58 0.19 265);
+  --popover-foreground: oklch(0.21 0.03 265);
+  --primary: oklch(0.56 0.22 264);
   --primary-foreground: oklch(1 0 0);
-  --primary-glow: oklch(0.65 0.22 295);
-  --secondary: oklch(0.97 0.015 265);
-  --secondary-foreground: oklch(0.28 0.08 265);
-  --muted: oklch(0.97 0.012 265);
-  --muted-foreground: oklch(0.52 0.03 265);
-  --accent: oklch(0.65 0.22 295);
+  --primary-glow: oklch(0.68 0.18 250);
+  --secondary: oklch(0.68 0.16 163);
+  --secondary-foreground: oklch(1 0 0);
+  --muted: oklch(0.965 0.005 265);
+  --muted-foreground: oklch(0.55 0.02 265);
+  --accent: oklch(0.72 0.19 45);
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.6 0.24 27);
   --destructive-foreground: oklch(0.99 0 0);
-  --border: oklch(0.92 0.015 265);
-  --input: oklch(0.94 0.012 265);
-  --ring: oklch(0.58 0.19 265);
-  --gradient-primary: linear-gradient(135deg, oklch(0.58 0.19 265), oklch(0.65 0.22 295));
-  --gradient-soft: linear-gradient(135deg, oklch(0.98 0.02 265), oklch(0.97 0.03 295));
-  --shadow-card: 0 4px 20px -8px oklch(0.58 0.19 265 / 0.15);
-  --shadow-elegant: 0 20px 50px -20px oklch(0.58 0.19 265 / 0.35);
+  --border: oklch(0.92 0.005 265);
+  --input: oklch(0.94 0.005 265);
+  --ring: oklch(0.56 0.22 264);
+  --gradient-primary: linear-gradient(135deg, oklch(0.56 0.22 264), oklch(0.68 0.18 250));
+  --gradient-secondary: linear-gradient(135deg, oklch(0.68 0.16 163), oklch(0.75 0.16 195));
+  --gradient-accent: linear-gradient(135deg, oklch(0.72 0.19 45), oklch(0.75 0.18 25));
+  --gradient-hero: linear-gradient(135deg, oklch(0.56 0.22 264) 0%, oklch(0.60 0.20 220) 45%, oklch(0.68 0.16 163) 100%);
+  --gradient-soft: linear-gradient(180deg, oklch(0.99 0.005 265), oklch(0.965 0.008 250));
+  --gradient-mesh: radial-gradient(at 20% 0%, oklch(0.56 0.22 264 / 0.18) 0px, transparent 50%), radial-gradient(at 90% 10%, oklch(0.72 0.19 45 / 0.14) 0px, transparent 50%), radial-gradient(at 40% 100%, oklch(0.68 0.16 163 / 0.16) 0px, transparent 50%);
+  --shadow-card: 0 1px 2px oklch(0.21 0.03 265 / 0.04), 0 8px 24px -12px oklch(0.21 0.03 265 / 0.10);
+  --shadow-elevated: 0 4px 12px -4px oklch(0.21 0.03 265 / 0.08), 0 24px 48px -20px oklch(0.21 0.03 265 / 0.18);
+  --shadow-elegant: 0 20px 50px -20px oklch(0.56 0.22 264 / 0.35);
+  --shadow-glow: 0 0 0 1px oklch(1 0 0 / 0.6) inset, 0 20px 60px -20px oklch(0.56 0.22 264 / 0.35);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -145,5 +153,45 @@
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.01em;
   }
+
+  h1, h2, h3, h4 {
+    letter-spacing: -0.03em;
+  }
+}
+
+@utility glass-card {
+  background: color-mix(in oklab, white 72%, transparent);
+  backdrop-filter: saturate(160%) blur(18px);
+  border: 1px solid color-mix(in oklab, white 60%, var(--color-border));
+  box-shadow: var(--shadow-card);
+}
+
+@utility glass-strong {
+  background: color-mix(in oklab, white 85%, transparent);
+  backdrop-filter: saturate(180%) blur(24px);
+  border: 1px solid color-mix(in oklab, white 50%, var(--color-border));
+  box-shadow: var(--shadow-elevated);
+}
+
+@utility mesh-bg {
+  background-image: var(--gradient-mesh);
+  background-color: var(--color-background);
+}
+
+@utility text-gradient-primary {
+  background-image: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility text-gradient-hero {
+  background-image: var(--gradient-hero);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
