@@ -6,14 +6,27 @@ import { Logo } from "@/components/snapit/Logo";
 import { categories, providers, testimonials } from "@/lib/snapit-data";
 import { cn } from "@/lib/utils";
 
+const SITE_URL = "https://id-preview--bca1ede1-6b69-4084-95f5-53bb43a6c24e.lovable.app";
+const OG_IMAGE = `${SITE_URL}/__l5e/assets-v1/a199e0d6-211d-4b74-ab79-c58ffbd2870e/og-snapit.jpg`;
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SnapIt — Trusted local services on demand" },
-      { name: "description", content: "Snap it. Book it. Done. Find, compare and book vetted local pros for home and personal services." },
-      { property: "og:title", content: "SnapIt — Trusted local services on demand" },
-      { property: "og:description", content: "Snap it. Book it. Done. Book vetted local pros in minutes." },
+      { title: "SnapIt — AI-Powered Local Services Marketplace" },
+      { name: "description", content: "One photo. One tap. Problem solved. Use AI to instantly identify home or personal service needs, compare trusted local professionals, and book in minutes." },
+      { property: "og:title", content: "SnapIt — AI-Powered Local Services Marketplace" },
+      { property: "og:description", content: "Use AI to identify problems instantly, compare trusted local professionals, and book services in minutes." },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: SITE_URL + "/" },
+      { property: "og:image", content: OG_IMAGE },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "SnapIt — AI-Powered Local Services Marketplace" },
+      { name: "twitter:description", content: "One photo. One tap. Problem solved." },
+      { name: "twitter:image", content: OG_IMAGE },
     ],
+    links: [{ rel: "canonical", href: SITE_URL + "/" }],
   }),
   component: Landing,
 });
