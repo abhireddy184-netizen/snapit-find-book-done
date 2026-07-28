@@ -86,6 +86,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@snapit" },
+      { property: "og:title", content: "SnapIt — AI-Powered Local Services Marketplace" },
+      { name: "twitter:title", content: "SnapIt — AI-Powered Local Services Marketplace" },
+      { property: "og:description", content: "One photo. One tap. Problem solved. Use AI to instantly identify home or personal service needs, compare trusted local professionals, and book in minutes." },
+      { name: "twitter:description", content: "One photo. One tap. Problem solved. Use AI to instantly identify home or personal service needs, compare trusted local professionals, and book in minutes." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f81df07e-7fdd-4c23-b0a6-e8e80cf72b13/id-preview-7390e082--bca1ede1-6b69-4084-95f5-53bb43a6c24e.lovable.app-1785197160606.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f81df07e-7fdd-4c23-b0a6-e8e80cf72b13/id-preview-7390e082--bca1ede1-6b69-4084-95f5-53bb43a6c24e.lovable.app-1785197160606.png" },
     ],
     links: [
       {
