@@ -78,14 +78,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SnapIt — Trusted local services on demand" },
-      { name: "description", content: "Snap it. Book it. Done. Find, compare and book trusted local pros for plumbing, cleaning, handyman, beauty and more." },
+      { title: "SnapIt — AI-Powered Local Services Marketplace" },
+      { name: "description", content: "One photo. One tap. Problem solved. Use AI to instantly identify home or personal service needs, compare trusted local professionals, and book in minutes." },
+      { name: "keywords", content: "AI local services, AI home services, plumber near me, electrician near me, handyman, HVAC, cleaning services, lawn care, appliance repair, beauty services, home maintenance, AI marketplace, on-demand services, SnapIt" },
       { name: "author", content: "SnapIt" },
-      { property: "og:title", content: "SnapIt — Trusted local services on demand" },
-      { property: "og:description", content: "Snap it. Book it. Done. Book vetted local pros in minutes." },
+      { property: "og:site_name", content: "SnapIt" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:site", content: "@snapit" },
     ],
     links: [
       {
