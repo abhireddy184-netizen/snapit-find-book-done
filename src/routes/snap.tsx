@@ -766,7 +766,7 @@ function ProCard({
           <div className="flex items-center gap-1.5">
             <div className="truncate text-sm font-black">{pro.name}</div>
             {pro.verified && (
-              <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
+              <span className="inline-flex items-center gap-0.5 rounded-full bg-mint/25 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-mint-ink">
                 <ShieldCheck className="h-2.5 w-2.5" /> Verified
               </span>
             )}
