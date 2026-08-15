@@ -203,7 +203,7 @@ const PROS: Pro[] = [
 const WALK_MS = 11000;
 const PAUSE_MS = 700;
 
-export function ProsOnTheMove() {
+export function ProsOnTheMove({ slim = false }: { slim?: boolean } = {}) {
   const [index, setIndex] = useState(0);
   const [cycle, setCycle] = useState(0);
 
@@ -220,9 +220,9 @@ export function ProsOnTheMove() {
   const Figure = pro.Figure;
 
   return (
-    <section className="mt-6" aria-label="GPB pros on the move">
+    <section className={slim ? "mt-4" : "mt-6"} aria-label="GPB pros on the move">
       <div
-        className="relative overflow-hidden rounded-[22px] border border-border/50 px-4 py-3 sm:rounded-[24px] md:px-6 lg:px-8 lg:py-4"
+        className="relative overflow-hidden rounded-[22px] border border-border/50 px-4 py-2.5 sm:rounded-[24px] md:px-6 lg:px-8"
         style={{ backgroundColor: "color-mix(in oklab, var(--card) 86%, var(--background))" }}
       >
         {/* ambient wash */}
@@ -244,15 +244,17 @@ export function ProsOnTheMove() {
         </div>
 
         {/* stage */}
-        <div className="relative mt-1 h-[100px] sm:h-[112px] md:h-[128px] lg:h-[152px]">
+        <div className={slim ? "relative mt-1 h-[84px] sm:h-[96px] md:h-[104px] lg:h-[120px]" : "relative mt-1 h-[100px] sm:h-[112px] md:h-[128px] lg:h-[152px]"}>
           <div
             key={`${pro.id}-${cycle}`}
-            className="walk-across absolute bottom-3 left-0 flex items-end gap-2"
+            className="walk-across pointer-events-none absolute bottom-3 left-0 flex items-end gap-2"
             style={{ ["--walk-duration" as any]: `${WALK_MS}ms` }}
           >
             <svg
               viewBox="0 0 100 104"
-              className="h-[70px] w-[68px] sm:h-[80px] sm:w-[78px] md:h-[92px] md:w-[88px] lg:h-[112px] lg:w-[106px]"
+              className={slim
+                ? "h-[62px] w-[60px] sm:h-[72px] sm:w-[70px] md:h-[80px] md:w-[78px] lg:h-[94px] lg:w-[90px]"
+                : "h-[70px] w-[68px] sm:h-[80px] sm:w-[78px] md:h-[92px] md:w-[88px] lg:h-[112px] lg:w-[106px]"}
               role="img"
               aria-label={`${pro.label} walking`}
             >
