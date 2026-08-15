@@ -31,7 +31,7 @@ import {
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
 import { providers, type Provider } from "@/lib/snapit-data";
-import { getCategoryBySlug, providerPoolFor, formatPrice } from "@/lib/catalog";
+import { getCategoryBySlug, providerPoolFor } from "@/lib/catalog";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
 import { useAuth } from "@/lib/auth";
 import { createJobFromAnalysis } from "@/lib/jobs";
