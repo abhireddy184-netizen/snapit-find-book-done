@@ -182,7 +182,7 @@ function MapPreview({ progress, providerInitials, gradient }: { progress: number
       </div>
       {/* Origin */}
       <div className="absolute bottom-4 left-4 flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-[11px] font-bold text-foreground shadow-md">
-        <span className="h-2 w-2 rounded-full bg-emerald-500" /> Pro origin
+        <span className="h-2 w-2 rounded-full bg-mint" /> Pro origin
       </div>
       {/* Moving avatar */}
       <div

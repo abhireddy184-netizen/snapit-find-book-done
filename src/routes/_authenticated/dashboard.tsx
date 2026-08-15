@@ -220,8 +220,8 @@ function Bookings({ userId }: { userId: string | undefined }) {
 
 const statusStyle: Record<string, string> = {
   pending: "bg-amber-100 text-amber-700",
-  confirmed: "bg-emerald-100 text-emerald-700",
-  in_progress: "bg-blue-100 text-blue-700",
+  confirmed: "bg-mint/25 text-mint-ink",
+  in_progress: "bg-sky/25 text-sky-ink",
   completed: "bg-muted text-muted-foreground",
   cancelled: "bg-muted text-muted-foreground",
 };
@@ -232,7 +232,7 @@ function BookingCard({ booking }: { booking: Booking }) {
   return (
     <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
-        <Avatar initials={initials} gradient="from-blue-500 to-purple-600" />
+        <Avatar initials={initials} gradient="from-[#FF3D8D] to-[#FF7A45]" />
         <div className="min-w-0">
           <div className="truncate text-sm font-bold">{booking.service}</div>
           <div className="truncate text-xs text-muted-foreground">
@@ -311,7 +311,7 @@ function Profile() {
     <div className="grid gap-6 md:grid-cols-2">
       <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
         <div className="flex items-center gap-4">
-          <Avatar initials={initials} gradient="from-blue-500 to-purple-600" size={64} />
+          <Avatar initials={initials} gradient="from-[#FF3D8D] to-[#FF7A45]" size={64} />
           <div className="min-w-0">
             <div className="truncate text-lg font-bold">{profile?.full_name || "Your account"}</div>
             <div className="truncate text-xs text-muted-foreground">{user?.email}</div>

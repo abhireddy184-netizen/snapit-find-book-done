@@ -140,7 +140,7 @@ export function AuthForm({
               </div>
             )}
             {notice && (
-              <div className="flex items-start gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-xs font-medium text-emerald-600">
+              <div className="flex items-start gap-2 rounded-xl border border-mint/40 bg-mint/20 px-3 py-2.5 text-xs font-medium text-mint-ink">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> <span>{notice}</span>
               </div>
             )}

@@ -168,7 +168,7 @@ function BookPage() {
     );
   }
 
-  const photoGrads = ["from-blue-500 to-purple-600", "from-indigo-500 to-violet-600", "from-purple-500 to-pink-500"];
+  const photoGrads = ["from-[#FF3D8D] to-[#FF7A45]", "from-[#FFD83D] to-[#FF9E2C]", "from-[#B58CFF] to-[#FF3D8D]"];
 
   return (
     <AppShell hideBottomNav>

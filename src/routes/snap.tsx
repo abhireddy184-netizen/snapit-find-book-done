@@ -58,7 +58,7 @@ const urgencyStyles: Record<string, { chip: string; label: string; icon: typeof 
   emergency: { chip: "bg-red-100 text-red-700 border-red-200", label: "Emergency", icon: ShieldAlert },
   high: { chip: "bg-orange-100 text-orange-700 border-orange-200", label: "High priority", icon: Zap },
   medium: { chip: "bg-amber-100 text-amber-700 border-amber-200", label: "This week", icon: Clock },
-  low: { chip: "bg-emerald-100 text-emerald-700 border-emerald-200", label: "Whenever", icon: Clock },
+  low: { chip: "bg-mint/25 text-mint-ink border-mint/40", label: "Whenever", icon: Clock },
 };
 
 function SnapPage() {
@@ -266,7 +266,7 @@ function ScanningOverlay({ image }: { image: string }) {
       <div className="relative mx-4 w-full max-w-md rounded-[28px] border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-2xl animate-scale-in">
         <div className="relative overflow-hidden rounded-2xl border border-white/20">
           <img src={image} alt="Analyzing" className="h-64 w-full object-cover" />
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 animate-[scanline_1.8s_ease-in-out_infinite]" style={{ background: "var(--gradient-primary)", boxShadow: "0 0 32px rgba(168,85,247,0.9)" }} />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 animate-[scanline_1.8s_ease-in-out_infinite]" style={{ background: "var(--gradient-primary)", boxShadow: "0 0 32px color-mix(in oklab, var(--primary) 85%, transparent)" }} />
           <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-primary/30 mix-blend-overlay" />
           {/* Corner brackets */}
           <div className="absolute left-2 top-2 h-5 w-5 border-l-2 border-t-2 border-white/70 rounded-tl-md" />
