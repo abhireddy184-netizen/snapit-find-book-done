@@ -29,12 +29,6 @@ const tabs = [
 function ProviderDashboard() {
   const [tab, setTab] = useState("requests");
   const { user, profile } = useAuth();
-  const { data: providerProfile } = useQuery({
-    queryKey: ["provider-profile", user?.id],
-    queryFn: () => fetchMyProviderProfile(user as never as string extends never ? never : string),
-    enabled: false,
-  });
-
   return (
     <AppShell>
       <div className="pt-4">
@@ -76,7 +70,6 @@ function ProviderDashboard() {
         {tab === "schedule" && <Schedule userId={user?.id} />}
         {tab === "profile" && <BusinessProfile />}
       </div>
-      {providerProfile ? null : null}
     </AppShell>
   );
 }
