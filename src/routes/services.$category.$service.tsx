@@ -4,6 +4,7 @@ import { ArrowRight, Camera, CheckCircle2, ShieldCheck, Clock, Info } from "luci
 import { AppShell, GradientButton } from "@/components/snapit/AppShell";
 import { getService, serviceEligibility, formatPrice, providerPoolFor } from "@/lib/catalog";
 import { recallLocation } from "@/lib/search-intent";
+import { serviceScene } from "@/lib/scenes";
 import { providers } from "@/lib/snapit-data";
 
 export const Route = createFileRoute("/services/$category/$service")({
