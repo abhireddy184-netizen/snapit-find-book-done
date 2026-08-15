@@ -93,7 +93,7 @@ export function AuthForm({
     <div className="min-h-screen bg-background">
       <div className="mx-auto grid min-h-screen max-w-6xl md:grid-cols-2">
         <aside className="relative hidden overflow-hidden p-10 text-white md:block" style={{ background: "var(--gradient-primary)" }}>
-          <Logo />
+          <Logo onColor />
           <div className="mt-24">
             <h2 className="text-4xl font-black leading-tight">Snap it.<br />Book it.<br />Done.</h2>
             <p className="mt-4 max-w-sm text-white/90">Built to connect customers with trusted local pros — AI-powered service matching from a single photo.</p>
