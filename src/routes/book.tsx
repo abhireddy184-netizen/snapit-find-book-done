@@ -47,9 +47,9 @@ export const Route = createFileRoute("/book")({
   }),
   head: () => ({
     meta: [
-      { title: "Book a service — SnapIt" },
+      { title: "Book a service — GPB" },
       { name: "description", content: "Book a trusted local pro in a few taps." },
-      { property: "og:title", content: "Book a service — SnapIt" },
+      { property: "og:title", content: "Book a service — GPB" },
       { property: "og:description", content: "Book a trusted local pro in a few taps." },
     ],
   }),

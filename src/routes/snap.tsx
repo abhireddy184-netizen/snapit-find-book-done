@@ -49,9 +49,9 @@ const ANALYSIS_TIMEOUT_MS = 40_000;
 export const Route = createFileRoute("/snap")({
   head: () => ({
     meta: [
-      { title: "Snap a problem — AI diagnosis in seconds | SnapIt" },
-      { name: "description", content: "Snap a photo or video of any problem. SnapIt's AI explains what it likely needs, builds a standardized job scope and helps you compare quotes from service pros." },
-      { property: "og:title", content: "Snap a Problem — AI diagnosis | SnapIt" },
+      { title: "Snap a problem — AI diagnosis in seconds | GPB" },
+      { name: "description", content: "Snap a photo or video of any problem. GPB's AI explains what it likely needs, builds a standardized job scope and helps you compare quotes from service pros." },
+      { property: "og:title", content: "Snap a Problem — AI diagnosis | GPB" },
       { property: "og:description", content: "Point your camera. Get an instant diagnosis, estimate and matched pros." },
     ],
   }),
@@ -398,7 +398,7 @@ function ScanningOverlay({
         <div className="mt-5">
           <div className="text-center">
             <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white/80">
-              <Sparkles className="h-3.5 w-3.5" /> SnapIt AI
+              <Sparkles className="h-3.5 w-3.5" /> GPB AI
             </div>
             <div className="mt-1 text-lg font-black text-white">
               {phase === "preparing" ? "Preparing your photo" : "Diagnosing your problem"}
@@ -978,7 +978,7 @@ function Sheet({ children, onClose }: { children: React.ReactNode; onClose: () =
 }
 
 function MessageProSheet({ pro, problem, onClose }: { pro: MatchedProvider; problem: string; onClose: () => void }) {
-  const [text, setText] = useState(`Hi ${pro.name.split(" ")[0]}, I just used SnapIt AI. Here's what it flagged: "${problem}". Are you available to help?`);
+  const [text, setText] = useState(`Hi ${pro.name.split(" ")[0]}, I just used GPB AI. Here's what it flagged: "${problem}". Are you available to help?`);
   const [sent, setSent] = useState(false);
   return (
     <Sheet onClose={onClose}>

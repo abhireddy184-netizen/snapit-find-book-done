@@ -6,9 +6,9 @@ import { providers } from "@/lib/snapit-data";
 export const Route = createFileRoute("/emergency")({
   head: () => ({
     meta: [
-      { title: "24/7 Emergency Services — SnapIt" },
-      { name: "description", content: "Burst pipe, no power, no heat or lockout? SnapIt dispatches vetted emergency pros to your door in minutes." },
-      { property: "og:title", content: "24/7 Emergency Services — SnapIt" },
+      { title: "24/7 Emergency Services — GPB" },
+      { name: "description", content: "Burst pipe, no power, no heat or lockout? GPB dispatches vetted emergency pros to your door in minutes." },
+      { property: "og:title", content: "24/7 Emergency Services — GPB" },
       { property: "og:description", content: "Fast, verified emergency pros dispatched in minutes." },
     ],
   }),
@@ -111,7 +111,7 @@ function EmergencyPage() {
       </section>
 
       <div className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800">
-        <strong>Life-threatening emergency?</strong> Call 911 immediately. SnapIt dispatches trade professionals, not first responders.
+        <strong>Life-threatening emergency?</strong> Call 911 immediately. GPB dispatches trade professionals, not first responders.
       </div>
     </AppShell>
   );

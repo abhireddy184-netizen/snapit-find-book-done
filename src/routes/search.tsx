@@ -7,9 +7,9 @@ import { providers, categories } from "@/lib/snapit-data";
 export const Route = createFileRoute("/search")({
   head: () => ({
     meta: [
-      { title: "Find a Pro — SnapIt" },
+      { title: "Find a Pro — GPB" },
       { name: "description", content: "Search vetted local professionals by category, rating, price and distance." },
-      { property: "og:title", content: "Find a Pro — SnapIt" },
+      { property: "og:title", content: "Find a Pro — GPB" },
       { property: "og:description", content: "Search vetted local professionals near you." },
     ],
   }),

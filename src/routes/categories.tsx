@@ -7,10 +7,10 @@ import { Footer } from "./index";
 export const Route = createFileRoute("/categories")({
   head: () => ({
     meta: [
-      { title: "Browse services — SnapIt" },
-      { name: "description", content: "Browse every service category on SnapIt, from plumbing to beauty and spa." },
-      { property: "og:title", content: "Browse services — SnapIt" },
-      { property: "og:description", content: "Every SnapIt service in one place." },
+      { title: "Browse services — GPB" },
+      { name: "description", content: "Browse every service category on GPB, from plumbing to beauty and spa." },
+      { property: "og:title", content: "Browse services — GPB" },
+      { property: "og:description", content: "Every GPB service in one place." },
     ],
   }),
   component: CategoriesPage,

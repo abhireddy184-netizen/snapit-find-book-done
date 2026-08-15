@@ -7,10 +7,10 @@ export const Route = createFileRoute("/register")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign up — SnapIt" },
-      { name: "description", content: "Create your SnapIt account as a customer or service provider." },
-      { property: "og:title", content: "Sign up — SnapIt" },
-      { property: "og:description", content: "Create a SnapIt account in seconds." },
+      { title: "Sign up — GPB" },
+      { name: "description", content: "Create your GPB account as a customer or service provider." },
+      { property: "og:title", content: "Sign up — GPB" },
+      { property: "og:description", content: "Create a GPB account in seconds." },
     ],
   }),
   component: RegisterPage,

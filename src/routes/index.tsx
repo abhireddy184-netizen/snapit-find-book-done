@@ -12,9 +12,9 @@ const OG_IMAGE = `${SITE_URL}/__l5e/assets-v1/a199e0d6-211d-4b74-ab79-c58ffbd287
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SnapIt — Show the problem. Get it fixed with proof." },
-      { name: "description", content: "Snap a photo of any problem. SnapIt's AI explains what it likely needs, turns it into one standardized job scope, gets comparable quotes, books a pro and keeps a permanent record of the work." },
-      { property: "og:title", content: "SnapIt — Show the problem. Get it fixed with proof." },
+      { title: "GPB — Show the problem. Get it fixed with proof." },
+      { name: "description", content: "Snap a photo of any problem. GPB's AI explains what it likely needs, turns it into one standardized job scope, gets comparable quotes, books a pro and keeps a permanent record of the work." },
+      { property: "og:title", content: "GPB — Show the problem. Get it fixed with proof." },
       { property: "og:description", content: "AI diagnosis, one standardized scope, comparable quotes, booking and a permanent proof record for every job." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
@@ -22,7 +22,7 @@ export const Route = createFileRoute("/")({
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "SnapIt — Show the problem. Get it fixed with proof." },
+      { name: "twitter:title", content: "GPB — Show the problem. Get it fixed with proof." },
       { name: "twitter:description", content: "AI diagnosis, one standardized scope, comparable quotes, booking and a permanent proof record for every job." },
       { name: "twitter:image", content: OG_IMAGE },
     ],
@@ -95,7 +95,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* The SnapIt flow */}
+      {/* The GPB flow */}
       <section className="mt-10">
         <div className="overflow-x-auto rounded-[28px] border border-border/60 bg-card p-5 shadow-sm">
           <div className="flex min-w-max items-center gap-2">
@@ -146,7 +146,7 @@ function Landing() {
 
       {/* How it works */}
       <section className="mt-16">
-        <SectionHeader title="How SnapIt works" />
+        <SectionHeader title="How GPB works" />
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {[
             { n: "01", t: "Snap & understand", d: "Show the problem. Our AI describes what it likely is, how urgent it is and what it typically costs." },
@@ -165,15 +165,15 @@ function Landing() {
       {/* Featured pros */}
       <section className="mt-16">
         <SectionHeader title="Sample professionals" cta={{ label: "Browse all", to: "/search" }} />
-        <p className="mt-2 text-xs text-muted-foreground">Example listings shown while SnapIt onboards its first local pros.</p>
+        <p className="mt-2 text-xs text-muted-foreground">Example listings shown while GPB onboards its first local pros.</p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {providers.slice(0, 3).map((p) => <ProviderCard key={p.id} p={p} />)}
         </div>
       </section>
 
-      {/* Why SnapIt */}
+      {/* Why GPB */}
       <section className="mt-16">
-        <SectionHeader title="What SnapIt is built for" />
+        <SectionHeader title="What GPB is built for" />
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {[
             { title: "AI that explains the problem", text: "Snap a photo and get a plain-language diagnosis with a likely category, urgency and typical cost range." },
@@ -199,7 +199,7 @@ function Landing() {
         <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-center">
           <div>
             <div className="mb-3 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur">For pros</div>
-            <h2 className="text-3xl font-black md:text-4xl">Grow your business with SnapIt</h2>
+            <h2 className="text-3xl font-black md:text-4xl">Grow your business with GPB</h2>
             <p className="mt-3 max-w-xl text-white/90">Receive clear, standardized job briefs instead of vague enquiries — so you can quote accurately and win the right work.</p>
             <div className="mt-6">
               <Link
@@ -435,8 +435,8 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
       </div>
       <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-border/60 pt-8 text-xs md:flex-row md:items-center">
         <div className="flex flex-col gap-1">
-          <span className="text-base font-black tracking-tight text-foreground">SnapIt</span>
-          <span>© {new Date().getFullYear()} SnapIt Technologies, Inc. All rights reserved.</span>
+          <span className="text-base font-black tracking-tight text-foreground">GPB</span>
+          <span>© {new Date().getFullYear()} GPB Technologies, Inc. All rights reserved.</span>
         </div>
         <div className="flex flex-wrap gap-5"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a><a href="#">Accessibility</a><a href="#">Sitemap</a></div>
       </div>

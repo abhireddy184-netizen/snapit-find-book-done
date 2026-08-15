@@ -13,12 +13,12 @@ export const Route = createFileRoute("/provider/$id")({
   head: ({ loaderData }) => ({
     meta: loaderData
       ? [
-          { title: `${loaderData.provider.name} — SnapIt` },
+          { title: `${loaderData.provider.name} — GPB` },
           { name: "description", content: loaderData.provider.description },
-          { property: "og:title", content: `${loaderData.provider.name} — SnapIt` },
+          { property: "og:title", content: `${loaderData.provider.name} — GPB` },
           { property: "og:description", content: loaderData.provider.description },
         ]
-      : [{ title: "Provider — SnapIt" }, { name: "robots", content: "noindex" }],
+      : [{ title: "Provider — GPB" }, { name: "robots", content: "noindex" }],
   }),
   component: ProviderPage,
 });
