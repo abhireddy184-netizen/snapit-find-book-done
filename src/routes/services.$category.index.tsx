@@ -113,16 +113,16 @@ function ServicePicker({ category }: { category: MasterCategory }) {
         )}
       </div>
 
-      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-5 grid gap-2.5 sm:grid-cols-2 sm:gap-3 lg:grid-cols-3">
         {services.map((sv) => (
           <Link
             key={sv.slug}
             to="/services/$category/$service"
             params={{ category: category.slug, service: sv.slug }}
-            className="card-lift group flex h-full flex-col overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm hover:-translate-y-1 hover:border-secondary/40 hover:shadow-xl"
+            className="card-lift group flex h-full items-center gap-3 overflow-hidden rounded-2xl border border-border/60 bg-card p-2.5 shadow-sm hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-md sm:flex-col sm:items-stretch sm:gap-0 sm:rounded-3xl sm:p-0"
           >
             {serviceScene(category.slug, sv.slug) && (
-              <div className="relative aspect-[3/2] w-full overflow-hidden bg-muted">
+              <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-xl bg-muted sm:h-auto sm:w-full sm:rounded-none sm:aspect-[16/9]">
                 <img
                   src={serviceScene(category.slug, sv.slug)}
                   alt={`${sv.name} — ${category.name}`}
@@ -134,17 +134,17 @@ function ServicePicker({ category }: { category: MasterCategory }) {
                 />
               </div>
             )}
-            <div className="flex flex-1 flex-col p-5">
+            <div className="flex min-w-0 flex-1 flex-col sm:p-4">
             <div className="flex items-start justify-between gap-2">
-              <h3 className="text-base font-black">{sv.name}</h3>
+              <h3 className="text-sm font-black sm:text-base">{sv.name}</h3>
               {sv.featured && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-secondary/15 px-2 py-0.5 text-[10px] font-bold text-secondary">
                   <Sparkles className="h-3 w-3" /> Popular
                 </span>
               )}
             </div>
-            <p className="mt-1 flex-1 text-sm text-muted-foreground">{sv.blurb}</p>
-            <div className="mt-4 flex items-center justify-between text-xs">
+            <p className="mt-0.5 hidden flex-1 text-sm text-muted-foreground sm:line-clamp-2 sm:block">{sv.blurb}</p>
+            <div className="mt-1 flex items-center justify-between text-xs sm:mt-3">
               <span className="font-bold text-primary">{formatPrice(sv.priceLow, sv.priceHigh)}{sv.unit ? ` ${sv.unit}` : ""}</span>
               <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
             </div>
