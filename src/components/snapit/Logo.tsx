@@ -9,19 +9,20 @@ export function Wordmark({
   gradient = true,
   className = "",
 }: {
-  size?: number;
+  size?: number | string;
   gradient?: boolean;
   className?: string;
 }) {
+  const g = gradient ? "text-gradient-hero" : "";
   return (
     <span
       aria-hidden="true"
-      className={`inline-flex items-baseline font-black leading-none tracking-[-0.045em] ${gradient ? "text-gradient-hero" : ""} ${className}`}
-      style={{ fontSize: size }}
+      className={`inline-block font-black leading-none tracking-[-0.045em] ${className}`}
+      style={{ fontSize: size, paddingBottom: "0.14em" }}
     >
-      <span>G</span>
-      <span style={{ display: "inline-block", transform: `translateY(${Math.round(size * 0.12)}px)` }}>P</span>
-      <span>B</span>
+      <span className={g}>G</span>
+      <span className={`relative inline-block ${g}`} style={{ top: "0.12em" }}>P</span>
+      <span className={g}>B</span>
     </span>
   );
 }
