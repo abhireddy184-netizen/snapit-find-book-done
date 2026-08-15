@@ -4,6 +4,7 @@ import { ArrowRight, Camera, ShieldCheck, Sparkles } from "lucide-react";
 import { Search as SearchIcon } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { getCategoryBySlug, serviceEligibility, formatPrice, type SubService, type MasterCategory } from "@/lib/catalog";
+import { serviceScene } from "@/lib/scenes";
 
 export const Route = createFileRoute("/services/$category/")({
   loader: ({ params }) => {
@@ -118,8 +119,22 @@ function ServicePicker({ category }: { category: MasterCategory }) {
             key={sv.slug}
             to="/services/$category/$service"
             params={{ category: category.slug, service: sv.slug }}
-            className="card-lift group flex h-full flex-col rounded-3xl border border-border/60 bg-card p-5 shadow-sm hover:-translate-y-1 hover:border-secondary/40 hover:shadow-xl"
+            className="card-lift group flex h-full flex-col overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm hover:-translate-y-1 hover:border-secondary/40 hover:shadow-xl"
           >
+            {serviceScene(category.slug, sv.slug) && (
+              <div className="relative aspect-[3/2] w-full overflow-hidden bg-muted">
+                <img
+                  src={serviceScene(category.slug, sv.slug)}
+                  alt={`${sv.name} — ${category.name}`}
+                  loading="lazy"
+                  decoding="async"
+                  width={768}
+                  height={512}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+              </div>
+            )}
+            <div className="flex flex-1 flex-col p-5">
             <div className="flex items-start justify-between gap-2">
               <h3 className="text-base font-black">{sv.name}</h3>
               {sv.featured && (
@@ -132,6 +147,7 @@ function ServicePicker({ category }: { category: MasterCategory }) {
             <div className="mt-4 flex items-center justify-between text-xs">
               <span className="font-bold text-primary">{formatPrice(sv.priceLow, sv.priceHigh)}{sv.unit ? ` ${sv.unit}` : ""}</span>
               <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
+            </div>
             </div>
           </Link>
         ))}
