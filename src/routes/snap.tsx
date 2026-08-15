@@ -355,6 +355,52 @@ function CaptureTile({
 
 type MatchedProvider = Provider & { eta: number };
 
+function JobScopeCta({ analysis, image }: { analysis: SnapAnalysis; image: string }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const go = async () => {
+    if (!user) {
+      await navigate({ to: "/login", search: { redirect: "/snap" } });
+      return;
+    }
+    setBusy(true);
+    setErr(null);
+    try {
+      const job = await createJobFromAnalysis({ customerId: user.id, analysis, imageDataUrl: image });
+      await navigate({ to: "/job/$id", params: { id: job.id } });
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "We couldn't create the job scope. Please try again.");
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/5 to-card p-5 shadow-sm">
+      <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+        {["Snap", "Understand", "Scope", "Compare", "Book", "Verify", "Proof"].map((s, i) => (
+          <span key={s} className="inline-flex items-center gap-2">
+            <span className={i <= 1 ? "text-primary" : ""}>{s}</span>
+            {i < 6 && <span className="text-border">→</span>}
+          </span>
+        ))}
+      </div>
+      <h3 className="mt-3 text-lg font-black">Turn this into a standardized job scope</h3>
+      <p className="mt-1 text-sm text-muted-foreground">
+        We package the diagnosis into one clear scope — problem, work required, urgency, time and expected price — so every pro
+        quotes on exactly the same thing. You can edit it before requesting quotes.
+      </p>
+      <GradientButton onClick={go} disabled={busy} className="mt-4 w-full justify-center py-4 text-base">
+        {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ClipboardList className="h-5 w-5" />}
+        {user ? "Create job scope & compare quotes" : "Sign in to create your job scope"}
+      </GradientButton>
+      {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
+    </div>
+  );
+}
+
 function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; image: string; onReset: () => void }) {
   const navigate = useNavigate();
   const u = urgencyStyles[analysis.urgency] ?? urgencyStyles.medium;
