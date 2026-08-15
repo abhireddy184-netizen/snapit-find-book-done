@@ -138,39 +138,28 @@ function Landing() {
 
       {/* Featured pros */}
       <section className="mt-16">
-        <SectionHeader title="Featured professionals" cta={{ label: "Browse all", to: "/search" }} />
+        <SectionHeader title="Sample professionals" cta={{ label: "Browse all", to: "/search" }} />
+        <p className="mt-2 text-xs text-muted-foreground">Example listings shown while SnapIt onboards its first local pros.</p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {providers.slice(0, 3).map((p) => <ProviderCard key={p.id} p={p} />)}
         </div>
       </section>
 
-      {/* Reviews */}
+      {/* Why SnapIt */}
       <section className="mt-16">
         <SectionHeader title="What SnapIt is built for" />
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {testimonials.map((t) => (
-            <div key={t.name} className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-              <div className="flex items-center gap-3">
-                <div
-                  className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-white font-bold shadow-md ring-2 ring-white dark:ring-card"
-                  style={{ background: "var(--gradient-primary)" }}
-                >
-                  {t.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <div className="truncate text-sm font-bold">{t.name}</div>
-                    <BadgeCheck className="h-4 w-4 shrink-0 text-primary" />
-                  </div>
-                  <div className="truncate text-xs text-muted-foreground">Verified customer · {t.role}</div>
-                </div>
+          {[
+            { title: "AI-powered service matching", text: "Snap a photo and our AI identifies the likely problem, category and cost range before you book." },
+            { title: "Clear, upfront estimates", text: "See an estimated price and duration up front, so there are no surprises when a pro arrives." },
+            { title: "Built for trusted local pros", text: "Providers create real business profiles. Verification badges only appear once a pro is reviewed." },
+          ].map((c) => (
+            <div key={c.title} className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+              <div className="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-md" style={{ background: "var(--gradient-primary)" }}>
+                <BadgeCheck className="h-5 w-5" />
               </div>
-              <div className="mt-3 flex gap-0.5">
-                {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-foreground">"{t.text}"</p>
+              <h3 className="mt-4 text-base font-black">{c.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.text}</p>
             </div>
           ))}
         </div>
