@@ -597,7 +597,7 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
               quoteMode={quoteMode}
               selected={selected.includes(recommended.id)}
               onToggle={() => toggleSelect(recommended.id)}
-              onBook={() => navigate({ to: "/tracking/$id", params: { id: recommended.id } })}
+              onBook={() => navigate({ to: "/book", search: { provider: recommended.id } })}
               onMessage={() => setMessagingId(recommended.id)}
               onCall={() => setCallingId(recommended.id)}
             />
@@ -610,7 +610,7 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
                 quoteMode={quoteMode}
                 selected={selected.includes(p.id)}
                 onToggle={() => toggleSelect(p.id)}
-                onBook={() => navigate({ to: "/tracking/$id", params: { id: p.id } })}
+                onBook={() => navigate({ to: "/book", search: { provider: p.id } })}
                 onMessage={() => setMessagingId(p.id)}
                 onCall={() => setCallingId(p.id)}
               />
