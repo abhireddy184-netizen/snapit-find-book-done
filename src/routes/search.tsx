@@ -146,6 +146,11 @@ function SearchPage() {
         <GradientButton type="submit" className="w-full md:w-auto">Update search</GradientButton>
       </form>
 
+      {search.loc && !loc && (
+        <p className="mt-3 inline-flex items-start gap-2 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs font-medium text-muted-foreground">
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> “{search.loc}” looks like a service, not a place. Add a ZIP code or city to see pros near you.
+        </p>
+      )}
       {resolved.kind === "loading" && (
         <p className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground">
           <Loader2 className="h-3.5 w-3.5 animate-spin" /> Checking location…
