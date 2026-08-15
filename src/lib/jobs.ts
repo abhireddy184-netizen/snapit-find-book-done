@@ -20,8 +20,8 @@ export const JOB_STATUS_FLOW: { id: JobStatus; label: string }[] = [
 export const JOB_STATUS_STYLE: Record<JobStatus, string> = {
   diagnosed: "bg-primary/10 text-primary",
   quotes_requested: "bg-amber-100 text-amber-700",
-  booked: "bg-emerald-100 text-emerald-700",
-  in_progress: "bg-blue-100 text-blue-700",
+  booked: "bg-mint/25 text-mint-ink",
+  in_progress: "bg-sky/25 text-sky-ink",
   needs_verification: "bg-orange-100 text-orange-700",
   completed: "bg-muted text-muted-foreground",
   cancelled: "bg-muted text-muted-foreground",
@@ -34,7 +34,7 @@ export function jobStatusLabel(status: JobStatus): string {
 export const VERIFICATION_COPY: Record<VerificationResult, { label: string; tone: string }> = {
   not_started: { label: "Not checked yet", tone: "bg-muted text-muted-foreground" },
   pending: { label: "Checking…", tone: "bg-amber-100 text-amber-700" },
-  appears_completed: { label: "Appears completed", tone: "bg-emerald-100 text-emerald-700" },
+  appears_completed: { label: "Appears completed", tone: "bg-mint/25 text-mint-ink" },
   needs_manual_review: { label: "Needs manual review", tone: "bg-orange-100 text-orange-700" },
   unable_to_verify: { label: "Unable to verify", tone: "bg-muted text-muted-foreground" },
 };
@@ -246,7 +246,7 @@ export async function seedDemoQuotes(job: Job, pros: { name: string; availabilit
 export function quoteRangeVerdict(price: number, low: number, high: number) {
   if (!high) return { label: "No benchmark", tone: "bg-muted text-muted-foreground" };
   if (price < low * 0.85) return { label: "Below expected range", tone: "bg-amber-100 text-amber-700" };
-  if (price <= high) return { label: "Within expected range", tone: "bg-emerald-100 text-emerald-700" };
+  if (price <= high) return { label: "Within expected range", tone: "bg-mint/25 text-mint-ink" };
   return { label: "Above expected range", tone: "bg-orange-100 text-orange-700" };
 }
 

@@ -229,9 +229,9 @@ function Landing() {
 
 function EmergencySection() {
   const items = [
-    { label: "Burst pipe", icon: Droplet, color: "from-blue-500 to-cyan-500" },
+    { label: "Burst pipe", icon: Droplet, color: "from-[#6EC8FF] to-[#3AA6F0]" },
     { label: "No power", icon: Zap, color: "from-amber-500 to-orange-500" },
-    { label: "No heat / AC", icon: Wind, color: "from-sky-500 to-indigo-500" },
+    { label: "No heat / AC", icon: Wind, color: "from-[#6EC8FF] to-[#B58CFF]" },
     { label: "Lockout", icon: Lock, color: "from-rose-500 to-red-500" },
   ];
   return (
@@ -327,8 +327,8 @@ function ProviderCard({ p }: { p: (typeof providers)[number] }) {
       params={{ id: p.id }}
       className="group relative flex h-full flex-col rounded-3xl border border-border/60 bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl active:scale-[0.99]"
     >
-      <div className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-        <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" /> Available now
+      <div className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-mint/20 px-2 py-1 text-[10px] font-bold text-mint-ink">
+        <span className="h-1.5 w-1.5 rounded-full bg-mint animate-pulse" /> Available now
       </div>
       <div className="flex items-center gap-3">
         <Avatar initials={p.initials} gradient={p.gradient} />
@@ -430,7 +430,7 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
               {subscribed ? "Subscribed" : "Subscribe"}
             </button>
           </form>
-          {subscribed && <div className="mt-2 text-[11px] font-semibold text-emerald-500">Thanks! Check your inbox.</div>}
+          {subscribed && <div className="mt-2 text-[11px] font-semibold text-mint-ink">Thanks! Check your inbox.</div>}
         </div>
       </div>
       <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-border/60 pt-8 text-xs md:flex-row md:items-center">

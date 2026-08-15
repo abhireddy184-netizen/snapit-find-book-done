@@ -16,12 +16,12 @@ export const Route = createFileRoute("/emergency")({
 });
 
 const emergencyTypes = [
-  { slug: "plumbing", label: "Burst pipe / flood", icon: Droplet, color: "from-blue-500 to-cyan-500", eta: 12 },
+  { slug: "plumbing", label: "Burst pipe / flood", icon: Droplet, color: "from-[#6EC8FF] to-[#3AA6F0]", eta: 12 },
   { slug: "electrical", label: "Power outage / sparks", icon: Zap, color: "from-amber-500 to-orange-500", eta: 18 },
-  { slug: "hvac", label: "No heat / no AC", icon: Wind, color: "from-sky-500 to-indigo-500", eta: 25 },
+  { slug: "hvac", label: "No heat / no AC", icon: Wind, color: "from-[#6EC8FF] to-[#B58CFF]", eta: 25 },
   { slug: "handyman", label: "Broken lock / door", icon: Lock, color: "from-rose-500 to-red-500", eta: 22 },
   { slug: "appliance-repair", label: "Gas leak / smoke", icon: Flame, color: "from-red-500 to-orange-600", eta: 15 },
-  { slug: "auto-services", label: "Roadside / breakdown", icon: Car, color: "from-violet-500 to-purple-600", eta: 20 },
+  { slug: "auto-services", label: "Roadside / breakdown", icon: Car, color: "from-[#B58CFF] to-[#8A5CF0]", eta: 20 },
 ];
 
 function EmergencyPage() {
@@ -95,8 +95,8 @@ function EmergencyPage() {
                 <span className="inline-flex items-center gap-1 font-semibold">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating}
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 font-bold text-emerald-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Available now
+                <span className="inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-0.5 font-bold text-mint-ink">
+                  <span className="h-1.5 w-1.5 rounded-full bg-mint" /> Available now
                 </span>
                 <span className="inline-flex items-center gap-1 text-muted-foreground">
                   <Clock className="h-3 w-3" /> {p.eta} min

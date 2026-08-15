@@ -58,7 +58,7 @@ const urgencyStyles: Record<string, { chip: string; label: string; icon: typeof 
   emergency: { chip: "bg-red-100 text-red-700 border-red-200", label: "Emergency", icon: ShieldAlert },
   high: { chip: "bg-orange-100 text-orange-700 border-orange-200", label: "High priority", icon: Zap },
   medium: { chip: "bg-amber-100 text-amber-700 border-amber-200", label: "This week", icon: Clock },
-  low: { chip: "bg-emerald-100 text-emerald-700 border-emerald-200", label: "Whenever", icon: Clock },
+  low: { chip: "bg-mint/25 text-mint-ink border-mint/40", label: "Whenever", icon: Clock },
 };
 
 function SnapPage() {
@@ -129,7 +129,7 @@ function SnapPage() {
           </div>
           <h1 className="mt-3 text-3xl font-black tracking-tight md:text-4xl">Snap a Problem</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Show us what's going on. Our AI identifies the service, estimates the cost and matches you with vetted pros nearby.
+            Show us what's going on. Our AI identifies the service, estimates the cost and builds a standardized job scope and matches you with pros nearby.
           </p>
         </div>
 
@@ -258,7 +258,7 @@ function ScanningOverlay({ image }: { image: string }) {
         className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl opacity-60"
         style={{ backgroundImage: `url(${image})` }}
       />
-      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(15,10,40,0.85), rgba(88,28,180,0.75) 60%, rgba(20,10,50,0.9))" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, oklch(0.274 0.084 322 / 0.88), oklch(0.45 0.19 350 / 0.78) 60%, oklch(0.274 0.084 322 / 0.92))" }} />
       {/* Floating orbs */}
       <div className="absolute -left-24 top-1/4 h-80 w-80 rounded-full bg-primary/30 blur-3xl animate-pulse" />
       <div className="absolute -right-24 bottom-1/4 h-96 w-96 rounded-full bg-fuchsia-500/20 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
@@ -266,7 +266,7 @@ function ScanningOverlay({ image }: { image: string }) {
       <div className="relative mx-4 w-full max-w-md rounded-[28px] border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-2xl animate-scale-in">
         <div className="relative overflow-hidden rounded-2xl border border-white/20">
           <img src={image} alt="Analyzing" className="h-64 w-full object-cover" />
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 animate-[scanline_1.8s_ease-in-out_infinite]" style={{ background: "var(--gradient-primary)", boxShadow: "0 0 32px rgba(168,85,247,0.9)" }} />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 animate-[scanline_1.8s_ease-in-out_infinite]" style={{ background: "var(--gradient-primary)", boxShadow: "0 0 32px color-mix(in oklab, var(--primary) 85%, transparent)" }} />
           <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-primary/30 mix-blend-overlay" />
           {/* Corner brackets */}
           <div className="absolute left-2 top-2 h-5 w-5 border-l-2 border-t-2 border-white/70 rounded-tl-md" />
@@ -766,7 +766,7 @@ function ProCard({
           <div className="flex items-center gap-1.5">
             <div className="truncate text-sm font-black">{pro.name}</div>
             {pro.verified && (
-              <span className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
+              <span className="inline-flex items-center gap-0.5 rounded-full bg-mint/25 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-mint-ink">
                 <ShieldCheck className="h-2.5 w-2.5" /> Verified
               </span>
             )}

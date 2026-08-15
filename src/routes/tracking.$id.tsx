@@ -149,7 +149,7 @@ function TrackingPage() {
 function MapPreview({ progress, providerInitials, gradient }: { progress: number; providerInitials: string; gradient: string }) {
   return (
     <div className="relative h-64 overflow-hidden rounded-3xl border border-border/60 shadow-lg md:h-80">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(99,102,241,0.15),transparent_40%),radial-gradient(circle_at_80%_60%,rgba(168,85,247,0.12),transparent_45%)] bg-slate-50" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,61,141,0.14),transparent_40%),radial-gradient(circle_at_80%_60%,rgba(255,216,61,0.20),transparent_45%)] bg-muted" />
       {/* Grid lines to suggest map */}
       <svg className="absolute inset-0 h-full w-full opacity-40" xmlns="http://www.w3.org/2000/svg">
         <defs>
@@ -163,8 +163,8 @@ function MapPreview({ progress, providerInitials, gradient }: { progress: number
       <svg viewBox="0 0 400 240" className="absolute inset-0 h-full w-full">
         <defs>
           <linearGradient id="route" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#6366f1" />
-            <stop offset="100%" stopColor="#a855f7" />
+            <stop offset="0%" stopColor="#FF3D8D" />
+            <stop offset="100%" stopColor="#FF7A45" />
           </linearGradient>
         </defs>
         <path
@@ -182,7 +182,7 @@ function MapPreview({ progress, providerInitials, gradient }: { progress: number
       </div>
       {/* Origin */}
       <div className="absolute bottom-4 left-4 flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-[11px] font-bold text-foreground shadow-md">
-        <span className="h-2 w-2 rounded-full bg-emerald-500" /> Pro origin
+        <span className="h-2 w-2 rounded-full bg-mint" /> Pro origin
       </div>
       {/* Moving avatar */}
       <div

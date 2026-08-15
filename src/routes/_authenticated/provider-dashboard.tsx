@@ -146,7 +146,7 @@ function JobRow({ booking }: { booking: Booking }) {
   return (
     <>
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
-        <Avatar initials={booking.service.slice(0, 2).toUpperCase()} gradient="from-blue-500 to-purple-600" />
+        <Avatar initials={booking.service.slice(0, 2).toUpperCase()} gradient="from-[#FF3D8D] to-[#FF7A45]" />
         <div className="min-w-0">
           <div className="truncate text-sm font-bold">{booking.service}</div>
           <div className="truncate text-xs text-muted-foreground">
@@ -286,7 +286,7 @@ function BusinessProfile() {
         </div>
 
         {error && <p className="mt-3 text-xs font-medium text-destructive">{error}</p>}
-        {message && <p className="mt-3 text-xs font-medium text-emerald-600">{message}</p>}
+        {message && <p className="mt-3 text-xs font-medium text-mint-ink">{message}</p>}
 
         <div className="mt-5">
           <GradientButton type="submit" disabled={saving}>
@@ -299,7 +299,7 @@ function BusinessProfile() {
         <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
           <div className="text-sm font-bold">Verification</div>
           <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-xs font-semibold capitalize">
-            <span className={`h-2 w-2 rounded-full ${verified ? "bg-emerald-500" : "bg-amber-500"}`} />
+            <span className={`h-2 w-2 rounded-full ${verified ? "bg-mint" : "bg-amber-500"}`} />
             {data?.verification_status ?? "unverified"}
           </div>
           <p className="mt-3 text-xs text-muted-foreground">

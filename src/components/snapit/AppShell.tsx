@@ -29,7 +29,7 @@ function TopBar() {
       className={cn(
         "sticky top-0 z-40 border-b transition-all duration-300 backdrop-blur-xl supports-[backdrop-filter]:bg-background/55",
         scrolled
-          ? "border-border/60 bg-background/80 shadow-[0_4px_24px_-12px_rgba(15,23,42,0.15)] dark:shadow-[0_4px_24px_-8px_rgba(0,0,0,0.55)]"
+          ? "border-border/60 bg-background/80 shadow-[0_4px_24px_-12px_color-mix(in oklab, var(--plum) 16%, transparent)] dark:shadow-[0_4px_24px_-8px_rgba(0,0,0,0.55)]"
           : "border-transparent bg-background/60"
       )}
     >
@@ -106,7 +106,7 @@ function AuthNav() {
         to="/register"
         search={{ redirect: undefined }}
         className="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] hover:shadow-lg"
-        style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px rgba(37,99,235,0.55)" }}
+        style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px color-mix(in oklab, var(--primary) 55%, transparent)" }}
       >
         Sign up
       </Link>
@@ -125,7 +125,7 @@ function BottomNav() {
   ];
   return (
     <nav className="fixed inset-x-0 bottom-3 z-40 mx-auto max-w-md px-4 md:hidden">
-      <div className="glass-strong mx-auto flex items-stretch justify-around rounded-full px-2 py-2 shadow-[0_20px_60px_-20px_rgba(17,24,39,0.25)]">
+      <div className="glass-strong mx-auto flex items-stretch justify-around rounded-full px-2 py-2 shadow-[0_20px_60px_-20px_color-mix(in oklab, var(--plum) 22%, transparent)]">
         {items.map((it, i) => {
           const active = pathname === it.to && (i === 0 ? pathname === "/" : true);
           const Icon = it.icon;
@@ -138,7 +138,7 @@ function BottomNav() {
               >
                 <span
                   className="grid h-14 w-14 place-items-center rounded-full text-white shadow-xl ring-4 ring-white transition-transform hover:scale-105"
-                  style={{ background: "var(--gradient-primary)", boxShadow: "0 16px 40px -12px rgba(37,99,235,0.6)" }}
+                  style={{ background: "var(--gradient-primary)", boxShadow: "0 16px 40px -12px color-mix(in oklab, var(--primary) 60%, transparent)" }}
                 >
                   <Icon className="h-6 w-6" />
                 </span>
@@ -188,10 +188,10 @@ export function GradientButton({
       : "var(--gradient-primary)";
   const glow =
     variant === "secondary"
-      ? "0 16px 40px -12px rgba(16,185,129,0.5)"
+      ? "0 16px 40px -12px color-mix(in oklab, var(--mint) 60%, transparent)"
       : variant === "accent"
-      ? "0 16px 40px -12px rgba(249,115,22,0.55)"
-      : "0 16px 40px -12px rgba(37,99,235,0.55)";
+      ? "0 16px 40px -12px color-mix(in oklab, var(--secondary) 65%, transparent)"
+      : "0 16px 40px -12px color-mix(in oklab, var(--primary) 55%, transparent)";
   return (
     <button
       type={type}

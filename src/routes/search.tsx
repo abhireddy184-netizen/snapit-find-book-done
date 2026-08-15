@@ -97,7 +97,7 @@ function SearchPage() {
                   <div className="flex flex-wrap items-center gap-1.5">
                     <div className="truncate text-lg font-bold">{p.name}</div>
                     {p.verified && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-0.5 text-[10px] font-semibold text-mint-ink">
                         <ShieldCheck className="h-3 w-3" /> Verified
                       </span>
                     )}
