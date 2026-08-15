@@ -49,7 +49,7 @@ function ProviderPage() {
                 <div className="truncate text-sm text-muted-foreground">{p.business}</div>
               </div>
             </div>
-            <Link to="/book" className="shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-md" style={{ background: "var(--gradient-primary)" }}>
+            <Link to="/book" search={{ provider: p.id }} className="shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-md" style={{ background: "var(--gradient-primary)" }}>
               Book Now
             </Link>
           </div>
@@ -104,7 +104,7 @@ function ProviderPage() {
             ))}
           </div>
           <div className="mt-4">
-            <Link to="/book">
+            <Link to="/book" search={{ provider: p.id }}>
               <GradientButton className="w-full">
                 <CalendarIcon className="h-4 w-4" /> Book this pro
               </GradientButton>

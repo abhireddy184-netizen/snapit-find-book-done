@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
-import { categories, providers, testimonials } from "@/lib/snapit-data";
+import { categories, providers } from "@/lib/snapit-data";
 import { cn } from "@/lib/utils";
 
 const SITE_URL = "https://id-preview--bca1ede1-6b69-4084-95f5-53bb43a6c24e.lovable.app";
@@ -88,7 +88,7 @@ function Landing() {
 
           <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Background-checked</span>
-            <span className="inline-flex items-center gap-1.5"><Star className="h-4 w-4 text-primary" /> 5-star pros</span>
+            <span className="inline-flex items-center gap-1.5"><Star className="h-4 w-4 text-primary" /> Upfront pricing</span>
             <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4 text-primary" /> Same-day bookings</span>
           </div>
         </div>
@@ -138,39 +138,28 @@ function Landing() {
 
       {/* Featured pros */}
       <section className="mt-16">
-        <SectionHeader title="Featured professionals" cta={{ label: "Browse all", to: "/search" }} />
+        <SectionHeader title="Sample professionals" cta={{ label: "Browse all", to: "/search" }} />
+        <p className="mt-2 text-xs text-muted-foreground">Example listings shown while SnapIt onboards its first local pros.</p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {providers.slice(0, 3).map((p) => <ProviderCard key={p.id} p={p} />)}
         </div>
       </section>
 
-      {/* Reviews */}
+      {/* Why SnapIt */}
       <section className="mt-16">
-        <SectionHeader title="Loved by thousands of customers" />
+        <SectionHeader title="What SnapIt is built for" />
         <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {testimonials.map((t) => (
-            <div key={t.name} className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-              <div className="flex items-center gap-3">
-                <div
-                  className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-white font-bold shadow-md ring-2 ring-white dark:ring-card"
-                  style={{ background: "var(--gradient-primary)" }}
-                >
-                  {t.name.split(" ").map((w) => w[0]).slice(0, 2).join("")}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-1.5">
-                    <div className="truncate text-sm font-bold">{t.name}</div>
-                    <BadgeCheck className="h-4 w-4 shrink-0 text-primary" />
-                  </div>
-                  <div className="truncate text-xs text-muted-foreground">Verified customer · {t.role}</div>
-                </div>
+          {[
+            { title: "AI-powered service matching", text: "Snap a photo and our AI identifies the likely problem, category and cost range before you book." },
+            { title: "Clear, upfront estimates", text: "See an estimated price and duration up front, so there are no surprises when a pro arrives." },
+            { title: "Built for trusted local pros", text: "Providers create real business profiles. Verification badges only appear once a pro is reviewed." },
+          ].map((c) => (
+            <div key={c.title} className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+              <div className="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-md" style={{ background: "var(--gradient-primary)" }}>
+                <BadgeCheck className="h-5 w-5" />
               </div>
-              <div className="mt-3 flex gap-0.5">
-                {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                ))}
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-foreground">"{t.text}"</p>
+              <h3 className="mt-4 text-base font-black">{c.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{c.text}</p>
             </div>
           ))}
         </div>
@@ -189,6 +178,7 @@ function Landing() {
             <div className="mt-6">
               <Link
                 to="/register"
+                search={{ redirect: undefined }}
                 className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary shadow-lg transition-transform hover:scale-[1.02]"
               >
                 Become a Provider <ArrowRight className="h-4 w-4" />
@@ -379,7 +369,7 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
       <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
         <div>
           <Logo />
-          <p className="mt-4 max-w-xs leading-relaxed">Snap it. Book it. Done. AI-powered local services trusted by thousands.</p>
+          <p className="mt-4 max-w-xs leading-relaxed">Snap it. Book it. Done. AI-powered matching between customers and trusted local pros.</p>
           <div className="mt-5 flex items-center gap-2">
             {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
               <a key={i} href="#" aria-label="Social" className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary">

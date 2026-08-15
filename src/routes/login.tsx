@@ -2,6 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AuthForm } from "@/components/snapit/AuthForm";
 
 export const Route = createFileRoute("/login")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search['redirect'] === "string" ? (search['redirect'] as string) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Log in — SnapIt" },
@@ -14,12 +17,14 @@ export const Route = createFileRoute("/login")({
 });
 
 function LoginPage() {
+  const { redirect } = Route.useSearch();
   return (
     <AuthForm
       mode="login"
       title="Welcome back"
       subtitle="Log in to book services or manage your business."
-      footer={<p>New to SnapIt? <Link to="/register" className="font-semibold text-primary">Create an account</Link></p>}
+      redirectTo={redirect}
+      footer={<p>New to SnapIt? <Link to="/register" search={{ redirect: undefined }} className="font-semibold text-primary">Create an account</Link></p>}
     />
   );
 }

@@ -1,10 +1,45 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
-import { Check, Camera, ChevronLeft, ChevronRight, MapPin } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, Camera, ChevronLeft, ChevronRight, MapPin, Loader2 } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { providers } from "@/lib/snapit-data";
+import { providers, getProvider } from "@/lib/snapit-data";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { BOOKING_DRAFT_KEY } from "@/lib/bookings";
+
+type BookingDraft = {
+  service: string;
+  details: string;
+  address: string;
+  date: string;
+  time: string;
+  providerId?: string;
+};
+
+const dayOptions = ["Today", "Tomorrow", "Wed", "Thu", "Fri", "Sat"];
+
+function resolveDate(label: string): string {
+  const d = new Date();
+  const index = dayOptions.indexOf(label);
+  if (index <= 1) {
+    d.setDate(d.getDate() + index);
+  } else {
+    const targets = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+    const target = targets.indexOf(label.toLowerCase().slice(0, 3));
+    if (target >= 0) {
+      let diff = (target - d.getDay() + 7) % 7;
+      if (diff === 0) diff = 7;
+      d.setDate(d.getDate() + diff);
+    }
+  }
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
 
 export const Route = createFileRoute("/book")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    provider: typeof search['provider'] === "string" ? (search['provider'] as string) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Book a service — SnapIt" },
@@ -20,6 +55,8 @@ const steps = ["Service", "Details", "Photos", "Address", "Schedule", "Review"];
 
 function BookPage() {
   const navigate = useNavigate();
+  const { provider: providerParam } = Route.useSearch();
+  const { user, loading: authLoading } = useAuth();
   const [step, setStep] = useState(0);
   const [service, setService] = useState("Leak repair");
   const [details, setDetails] = useState("");
@@ -28,15 +65,71 @@ function BookPage() {
   const [date, setDate] = useState("Tomorrow");
   const [time, setTime] = useState("11:00 AM");
   const [confirmed, setConfirmed] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const pro = providers[0];
+  const pro = (providerParam ? getProvider(providerParam) : undefined) ?? providers[0];
+
+  // Restore a draft saved when a guest was sent to sign in.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const raw = window.localStorage.getItem(BOOKING_DRAFT_KEY);
+    if (!raw) return;
+    window.localStorage.removeItem(BOOKING_DRAFT_KEY);
+    try {
+      const draft = JSON.parse(raw) as BookingDraft;
+      if (draft.service) setService(draft.service);
+      if (draft.details) setDetails(draft.details);
+      if (draft.address) setAddress(draft.address);
+      if (draft.date) setDate(draft.date);
+      if (draft.time) setTime(draft.time);
+      setStep(steps.length - 1);
+    } catch {
+      /* ignore malformed draft */
+    }
+  }, []);
 
   const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
-  const submit = () => {
+  const submit = async () => {
+    setError(null);
+    if (!address.trim()) {
+      setError("Please add a service address before confirming.");
+      setStep(3);
+      return;
+    }
+
+    if (!user) {
+      if (typeof window !== "undefined") {
+        const draft: BookingDraft = { service, details, address, date, time, providerId: pro.id };
+        window.localStorage.setItem(BOOKING_DRAFT_KEY, JSON.stringify(draft));
+      }
+      await navigate({ to: "/login", search: { redirect: "/book" } });
+      return;
+    }
+
+    setSubmitting(true);
+    const { error: insertError } = await supabase.from("bookings").insert({
+      customer_id: user.id,
+      provider_id: null,
+      provider_name_snapshot: pro.name,
+      service,
+      details: details || null,
+      service_address: address.trim(),
+      scheduled_date: resolveDate(date),
+      scheduled_time: time,
+      status: "pending",
+    });
+    setSubmitting(false);
+
+    if (insertError) {
+      setError("We couldn't save your request. Please try again.");
+      return;
+    }
+
     setConfirmed(true);
-    setTimeout(() => navigate({ to: "/dashboard" }), 1600);
+    setTimeout(() => void navigate({ to: "/dashboard" }), 1600);
   };
 
   if (confirmed) {
@@ -138,7 +231,7 @@ function BookPage() {
           {step === 4 && (
             <StepWrap title="Pick date & time" subtitle="Choose what works best for you.">
               <div className="mb-4 flex flex-wrap gap-2">
-                {["Today", "Tomorrow", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                {dayOptions.map((d) => (
                   <button key={d} onClick={() => setDate(d)} className={`rounded-xl border px-4 py-2 text-sm font-semibold ${date === d ? "border-primary bg-primary text-white" : "border-border bg-background"}`}>
                     {d}
                   </button>
@@ -185,9 +278,16 @@ function BookPage() {
             {step < steps.length - 1 ? (
               <GradientButton onClick={next}>Continue <ChevronRight className="h-4 w-4" /></GradientButton>
             ) : (
-              <GradientButton onClick={submit}>Confirm request <Check className="h-4 w-4" /></GradientButton>
+              <GradientButton onClick={() => void submit()} disabled={submitting || authLoading}>
+                {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</> : <>Confirm request <Check className="h-4 w-4" /></>}
+              </GradientButton>
             )}
           </div>
+
+          {error && <p className="mt-4 text-center text-xs font-medium text-destructive">{error}</p>}
+          {!user && !authLoading && (
+            <p className="mt-3 text-center text-xs text-muted-foreground">You'll be asked to sign in to confirm — your request is saved.</p>
+          )}
         </div>
 
         <div className="mt-6 text-center text-xs text-muted-foreground">

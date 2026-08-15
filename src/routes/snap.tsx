@@ -597,7 +597,7 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
               quoteMode={quoteMode}
               selected={selected.includes(recommended.id)}
               onToggle={() => toggleSelect(recommended.id)}
-              onBook={() => navigate({ to: "/tracking/$id", params: { id: recommended.id } })}
+              onBook={() => navigate({ to: "/book", search: { provider: recommended.id } })}
               onMessage={() => setMessagingId(recommended.id)}
               onCall={() => setCallingId(recommended.id)}
             />
@@ -610,7 +610,7 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
                 quoteMode={quoteMode}
                 selected={selected.includes(p.id)}
                 onToggle={() => toggleSelect(p.id)}
-                onBook={() => navigate({ to: "/tracking/$id", params: { id: p.id } })}
+                onBook={() => navigate({ to: "/book", search: { provider: p.id } })}
                 onMessage={() => setMessagingId(p.id)}
                 onCall={() => setCallingId(p.id)}
               />
@@ -942,7 +942,7 @@ function TrustBadges() {
   return (
     <div className="mt-6 rounded-3xl border border-border/60 bg-gradient-to-br from-primary/5 via-card to-card p-4 backdrop-blur-xl">
       <div className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-        <Users className="h-3.5 w-3.5 text-primary" /> Trusted by thousands
+        <Users className="h-3.5 w-3.5 text-primary" /> AI-powered matching
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         {items.map(({ icon: Icon, label }) => (

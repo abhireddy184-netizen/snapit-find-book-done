@@ -116,7 +116,7 @@ function SearchPage() {
                   <Link to="/provider/$id" params={{ id: p.id }} className="inline-flex items-center justify-center rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold hover:bg-muted">
                     View Profile
                   </Link>
-                  <Link to="/book" className="inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold text-white shadow-md" style={{ background: "var(--gradient-primary)" }}>
+                  <Link to="/book" search={{ provider: p.id }} className="inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold text-white shadow-md" style={{ background: "var(--gradient-primary)" }}>
                     Book Now
                   </Link>
                 </div>

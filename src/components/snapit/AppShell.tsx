@@ -1,8 +1,9 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Home, Search, CalendarDays, User, Camera, ShieldAlert, History } from "lucide-react";
+import { Home, Search, CalendarDays, User, Camera, ShieldAlert, History, LogOut, LayoutDashboard } from "lucide-react";
 import { Logo } from "./Logo";
 import { ThemeToggle } from "@/lib/theme";
+import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children, hideBottomNav = false }: { children: ReactNode; hideBottomNav?: boolean }) {
@@ -51,22 +52,65 @@ function TopBar() {
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
-          <Link
-            to="/login"
-            className="hidden rounded-full px-4 py-2 text-sm font-medium text-foreground hover:bg-muted md:inline-flex"
-          >
-            Log in
-          </Link>
-          <Link
-            to="/register"
-            className="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] hover:shadow-lg"
-            style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px rgba(37,99,235,0.55)" }}
-          >
-            Sign up
-          </Link>
+          <AuthNav />
         </div>
       </div>
     </header>
+  );
+}
+
+function AuthNav() {
+  const { user, profile, loading, signOut } = useAuth();
+
+  if (loading) return <div className="h-9 w-24 animate-pulse rounded-full bg-muted" />;
+
+  if (user) {
+    const dashboardTo = profile?.role === "provider" ? "/provider-dashboard" : "/dashboard";
+    const initials = (profile?.full_name || user.email || "?")
+      .split(" ")
+      .map((w) => w[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+    return (
+      <>
+        <Link
+          to={dashboardTo}
+          className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted"
+        >
+          <span className="grid h-7 w-7 place-items-center rounded-full text-[11px] font-bold text-white" style={{ background: "var(--gradient-primary)" }}>
+            {initials}
+          </span>
+          <span className="hidden md:inline">
+            <LayoutDashboard className="mr-1 inline h-3.5 w-3.5" /> Dashboard
+          </span>
+        </Link>
+        <button
+          onClick={() => void signOut()}
+          aria-label="Log out"
+          className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-2 text-sm font-medium hover:bg-muted"
+        >
+          <LogOut className="h-4 w-4" />
+          <span className="hidden md:inline">Log out</span>
+        </button>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Link to="/login" search={{ redirect: undefined }} className="hidden rounded-full px-4 py-2 text-sm font-medium text-foreground hover:bg-muted md:inline-flex">
+        Log in
+      </Link>
+      <Link
+        to="/register"
+        search={{ redirect: undefined }}
+        className="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] hover:shadow-lg"
+        style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px rgba(37,99,235,0.55)" }}
+      >
+        Sign up
+      </Link>
+    </>
   );
 }
 
