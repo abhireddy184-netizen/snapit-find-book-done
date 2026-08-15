@@ -8,6 +8,7 @@ import { fetchProviderBookings, fetchMyProviderProfile, formatBookingDate, type 
 import { supabase } from "@/integrations/supabase/client";
 import { catalog } from "@/lib/catalog";
 import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
+import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 
 export const Route = createFileRoute("/_authenticated/provider-dashboard")({
   head: () => ({
@@ -296,7 +297,7 @@ function BusinessProfile() {
             <LocationAutocomplete
               mode="zip"
               value={form.service_zip}
-              onChange={(v) => setForm({ ...form, service_zip: v })}
+              onChange={(v: string) => setForm({ ...form, service_zip: v })}
               aria-label="Service ZIP code"
               placeholder="75034"
               showIcon={false}
