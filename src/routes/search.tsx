@@ -127,16 +127,12 @@ function SearchPage() {
             className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         </label>
-        <label className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3">
-          <MapPin className="h-4 w-4 shrink-0 text-primary" />
-          <input
-            value={locationInput}
-            onChange={(e) => setLocationInput(e.target.value)}
-            inputMode="text"
-            placeholder="ZIP or city (e.g. 75034)"
-            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-          />
-        </label>
+        <LocationAutocomplete
+          value={locationInput}
+          onChange={setLocationInput}
+          aria-label="Location"
+          placeholder="ZIP or city (e.g. 75034)"
+        />
         <GradientButton type="submit" className="w-full md:w-auto">Update search</GradientButton>
       </form>
 
