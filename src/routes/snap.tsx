@@ -726,6 +726,11 @@ function AnalysisView({
             <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
               {sourceLabel[analysis.issueSource] ?? "Possible issue"}
             </span>
+            {image && analysis.visualSubject && (
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs font-semibold text-muted-foreground">
+                Focused on: {analysis.visualSubject}
+              </span>
+            )}
             <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground">
               <HistoryIcon className="h-3 w-3" /> Saved to history
             </span>

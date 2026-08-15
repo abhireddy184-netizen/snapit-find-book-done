@@ -38,5 +38,5 @@ export const analyzeSnap = createServerFn({ method: "POST" })
       messages: [{ role: "user", content }],
     });
 
-    return normalizeAnalysis(text, Boolean(note));
+    return normalizeAnalysis(text, Boolean(note), hasMedia);
   });
