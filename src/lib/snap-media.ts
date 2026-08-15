@@ -6,6 +6,8 @@
 export const MAX_DIMENSION = 1280;
 export const JPEG_QUALITY = 0.82;
 export const VIDEO_FRAME_TIMEOUT_MS = 12_000;
+export const VIDEO_FRAMES_TIMEOUT_MS = 18_000;
+export const VIDEO_FRAME_COUNT = 3;
 export const IMAGE_READ_TIMEOUT_MS = 20_000;
 
 export class MediaError extends Error {}
@@ -179,10 +181,146 @@ export function extractVideoFrame(file: File): Promise<string> {
   });
 }
 
-export async function prepareMediaForAnalysis(file: File): Promise<string> {
+/**
+ * Sample several representative stills spread across a short clip so the AI
+ * sees motion/context instead of one arbitrary still. Falls back to a single
+ * frame whenever the browser can't seek reliably.
+ */
+export function extractVideoFrames(file: File, count = VIDEO_FRAME_COUNT): Promise<string[]> {
+  return new Promise<string[]>((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    const frames: string[] = [];
+    let settled = false;
+    let targets: number[] = [];
+    let index = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let stepTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const cleanup = () => {
+      if (timer) clearTimeout(timer);
+      if (stepTimer) clearTimeout(stepTimer);
+      video.onseeked = null;
+      video.onerror = null;
+      video.removeAttribute("src");
+      try {
+        video.load();
+      } catch {
+        /* noop */
+      }
+      URL.revokeObjectURL(url);
+    };
+
+    const finish = () => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      if (frames.length === 0) {
+        reject(new MediaError("We couldn't read a frame from that video. Try a photo instead."));
+      } else {
+        resolve(frames);
+      }
+    };
+
+    const fail = (message: string) => {
+      if (settled) return;
+      if (frames.length > 0) return finish(); // partial success is good enough
+      settled = true;
+      cleanup();
+      reject(new MediaError(message));
+    };
+
+    const grab = () => {
+      if (settled) return;
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return fail("We couldn't read a frame from that video. Try a photo instead.");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
+        if (dataUrl && dataUrl.length > 1000) frames.push(dataUrl);
+      } catch {
+        /* keep whatever we already captured */
+      }
+      next();
+    };
+
+    const next = () => {
+      if (settled) return;
+      if (stepTimer) clearTimeout(stepTimer);
+      if (index >= targets.length) return finish();
+      const target = targets[index++]!;
+      try {
+        video.currentTime = target;
+      } catch {
+        return finish();
+      }
+      // Safety net for browsers where `seeked` never fires.
+      stepTimer = setTimeout(() => {
+        if (!settled && video.readyState >= 2) grab();
+        else finish();
+      }, 2500);
+    };
+
+    const start = () => {
+      if (settled || targets.length) return;
+      const duration = Number.isFinite(video.duration) && video.duration > 0 ? video.duration : 0;
+      const wanted = Math.max(1, Math.min(count, duration >= 1.5 ? count : 1));
+      targets = Array.from({ length: wanted }, (_, i) =>
+        duration > 0 ? Math.min(duration - 0.05, (duration * (i + 0.5)) / wanted) : 0,
+      );
+      next();
+    };
+
+    timer = setTimeout(() => {
+      if (!settled && frames.length === 0 && video.readyState >= 2) grab();
+      else finish();
+    }, VIDEO_FRAMES_TIMEOUT_MS);
+
+    video.preload = "auto";
+    video.muted = true;
+    video.playsInline = true;
+    video.onloadeddata = start;
+    video.onloadedmetadata = () => {
+      if (video.readyState >= 2) start();
+    };
+    video.onseeked = grab;
+    video.onerror = () => fail("We couldn't open that video. Please try a photo instead.");
+    video.src = url;
+    try {
+      video.load();
+    } catch {
+      /* noop */
+    }
+  });
+}
+
+export type PreparedMedia = {
+  /** Frames sent to the AI (1 for a photo, up to 3 for a short clip). */
+  frames: string[];
+  /** Single still used for the UI preview and history thumbnail. */
+  preview: string;
+};
+
+export async function prepareMediaForAnalysis(file: File): Promise<PreparedMedia> {
   if (!file || file.size === 0) {
     throw new MediaError("That file appears to be empty. Please try again.");
   }
-  if (file.type.startsWith("video/")) return extractVideoFrame(file);
-  return compressImageFile(file);
+  if (file.type.startsWith("video/")) {
+    let frames: string[];
+    try {
+      frames = await extractVideoFrames(file);
+    } catch (err) {
+      // Last-resort fallback to the original single-frame path.
+      const single = await extractVideoFrame(file).catch(() => {
+        throw err;
+      });
+      frames = [single];
+    }
+    return { frames, preview: frames[Math.floor(frames.length / 2)] ?? frames[0]! };
+  }
+  const image = await compressImageFile(file);
+  return { frames: [image], preview: image };
 }
