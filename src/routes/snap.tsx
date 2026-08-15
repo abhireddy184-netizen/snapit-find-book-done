@@ -223,9 +223,10 @@ function SnapPage() {
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
             <Sparkles className="h-3.5 w-3.5" /> AI-powered diagnosis
           </div>
-          <h1 className="mt-3 text-3xl font-black tracking-tight md:text-4xl">Snap a Problem</h1>
+          <h1 className="mt-3 text-3xl font-black tracking-tight md:text-4xl">Show us what you need</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Show us what's going on. Our AI identifies the service, estimates the cost and builds a standardized job scope and matches you with pros nearby.
+            Take a photo, record a video, upload an image, or simply describe what you need. GPB figures out the service and
+            connects you with the right local professional. A photo is never required.
           </p>
         </div>
 
@@ -255,8 +256,8 @@ function SnapPage() {
           onChange={onPick("upload")}
         />
 
-        {!image && (
-          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        {!image && !analysis && (
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <CaptureTile
               icon={Camera}
               label="Take a photo"
@@ -275,6 +276,36 @@ function SnapPage() {
               hint="Choose an image"
               onClick={() => uploadRef.current?.click()}
             />
+            <CaptureTile
+              icon={MessageCircle}
+              label="Describe the job"
+              hint="No photo needed"
+              active={describeMode}
+              onClick={() => setDescribeMode((v) => !v)}
+            />
+          </div>
+        )}
+
+        {!image && !analysis && describeMode && (
+          <div className="mt-4 rounded-3xl border border-secondary/30 bg-card p-5 shadow-sm animate-fade-in">
+            <label className="block text-sm font-bold">Tell us what you need</label>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Plain language is perfect — e.g. “the seat on my sofa has sunk down and feels soft underneath”.
+            </p>
+            <textarea
+              value={describeText}
+              onChange={(e) => setDescribeText(e.target.value)}
+              rows={4}
+              placeholder="Describe the problem or the job you want done…"
+              className="mt-3 w-full resize-none rounded-2xl border border-border/60 bg-background p-3 text-sm outline-none focus:border-secondary"
+            />
+            <GradientButton
+              onClick={() => void runTextAnalysis()}
+              disabled={describeText.trim().length < 4 || loading}
+              className="mt-3 w-full justify-center"
+            >
+              <Sparkles className="h-4 w-4" /> Find the right service
+            </GradientButton>
           </div>
         )}
 
@@ -345,7 +376,7 @@ function SnapPage() {
           />
         )}
 
-        {analysis && image && (
+        {analysis && (image || textOnly) && (
           <AnalysisView analysis={analysis} image={image} onReset={reset} />
         )}
       </div>
