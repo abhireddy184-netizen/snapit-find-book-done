@@ -471,8 +471,8 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   return (
-    <footer ref={footerRef} className="mt-24 rounded-t-[32px] border-t border-border/60 bg-gradient-to-b from-transparent to-muted/40 pt-14 pb-8 text-sm text-muted-foreground">
-      <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
+    <footer ref={footerRef} className="mt-20 rounded-t-[32px] md:mt-24 border-t border-border/60 bg-gradient-to-b from-transparent to-muted/40 pt-14 pb-8 text-sm text-muted-foreground">
+      <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
         <div>
           <Logo />
           <p className="mt-4 max-w-xs leading-relaxed">Show it. Tell us. Get it fixed. AI-powered matching between customers and trusted local pros.</p>
@@ -487,12 +487,12 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
         </div>
         <FooterCol title="Company" links={["About", "Careers", "Press", "Blog"]} />
         <FooterCol title="Support" links={["Help center", "Contact", "Trust & safety", "Cancellation"]} />
-        <div>
+        <div className="min-w-0">
           <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">Stay in the loop</div>
           <p className="text-xs">Product updates, new services and stories from our pros.</p>
           <form
             onSubmit={(e) => { e.preventDefault(); if (email) { setSubscribed(true); setEmail(""); } }}
-            className="mt-3 flex overflow-hidden rounded-full border border-border/60 bg-card p-1 shadow-sm"
+            className="mt-3 flex min-w-0 overflow-hidden rounded-full border border-border/60 bg-card p-1 shadow-sm"
           >
             <input
               type="email"
