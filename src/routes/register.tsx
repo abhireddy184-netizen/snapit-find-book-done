@@ -22,7 +22,7 @@ function RegisterPage() {
     <AuthForm
       mode="register"
       title="Create your account"
-      subtitle="Snap it. Book it. Done. Get started in seconds."
+      subtitle="Show it. Tell us. Get it done. Get started in seconds."
       redirectTo={redirect}
       footer={<p>Already have an account? <Link to="/login" search={{ redirect: undefined }} className="font-semibold text-primary">Log in</Link></p>}
     />

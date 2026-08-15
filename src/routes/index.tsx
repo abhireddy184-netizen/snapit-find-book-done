@@ -45,7 +45,7 @@ function Landing() {
         <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full opacity-20 blur-3xl" style={{ background: "var(--gradient-primary)" }} />
         <div className="relative">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-primary shadow-sm backdrop-blur">
-            <Sparkles className="h-3.5 w-3.5" /> Snap it. Book it. Done.
+            <Sparkles className="h-3.5 w-3.5" /> Show it. Tell us. Get it done.
           </div>
           <h1 className="max-w-4xl text-[2.5rem] font-black leading-[1.05] tracking-tight text-foreground md:text-7xl">
             Show the problem.{" "}
@@ -396,7 +396,7 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
       <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
         <div>
           <Logo />
-          <p className="mt-4 max-w-xs leading-relaxed">Snap it. Book it. Done. AI-powered matching between customers and trusted local pros.</p>
+          <p className="mt-4 max-w-xs leading-relaxed">Show it. Tell us. Get it done. AI-powered matching between customers and trusted local pros.</p>
           <div className="mt-5 flex items-center gap-2">
             {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
               <a key={i} href="#" aria-label="Social" className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary">
