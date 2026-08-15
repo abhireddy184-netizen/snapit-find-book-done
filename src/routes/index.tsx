@@ -4,7 +4,7 @@ import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
-import { JourneyRail, InputModes, RoomStory, ProVerticals, SectionConnector } from "@/components/snapit/HomeStory";
+import { JourneyRail, InputModes, RoomStory, ProVerticals, SectionConnector, SectionBridge } from "@/components/snapit/HomeStory";
 import { providers } from "@/lib/snapit-data";
 import { catalog, popularCategories, TOTAL_SERVICES } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
@@ -131,17 +131,18 @@ function Landing() {
         </div>
       </section>
 
-      <SectionConnector label="Pros behind the work" />
-
       {/* Provider verticals */}
-      <section>
-        <SectionHeader title="Real pros, every vertical" cta={{ label: "Browse all pros", to: "/search" }} />
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-          From at-home beauty to electrical, cleaning, lawn care, handyman work and mobile auto — GPB is onboarding
-          professionals category by category across the USA.
-        </p>
-        <div className="mt-6">
-          <ProVerticals />
+      <section className="mt-4">
+        <SectionBridge label="Pros behind the work" />
+        <div className="mt-5">
+          <SectionHeader title="Real pros, every vertical" cta={{ label: "Browse all pros", to: "/search" }} />
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+            From at-home beauty to electrical, cleaning, lawn care, handyman work and mobile auto — GPB is onboarding
+            professionals category by category across the USA.
+          </p>
+          <div className="mt-6">
+            <ProVerticals />
+          </div>
         </div>
       </section>
 
