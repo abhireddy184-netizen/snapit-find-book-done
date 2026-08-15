@@ -987,8 +987,8 @@ function TrustBadges() {
     { icon: Sparkles, label: "AI Powered Diagnosis" },
     { icon: BadgeCheck, label: "Verification when reviewed" },
     { icon: Tag, label: "Upfront Pricing" },
-    { icon: Lock, label: "Secure Payments" },
-    { icon: HandHeart, label: "Satisfaction Guaranteed" },
+    { icon: Lock, label: "Private & Secure" },
+    { icon: HandHeart, label: "Before & After Proof" },
   ];
   return (
     <div className="mt-6 rounded-3xl border border-border/60 bg-gradient-to-br from-primary/5 via-card to-card p-4 backdrop-blur-xl">
