@@ -129,7 +129,7 @@ function SnapPage() {
           </div>
           <h1 className="mt-3 text-3xl font-black tracking-tight md:text-4xl">Snap a Problem</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Show us what's going on. Our AI identifies the service, estimates the cost and matches you with vetted pros nearby.
+            Show us what's going on. Our AI identifies the service, estimates the cost and builds a standardized job scope and matches you with pros nearby.
           </p>
         </div>
 
