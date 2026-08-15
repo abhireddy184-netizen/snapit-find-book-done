@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
+import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, Video, Upload, MessageCircle, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
-import { categories, providers } from "@/lib/snapit-data";
+import { providers } from "@/lib/snapit-data";
+import { popularCategories, TOTAL_SERVICES } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
 const SITE_URL = "https://id-preview--bca1ede1-6b69-4084-95f5-53bb43a6c24e.lovable.app";
@@ -95,6 +96,37 @@ function Landing() {
         </div>
       </section>
 
+      {/* AI entry point */}
+      <section className="mt-10">
+        <div className="rounded-[28px] border border-border/60 bg-card p-6 shadow-sm md:p-8">
+          <h2 className="text-2xl font-black tracking-tight md:text-3xl">Show us what you need</h2>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground md:text-base">
+            Take a photo, record a video, upload an image, or simply describe what you need. GPB figures out the service and
+            connects you with the right local professional. A photo is never required.
+          </p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: Camera, label: "Take a photo", hint: "Use your camera" },
+              { icon: Video, label: "Record a video", hint: "Show the issue" },
+              { icon: Upload, label: "Upload an image", hint: "From your gallery" },
+              { icon: MessageCircle, label: "Describe the job", hint: "No photo needed" },
+            ].map((x) => (
+              <Link
+                key={x.label}
+                to="/snap"
+                className="group flex flex-col items-start gap-2 rounded-3xl border border-border/60 bg-background p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
+              >
+                <span className="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-md transition-transform group-hover:scale-110" style={{ background: "var(--gradient-primary)" }}>
+                  <x.icon className="h-5 w-5" />
+                </span>
+                <span className="mt-1 text-sm font-bold">{x.label}</span>
+                <span className="text-xs text-muted-foreground">{x.hint}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* The GPB flow */}
       <section className="mt-10">
         <div className="overflow-x-auto rounded-[28px] border border-border/60 bg-card p-5 shadow-sm">
@@ -122,22 +154,25 @@ function Landing() {
 
       {/* Popular categories */}
       <section className="mt-14">
-        <SectionHeader title="Popular services" cta={{ label: "View all", to: "/categories" }} />
+        <SectionHeader
+          title="Popular services"
+          cta={{ label: `All ${TOTAL_SERVICES}+ services`, to: "/services" }}
+        />
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
-          {categories.slice(0, 10).map((cat) => {
+          {popularCategories.slice(0, 10).map((cat) => {
             const Icon = cat.icon;
             return (
               <Link
                 key={cat.slug}
-                to="/search"
-                search={{ cat: cat.slug } as never}
+                to="/services/$category"
+                params={{ category: cat.slug }}
                 className="group flex h-full flex-col rounded-3xl border border-border/60 bg-card p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl active:scale-[0.98]"
               >
-                <div className={`grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br ${cat.color} text-white shadow-md transition-transform duration-300 group-hover:scale-110`}>
+                <div className={`grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br ${cat.gradient} text-white shadow-md transition-transform duration-300 group-hover:scale-110`}>
                   <Icon className="h-7 w-7" />
                 </div>
                 <div className="mt-4 text-sm font-semibold text-foreground">{cat.name}</div>
-                <div className="mt-1 text-xs text-muted-foreground line-clamp-1">{cat.description}</div>
+                <div className="mt-1 text-xs text-muted-foreground line-clamp-1">{cat.tagline}</div>
               </Link>
             );
           })}
