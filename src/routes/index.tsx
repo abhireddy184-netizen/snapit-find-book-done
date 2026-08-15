@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, Video, Upload, MessageCircle, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
+import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, Video, Upload, MessageCircle, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
 import { providers } from "@/lib/snapit-data";
@@ -14,14 +14,14 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "GPB — Show the problem. Get it fixed with proof." },
-      { name: "description", content: "Snap a photo of any problem. GPB's AI explains what it likely needs, turns it into one standardized job scope, gets comparable quotes, books a pro and keeps a permanent record of the work." },
+      { name: "description", content: "Show a photo, video, upload an image, or describe what you need. GPB helps identify the right service, compare local pros and keep a clear job record." },
       { property: "og:title", content: "GPB — Show the problem. Get it fixed with proof." },
-      { property: "og:description", content: "AI diagnosis, one standardized scope, comparable quotes, booking and a permanent proof record for every job." },
+      { property: "og:description", content: "Photo, video, upload or text — GPB helps identify the right service, compare local pros and keep a clear job record." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "GPB — Show the problem. Get it fixed with proof." },
-      { name: "twitter:description", content: "AI diagnosis, one standardized scope, comparable quotes, booking and a permanent proof record for every job." },
+      { name: "twitter:description", content: "Photo, video, upload or text — GPB helps identify the right service, compare local pros and keep a clear job record." },
     ],
     links: [{ rel: "canonical", href: SITE_URL + "/" }],
   }),
@@ -443,11 +443,7 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
               </a>
             ))}
           </div>
-          <div className="mt-5 space-y-1.5 text-xs">
-            <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-primary" /> hello@getperfectboy.com</div>
-            <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-primary" /> +1 (415) 1 (888) 555-0142</div>
-            <div className="flex items-center gap-2"><MapPinIcon className="h-3.5 w-3.5 text-primary" /> San Francisco, CA</div>
-          </div>
+          <div className="mt-5 text-xs">USA-wide services marketplace · GetPerfectBoy.com</div>
         </div>
         <FooterCol title="Company" links={["About", "Careers", "Press", "Blog"]} />
         <FooterCol title="Support" links={["Help center", "Contact", "Trust & safety", "Cancellation"]} />
@@ -475,7 +471,7 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
       <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-border/60 pt-8 text-xs md:flex-row md:items-center">
         <div className="flex flex-col gap-1">
           <span className="text-base font-black tracking-tight text-foreground">GPB</span>
-          <span>© {new Date().getFullYear()} GPB Technologies, Inc. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} GetPerfectBoy.com. All rights reserved.</span>
         </div>
         <div className="flex flex-wrap gap-5"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a><a href="#">Accessibility</a><a href="#">Sitemap</a></div>
       </div>
