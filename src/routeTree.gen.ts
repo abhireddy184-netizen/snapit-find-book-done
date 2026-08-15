@@ -13,6 +13,7 @@ import { Route as SnapRouteImport } from './routes/snap'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ProviderInterestRouteImport } from './routes/provider-interest'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as EmergencyRouteImport } from './routes/emergency'
@@ -47,6 +48,11 @@ const SearchRoute = SearchRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProviderInterestRoute = ProviderInterestRouteImport.update({
+  id: '/provider-interest',
+  path: '/provider-interest',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -132,6 +138,7 @@ export interface FileRoutesByFullPath {
   '/emergency': typeof EmergencyRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
+  '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRouteWithChildren
@@ -152,6 +159,7 @@ export interface FileRoutesByTo {
   '/emergency': typeof EmergencyRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
+  '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/snap': typeof SnapRoute
@@ -173,6 +181,7 @@ export interface FileRoutesById {
   '/emergency': typeof EmergencyRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
+  '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRouteWithChildren
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/history'
     | '/login'
+    | '/provider-interest'
     | '/register'
     | '/search'
     | '/services'
@@ -215,6 +225,7 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/history'
     | '/login'
+    | '/provider-interest'
     | '/register'
     | '/search'
     | '/snap'
@@ -235,6 +246,7 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/history'
     | '/login'
+    | '/provider-interest'
     | '/register'
     | '/search'
     | '/services'
@@ -257,6 +269,7 @@ export interface RootRouteChildren {
   EmergencyRoute: typeof EmergencyRoute
   HistoryRoute: typeof HistoryRoute
   LoginRoute: typeof LoginRoute
+  ProviderInterestRoute: typeof ProviderInterestRoute
   RegisterRoute: typeof RegisterRoute
   SearchRoute: typeof SearchRoute
   ServicesRoute: typeof ServicesRouteWithChildren
@@ -293,6 +306,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/provider-interest': {
+      id: '/provider-interest'
+      path: '/provider-interest'
+      fullPath: '/provider-interest'
+      preLoaderRoute: typeof ProviderInterestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -442,6 +462,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmergencyRoute: EmergencyRoute,
   HistoryRoute: HistoryRoute,
   LoginRoute: LoginRoute,
+  ProviderInterestRoute: ProviderInterestRoute,
   RegisterRoute: RegisterRoute,
   SearchRoute: SearchRoute,
   ServicesRoute: ServicesRouteWithChildren,

@@ -18,9 +18,11 @@ export function Logo({ compact = false, onColor = false }: { compact?: boolean; 
       </span>
       {!compact && (
         <span className="leading-none">
-          <span className={`block text-xl font-black tracking-tight ${onColor ? "text-white" : "text-foreground"}`}>GPB</span>
-          <span className={`block text-[10px] font-semibold tracking-wide ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
+          <span className={`block text-[15px] font-black tracking-tight sm:text-lg ${onColor ? "text-white" : "text-foreground"}`}>
             GetPerfectBoy.com
+          </span>
+          <span className={`mt-1 block text-[9px] font-semibold uppercase tracking-[0.12em] sm:text-[10px] ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
+            AI-Powered Services Marketplace
           </span>
         </span>
       )}

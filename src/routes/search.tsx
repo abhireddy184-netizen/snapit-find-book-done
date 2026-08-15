@@ -1,149 +1,274 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { Star, ShieldCheck, MapPin, Clock, SlidersHorizontal } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { Star, ShieldCheck, MapPin, Clock, Search as SearchIcon, AlertCircle, Loader2, ArrowRight } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { providers, categories } from "@/lib/snapit-data";
+import { providers as demoProviders } from "@/lib/snapit-data";
+import { catalog, searchServices } from "@/lib/catalog";
+import { fetchPublicProviders, matchProviders, type ProviderMatch } from "@/lib/providers";
+import { useResolvedLocation } from "@/lib/us-zip";
+
+type SearchParams = { q: string; loc: string };
+
+/**
+ * TanStack's default search parser JSON-decodes values, so `?loc=75034`
+ * arrives as the number 75034. Coerce back to a ZIP-shaped string.
+ */
+function toSearchString(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" && Number.isInteger(value) && value >= 0 && value < 100000) {
+    return String(value).padStart(5, "0");
+  }
+  if (typeof value === "number") return String(value);
+  return "";
+}
 
 export const Route = createFileRoute("/search")({
+  validateSearch: (search: Record<string, unknown>): SearchParams => ({
+    q: toSearchString(search['q']),
+    loc: toSearchString(search['loc']),
+  }),
   head: () => ({
     meta: [
-      { title: "Find a Pro — GPB" },
-      { name: "description", content: "Search vetted local professionals by category, rating, price and distance." },
-      { property: "og:title", content: "Find a Pro — GPB" },
-      { property: "og:description", content: "Search vetted local professionals near you." },
+      { title: "Find a pro near you — GetPerfectBoy.com" },
+      { name: "description", content: "Search local service professionals by ZIP code or city. GPB matches your job to pros who actually cover your area." },
+      { property: "og:title", content: "Find a pro near you — GetPerfectBoy.com" },
+      { property: "og:description", content: "Search local service professionals by ZIP code or city on GPB." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: SearchPage,
 });
 
 function SearchPage() {
-  const [minRating, setMinRating] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(500);
-  const [maxDist, setMaxDist] = useState(25);
-  const [avail, setAvail] = useState<string>("any");
-  const [showFilters, setShowFilters] = useState(false);
+  const navigate = useNavigate();
+  const { q, loc } = Route.useSearch();
+  const [serviceInput, setServiceInput] = useState(q);
+  const [locationInput, setLocationInput] = useState(loc);
 
-  const results = providers.filter((p) =>
-    p.rating >= minRating &&
-    p.startingPrice <= maxPrice &&
-    p.distance <= maxDist &&
-    (avail === "any" || p.availability.toLowerCase() === avail.toLowerCase())
-  );
+  useEffect(() => setServiceInput(q), [q]);
+  useEffect(() => setLocationInput(loc), [loc]);
+
+  const resolved = useResolvedLocation(loc);
+  const place = resolved.kind === "zip" ? resolved.place : null;
+
+  const serviceMatches = q.trim() ? searchServices(q, 6) : [];
+  const matchedCategoryName = serviceMatches[0]?.category.name;
+
+  const { data: realProviders, isLoading: loadingProviders } = useQuery({
+    queryKey: ["public-providers"],
+    queryFn: fetchPublicProviders,
+  });
+
+  const { data: matched } = useQuery({
+    queryKey: ["provider-matches", place?.zip ?? null, matchedCategoryName ?? null, realProviders?.length ?? 0],
+    queryFn: () => matchProviders(realProviders ?? [], place, matchedCategoryName),
+    enabled: Boolean(realProviders),
+  });
+
+  const serving = matched?.serving ?? [];
+
+  const heading =
+    resolved.kind === "zip"
+      ? `Pros for ${resolved.label}`
+      : resolved.kind === "text"
+        ? `Pros for ${resolved.label}`
+        : "Find a pro";
+
+  function submit(e: React.FormEvent) {
+    e.preventDefault();
+    void navigate({ to: "/search", search: { q: serviceInput.trim(), loc: locationInput.trim() } });
+  }
 
   return (
     <AppShell>
       <div className="pt-4">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-          <h1 className="truncate text-2xl font-black md:text-3xl">Pros near you</h1>
-          <button
-            onClick={() => setShowFilters((s) => !s)}
-            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm font-semibold shadow-sm md:hidden"
-          >
-            <SlidersHorizontal className="h-4 w-4" /> Filters
-          </button>
-        </div>
-        <p className="mt-1 text-sm text-muted-foreground">{results.length} pros match your filters</p>
-        <p className="mt-1 text-xs font-medium text-muted-foreground">Demo data — sample profiles shown while we onboard real local pros.</p>
+        <h1 className="text-2xl font-black md:text-3xl">{heading}</h1>
+        <p className="mt-1 text-sm text-muted-foreground">
+          {q.trim() ? <>Looking for “{q.trim()}”.</> : "Tell us what you need and where you are."}
+        </p>
       </div>
 
-      <div className="mt-6 grid gap-6 md:grid-cols-[280px_1fr]">
-        <aside className={`${showFilters ? "block" : "hidden"} md:block rounded-2xl border border-border/60 bg-card p-5 shadow-sm h-fit md:sticky md:top-20`}>
-          <h3 className="text-sm font-bold">Filters</h3>
+      <form
+        onSubmit={submit}
+        className="mt-5 grid gap-3 rounded-3xl border border-border/60 bg-card p-3 shadow-sm md:grid-cols-[1.4fr_1.1fr_auto]"
+      >
+        <label className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3">
+          <SearchIcon className="h-4 w-4 shrink-0 text-primary" />
+          <input
+            value={serviceInput}
+            onChange={(e) => setServiceInput(e.target.value)}
+            placeholder="What do you need? (e.g. plumber)"
+            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+          />
+        </label>
+        <label className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3">
+          <MapPin className="h-4 w-4 shrink-0 text-primary" />
+          <input
+            value={locationInput}
+            onChange={(e) => setLocationInput(e.target.value)}
+            inputMode="text"
+            placeholder="ZIP or city (e.g. 75034)"
+            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+          />
+        </label>
+        <GradientButton type="submit" className="w-full md:w-auto">Update search</GradientButton>
+      </form>
 
-          <FilterBlock label={`Minimum rating: ${minRating.toFixed(1)}★`}>
-            <input type="range" min={0} max={5} step={0.5} value={minRating} onChange={(e) => setMinRating(+e.target.value)} className="w-full accent-[oklch(0.58_0.19_265)]" />
-          </FilterBlock>
+      {resolved.kind === "loading" && (
+        <p className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground">
+          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Checking location…
+        </p>
+      )}
+      {resolved.kind === "invalid-zip" && (
+        <p className="mt-3 inline-flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-xs font-medium text-destructive">
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> {resolved.message}
+        </p>
+      )}
+      {resolved.kind === "text" && (
+        <p className="mt-3 text-xs text-muted-foreground">
+          Showing results for “{resolved.label}”. Add a 5-digit ZIP code for distance-accurate matching.
+        </p>
+      )}
 
-          <FilterBlock label={`Max starting price: $${maxPrice}`}>
-            <input type="range" min={20} max={500} step={10} value={maxPrice} onChange={(e) => setMaxPrice(+e.target.value)} className="w-full accent-[oklch(0.58_0.19_265)]" />
-          </FilterBlock>
+      {serviceMatches.length > 0 && (
+        <section className="mt-6">
+          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Matching GPB services</div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {serviceMatches.map((hit) => (
+              <Link
+                key={`${hit.category.slug}/${hit.service.slug}`}
+                to="/services/$category/$service"
+                params={{ category: hit.category.slug, service: hit.service.slug }}
+                className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary"
+              >
+                {hit.service.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
-          <FilterBlock label={`Max distance: ${maxDist} mi`}>
-            <input type="range" min={1} max={25} value={maxDist} onChange={(e) => setMaxDist(+e.target.value)} className="w-full accent-[oklch(0.58_0.19_265)]" />
-          </FilterBlock>
-
-          <FilterBlock label="Availability">
-            <div className="mt-2 flex flex-wrap gap-2">
-              {["any", "Today", "Tomorrow", "This week"].map((a) => (
-                <button
-                  key={a}
-                  onClick={() => setAvail(a)}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium ${avail === a ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"}`}
-                >
-                  {a === "any" ? "Any time" : a}
-                </button>
-              ))}
-            </div>
-          </FilterBlock>
-
-          <div className="mt-4 border-t border-border/60 pt-4">
-            <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Categories</div>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {categories.slice(0, 6).map((c) => (
-                <Link key={c.slug} to="/search" className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground hover:border-primary hover:text-primary">
-                  {c.name}
-                </Link>
-              ))}
-            </div>
+      <div className="mt-8 grid gap-8 md:grid-cols-[240px_1fr]">
+        <aside className="h-fit rounded-3xl border border-border/60 bg-card p-5 shadow-sm md:sticky md:top-20">
+          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Browse all categories</div>
+          <div className="mt-3 flex flex-wrap gap-1.5">
+            {catalog.map((c) => (
+              <Link
+                key={c.slug}
+                to="/services/$category"
+                params={{ category: c.slug }}
+                className="rounded-full border border-border px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary"
+              >
+                {c.name}
+              </Link>
+            ))}
           </div>
         </aside>
 
-        <div className="space-y-4">
-          {results.map((p) => (
-            <div key={p.id} className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:shadow-md">
-              <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4 md:grid-cols-[auto_minmax(0,1fr)_auto]">
-                <Avatar initials={p.initials} gradient={p.gradient} size={64} />
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-1.5">
-                    <div className="truncate text-lg font-bold">{p.name}</div>
-                    {p.verified && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-0.5 text-[10px] font-semibold text-mint-ink">
-                        <ShieldCheck className="h-3 w-3" /> Verified
-                      </span>
-                    )}
-                  </div>
-                  <div className="truncate text-xs text-muted-foreground">{p.business}</div>
-                  <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
-                  <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1 font-semibold text-foreground">
-                      <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating} <span className="font-normal text-muted-foreground">({p.reviews})</span>
-                    </span>
-                    <span className="inline-flex items-center gap-1"><MapPin className="h-3.5 w-3.5" /> {p.distance} mi</span>
-                    <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {p.availability}</span>
-                    <span className="font-semibold text-primary">from ${p.startingPrice}</span>
-                  </div>
-                </div>
-                <div className="col-span-2 flex flex-wrap gap-2 md:col-span-1 md:flex-col md:items-end md:justify-center">
-                  <Link to="/provider/$id" params={{ id: p.id }} className="inline-flex items-center justify-center rounded-full border border-border bg-background px-4 py-2 text-xs font-semibold hover:bg-muted">
-                    View Profile
+        <div className="space-y-6">
+          <section>
+            <h2 className="text-lg font-black">Professionals on GPB</h2>
+            {loadingProviders ? (
+              <p className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" /> Loading providers…
+              </p>
+            ) : serving.length > 0 ? (
+              <div className="mt-3 space-y-3">
+                {serving.map((m) => <RealProviderCard key={m.provider.id} match={m} />)}
+              </div>
+            ) : (
+              <div className="mt-3 rounded-3xl border border-dashed border-border p-6">
+                <p className="text-sm font-semibold">
+                  {place
+                    ? `No GPB professional covers ${place.city}, ${place.state} yet.`
+                    : "No GPB professional has been matched to this search yet."}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  We’re onboarding pros across the USA. Show us the job and we’ll notify you as coverage opens in your area.
+                </p>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Link to="/snap" className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-white shadow-md" style={{ background: "var(--gradient-primary)" }}>
+                    Show us the problem <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
-                  <Link to="/book" search={{ provider: p.id }} className="inline-flex items-center justify-center rounded-full px-4 py-2 text-xs font-semibold text-white shadow-md" style={{ background: "var(--gradient-primary)" }}>
-                    Book Now
+                  <Link to="/provider-interest" className="inline-flex items-center rounded-full border border-border px-4 py-2 text-xs font-semibold hover:bg-muted">
+                    I’m a pro — join GPB
                   </Link>
                 </div>
               </div>
-            </div>
-          ))}
+            )}
+          </section>
 
-          {results.length === 0 && (
-            <div className="rounded-2xl border border-dashed border-border p-10 text-center">
-              <p className="text-sm text-muted-foreground">No pros match your filters. Try widening your search.</p>
-              <div className="mt-4 flex justify-center">
-                <GradientButton onClick={() => { setMinRating(0); setMaxPrice(500); setMaxDist(25); setAvail("any"); }}>Reset filters</GradientButton>
-              </div>
+          <section>
+            <h2 className="text-lg font-black">Example profiles</h2>
+            <p className="mt-1 text-xs font-medium text-muted-foreground">
+              Sample listings that show how GPB profiles look. These are demo profiles — they are not local providers and are not available to book in your area.
+            </p>
+            <div className="mt-3 space-y-3">
+              {demoProviders.slice(0, 4).map((p) => (
+                <div key={p.id} className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
+                  <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
+                    <Avatar initials={p.initials} gradient={p.gradient} size={56} />
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <div className="truncate text-base font-bold">{p.name}</div>
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">Demo profile</span>
+                      </div>
+                      <div className="truncate text-xs text-muted-foreground">{p.business}</div>
+                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
+                      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1 font-semibold text-foreground">
+                          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating}
+                        </span>
+                        <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {p.availability}</span>
+                        <span className="font-semibold text-primary">from ${p.startingPrice}</span>
+                      </div>
+                      <Link to="/provider/$id" params={{ id: p.id }} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+                        View example profile <ArrowRight className="h-3.5 w-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          )}
+          </section>
         </div>
       </div>
     </AppShell>
   );
 }
 
-function FilterBlock({ label, children }: { label: string; children: React.ReactNode }) {
+function RealProviderCard({ match }: { match: ProviderMatch }) {
+  const { provider, distanceMiles, place } = match;
+  const initials = (provider.business_name || "GPB").slice(0, 2).toUpperCase();
   return (
-    <div className="mt-5">
-      <div className="text-xs font-semibold text-foreground">{label}</div>
-      <div className="mt-2">{children}</div>
+    <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
+        <Avatar initials={initials} gradient="from-[#FF3D8D] to-[#5B6CFF]" size={56} />
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-1.5">
+            <div className="truncate text-base font-bold">{provider.business_name || "GPB professional"}</div>
+            {provider.verification_status === "verified" && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-0.5 text-[10px] font-semibold text-mint-ink">
+                <ShieldCheck className="h-3 w-3" /> Verified
+              </span>
+            )}
+          </div>
+          {provider.service_category && <div className="truncate text-xs text-muted-foreground">{provider.service_category}</div>}
+          {provider.bio && <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{provider.bio}</p>}
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+            {place && (
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" /> {place.city}, {place.state}
+                {distanceMiles != null && <> · {distanceMiles < 1 ? "under 1" : Math.round(distanceMiles)} mi away</>}
+              </span>
+            )}
+            {provider.availability && <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {provider.availability}</span>}
+            {provider.starting_price != null && <span className="font-semibold text-primary">from ${provider.starting_price}</span>}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

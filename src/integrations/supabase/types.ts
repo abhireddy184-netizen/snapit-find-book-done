@@ -141,6 +141,51 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_interest: {
+        Row: {
+          business_name: string | null
+          category_label: string
+          category_slug: string
+          city: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          note: string | null
+          phone: string | null
+          state: string | null
+          zip: string
+        }
+        Insert: {
+          business_name?: string | null
+          category_label?: string
+          category_slug: string
+          city?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          note?: string | null
+          phone?: string | null
+          state?: string | null
+          zip: string
+        }
+        Update: {
+          business_name?: string | null
+          category_label?: string
+          category_slug?: string
+          city?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          note?: string | null
+          phone?: string | null
+          state?: string | null
+          zip?: string
+        }
+        Relationships: []
+      }
       provider_profiles: {
         Row: {
           availability: string | null
@@ -150,6 +195,8 @@ export type Database = {
           id: string
           service_area: string | null
           service_category: string | null
+          service_radius_miles: number | null
+          service_zip: string | null
           starting_price: number | null
           updated_at: string
           user_id: string
@@ -163,6 +210,8 @@ export type Database = {
           id?: string
           service_area?: string | null
           service_category?: string | null
+          service_radius_miles?: number | null
+          service_zip?: string | null
           starting_price?: number | null
           updated_at?: string
           user_id: string
@@ -176,6 +225,8 @@ export type Database = {
           id?: string
           service_area?: string | null
           service_category?: string | null
+          service_radius_miles?: number | null
+          service_zip?: string | null
           starting_price?: number | null
           updated_at?: string
           user_id?: string

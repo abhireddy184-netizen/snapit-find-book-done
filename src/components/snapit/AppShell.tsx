@@ -35,20 +35,16 @@ function TopBar() {
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
         <Logo />
-        <nav className="hidden items-center gap-1 text-sm font-medium text-muted-foreground md:flex">
+        <nav className="hidden items-center gap-1 text-sm font-medium text-muted-foreground lg:flex [&>a]:whitespace-nowrap">
           <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-primary hover:bg-primary/5 transition-colors">
             <Camera className="h-4 w-4" /> Show us
           </Link>
           <Link to="/emergency" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[color:var(--color-accent)] hover:bg-[color:var(--color-accent)]/10 transition-colors">
             <ShieldAlert className="h-4 w-4" /> Emergency
           </Link>
-          <Link to="/history" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">
-            <History className="h-4 w-4" /> History
-          </Link>
           <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">All Services</Link>
-          <Link to="/search" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Find a Pro</Link>
-          <Link to="/provider-dashboard" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">For Providers</Link>
-          <Link to="/dashboard" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Dashboard</Link>
+          <Link to="/search" search={{ q: "", loc: "" }} className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Find a Pro</Link>
+          <Link to="/provider-interest" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">For Pros</Link>
         </nav>
         <div className="flex items-center gap-2">
           <ThemeToggle />
@@ -104,7 +100,7 @@ function AuthNav() {
       </Link>
       <Link
         to="/register"
-        search={{ redirect: undefined }}
+        search={{ redirect: undefined, role: undefined }}
         className="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] hover:shadow-lg"
         style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px color-mix(in oklab, var(--primary) 55%, transparent)" }}
       >
