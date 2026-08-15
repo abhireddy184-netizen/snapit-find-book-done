@@ -4,6 +4,7 @@ import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, Video, Upload, MessageCircle, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
+import { JourneyRail, InputModes, RoomStory, ProVerticals, SectionConnector } from "@/components/snapit/HomeStory";
 import { providers } from "@/lib/snapit-data";
 import { catalog, popularCategories, TOTAL_SERVICES } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
