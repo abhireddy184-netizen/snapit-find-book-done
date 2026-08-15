@@ -31,6 +31,8 @@ import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
 import { providers, categories, type Provider } from "@/lib/snapit-data";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
+import { useAuth } from "@/lib/auth";
+import { createJobFromAnalysis } from "@/lib/jobs";
 import {
   BadgeCheck,
   Lock,
@@ -527,6 +529,8 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
       )}
 
       {/* Pros section header + quote toolbar */}
+      <JobScopeCta analysis={analysis} image={image} />
+
       <GradientButton
         onClick={() => document.getElementById("pros-list")?.scrollIntoView({ behavior: "smooth", block: "start" })}
         className="w-full justify-center py-4 text-base"
