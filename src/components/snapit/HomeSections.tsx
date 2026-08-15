@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Camera, Brain, UserCheck, ShieldCheck, Sparkles, Sparkle, Wrench, Zap, Wind, Hammer, Leaf, SprayCan, Grid3x3 } from "lucide-react";
-import { catalog, formatPrice, getCategoryBySlug, type SubService } from "@/lib/catalog";
+import { catalog, getCategoryBySlug, type SubService } from "@/lib/catalog";
 import { serviceScene } from "@/lib/scenes";
 
 /* ---------------- AI journey: 4 compact steps ---------------- */
@@ -14,11 +14,11 @@ const STEPS = [
 
 export function AiJourneyStrip() {
   return (
-    <ol className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-4 sm:overflow-visible sm:px-0">
+    <ol className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 md:grid md:grid-cols-4 md:overflow-visible">
       {STEPS.map((s, i) => (
         <li
           key={s.label}
-          className="flex min-w-[42%] snap-start items-center gap-2.5 rounded-2xl border border-border/60 bg-card px-3 py-2.5 shadow-sm sm:min-w-0"
+          className="flex min-w-[70%] snap-start items-center gap-2.5 rounded-2xl border border-border/60 bg-card px-3 py-2.5 shadow-sm min-[430px]:min-w-[58%] md:min-w-0"
         >
           <span
             className="grid h-8 w-8 shrink-0 place-items-center rounded-xl text-white"
@@ -27,8 +27,8 @@ export function AiJourneyStrip() {
             <s.icon className="h-4 w-4" />
           </span>
           <span className="min-w-0">
-            <span className="block truncate text-[13px] font-black leading-tight text-foreground">{s.label}</span>
-            <span className="block truncate text-[11px] text-muted-foreground">{s.hint}</span>
+            <span className="block text-[13px] font-black leading-tight text-foreground">{s.label}</span>
+            <span className="block text-[11px] leading-tight text-muted-foreground">{s.hint}</span>
           </span>
         </li>
       ))}
@@ -95,7 +95,7 @@ function mix(slugs: string[], perCat = 2): RowItem[] {
 }
 
 export const HOME_ROWS: { title: string; seeAll: string; items: RowItem[] }[] = [
-  { title: "Popular near you", seeAll: "/services", items: mix(["cleaning", "plumbing", "electrical", "handyman"], 2) },
+  { title: "Popular services", seeAll: "/services", items: mix(["cleaning", "plumbing", "electrical", "handyman"], 2) },
   { title: "Beauty at Home", seeAll: "/services/beauty-at-home", items: pick("beauty-at-home", 8) },
   { title: "Home repairs", seeAll: "/services/handyman", items: mix(["mounting-installation", "appliances", "painting", "walls-drywall"], 2) },
   { title: "Outdoor & quick jobs", seeAll: "/services/lawn-outdoor", items: mix(["lawn-outdoor", "junk-removal", "exterior-cleaning"], 2) },
@@ -113,7 +113,7 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
           See all <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
-      <div className="-mx-4 mt-3 flex snap-x gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
+      <div className="-mx-4 mt-3 flex snap-x gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0 xl:grid-cols-6">
         {items.map(({ categorySlug, service }) => {
           const raw = serviceScene(categorySlug, service.slug);
           const img = raw && !used.has(raw) ? raw : undefined;
@@ -124,7 +124,7 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
               key={`${categorySlug}/${service.slug}`}
               to="/services/$category/$service"
               params={{ category: categorySlug, service: service.slug }}
-              className="group w-[152px] shrink-0 snap-start overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md sm:w-[190px] lg:w-[220px]"
+              className="group w-[154px] shrink-0 snap-start overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md min-[430px]:w-[168px] md:w-auto"
             >
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
                 {img ? (
@@ -144,12 +144,11 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
                   </span>
                 )}
               </div>
-              <div className="p-3">
-                <div className="truncate text-[13px] font-bold text-foreground">{service.name}</div>
-                <div className="mt-0.5 text-[11px] font-semibold text-primary">
-                  {formatPrice(service.priceLow, service.priceHigh)}
-                  {service.unit ? ` ${service.unit}` : ""}
-                </div>
+               <div className="flex min-h-14 flex-col justify-center p-3">
+                 <div className="line-clamp-2 text-[13px] font-bold leading-tight text-foreground">{service.name}</div>
+                 <div className="mt-1 truncate text-[10px] font-semibold text-muted-foreground">
+                   {getCategoryBySlug(categorySlug)?.name}
+                 </div>
               </div>
             </Link>
           );
