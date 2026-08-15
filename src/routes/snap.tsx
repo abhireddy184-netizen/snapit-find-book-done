@@ -582,7 +582,7 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
         onClick={() => document.getElementById("pros-list")?.scrollIntoView({ behavior: "smooth", block: "start" })}
         className="w-full justify-center py-4 text-base"
       >
-        <ShieldCheck className="h-5 w-5" /> View Verified Professionals
+        <ShieldCheck className="h-5 w-5" /> Browse service pros
       </GradientButton>
 
       <div id="pros-list" className="scroll-mt-20">
@@ -985,7 +985,7 @@ void ArrowRight;
 function TrustBadges() {
   const items = [
     { icon: Sparkles, label: "AI Powered Diagnosis" },
-    { icon: BadgeCheck, label: "Verified Professionals" },
+    { icon: BadgeCheck, label: "Verification when reviewed" },
     { icon: Tag, label: "Upfront Pricing" },
     { icon: Lock, label: "Secure Payments" },
     { icon: HandHeart, label: "Satisfaction Guaranteed" },
