@@ -12,16 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SnapRouteImport } from './routes/snap'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as RegisterRouteImport } from './routes/register'
-import { Route as ProviderDashboardRouteImport } from './routes/provider-dashboard'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as EmergencyRouteImport } from './routes/emergency'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TrackingIdRouteImport } from './routes/tracking.$id'
 import { Route as ProviderIdRouteImport } from './routes/provider.$id'
+import { Route as AuthenticatedProviderDashboardRouteImport } from './routes/_authenticated/provider-dashboard'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const SnapRoute = SnapRouteImport.update({
   id: '/snap',
@@ -38,11 +38,6 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ProviderDashboardRoute = ProviderDashboardRouteImport.update({
-  id: '/provider-dashboard',
-  path: '/provider-dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -56,11 +51,6 @@ const HistoryRoute = HistoryRouteImport.update({
 const EmergencyRoute = EmergencyRouteImport.update({
   id: '/emergency',
   path: '/emergency',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CategoriesRoute = CategoriesRouteImport.update({
@@ -88,19 +78,30 @@ const ProviderIdRoute = ProviderIdRouteImport.update({
   path: '/provider/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedProviderDashboardRoute =
+  AuthenticatedProviderDashboardRouteImport.update({
+    id: '/_authenticated/provider-dashboard',
+    path: '/provider-dashboard',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/_authenticated/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
-  '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
-  '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/snap': typeof SnapRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
 }
@@ -108,14 +109,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
-  '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
-  '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/snap': typeof SnapRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
 }
@@ -124,14 +125,14 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
-  '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
   '/history': typeof HistoryRoute
   '/login': typeof LoginRoute
-  '/provider-dashboard': typeof ProviderDashboardRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/snap': typeof SnapRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
 }
@@ -141,14 +142,14 @@ export interface FileRouteTypes {
     | '/'
     | '/book'
     | '/categories'
-    | '/dashboard'
     | '/emergency'
     | '/history'
     | '/login'
-    | '/provider-dashboard'
     | '/register'
     | '/search'
     | '/snap'
+    | '/dashboard'
+    | '/provider-dashboard'
     | '/provider/$id'
     | '/tracking/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -156,14 +157,14 @@ export interface FileRouteTypes {
     | '/'
     | '/book'
     | '/categories'
-    | '/dashboard'
     | '/emergency'
     | '/history'
     | '/login'
-    | '/provider-dashboard'
     | '/register'
     | '/search'
     | '/snap'
+    | '/dashboard'
+    | '/provider-dashboard'
     | '/provider/$id'
     | '/tracking/$id'
   id:
@@ -171,14 +172,14 @@ export interface FileRouteTypes {
     | '/'
     | '/book'
     | '/categories'
-    | '/dashboard'
     | '/emergency'
     | '/history'
     | '/login'
-    | '/provider-dashboard'
     | '/register'
     | '/search'
     | '/snap'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/provider-dashboard'
     | '/provider/$id'
     | '/tracking/$id'
   fileRoutesById: FileRoutesById
@@ -187,14 +188,14 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BookRoute: typeof BookRoute
   CategoriesRoute: typeof CategoriesRoute
-  DashboardRoute: typeof DashboardRoute
   EmergencyRoute: typeof EmergencyRoute
   HistoryRoute: typeof HistoryRoute
   LoginRoute: typeof LoginRoute
-  ProviderDashboardRoute: typeof ProviderDashboardRoute
   RegisterRoute: typeof RegisterRoute
   SearchRoute: typeof SearchRoute
   SnapRoute: typeof SnapRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedProviderDashboardRoute: typeof AuthenticatedProviderDashboardRoute
   ProviderIdRoute: typeof ProviderIdRoute
   TrackingIdRoute: typeof TrackingIdRoute
 }
@@ -222,13 +223,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/provider-dashboard': {
-      id: '/provider-dashboard'
-      path: '/provider-dashboard'
-      fullPath: '/provider-dashboard'
-      preLoaderRoute: typeof ProviderDashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -248,13 +242,6 @@ declare module '@tanstack/react-router' {
       path: '/emergency'
       fullPath: '/emergency'
       preLoaderRoute: typeof EmergencyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/categories': {
@@ -292,6 +279,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProviderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/provider-dashboard': {
+      id: '/_authenticated/provider-dashboard'
+      path: '/provider-dashboard'
+      fullPath: '/provider-dashboard'
+      preLoaderRoute: typeof AuthenticatedProviderDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -299,14 +300,14 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BookRoute: BookRoute,
   CategoriesRoute: CategoriesRoute,
-  DashboardRoute: DashboardRoute,
   EmergencyRoute: EmergencyRoute,
   HistoryRoute: HistoryRoute,
   LoginRoute: LoginRoute,
-  ProviderDashboardRoute: ProviderDashboardRoute,
   RegisterRoute: RegisterRoute,
   SearchRoute: SearchRoute,
   SnapRoute: SnapRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedProviderDashboardRoute: AuthenticatedProviderDashboardRoute,
   ProviderIdRoute: ProviderIdRoute,
   TrackingIdRoute: TrackingIdRoute,
 }

@@ -4,7 +4,7 @@ import { CalendarDays, Heart, MessageCircle, User, MapPin, Star, ShieldCheck } f
 import { AppShell, Avatar } from "@/components/snapit/AppShell";
 import { providers, type Provider } from "@/lib/snapit-data";
 
-export const Route = createFileRoute("/dashboard")({
+export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
       { title: "Your dashboard — SnapIt" },
