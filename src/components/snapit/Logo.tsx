@@ -17,11 +17,11 @@ export function Logo({ compact = false, onColor = false }: { compact?: boolean; 
         {!onColor && <span className="pointer-events-none absolute -inset-px bg-gradient-to-b from-white/35 to-transparent opacity-70" />}
       </span>
       {!compact && (
-        <span className="leading-none">
-          <span className={`block text-[15px] font-black tracking-tight sm:text-lg ${onColor ? "text-white" : "text-foreground"}`}>
+        <span className="min-w-0 leading-none">
+          <span className={`block truncate text-[15px] font-black tracking-tight sm:text-lg ${onColor ? "text-white" : "text-foreground"}`}>
             GetPerfectBoy.com
           </span>
-          <span className={`mt-1 block text-[9px] font-semibold uppercase tracking-[0.12em] sm:text-[10px] ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
+          <span className={`mt-1 hidden whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.12em] sm:block sm:text-[10px] ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
             AI-Powered Services Marketplace
           </span>
         </span>

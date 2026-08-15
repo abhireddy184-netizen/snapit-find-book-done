@@ -382,7 +382,7 @@ function FloatingSnapButton({ footerRef }: { footerRef: React.RefObject<HTMLElem
       to="/snap"
       aria-label="Snap a problem for AI diagnosis"
       className={cn(
-        "fixed bottom-28 right-4 z-50 flex items-center gap-1.5 rounded-full py-2.5 pl-3 pr-4 text-xs font-bold text-white transition-all duration-300 hover:scale-105 active:scale-95 md:bottom-6 md:right-6 pulse-soft",
+        "fixed bottom-28 right-4 z-50 hidden items-center gap-1.5 md:flex rounded-full py-2.5 pl-3 pr-4 text-xs font-bold text-white transition-all duration-300 hover:scale-105 active:scale-95 md:bottom-6 md:right-6 pulse-soft",
         hidden ? "translate-y-24 opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
       )}
       style={{ background: "var(--gradient-primary)" }}
