@@ -26,7 +26,7 @@ function RegisterPage() {
       subtitle={
         role === "provider"
           ? "Set up your business profile and start receiving standardized job briefs."
-          : "Show it. Tell us. Get it done. Get started in seconds."
+          : "Show it. Tell us. Get it fixed. Get started in seconds."
       }
       initialRole={role ?? "customer"}
       redirectTo={redirect}

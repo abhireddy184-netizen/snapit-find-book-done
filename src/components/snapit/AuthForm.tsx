@@ -97,7 +97,7 @@ export function AuthForm({
         <aside className="relative hidden overflow-hidden p-10 text-white md:block" style={{ background: "var(--gradient-primary)" }}>
           <Logo onColor />
           <div className="mt-24">
-            <h2 className="text-4xl font-black leading-tight">Show it.<br />Tell us.<br />Get it done.</h2>
+            <h2 className="text-4xl font-black leading-tight">Show it.<br />Tell us.<br />Get it fixed.</h2>
             <p className="mt-4 max-w-sm text-white/90">
               GetPerfectBoy.com is an AI-powered services marketplace — describe or show the job, compare local pros on one
               standard scope, and keep the proof.
