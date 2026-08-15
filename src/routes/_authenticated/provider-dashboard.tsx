@@ -6,7 +6,8 @@ import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { useAuth } from "@/lib/auth";
 import { fetchProviderBookings, fetchMyProviderProfile, formatBookingDate, type Booking } from "@/lib/bookings";
 import { supabase } from "@/integrations/supabase/client";
-import { categories } from "@/lib/snapit-data";
+import { catalog } from "@/lib/catalog";
+import { useResolvedLocation } from "@/lib/us-zip";
 
 export const Route = createFileRoute("/_authenticated/provider-dashboard")({
   head: () => ({
@@ -209,6 +210,8 @@ function BusinessProfile() {
     business_name: "",
     service_category: "",
     service_area: "",
+    service_zip: "",
+    service_radius_miles: "",
     starting_price: "",
     availability: "",
     bio: "",
@@ -223,6 +226,8 @@ function BusinessProfile() {
       business_name: data.business_name ?? "",
       service_category: data.service_category ?? "",
       service_area: data.service_area ?? "",
+      service_zip: data.service_zip ?? "",
+      service_radius_miles: data.service_radius_miles != null ? String(data.service_radius_miles) : "",
       starting_price: data.starting_price != null ? String(data.starting_price) : "",
       availability: data.availability ?? "",
       bio: data.bio ?? "",
@@ -238,12 +243,27 @@ function BusinessProfile() {
       setError("Please enter your business name.");
       return;
     }
+    if (form.service_zip && !/^\d{5}$/.test(form.service_zip)) {
+      setError("Service ZIP must be a 5-digit US ZIP code.");
+      return;
+    }
+    if (form.service_zip && !zipPlace) {
+      setError(`${form.service_zip} isn’t a recognized US ZIP code.`);
+      return;
+    }
+    const radius = form.service_radius_miles ? Number(form.service_radius_miles) : null;
+    if (radius != null && (!Number.isFinite(radius) || radius < 1 || radius > 200)) {
+      setError("Service radius must be between 1 and 200 miles.");
+      return;
+    }
     setSaving(true);
     const payload = {
       user_id: user.id,
       business_name: form.business_name.trim(),
       service_category: form.service_category || null,
       service_area: form.service_area || null,
+      service_zip: form.service_zip || null,
+      service_radius_miles: radius,
       starting_price: form.starting_price ? Number(form.starting_price) : null,
       availability: form.availability || null,
       bio: form.bio || null,
@@ -258,9 +278,8 @@ function BusinessProfile() {
     await queryClient.invalidateQueries({ queryKey: ["provider-profile", user.id] });
   }
 
-  if (isLoading) return <Loading />;
-
   const verified = data?.verification_status === "verified";
+  if (isLoading) return <Loading />;
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
@@ -270,10 +289,36 @@ function BusinessProfile() {
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           <Input label="Business name" value={form.business_name} onChange={(v) => setForm({ ...form, business_name: v })} placeholder="Rivera Plumbing Co." />
           <Select label="Service category" value={form.service_category} onChange={(v) => setForm({ ...form, service_category: v })} />
-          <Input label="Service area" value={form.service_area} onChange={(v) => setForm({ ...form, service_area: v })} placeholder="Springfield & nearby" />
+          <div>
+            <Input
+              label="Service ZIP code"
+              value={form.service_zip}
+              onChange={(v) => setForm({ ...form, service_zip: v.replace(/[^0-9]/g, "").slice(0, 5) })}
+              placeholder="75034"
+            />
+            {zipPlace && (
+              <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-primary">
+                <MapPin className="h-3 w-3" /> {zipPlace.city}, {zipPlace.state}
+              </p>
+            )}
+            {zipResolved.kind === "invalid-zip" && (
+              <p className="mt-1 text-xs font-medium text-destructive">{zipResolved.message}</p>
+            )}
+          </div>
+          <Input
+            label="Service radius (miles)"
+            value={form.service_radius_miles}
+            onChange={(v) => setForm({ ...form, service_radius_miles: v.replace(/[^0-9]/g, "").slice(0, 3) })}
+            placeholder="25"
+          />
+          <Input label="Service area (description)" value={form.service_area} onChange={(v) => setForm({ ...form, service_area: v })} placeholder="Frisco, Plano & north Dallas" />
           <Input label="Starting price ($)" value={form.starting_price} onChange={(v) => setForm({ ...form, starting_price: v.replace(/[^0-9.]/g, "") })} placeholder="89" />
           <Input label="Availability" value={form.availability} onChange={(v) => setForm({ ...form, availability: v })} placeholder="Mon–Fri, 8am–6pm" />
         </div>
+        <p className="mt-2 text-xs text-muted-foreground">
+          Your ZIP and radius decide which customer searches you appear in. Leave them blank and you won’t show up in
+          location-based results.
+        </p>
         <div className="mt-3">
           <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">About your business</label>
           <textarea
@@ -344,8 +389,8 @@ function Select({ label, value, onChange }: { label: string; value: string; onCh
         className="mt-1 w-full rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary"
       >
         <option value="">Select a category</option>
-        {categories.map((c) => (
-          <option key={c.name} value={c.name}>{c.name}</option>
+        {catalog.map((c) => (
+          <option key={c.slug} value={c.name}>{c.name}</option>
         ))}
       </select>
     </label>
