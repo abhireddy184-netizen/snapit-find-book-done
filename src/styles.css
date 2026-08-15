@@ -364,3 +364,65 @@
 @media (prefers-reduced-motion: reduce) {
   .scan-sweep, .float-slow, .ping-ring { animation: none !important; }
 }
+
+/* ------------------------------------------------------------------ */
+/* GPB Pros on the Move — walking strip                                */
+/* ------------------------------------------------------------------ */
+
+@keyframes gpb-walk-across {
+  0%   { transform: translateX(-18%); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateX(118%); opacity: 0; }
+}
+
+@keyframes gpb-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-1.5px); }
+}
+
+@keyframes gpb-swing-front {
+  0%, 100% { transform: rotate(16deg); }
+  50%      { transform: rotate(-16deg); }
+}
+
+@keyframes gpb-swing-back {
+  0%, 100% { transform: rotate(-16deg); }
+  50%      { transform: rotate(16deg); }
+}
+
+@keyframes gpb-bubble-in {
+  0%   { opacity: 0; transform: translateY(6px) scale(0.96); }
+  12%  { opacity: 1; transform: translateY(0) scale(1); }
+  80%  { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-6px) scale(0.98); }
+}
+
+@utility walk-across {
+  animation: gpb-walk-across var(--walk-duration, 11s) linear forwards;
+}
+
+@utility walk-bob {
+  animation: gpb-bob 0.9s ease-in-out infinite;
+}
+
+@utility walk-swing-front {
+  transform-origin: top center;
+  animation: gpb-swing-front 0.9s ease-in-out infinite;
+}
+
+@utility walk-swing-back {
+  transform-origin: top center;
+  animation: gpb-swing-back 0.9s ease-in-out infinite;
+}
+
+@utility walk-bubble {
+  animation: gpb-bubble-in var(--walk-duration, 11s) ease-in-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .walk-across, .walk-bob, .walk-swing-front, .walk-swing-back, .walk-bubble {
+    animation: none !important;
+  }
+  .walk-across { transform: translateX(38%); opacity: 1; }
+}
