@@ -10,7 +10,9 @@ import { Logo, Wordmark } from "@/components/snapit/Logo";
 import { AiJourneyStrip, CategoryIconRow, HomeRows } from "@/components/snapit/HomeSections";
 import { ProsOnTheMove } from "@/components/snapit/ProsOnTheMove";
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
-import heroProblem from "@/assets/scenes/plumbing.jpg";
+import heroProblemAsset from "@/assets/uploaded-services/plumbing-service.png.asset.json";
+
+const heroProblem = heroProblemAsset.url;
 
 const SITE_URL = "https://getperfectboy.com";
 
@@ -106,8 +108,7 @@ function Landing() {
                   src={heroProblem}
                   alt="Framing a leaking pipe under a sink with the GPB camera"
                   className="h-full w-full object-cover"
-                  width={768}
-                  height={512}
+                  fetchPriority="high"
                 />
                 <div className="scan-sweep" aria-hidden="true" />
                 {/* viewfinder corners */}
