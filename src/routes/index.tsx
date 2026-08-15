@@ -12,18 +12,18 @@ const OG_IMAGE = `${SITE_URL}/__l5e/assets-v1/a199e0d6-211d-4b74-ab79-c58ffbd287
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SnapIt — AI-Powered Local Services Marketplace" },
-      { name: "description", content: "One photo. One tap. Problem solved. Use AI to instantly identify home or personal service needs, compare trusted local professionals, and book in minutes." },
-      { property: "og:title", content: "SnapIt — AI-Powered Local Services Marketplace" },
-      { property: "og:description", content: "One photo. One tap. Problem solved. Use AI to instantly identify home or personal service needs, compare trusted local professionals, and book in minutes." },
+      { title: "SnapIt — Show the problem. Get it fixed with proof." },
+      { name: "description", content: "Snap a photo of any problem. SnapIt's AI explains what it likely needs, turns it into one standardized job scope, gets comparable quotes, books a pro and keeps a permanent record of the work." },
+      { property: "og:title", content: "SnapIt — Show the problem. Get it fixed with proof." },
+      { property: "og:description", content: "AI diagnosis, one standardized scope, comparable quotes, booking and a permanent proof record for every job." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
       { property: "og:image", content: OG_IMAGE },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "SnapIt — AI-Powered Local Services Marketplace" },
-      { name: "twitter:description", content: "One photo. One tap. Problem solved. Use AI to instantly identify home or personal service needs, compare trusted local professionals, and book in minutes." },
+      { name: "twitter:title", content: "SnapIt — Show the problem. Get it fixed with proof." },
+      { name: "twitter:description", content: "AI diagnosis, one standardized scope, comparable quotes, booking and a permanent proof record for every job." },
       { name: "twitter:image", content: OG_IMAGE },
     ],
     links: [{ rel: "canonical", href: SITE_URL + "/" }],
@@ -48,11 +48,12 @@ function Landing() {
             <Sparkles className="h-3.5 w-3.5" /> Snap it. Book it. Done.
           </div>
           <h1 className="max-w-4xl text-[2.5rem] font-black leading-[1.05] tracking-tight text-foreground md:text-7xl">
-            One Photo. One Tap.{" "}
-            <span className="text-gradient-hero">Problem Solved.</span>
+            Show the problem.{" "}
+            <span className="text-gradient-hero">Get it fixed with proof.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-xl">
-            Use AI to identify your problem instantly and connect with trusted local professionals in minutes.
+            Snap it and our AI explains what it likely needs. We turn that into one standardized job scope, so quotes are
+            comparable, booking is simple and every job ends with a record you keep.
           </p>
 
           <form
@@ -87,9 +88,34 @@ function Landing() {
           </form>
 
           <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Background-checked</span>
-            <span className="inline-flex items-center gap-1.5"><Star className="h-4 w-4 text-primary" /> Upfront pricing</span>
-            <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4 text-primary" /> Same-day bookings</span>
+            <span className="inline-flex items-center gap-1.5"><Sparkles className="h-4 w-4 text-primary" /> AI diagnosis in seconds</span>
+            <span className="inline-flex items-center gap-1.5"><Star className="h-4 w-4 text-primary" /> Like-for-like quotes</span>
+            <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Before &amp; after proof</span>
+          </div>
+        </div>
+      </section>
+
+      {/* The SnapIt flow */}
+      <section className="mt-10">
+        <div className="overflow-x-auto rounded-[28px] border border-border/60 bg-card p-5 shadow-sm">
+          <div className="flex min-w-max items-center gap-2">
+            {[
+              { s: "Snap", d: "Show the problem" },
+              { s: "Understand", d: "AI explains it" },
+              { s: "Scope", d: "One standard brief" },
+              { s: "Compare", d: "Like-for-like quotes" },
+              { s: "Book", d: "Pick your pro" },
+              { s: "Verify", d: "Before & after check" },
+              { s: "Proof", d: "Kept in your passport" },
+            ].map((x, i) => (
+              <div key={x.s} className="flex items-center gap-2">
+                <div className="rounded-2xl bg-muted/50 px-4 py-3">
+                  <div className="text-xs font-black">{x.s}</div>
+                  <div className="text-[11px] text-muted-foreground">{x.d}</div>
+                </div>
+                {i < 6 && <ArrowRight className="h-3.5 w-3.5 shrink-0 text-border" />}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -123,9 +149,9 @@ function Landing() {
         <SectionHeader title="How SnapIt works" />
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {[
-            { n: "01", t: "Snap a photo", d: "Show us the problem or the service you need in seconds." },
-            { n: "02", t: "Match with pros", d: "See vetted local pros ranked by rating, price and distance." },
-            { n: "03", t: "Book and relax", d: "Confirm the time that works for you. The pro is on the way." },
+            { n: "01", t: "Snap & understand", d: "Show the problem. Our AI describes what it likely is, how urgent it is and what it typically costs." },
+            { n: "02", t: "Standardize & compare", d: "We turn the diagnosis into one job scope every pro quotes against, so prices are comparable." },
+            { n: "03", t: "Book & keep proof", d: "Book the pro you pick, add an after photo and keep a permanent job passport for the work." },
           ].map((s) => (
             <div key={s.n} className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
               <div className="text-4xl font-black text-transparent bg-clip-text" style={{ backgroundImage: "var(--gradient-primary)" }}>{s.n}</div>
@@ -150,9 +176,9 @@ function Landing() {
         <SectionHeader title="What SnapIt is built for" />
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {[
-            { title: "AI-powered service matching", text: "Snap a photo and our AI identifies the likely problem, category and cost range before you book." },
-            { title: "Clear, upfront estimates", text: "See an estimated price and duration up front, so there are no surprises when a pro arrives." },
-            { title: "Built for trusted local pros", text: "Providers create real business profiles. Verification badges only appear once a pro is reviewed." },
+            { title: "AI that explains the problem", text: "Snap a photo and get a plain-language diagnosis with a likely category, urgency and typical cost range." },
+            { title: "One scope, comparable quotes", text: "Every service pro receives the identical standardized brief, so you compare price, availability and warranty — not guesswork." },
+            { title: "Proof that stays with you", text: "Before and after photos, the accepted quote, receipts and warranty notes are kept in a permanent job record." },
           ].map((c) => (
             <div key={c.title} className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
               <div className="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-md" style={{ background: "var(--gradient-primary)" }}>
@@ -174,7 +200,7 @@ function Landing() {
           <div>
             <div className="mb-3 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur">For pros</div>
             <h2 className="text-3xl font-black md:text-4xl">Grow your business with SnapIt</h2>
-            <p className="mt-3 max-w-xl text-white/90">Get matched with local customers who need you today. Zero setup fees, transparent payouts and tools that make running your business easier.</p>
+            <p className="mt-3 max-w-xl text-white/90">Receive clear, standardized job briefs instead of vague enquiries — so you can quote accurately and win the right work.</p>
             <div className="mt-6">
               <Link
                 to="/register"
@@ -186,7 +212,7 @@ function Landing() {
             </div>
           </div>
           <ul className="space-y-2 text-sm">
-            {["Free profile and instant leads", "Set your own prices and schedule", "Get paid weekly, hassle-free", "Real reviews from real customers"].map((l) => (
+            {["Free business profile", "Standardized job scopes, not vague enquiries", "Set your own prices and schedule", "Before & after proof on every job"].map((l) => (
               <li key={l} className="flex items-center gap-2 rounded-xl bg-white/10 px-4 py-3 backdrop-blur">
                 <CheckCircle2 className="h-4 w-4 shrink-0" /> {l}
               </li>
@@ -221,7 +247,8 @@ function EmergencySection() {
             <span className="text-red-600">we dispatch fast.</span>
           </h2>
           <p className="mt-2 max-w-lg text-sm text-muted-foreground md:text-base">
-            On-call verified pros for burst pipes, power outages, lockouts and more. Average arrival under 20 minutes.
+            Flag burst pipes, power outages, lockouts and other urgent issues so they're triaged first. Emergency dispatch goes
+            live as pros are onboarded in your area.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
