@@ -146,7 +146,7 @@ function Landing() {
 
       {/* Reviews */}
       <section className="mt-16">
-        <SectionHeader title="Loved by thousands of customers" />
+        <SectionHeader title="What SnapIt is built for" />
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {testimonials.map((t) => (
             <div key={t.name} className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
@@ -379,7 +379,7 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
       <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
         <div>
           <Logo />
-          <p className="mt-4 max-w-xs leading-relaxed">Snap it. Book it. Done. AI-powered local services trusted by thousands.</p>
+          <p className="mt-4 max-w-xs leading-relaxed">Snap it. Book it. Done. AI-powered matching between customers and trusted local pros.</p>
           <div className="mt-5 flex items-center gap-2">
             {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
               <a key={i} href="#" aria-label="Social" className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary">
