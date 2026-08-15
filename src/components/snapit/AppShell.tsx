@@ -10,7 +10,14 @@ export function AppShell({ children, hideBottomNav = false }: { children: ReactN
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
       <TopBar />
-      <main className={cn("mx-auto w-full max-w-6xl px-4 pt-4", hideBottomNav ? "pb-10" : "pb-28 md:pb-10")}>{children}</main>
+      <main
+        className={cn(
+          "mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6 md:pt-6 lg:px-8 xl:max-w-7xl",
+          hideBottomNav ? "pb-10 md:pb-16" : "pb-32 md:pb-16"
+        )}
+      >
+        {children}
+      </main>
       {!hideBottomNav && <BottomNav />}
     </div>
   );
@@ -33,9 +40,11 @@ function TopBar() {
           : "border-transparent bg-background/60"
       )}
     >
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-        <Logo />
-        <nav className="hidden items-center gap-1 text-sm font-medium text-muted-foreground lg:flex [&>a]:whitespace-nowrap">
+      <div className="mx-auto grid h-14 max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-6 md:h-16 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-6 lg:px-8 xl:max-w-7xl">
+        <div className="min-w-0">
+          <Logo />
+        </div>
+        <nav className="hidden items-center justify-center gap-1 text-sm font-medium text-muted-foreground lg:flex xl:gap-2 [&>a]:whitespace-nowrap">
           <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-primary hover:bg-primary/5 transition-colors">
             <Camera className="h-4 w-4" /> Show us
           </Link>
@@ -46,7 +55,7 @@ function TopBar() {
           <Link to="/search" search={{ q: "", loc: "" }} className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Find a Pro</Link>
           <Link to="/provider-interest" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">For Pros</Link>
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 justify-self-end sm:gap-2">
           <ThemeToggle />
           <AuthNav />
         </div>

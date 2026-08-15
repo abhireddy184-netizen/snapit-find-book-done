@@ -4,7 +4,7 @@ import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
-import { JourneyRail, InputModes, RoomStory, ProVerticals, SectionConnector, SectionBridge } from "@/components/snapit/HomeStory";
+import { JourneyRail, InputModes, RoomStory, ProVerticals, SectionBridge } from "@/components/snapit/HomeStory";
 import { ProsOnTheMove } from "@/components/snapit/ProsOnTheMove";
 import { providers } from "@/lib/snapit-data";
 import { catalog, popularCategories, TOTAL_SERVICES } from "@/lib/catalog";
@@ -48,23 +48,24 @@ function Landing() {
   return (
     <AppShell>
       {/* Hero */}
-      <section className="aurora-veil relative overflow-hidden rounded-[32px] px-6 py-14 md:px-14 md:py-20 fade-up" style={{ backgroundColor: "color-mix(in oklab, var(--card) 88%, var(--background))" }}>
+      <section className="aurora-veil relative overflow-hidden rounded-[26px] px-5 py-10 sm:rounded-[32px] sm:px-7 sm:py-12 md:px-12 md:py-16 lg:py-20 xl:px-16 fade-up" style={{ backgroundColor: "color-mix(in oklab, var(--card) 88%, var(--background))" }}>
         <div className="pointer-events-none absolute -right-28 -top-28 h-80 w-80 rounded-full opacity-25 blur-3xl float-slow" style={{ background: "var(--gradient-primary)" }} />
         <div className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full opacity-20 blur-3xl float-slow" style={{ background: "var(--gradient-secondary)", animationDelay: "1.6s" }} />
-        <div className="relative">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-card/80 px-3.5 py-1.5 text-xs font-bold text-primary shadow-sm backdrop-blur">
-            <Sparkles className="h-3.5 w-3.5" /> GetPerfectBoy.com · Show it. Tell us. Get it fixed.
+        <div className="relative grid items-start gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12 xl:gap-16">
+          <div className="min-w-0">
+          <div className="mb-4 inline-flex max-w-full items-center gap-2 rounded-full border border-primary/20 bg-card/80 px-3 py-1.5 text-[11px] font-bold text-primary shadow-sm backdrop-blur sm:px-3.5 sm:text-xs md:mb-5">
+            <Sparkles className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">GetPerfectBoy.com · Show it. Tell us. Get it fixed.</span>
           </div>
-          <h1 className="max-w-4xl text-[2.6rem] font-black leading-[1.03] tracking-tight text-foreground md:text-7xl">
+          <h1 className="max-w-[16ch] text-[2.15rem] font-black leading-[1.05] tracking-tight text-foreground sm:text-5xl md:max-w-[18ch] md:text-6xl xl:text-7xl">
             Show the problem.{" "}
             <span className="text-gradient-hero">Get it fixed with proof.</span>
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-xl">
+          <p className="mt-4 max-w-[58ch] text-[0.95rem] leading-relaxed text-muted-foreground sm:text-base md:mt-5 md:text-lg">
             Upload a photo, record a short video, or just describe it in words. GPB works out what the job actually is,
             turns it into one clear scope and connects you to the right local professional — with before &amp; after proof kept for you.
           </p>
 
-          <div className="mt-6">
+          <div className="mt-5 md:mt-6">
             <InputModes />
           </div>
 
@@ -73,7 +74,7 @@ function Landing() {
               e.preventDefault();
               void navigate({ to: "/search", search: { q: service.trim(), loc: location.trim() } });
             }}
-            className="mt-10 grid gap-3 rounded-3xl bg-card p-3 shadow-xl md:grid-cols-[1.2fr_1.5fr_auto]"
+            className="mt-6 grid gap-2.5 rounded-[22px] bg-card p-2.5 shadow-xl sm:grid-cols-[1.1fr_1.4fr_auto] sm:gap-3 sm:rounded-3xl sm:p-3 md:mt-8"
             style={{ boxShadow: "var(--shadow-elegant)" }}
           >
             <LocationAutocomplete
@@ -82,7 +83,7 @@ function Landing() {
               aria-label="Location"
               placeholder="ZIP or city (e.g. 75034)"
             />
-            <label className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3">
+            <label className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3.5 sm:py-3">
               <Search className="h-4 w-4 shrink-0 text-primary" />
               <input
                 value={service}
@@ -91,30 +92,37 @@ function Landing() {
                 className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </label>
-            <GradientButton type="submit" className="w-full md:w-auto">
+            <GradientButton type="submit" className="w-full shrink-0 whitespace-nowrap px-5 sm:w-auto">
               Find a Pro <ArrowRight className="h-4 w-4" />
             </GradientButton>
           </form>
 
-          <div className="mt-9">
-            <JourneyRail />
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground md:mt-6">
             <span className="inline-flex items-center gap-1.5"><Sparkles className="h-4 w-4 text-primary" /> AI reads photo, video or text</span>
             <span className="inline-flex items-center gap-1.5"><Star className="h-4 w-4 text-primary" /> Like-for-like quotes</span>
             <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Before &amp; after proof</span>
+          </div>
+          </div>
+
+          {/* Journey panel — sits beside the hero copy on laptop, stacks on mobile */}
+          <div className="min-w-0 rounded-[24px] border border-border/60 bg-card/70 p-4 shadow-sm backdrop-blur md:p-5">
+            <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" /> How a GPB job runs
+            </div>
+            <JourneyRail stacked />
           </div>
         </div>
       </section>
 
       <ProsOnTheMove />
 
-      <SectionConnector label="One photo · many services" />
+      <div className="mt-8 md:mt-10">
+        <SectionBridge label="One photo · many services" />
+      </div>
 
       {/* One photo, many services */}
       <section
-        className="aurora-veil relative overflow-hidden rounded-[32px] border border-border/50 px-5 py-10 md:px-10 md:py-14"
+        className="mt-5 aurora-veil relative overflow-hidden rounded-[26px] border border-border/50 px-5 py-9 sm:rounded-[32px] sm:px-7 md:px-10 md:py-14 lg:px-12"
         style={{ backgroundColor: "color-mix(in oklab, var(--card) 80%, var(--background))" }}
       >
         <div className="relative">
@@ -150,12 +158,12 @@ function Landing() {
       </section>
 
       {/* Popular categories */}
-      <section className="mt-16">
+      <section className="mt-14 md:mt-20 lg:mt-24">
         <SectionHeader
           title="Popular services"
           cta={{ label: `All ${TOTAL_SERVICES}+ services`, to: "/services" }}
         />
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-6 lg:gap-5">
           {homepageCategories.map((cat) => {
             const Icon = cat.icon;
             return (
@@ -177,9 +185,9 @@ function Landing() {
       </section>
 
       {/* How it works */}
-      <section className="mt-16">
+      <section className="mt-14 md:mt-20 lg:mt-24">
         <SectionHeader title="How GPB works" />
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="mt-6 grid gap-4 md:grid-cols-3 lg:gap-6">
           {[
             { n: "01", t: "Snap & understand", d: "Show the problem. Our AI describes what it likely is, how urgent it is and what it typically costs." },
             { n: "02", t: "Standardize & compare", d: "We turn the diagnosis into one job scope every pro quotes against, so prices are comparable." },
@@ -195,18 +203,18 @@ function Landing() {
       </section>
 
       {/* Featured pros */}
-      <section className="mt-16">
+      <section className="mt-14 md:mt-20 lg:mt-24">
         <SectionHeader title="Sample professionals" cta={{ label: "Browse all", to: "/search" }} />
         <p className="mt-2 text-xs text-muted-foreground">Example listings shown while GPB onboards its first local pros.</p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {providers.slice(0, 3).map((p) => <ProviderCard key={p.id} p={p} />)}
         </div>
       </section>
 
       {/* Why GPB */}
-      <section className="mt-16">
+      <section className="mt-14 md:mt-20 lg:mt-24">
         <SectionHeader title="What GPB is built for" />
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="mt-6 grid gap-4 md:grid-cols-3 lg:gap-6">
           {[
             { title: "AI that explains the problem", text: "Send a photo, a video or a written description and get a plain-language read on the likely category, urgency and typical cost range." },
             { title: "One scope, comparable quotes", text: "Every service pro receives the identical standardized brief, so you compare price, availability and warranty — not guesswork." },
@@ -248,7 +256,7 @@ const PRO_TYPES = [
 
 function ProviderRecruitment() {
   return (
-    <section className="mt-16 overflow-hidden rounded-[28px] px-6 py-12 text-white md:px-12 md:py-16" style={{ background: "var(--gradient-primary)" }}>
+    <section className="mt-14 md:mt-20 lg:mt-24 overflow-hidden rounded-[28px] px-6 py-12 text-white md:px-12 md:py-16" style={{ background: "var(--gradient-primary)" }}>
       <div className="grid gap-8 lg:grid-cols-[1.25fr_1fr] lg:items-start">
         <div>
           <div className="mb-3 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-bold backdrop-blur">For professionals</div>
@@ -308,7 +316,7 @@ function EmergencySectionInner() {
     { label: "Lockout", icon: Lock, color: "from-rose-500 to-red-500" },
   ];
   return (
-    <section className="mt-16 relative overflow-hidden rounded-[28px] border border-red-200/70 dark:border-red-500/30 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-red-950/40 dark:via-card dark:to-orange-950/30 p-6 md:p-10 shadow-[0_0_60px_-15px_rgba(239,68,68,0.35)]">
+    <section className="mt-14 md:mt-20 lg:mt-24 relative overflow-hidden rounded-[28px] border border-red-200/70 dark:border-red-500/30 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-red-950/40 dark:via-card dark:to-orange-950/30 p-6 md:p-10 shadow-[0_0_60px_-15px_rgba(239,68,68,0.35)]">
       <div className="pointer-events-none absolute -inset-1 rounded-[32px] bg-red-500/10 blur-2xl -z-10 animate-pulse" />
       <div className="grid gap-6 md:grid-cols-[1.2fr_1fr] md:items-center">
         <div>
@@ -376,7 +384,7 @@ function FloatingSnapButton({ footerRef }: { footerRef: React.RefObject<HTMLElem
       to="/snap"
       aria-label="Snap a problem for AI diagnosis"
       className={cn(
-        "fixed bottom-24 right-4 z-50 flex items-center gap-1.5 rounded-full py-2.5 pl-3 pr-4 text-xs font-bold text-white transition-all duration-300 hover:scale-105 active:scale-95 md:bottom-6 md:right-6 pulse-soft",
+        "fixed bottom-28 right-4 z-50 hidden items-center gap-1.5 md:flex rounded-full py-2.5 pl-3 pr-4 text-xs font-bold text-white transition-all duration-300 hover:scale-105 active:scale-95 md:bottom-6 md:right-6 pulse-soft",
         hidden ? "translate-y-24 opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
       )}
       style={{ background: "var(--gradient-primary)" }}
@@ -465,8 +473,8 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
   return (
-    <footer ref={footerRef} className="mt-24 rounded-t-[32px] border-t border-border/60 bg-gradient-to-b from-transparent to-muted/40 pt-14 pb-8 text-sm text-muted-foreground">
-      <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
+    <footer ref={footerRef} className="mt-20 rounded-t-[32px] md:mt-24 border-t border-border/60 bg-gradient-to-b from-transparent to-muted/40 pt-14 pb-8 text-sm text-muted-foreground">
+      <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
         <div>
           <Logo />
           <p className="mt-4 max-w-xs leading-relaxed">Show it. Tell us. Get it fixed. AI-powered matching between customers and trusted local pros.</p>
@@ -481,12 +489,12 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
         </div>
         <FooterCol title="Company" links={["About", "Careers", "Press", "Blog"]} />
         <FooterCol title="Support" links={["Help center", "Contact", "Trust & safety", "Cancellation"]} />
-        <div>
+        <div className="min-w-0">
           <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">Stay in the loop</div>
           <p className="text-xs">Product updates, new services and stories from our pros.</p>
           <form
             onSubmit={(e) => { e.preventDefault(); if (email) { setSubscribed(true); setEmail(""); } }}
-            className="mt-3 flex overflow-hidden rounded-full border border-border/60 bg-card p-1 shadow-sm"
+            className="mt-3 flex min-w-0 overflow-hidden rounded-full border border-border/60 bg-card p-1 shadow-sm"
           >
             <input
               type="email"
