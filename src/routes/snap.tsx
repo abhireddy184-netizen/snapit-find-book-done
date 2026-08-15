@@ -194,6 +194,20 @@ function SnapPage() {
     setPendingPreview(null);
   };
 
+  /** Re-run the diagnosis with the customer's extra context merged in (intent wins). */
+  const runFollowUp = async (extra: string) => {
+    const text = extra.trim();
+    if (!text || busyRef.current) return;
+    const merged = [note, text].filter(Boolean).join(" ");
+    busyRef.current = true;
+    const token = ++runRef.current;
+    setNote(merged);
+    setAnalysis(null);
+    setError(null);
+    setLoading(true);
+    await runDiagnosis(image, merged, token);
+  };
+
   const reset = () => {
     runRef.current += 1;
     busyRef.current = false;
@@ -378,7 +392,7 @@ function SnapPage() {
         )}
 
         {analysis && (image || textOnly) && (
-          <AnalysisView analysis={analysis} image={image} onReset={reset} />
+          <AnalysisView analysis={analysis} image={image} onReset={reset} onAnswer={(t) => void runFollowUp(t)} />
         )}
       </div>
     </AppShell>
