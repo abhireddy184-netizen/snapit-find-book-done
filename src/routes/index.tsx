@@ -49,9 +49,8 @@ function Landing() {
         <div className="relative grid items-center gap-7 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
           <div className="min-w-0">
             <div className="flex flex-col items-start">
-              <Wordmark size={44} className="sm:hidden" />
-              <Wordmark size={58} className="hidden sm:inline-flex" />
-              <span className="mt-2 text-sm font-bold tracking-tight text-foreground sm:text-base">GetPerfectBoy.com</span>
+              <Wordmark size="clamp(2.6rem, 9vw, 3.6rem)" />
+              <span className="mt-1 text-sm font-bold tracking-tight text-foreground sm:text-base">GetPerfectBoy.com</span>
             </div>
 
             <h1 className="mt-4 max-w-[15ch] text-[2rem] font-black leading-[1.06] tracking-tight text-foreground sm:text-4xl lg:text-5xl">
@@ -66,15 +65,17 @@ function Landing() {
                 e.preventDefault();
                 void navigate({ to: "/search", search: { q: service.trim(), loc: location.trim() } });
               }}
-              className="mt-5 grid gap-2 rounded-[20px] border border-border/60 bg-card p-2 shadow-lg sm:grid-cols-[1fr_1.2fr_auto] sm:gap-2.5 sm:rounded-full sm:p-2"
+              className="mt-5 grid gap-2 rounded-[20px] border border-border/60 bg-card p-2 shadow-lg sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_auto] sm:gap-2.5 sm:rounded-full sm:p-2"
             >
+              <div className="min-w-0">
               <LocationAutocomplete
                 value={location}
                 onChange={setLocation}
                 aria-label="Location"
                 placeholder="ZIP or city"
               />
-              <label className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3 sm:rounded-full">
+              </div>
+              <label className="flex min-w-0 items-center gap-2 rounded-xl bg-muted/50 px-4 py-3 sm:rounded-full">
                 <Search className="h-4 w-4 shrink-0 text-primary" />
                 <input
                   value={service}
