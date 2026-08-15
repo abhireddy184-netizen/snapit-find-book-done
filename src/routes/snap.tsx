@@ -426,6 +426,17 @@ function ScanningOverlay({
               );
             })}
           </div>
+          <button
+            type="button"
+            onClick={onCancel}
+            data-testid="snap-cancel"
+            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+          >
+            <X className="h-4 w-4" /> Cancel
+          </button>
+          <p className="mt-2 text-center text-[11px] text-white/60">
+            This usually takes a few seconds. You can cancel any time.
+          </p>
         </div>
         <style>{`@keyframes scanline{0%{transform:translateY(0)}50%{transform:translateY(216px)}100%{transform:translateY(0)}}`}</style>
       </div>
