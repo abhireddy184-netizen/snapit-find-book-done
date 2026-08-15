@@ -366,7 +366,13 @@ function ScanningOverlay({
 
       <div className="relative mx-4 w-full max-w-md rounded-[28px] border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-2xl animate-scale-in">
         <div className="relative overflow-hidden rounded-2xl border border-white/20">
-          <img src={image} alt="Analyzing" className="h-64 w-full object-cover" />
+          {image ? (
+            <img src={image} alt="Analyzing" className="h-64 w-full object-cover" />
+          ) : (
+            <div className="grid h-64 w-full place-items-center bg-plum/40">
+              <Loader2 className="h-8 w-8 animate-spin text-white/80" />
+            </div>
+          )}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 animate-[scanline_1.8s_ease-in-out_infinite]" style={{ background: "var(--gradient-primary)", boxShadow: "0 0 32px color-mix(in oklab, var(--primary) 85%, transparent)" }} />
           <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-primary/30 mix-blend-overlay" />
           {/* Corner brackets */}
@@ -386,7 +392,9 @@ function ScanningOverlay({
             <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white/80">
               <Sparkles className="h-3.5 w-3.5" /> SnapIt AI
             </div>
-            <div className="mt-1 text-lg font-black text-white">Diagnosing your problem</div>
+            <div className="mt-1 text-lg font-black text-white">
+              {phase === "preparing" ? "Preparing your photo" : "Diagnosing your problem"}
+            </div>
           </div>
           <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white/15">
             <div
