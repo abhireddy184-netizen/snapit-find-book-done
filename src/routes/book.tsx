@@ -36,9 +36,14 @@ function resolveDate(label: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
+type BookSearch = { provider?: string; job?: string; service?: string; pro?: string };
+
 export const Route = createFileRoute("/book")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): BookSearch => ({
     provider: typeof search['provider'] === "string" ? (search['provider'] as string) : undefined,
+    job: typeof search['job'] === "string" ? (search['job'] as string) : undefined,
+    service: typeof search['service'] === "string" ? (search['service'] as string) : undefined,
+    pro: typeof search['pro'] === "string" ? (search['pro'] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -55,10 +60,10 @@ const steps = ["Service", "Details", "Photos", "Address", "Schedule", "Review"];
 
 function BookPage() {
   const navigate = useNavigate();
-  const { provider: providerParam } = Route.useSearch();
+  const { provider: providerParam, job: jobId, service: serviceParam, pro: proParam } = Route.useSearch();
   const { user, loading: authLoading } = useAuth();
   const [step, setStep] = useState(0);
-  const [service, setService] = useState("Leak repair");
+  const [service, setService] = useState(serviceParam || "Leak repair");
   const [details, setDetails] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [address, setAddress] = useState("");
@@ -69,6 +74,7 @@ function BookPage() {
   const [error, setError] = useState<string | null>(null);
 
   const pro = (providerParam ? getProvider(providerParam) : undefined) ?? providers[0];
+  const proName = proParam || pro.name;
 
   // Restore a draft saved when a guest was sent to sign in.
   useEffect(() => {
@@ -113,7 +119,8 @@ function BookPage() {
     const { error: insertError } = await supabase.from("bookings").insert({
       customer_id: user.id,
       provider_id: null,
-      provider_name_snapshot: pro.name,
+      provider_name_snapshot: proName,
+      job_id: jobId ?? null,
       service,
       details: details || null,
       service_address: address.trim(),
@@ -128,8 +135,23 @@ function BookPage() {
       return;
     }
 
+    if (jobId) {
+      await supabase
+        .from("service_requests")
+        .update({
+          status: "booked",
+          service_address: address.trim(),
+          preferred_date: resolveDate(date),
+          preferred_time: time,
+        })
+        .eq("id", jobId);
+    }
+
     setConfirmed(true);
-    setTimeout(() => void navigate({ to: "/dashboard" }), 1600);
+    setTimeout(() => {
+      if (jobId) void navigate({ to: "/job/$id", params: { id: jobId } });
+      else void navigate({ to: "/dashboard" });
+    }, 1600);
   };
 
   if (confirmed) {

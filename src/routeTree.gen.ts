@@ -23,6 +23,7 @@ import { Route as TrackingIdRouteImport } from './routes/tracking.$id'
 import { Route as ProviderIdRouteImport } from './routes/provider.$id'
 import { Route as AuthenticatedProviderDashboardRouteImport } from './routes/_authenticated/provider-dashboard'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedJobIdRouteImport } from './routes/_authenticated/job.$id'
 
 const SnapRoute = SnapRouteImport.update({
   id: '/snap',
@@ -94,6 +95,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedJobIdRoute = AuthenticatedJobIdRouteImport.update({
+  id: '/job/$id',
+  path: '/job/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
+  '/job/$id': typeof AuthenticatedJobIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
+  '/job/$id': typeof AuthenticatedJobIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   '/_authenticated/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
+  '/_authenticated/job/$id': typeof AuthenticatedJobIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/provider-dashboard'
     | '/provider/$id'
     | '/tracking/$id'
+    | '/job/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -173,6 +183,7 @@ export interface FileRouteTypes {
     | '/provider-dashboard'
     | '/provider/$id'
     | '/tracking/$id'
+    | '/job/$id'
   id:
     | '__root__'
     | '/'
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '/_authenticated/provider-dashboard'
     | '/provider/$id'
     | '/tracking/$id'
+    | '/_authenticated/job/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -306,17 +318,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/job/$id': {
+      id: '/_authenticated/job/$id'
+      path: '/job/$id'
+      fullPath: '/job/$id'
+      preLoaderRoute: typeof AuthenticatedJobIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProviderDashboardRoute: typeof AuthenticatedProviderDashboardRoute
+  AuthenticatedJobIdRoute: typeof AuthenticatedJobIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProviderDashboardRoute: AuthenticatedProviderDashboardRoute,
+  AuthenticatedJobIdRoute: AuthenticatedJobIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

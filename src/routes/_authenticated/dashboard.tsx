@@ -1,11 +1,12 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { CalendarDays, Heart, MessageCircle, User, MapPin, Star, ShieldCheck, Camera, LogOut, Loader2 } from "lucide-react";
+import { CalendarDays, Heart, MessageCircle, User, MapPin, Star, ShieldCheck, Camera, LogOut, Loader2, ClipboardList, ArrowRight } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { providers } from "@/lib/snapit-data";
 import { useAuth } from "@/lib/auth";
 import { fetchCustomerBookings, formatBookingDate, type Booking } from "@/lib/bookings";
+import { JOB_STATUS_FLOW, JOB_STATUS_STYLE, fetchJobs, jobStatusLabel, money, type Job, type JobStatus } from "@/lib/jobs";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -20,6 +21,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 });
 
 const tabs = [
+  { id: "jobs", label: "Jobs", icon: ClipboardList },
   { id: "bookings", label: "Bookings", icon: CalendarDays },
   { id: "saved", label: "Saved", icon: Heart },
   { id: "messages", label: "Messages", icon: MessageCircle },
@@ -27,7 +29,7 @@ const tabs = [
 ];
 
 function Dashboard() {
-  const [tab, setTab] = useState("bookings");
+  const [tab, setTab] = useState("jobs");
   const { profile, user } = useAuth();
   const firstName = (profile?.full_name || "").split(" ")[0] || "there";
 
@@ -60,6 +62,7 @@ function Dashboard() {
       </div>
 
       <div className="mt-6">
+        {tab === "jobs" && <Jobs userId={user?.id} />}
         {tab === "bookings" && <Bookings userId={user?.id} />}
         {tab === "saved" && <Saved />}
         {tab === "messages" && <Messages />}
@@ -72,6 +75,91 @@ function Dashboard() {
 function DemoNote({ children }: { children: string }) {
   return (
     <div className="mb-4 rounded-xl border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">{children}</div>
+  );
+}
+
+function Jobs({ userId }: { userId: string | undefined }) {
+  const [filter, setFilter] = useState<JobStatus | "all">("all");
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["jobs", userId],
+    queryFn: () => fetchJobs(userId as string),
+    enabled: Boolean(userId),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-2 py-10 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" /> Loading your jobs…
+      </div>
+    );
+  }
+  if (error) {
+    return <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">We couldn't load your jobs. Please refresh and try again.</div>;
+  }
+
+  const jobs = data ?? [];
+  const shown = filter === "all" ? jobs : jobs.filter((j) => j.status === filter);
+
+  if (jobs.length === 0) {
+    return (
+      <div className="rounded-3xl border border-border/60 bg-card p-10 text-center shadow-sm">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--gradient-primary)" }}>
+          <Camera className="h-6 w-6" />
+        </div>
+        <h2 className="mt-4 text-lg font-black">No jobs yet</h2>
+        <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
+          Snap a problem and we'll turn the diagnosis into a standardized scope you can send to pros — then keep the proof here.
+        </p>
+        <div className="mt-5 flex justify-center">
+          <Link to="/snap"><GradientButton>Snap a Problem</GradientButton></Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
+        {[{ id: "all" as const, label: "All" }, ...JOB_STATUS_FLOW].map((s) => (
+          <button
+            key={s.id}
+            onClick={() => setFilter(s.id as JobStatus | "all")}
+            className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold ${filter === s.id ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:bg-muted"}`}
+          >
+            {s.label}
+          </button>
+        ))}
+      </div>
+      {shown.length === 0 ? (
+        <p className="py-8 text-center text-sm text-muted-foreground">No jobs with this status yet.</p>
+      ) : (
+        <div className="space-y-3">{shown.map((j) => <JobCard key={j.id} job={j} />)}</div>
+      )}
+    </div>
+  );
+}
+
+function JobCard({ job }: { job: Job }) {
+  return (
+    <Link
+      to="/job/$id"
+      params={{ id: job.id }}
+      className="block rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">{job.category_label}</span>
+        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${JOB_STATUS_STYLE[job.status]}`}>{jobStatusLabel(job.status)}</span>
+        <span className="ml-auto text-[10px] text-muted-foreground">{new Date(job.created_at).toLocaleDateString()}</span>
+      </div>
+      <p className="mt-2 line-clamp-2 text-sm font-medium">{job.problem_statement}</p>
+      <div className="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground">
+        <span className="font-semibold text-foreground/80">
+          {money(job.expected_price_low, job.currency)}–{money(job.expected_price_high, job.currency)}
+        </span>
+        <span>{job.estimated_minutes} min</span>
+        <span className="ml-auto inline-flex items-center gap-1 font-semibold text-primary">Open passport <ArrowRight className="h-3 w-3" /></span>
+      </div>
+    </Link>
   );
 }
 

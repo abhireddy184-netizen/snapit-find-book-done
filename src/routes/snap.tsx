@@ -26,11 +26,14 @@ import {
   Check,
   X,
   History as HistoryIcon,
+  ClipboardList,
 } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
 import { providers, categories, type Provider } from "@/lib/snapit-data";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
+import { useAuth } from "@/lib/auth";
+import { createJobFromAnalysis } from "@/lib/jobs";
 import {
   BadgeCheck,
   Lock,
@@ -43,7 +46,7 @@ export const Route = createFileRoute("/snap")({
   head: () => ({
     meta: [
       { title: "Snap a problem — AI diagnosis in seconds | SnapIt" },
-      { name: "description", content: "Snap a photo or video of any home or personal service problem. SnapIt's AI diagnoses it and finds nearby verified pros in seconds." },
+      { name: "description", content: "Snap a photo or video of any problem. SnapIt's AI explains what it likely needs, builds a standardized job scope and helps you compare quotes from service pros." },
       { property: "og:title", content: "Snap a Problem — AI diagnosis | SnapIt" },
       { property: "og:description", content: "Point your camera. Get an instant diagnosis, estimate and matched pros." },
     ],
@@ -353,6 +356,52 @@ function CaptureTile({
 
 type MatchedProvider = Provider & { eta: number };
 
+function JobScopeCta({ analysis, image }: { analysis: SnapAnalysis; image: string }) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const go = async () => {
+    if (!user) {
+      await navigate({ to: "/login", search: { redirect: "/snap" } });
+      return;
+    }
+    setBusy(true);
+    setErr(null);
+    try {
+      const job = await createJobFromAnalysis({ customerId: user.id, analysis, imageDataUrl: image });
+      await navigate({ to: "/job/$id", params: { id: job.id } });
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "We couldn't create the job scope. Please try again.");
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/5 to-card p-5 shadow-sm">
+      <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+        {["Snap", "Understand", "Scope", "Compare", "Book", "Verify", "Proof"].map((s, i) => (
+          <span key={s} className="inline-flex items-center gap-2">
+            <span className={i <= 1 ? "text-primary" : ""}>{s}</span>
+            {i < 6 && <span className="text-border">→</span>}
+          </span>
+        ))}
+      </div>
+      <h3 className="mt-3 text-lg font-black">Turn this into a standardized job scope</h3>
+      <p className="mt-1 text-sm text-muted-foreground">
+        We package the diagnosis into one clear scope — problem, work required, urgency, time and expected price — so every pro
+        quotes on exactly the same thing. You can edit it before requesting quotes.
+      </p>
+      <GradientButton onClick={go} disabled={busy} className="mt-4 w-full justify-center py-4 text-base">
+        {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ClipboardList className="h-5 w-5" />}
+        {user ? "Create job scope & compare quotes" : "Sign in to create your job scope"}
+      </GradientButton>
+      {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
+    </div>
+  );
+}
+
 function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; image: string; onReset: () => void }) {
   const navigate = useNavigate();
   const u = urgencyStyles[analysis.urgency] ?? urgencyStyles.medium;
@@ -527,18 +576,20 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
       )}
 
       {/* Pros section header + quote toolbar */}
+      <JobScopeCta analysis={analysis} image={image} />
+
       <GradientButton
         onClick={() => document.getElementById("pros-list")?.scrollIntoView({ behavior: "smooth", block: "start" })}
         className="w-full justify-center py-4 text-base"
       >
-        <ShieldCheck className="h-5 w-5" /> View Verified Professionals
+        <ShieldCheck className="h-5 w-5" /> Browse service pros
       </GradientButton>
 
       <div id="pros-list" className="scroll-mt-20">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-black">Top 5 verified pros nearby</h2>
-            <p className="text-xs text-muted-foreground">Sorted by rating and distance</p>
+            <h2 className="text-lg font-black">Service pros nearby</h2>
+            <p className="text-xs text-muted-foreground">Demo data — sample profiles shown while real pros are onboarded.</p>
           </div>
           <button
             onClick={() => {
@@ -934,10 +985,10 @@ void ArrowRight;
 function TrustBadges() {
   const items = [
     { icon: Sparkles, label: "AI Powered Diagnosis" },
-    { icon: BadgeCheck, label: "Verified Professionals" },
+    { icon: BadgeCheck, label: "Verification when reviewed" },
     { icon: Tag, label: "Upfront Pricing" },
-    { icon: Lock, label: "Secure Payments" },
-    { icon: HandHeart, label: "Satisfaction Guaranteed" },
+    { icon: Lock, label: "Private & Secure" },
+    { icon: HandHeart, label: "Before & After Proof" },
   ];
   return (
     <div className="mt-6 rounded-3xl border border-border/60 bg-gradient-to-br from-primary/5 via-card to-card p-4 backdrop-blur-xl">
