@@ -321,9 +321,17 @@ function SnapPage() {
   );
 }
 
-function ScanningOverlay({ image }: { image: string }) {
+function ScanningOverlay({
+  image,
+  phase,
+  onCancel,
+}: {
+  image: string | null;
+  phase: "idle" | "preparing" | "analyzing";
+  onCancel: () => void;
+}) {
   const steps = [
-    "Uploading image…",
+    "Preparing your photo…",
     "AI is analyzing the problem…",
     "Identifying the service…",
     "Estimating repair cost…",
@@ -332,6 +340,7 @@ function ScanningOverlay({ image }: { image: string }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [progress, setProgress] = useState(6);
   useEffect(() => {
+    if (phase === "preparing") return;
     const stepTimer = setInterval(() => {
       setStepIndex((i) => (i < steps.length - 1 ? i + 1 : i));
     }, 1200);
@@ -342,13 +351,13 @@ function ScanningOverlay({ image }: { image: string }) {
       clearInterval(stepTimer);
       clearInterval(progressTimer);
     };
-  }, [steps.length]);
+  }, [steps.length, phase]);
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden animate-fade-in">
       {/* Ambient blurred image + gradient wash */}
       <div
         className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl opacity-60"
-        style={{ backgroundImage: `url(${image})` }}
+        style={image ? { backgroundImage: `url(${image})` } : undefined}
       />
       <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, oklch(0.274 0.084 322 / 0.88), oklch(0.45 0.19 350 / 0.78) 60%, oklch(0.274 0.084 322 / 0.92))" }} />
       {/* Floating orbs */}
