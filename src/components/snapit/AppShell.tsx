@@ -46,7 +46,7 @@ function TopBar() {
             <History className="h-4 w-4" /> History
           </Link>
           <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">All Services</Link>
-          <Link to="/search" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Find a Pro</Link>
+          <Link to="/search" search={{ q: "", loc: "" }} className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Find a Pro</Link>
           <Link to="/provider-dashboard" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">For Providers</Link>
           <Link to="/dashboard" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Dashboard</Link>
         </nav>
@@ -104,7 +104,7 @@ function AuthNav() {
       </Link>
       <Link
         to="/register"
-        search={{ redirect: undefined }}
+        search={{ redirect: undefined, role: undefined }}
         className="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] hover:shadow-lg"
         style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px color-mix(in oklab, var(--primary) 55%, transparent)" }}
       >

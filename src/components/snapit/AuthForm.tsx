@@ -14,15 +14,17 @@ export function AuthForm({
   subtitle,
   footer,
   redirectTo,
+  initialRole = "customer",
 }: {
   mode: "login" | "register";
   title: string;
   subtitle: string;
   footer: ReactNode;
   redirectTo?: string | undefined;
+  initialRole?: Role;
 }) {
   const navigate = useNavigate();
-  const [role, setRole] = useState<Role>("customer");
+  const [role, setRole] = useState<Role>(initialRole);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -95,8 +97,11 @@ export function AuthForm({
         <aside className="relative hidden overflow-hidden p-10 text-white md:block" style={{ background: "var(--gradient-primary)" }}>
           <Logo onColor />
           <div className="mt-24">
-            <h2 className="text-4xl font-black leading-tight">Snap it.<br />Book it.<br />Done.</h2>
-            <p className="mt-4 max-w-sm text-white/90">Built to connect customers with trusted local pros — AI-powered service matching from a single photo.</p>
+            <h2 className="text-4xl font-black leading-tight">Show it.<br />Tell us.<br />Get it done.</h2>
+            <p className="mt-4 max-w-sm text-white/90">
+              GetPerfectBoy.com is an AI-powered services marketplace — describe or show the job, compare local pros on one
+              standard scope, and keep the proof.
+            </p>
           </div>
           <div className="absolute -bottom-16 -right-16 h-64 w-64 rounded-full bg-white/10 blur-2xl" />
         </aside>

@@ -4,6 +4,7 @@ import { AuthForm } from "@/components/snapit/AuthForm";
 export const Route = createFileRoute("/register")({
   validateSearch: (search: Record<string, unknown>) => ({
     redirect: typeof search['redirect'] === "string" ? (search['redirect'] as string) : undefined,
+    role: search['role'] === "provider" ? ("provider" as const) : undefined,
   }),
   head: () => ({
     meta: [
@@ -17,12 +18,17 @@ export const Route = createFileRoute("/register")({
 });
 
 function RegisterPage() {
-  const { redirect } = Route.useSearch();
+  const { redirect, role } = Route.useSearch();
   return (
     <AuthForm
       mode="register"
-      title="Create your account"
-      subtitle="Show it. Tell us. Get it done. Get started in seconds."
+      title={role === "provider" ? "Join GPB as a pro" : "Create your account"}
+      subtitle={
+        role === "provider"
+          ? "Set up your business profile and start receiving standardized job briefs."
+          : "Show it. Tell us. Get it done. Get started in seconds."
+      }
+      initialRole={role ?? "customer"}
       redirectTo={redirect}
       footer={<p>Already have an account? <Link to="/login" search={{ redirect: undefined }} className="font-semibold text-primary">Log in</Link></p>}
     />

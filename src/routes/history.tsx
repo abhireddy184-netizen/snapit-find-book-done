@@ -111,6 +111,7 @@ function HistoryPage() {
                     <div className="mt-2 flex items-center gap-2">
                       <Link
                         to="/search"
+                        search={{ q: "", loc: "" }}
                         className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-semibold text-primary hover:bg-primary/20"
                       >
                         Find pros <ArrowRight className="h-3 w-3" />

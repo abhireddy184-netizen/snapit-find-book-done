@@ -4,7 +4,7 @@ import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCi
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
 import { providers } from "@/lib/snapit-data";
-import { popularCategories, TOTAL_SERVICES } from "@/lib/catalog";
+import { catalog, popularCategories, TOTAL_SERVICES } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
 const SITE_URL = "https://getperfectboy.com";
@@ -65,7 +65,7 @@ function Landing() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              navigate({ to: "/search", search: { q: service, loc: location } as never });
+              void navigate({ to: "/search", search: { q: service.trim(), loc: location.trim() } });
             }}
             className="mt-10 grid gap-3 rounded-3xl bg-card p-3 shadow-xl md:grid-cols-[1.2fr_1.5fr_auto]"
             style={{ boxShadow: "var(--shadow-elegant)" }}
@@ -75,7 +75,7 @@ function Landing() {
               <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="Your location"
+                placeholder="ZIP or city (e.g. 75034)"
                 className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </label>
@@ -234,32 +234,8 @@ function Landing() {
       {/* Emergency Services */}
       <EmergencySection />
 
-      {/* Become a provider */}
-      <section className="mt-16 overflow-hidden rounded-[28px] px-6 py-12 text-white md:px-12 md:py-16" style={{ background: "var(--gradient-primary)" }}>
-        <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-center">
-          <div>
-            <div className="mb-3 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur">For pros</div>
-            <h2 className="text-3xl font-black md:text-4xl">Grow your business with GPB</h2>
-            <p className="mt-3 max-w-xl text-white/90">Receive clear, standardized job briefs instead of vague enquiries — so you can quote accurately and win the right work.</p>
-            <div className="mt-6">
-              <Link
-                to="/register"
-                search={{ redirect: undefined }}
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary shadow-lg transition-transform hover:scale-[1.02]"
-              >
-                Become a Provider <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-          <ul className="space-y-2 text-sm">
-            {["Free business profile", "Standardized job scopes, not vague enquiries", "Set your own prices and schedule", "Before & after proof on every job"].map((l) => (
-              <li key={l} className="flex items-center gap-2 rounded-xl bg-white/10 px-4 py-3 backdrop-blur">
-                <CheckCircle2 className="h-4 w-4 shrink-0" /> {l}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      {/* Offer your services on GPB */}
+      <ProviderRecruitment />
 
       <Footer footerRef={footerRef} />
       <FloatingSnapButton footerRef={footerRef} />
@@ -268,6 +244,71 @@ function Landing() {
 }
 
 function EmergencySection() {
+  return <EmergencySectionInner />;
+}
+
+const PRO_TYPES = [
+  "Makeup Artist", "Hairstylist", "Nail Tech", "Barber", "Lash & Brow Tech", "Massage Therapist",
+  "Plumber", "Electrician", "HVAC Tech", "Handyman", "TV Mounting Pro", "Furniture Repair",
+  "Cleaner", "Lawn Care", "Painter", "Tile & Grout Pro", "Appliance Tech", "Mobile Car Detailer",
+  "Moving Help", "Pet Grooming", "Pest Control", "Locksmith",
+];
+
+function ProviderRecruitment() {
+  return (
+    <section className="mt-16 overflow-hidden rounded-[28px] px-6 py-12 text-white md:px-12 md:py-16" style={{ background: "var(--gradient-primary)" }}>
+      <div className="grid gap-8 lg:grid-cols-[1.25fr_1fr] lg:items-start">
+        <div>
+          <div className="mb-3 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-bold backdrop-blur">For professionals</div>
+          <h2 className="text-3xl font-black tracking-tight md:text-4xl">Offer your services on GPB</h2>
+          <p className="mt-3 max-w-xl text-white/90">
+            GPB is onboarding professionals across the USA — {catalog.length} master categories and {TOTAL_SERVICES}+ services,
+            from beauty and personal care to trades, cleaning and outdoor work. You receive a clear, standardized job brief
+            instead of a vague enquiry, so you can quote accurately and win the right work.
+          </p>
+
+          <div className="mt-6 flex flex-wrap gap-1.5">
+            {PRO_TYPES.map((p) => (
+              <span key={p} className="rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold backdrop-blur">{p}</span>
+            ))}
+          </div>
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link
+              to="/register"
+              search={{ redirect: undefined, role: "provider" }}
+              className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-primary shadow-lg transition-transform hover:scale-[1.02]"
+            >
+              Join GPB as a Pro <ArrowRight className="h-4 w-4" />
+            </Link>
+            <Link
+              to="/provider-interest"
+              className="inline-flex items-center gap-2 rounded-full border border-white/50 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-colors hover:bg-white/15"
+            >
+              Register your interest
+            </Link>
+          </div>
+        </div>
+
+        <ul className="space-y-2 text-sm">
+          {[
+            "Free business profile with your service ZIP and radius",
+            "Standardized job scopes, not vague enquiries",
+            "Set your own prices, availability and coverage area",
+            "Before & after proof recorded on every job",
+            "Onboarding opening market by market across the USA",
+          ].map((l) => (
+            <li key={l} className="flex items-start gap-2 rounded-2xl bg-white/10 px-4 py-3 backdrop-blur">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> {l}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function EmergencySectionInner() {
   const items = [
     { label: "Burst pipe", icon: Droplet, color: "from-[#6EC8FF] to-[#3AA6F0]" },
     { label: "No power", icon: Zap, color: "from-amber-500 to-orange-500" },

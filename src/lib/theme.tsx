@@ -6,11 +6,17 @@ type Theme = "light" | "dark";
 type ThemeCtx = { theme: Theme; toggle: () => void; setTheme: (t: Theme) => void };
 const Ctx = createContext<ThemeCtx | null>(null);
 
+const THEME_KEY = "gpb-theme";
+/** Read once for backwards compatibility with the pre-GPB key. */
+const LEGACY_THEME_KEY = "snapit-theme";
+
 function getInitial(): Theme {
   if (typeof window === "undefined") return "light";
-  const stored = window.localStorage.getItem("snapit-theme");
+  const stored =
+    window.localStorage.getItem(THEME_KEY) ?? window.localStorage.getItem(LEGACY_THEME_KEY);
   if (stored === "light" || stored === "dark") return stored;
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  // GPB is light-first: new visitors always start in light mode.
+  return "light";
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -25,7 +31,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const setTheme = (t: Theme) => {
     setThemeState(t);
     document.documentElement.classList.toggle("dark", t === "dark");
-    try { window.localStorage.setItem("snapit-theme", t); } catch {}
+    try { window.localStorage.setItem(THEME_KEY, t); } catch {}
   };
 
   const toggle = () => setTheme(theme === "dark" ? "light" : "dark");
@@ -59,5 +65,5 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
 
 /** Inline script (stringified) injected in <head> to avoid FOUC. */
 export const themeInitScript = `
-(function(){try{var s=localStorage.getItem('snapit-theme');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();
+(function(){try{var s=localStorage.getItem('gpb-theme')||localStorage.getItem('snapit-theme');if(s==='dark')document.documentElement.classList.add('dark');}catch(e){}})();
 `;
