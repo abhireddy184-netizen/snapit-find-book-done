@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, Video, Upload, MessageCircle, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
@@ -70,15 +71,12 @@ function Landing() {
             className="mt-10 grid gap-3 rounded-3xl bg-card p-3 shadow-xl md:grid-cols-[1.2fr_1.5fr_auto]"
             style={{ boxShadow: "var(--shadow-elegant)" }}
           >
-            <label className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3">
-              <MapPin className="h-4 w-4 shrink-0 text-primary" />
-              <input
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="ZIP or city (e.g. 75034)"
-                className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-              />
-            </label>
+            <LocationAutocomplete
+              value={location}
+              onChange={setLocation}
+              aria-label="Location"
+              placeholder="ZIP or city (e.g. 75034)"
+            />
             <label className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3">
               <Search className="h-4 w-4 shrink-0 text-primary" />
               <input

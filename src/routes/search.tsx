@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { Star, ShieldCheck, MapPin, Clock, Search as SearchIcon, AlertCircle, Loader2, ArrowRight } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { providers as demoProviders } from "@/lib/snapit-data";
@@ -127,16 +128,12 @@ function SearchPage() {
             className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
         </label>
-        <label className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3">
-          <MapPin className="h-4 w-4 shrink-0 text-primary" />
-          <input
-            value={locationInput}
-            onChange={(e) => setLocationInput(e.target.value)}
-            inputMode="text"
-            placeholder="ZIP or city (e.g. 75034)"
-            className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-          />
-        </label>
+        <LocationAutocomplete
+          value={locationInput}
+          onChange={setLocationInput}
+          aria-label="Location"
+          placeholder="ZIP or city (e.g. 75034)"
+        />
         <GradientButton type="submit" className="w-full md:w-auto">Update search</GradientButton>
       </form>
 
