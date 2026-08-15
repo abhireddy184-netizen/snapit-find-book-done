@@ -590,7 +590,17 @@ function JobScopeCta({ analysis, image }: { analysis: SnapAnalysis; image: strin
   );
 }
 
-function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; image: string | null; onReset: () => void }) {
+function AnalysisView({
+  analysis,
+  image,
+  onReset,
+  onAnswer,
+}: {
+  analysis: SnapAnalysis;
+  image: string | null;
+  onReset: () => void;
+  onAnswer?: (text: string) => void;
+}) {
   const navigate = useNavigate();
   const u = urgencyStyles[analysis.urgency] ?? urgencyStyles.medium;
   const UrgencyIcon = u.icon;
@@ -717,6 +727,7 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
         </div>
       </div>
 
+      {showPricing && (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat
           icon={DollarSign}
@@ -733,6 +744,30 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
           hint={`${matched.length} pros nearby`}
         />
       </div>
+      )}
+
+      {(analysis.clarifyingQuestions?.length ?? 0) > 0 && (
+        <ClarifyPanel questions={analysis.clarifyingQuestions!} onAnswer={onAnswer} />
+      )}
+
+      {(analysis.serviceOptions?.length ?? 0) > 0 && (
+        <div className="rounded-3xl border border-secondary/30 bg-card p-5 shadow-sm">
+          <div className="text-sm font-black">What do you want help with?</div>
+          <p className="mt-1 text-xs text-muted-foreground">More than one service could fit. Pick the closest match.</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {analysis.serviceOptions!.map((opt) => (
+              <button
+                key={opt.label}
+                onClick={() => onAnswer?.(`I want help with: ${opt.label}. ${opt.description ?? ""}`)}
+                className="rounded-2xl border border-border/60 bg-background p-3 text-left transition-all hover:-translate-y-0.5 hover:border-secondary hover:shadow-md"
+              >
+                <div className="text-sm font-bold">{opt.label}</div>
+                {opt.description && <div className="mt-0.5 text-xs text-muted-foreground">{opt.description}</div>}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {analysis.recommendedActions?.length > 0 && (
         <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
@@ -784,6 +819,8 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
         </div>
       )}
 
+      {showPros && (
+      <>
       {/* Pros section header + quote toolbar */}
       <JobScopeCta analysis={analysis} image={image} />
 
