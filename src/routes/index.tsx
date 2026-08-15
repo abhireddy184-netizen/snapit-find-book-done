@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
-import { categories, providers, testimonials } from "@/lib/snapit-data";
+import { categories, providers } from "@/lib/snapit-data";
 import { cn } from "@/lib/utils";
 
 const SITE_URL = "https://id-preview--bca1ede1-6b69-4084-95f5-53bb43a6c24e.lovable.app";
@@ -88,7 +88,7 @@ function Landing() {
 
           <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Background-checked</span>
-            <span className="inline-flex items-center gap-1.5"><Star className="h-4 w-4 text-primary" /> 5-star pros</span>
+            <span className="inline-flex items-center gap-1.5"><Star className="h-4 w-4 text-primary" /> Upfront pricing</span>
             <span className="inline-flex items-center gap-1.5"><Clock className="h-4 w-4 text-primary" /> Same-day bookings</span>
           </div>
         </div>
