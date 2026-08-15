@@ -296,3 +296,21 @@ export function SectionConnector({ label }: { label?: string }) {
     </div>
   );
 }
+
+/* ------------------------------------------------------------------ */
+/* Compact section bridge — short label + hairline cue                */
+/* ------------------------------------------------------------------ */
+
+export function SectionBridge({ label }: { label: string }) {
+  return (
+    <div className="flex items-center justify-center gap-3" aria-hidden="true">
+      <span className="h-px w-12 sm:w-20 bg-gradient-to-r from-transparent via-primary/40 to-primary/10 animate-pulse" />
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/90 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-muted-foreground backdrop-blur shadow-sm">
+        <span className="h-1.5 w-1.5 rounded-full bg-primary/70 animate-pulse" />
+        {label}
+      </span>
+      <span className="h-px w-12 sm:w-20 bg-gradient-to-l from-transparent via-primary/40 to-primary/10 animate-pulse" />
+    </div>
+  );
+}
+
