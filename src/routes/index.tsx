@@ -4,7 +4,7 @@ import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
-import { JourneyRail, InputModes, RoomStory, ProVerticals, SectionConnector, SectionBridge } from "@/components/snapit/HomeStory";
+import { JourneyRail, InputModes, RoomStory, ProVerticals, SectionBridge } from "@/components/snapit/HomeStory";
 import { ProsOnTheMove } from "@/components/snapit/ProsOnTheMove";
 import { providers } from "@/lib/snapit-data";
 import { catalog, popularCategories, TOTAL_SERVICES } from "@/lib/catalog";
@@ -116,11 +116,13 @@ function Landing() {
 
       <ProsOnTheMove />
 
-      <SectionConnector label="One photo · many services" />
+      <div className="mt-8 md:mt-10">
+        <SectionBridge label="One photo · many services" />
+      </div>
 
       {/* One photo, many services */}
       <section
-        className="aurora-veil relative overflow-hidden rounded-[26px] border border-border/50 px-5 py-9 sm:rounded-[32px] sm:px-7 md:px-10 md:py-14 lg:px-12"
+        className="mt-5 aurora-veil relative overflow-hidden rounded-[26px] border border-border/50 px-5 py-9 sm:rounded-[32px] sm:px-7 md:px-10 md:py-14 lg:px-12"
         style={{ backgroundColor: "color-mix(in oklab, var(--card) 80%, var(--background))" }}
       >
         <div className="relative">
