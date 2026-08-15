@@ -48,23 +48,24 @@ function Landing() {
   return (
     <AppShell>
       {/* Hero */}
-      <section className="aurora-veil relative overflow-hidden rounded-[32px] px-6 py-14 md:px-14 md:py-20 fade-up" style={{ backgroundColor: "color-mix(in oklab, var(--card) 88%, var(--background))" }}>
+      <section className="aurora-veil relative overflow-hidden rounded-[26px] px-5 py-10 sm:rounded-[32px] sm:px-7 sm:py-12 md:px-12 md:py-16 lg:py-20 xl:px-16 fade-up" style={{ backgroundColor: "color-mix(in oklab, var(--card) 88%, var(--background))" }}>
         <div className="pointer-events-none absolute -right-28 -top-28 h-80 w-80 rounded-full opacity-25 blur-3xl float-slow" style={{ background: "var(--gradient-primary)" }} />
         <div className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full opacity-20 blur-3xl float-slow" style={{ background: "var(--gradient-secondary)", animationDelay: "1.6s" }} />
-        <div className="relative">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-card/80 px-3.5 py-1.5 text-xs font-bold text-primary shadow-sm backdrop-blur">
-            <Sparkles className="h-3.5 w-3.5" /> GetPerfectBoy.com · Show it. Tell us. Get it fixed.
+        <div className="relative grid items-start gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12 xl:gap-16">
+          <div className="min-w-0">
+          <div className="mb-4 inline-flex max-w-full items-center gap-2 rounded-full border border-primary/20 bg-card/80 px-3 py-1.5 text-[11px] font-bold text-primary shadow-sm backdrop-blur sm:px-3.5 sm:text-xs md:mb-5">
+            <Sparkles className="h-3.5 w-3.5 shrink-0" /> <span className="truncate">GetPerfectBoy.com · Show it. Tell us. Get it fixed.</span>
           </div>
-          <h1 className="max-w-4xl text-[2.6rem] font-black leading-[1.03] tracking-tight text-foreground md:text-7xl">
+          <h1 className="max-w-[16ch] text-[2.15rem] font-black leading-[1.05] tracking-tight text-foreground sm:text-5xl md:max-w-[18ch] md:text-6xl xl:text-7xl">
             Show the problem.{" "}
             <span className="text-gradient-hero">Get it fixed with proof.</span>
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-xl">
+          <p className="mt-4 max-w-[58ch] text-[0.95rem] leading-relaxed text-muted-foreground sm:text-base md:mt-5 md:text-lg">
             Upload a photo, record a short video, or just describe it in words. GPB works out what the job actually is,
             turns it into one clear scope and connects you to the right local professional — with before &amp; after proof kept for you.
           </p>
 
-          <div className="mt-6">
+          <div className="mt-5 md:mt-6">
             <InputModes />
           </div>
 
@@ -73,7 +74,7 @@ function Landing() {
               e.preventDefault();
               void navigate({ to: "/search", search: { q: service.trim(), loc: location.trim() } });
             }}
-            className="mt-10 grid gap-3 rounded-3xl bg-card p-3 shadow-xl md:grid-cols-[1.2fr_1.5fr_auto]"
+            className="mt-6 grid gap-2.5 rounded-[22px] bg-card p-2.5 shadow-xl sm:grid-cols-[1.1fr_1.4fr_auto] sm:gap-3 sm:rounded-3xl sm:p-3 md:mt-8"
             style={{ boxShadow: "var(--shadow-elegant)" }}
           >
             <LocationAutocomplete
@@ -82,7 +83,7 @@ function Landing() {
               aria-label="Location"
               placeholder="ZIP or city (e.g. 75034)"
             />
-            <label className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3">
+            <label className="flex items-center gap-2 rounded-xl bg-muted/50 px-4 py-3.5 sm:py-3">
               <Search className="h-4 w-4 shrink-0 text-primary" />
               <input
                 value={service}
@@ -91,19 +92,24 @@ function Landing() {
                 className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </label>
-            <GradientButton type="submit" className="w-full md:w-auto">
+            <GradientButton type="submit" className="w-full sm:w-auto">
               Find a Pro <ArrowRight className="h-4 w-4" />
             </GradientButton>
           </form>
 
-          <div className="mt-9">
-            <JourneyRail />
-          </div>
-
-          <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground md:mt-6">
             <span className="inline-flex items-center gap-1.5"><Sparkles className="h-4 w-4 text-primary" /> AI reads photo, video or text</span>
             <span className="inline-flex items-center gap-1.5"><Star className="h-4 w-4 text-primary" /> Like-for-like quotes</span>
             <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Before &amp; after proof</span>
+          </div>
+          </div>
+
+          {/* Journey panel — sits beside the hero copy on laptop, stacks on mobile */}
+          <div className="min-w-0 rounded-[24px] border border-border/60 bg-card/70 p-4 shadow-sm backdrop-blur md:p-5">
+            <div className="mb-3 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.16em] text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" /> How a GPB job runs
+            </div>
+            <JourneyRail stacked />
           </div>
         </div>
       </section>
