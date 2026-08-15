@@ -95,72 +95,58 @@ function Landing() {
             </GradientButton>
           </form>
 
+          <div className="mt-9">
+            <JourneyRail />
+          </div>
+
           <div className="mt-6 flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5"><Sparkles className="h-4 w-4 text-primary" /> AI diagnosis in seconds</span>
+            <span className="inline-flex items-center gap-1.5"><Sparkles className="h-4 w-4 text-primary" /> AI reads photo, video or text</span>
             <span className="inline-flex items-center gap-1.5"><Star className="h-4 w-4 text-primary" /> Like-for-like quotes</span>
             <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Before &amp; after proof</span>
           </div>
         </div>
       </section>
 
-      {/* AI entry point */}
-      <section className="mt-10">
-        <div className="rounded-[28px] border border-border/60 bg-card p-6 shadow-sm md:p-8">
-          <h2 className="text-2xl font-black tracking-tight md:text-3xl">Show us what you need</h2>
-          <p className="mt-1 max-w-2xl text-sm text-muted-foreground md:text-base">
-            Take a photo, record a video, upload an image, or simply describe what you need. GPB figures out the service and
-            connects you with the right local professional. A photo is never required.
+      <SectionConnector label="One photo · many services" />
+
+      {/* One photo, many services */}
+      <section
+        className="aurora-veil relative overflow-hidden rounded-[32px] border border-border/50 px-5 py-10 md:px-10 md:py-14"
+        style={{ backgroundColor: "color-mix(in oklab, var(--card) 80%, var(--background))" }}
+      >
+        <div className="relative">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-secondary/25 bg-card/80 px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.14em] text-secondary shadow-sm backdrop-blur">
+            <Sparkles className="h-3.5 w-3.5" /> GPB sees the whole scene
+          </div>
+          <h2 className="max-w-3xl text-3xl font-black leading-tight tracking-tight md:text-4xl">
+            One photo can reveal <span className="text-gradient-primary">every service that space needs</span>.
+          </h2>
+          <p className="mt-3 max-w-2xl text-sm text-muted-foreground md:text-base">
+            Tap a marker to see what GPB spots in a single room — then tell us what you actually want, and we scope that
+            one job precisely.
           </p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              { icon: Camera, label: "Take a photo", hint: "Use your camera" },
-              { icon: Video, label: "Record a video", hint: "Show the issue" },
-              { icon: Upload, label: "Upload an image", hint: "From your gallery" },
-              { icon: MessageCircle, label: "Describe the job", hint: "No photo needed" },
-            ].map((x) => (
-              <Link
-                key={x.label}
-                to="/snap"
-                className="group flex flex-col items-start gap-2 rounded-3xl border border-border/60 bg-background p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
-              >
-                <span className="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-md transition-transform group-hover:scale-110" style={{ background: "var(--gradient-primary)" }}>
-                  <x.icon className="h-5 w-5" />
-                </span>
-                <span className="mt-1 text-sm font-bold">{x.label}</span>
-                <span className="text-xs text-muted-foreground">{x.hint}</span>
-              </Link>
-            ))}
+          <div className="mt-8">
+            <RoomStory />
           </div>
         </div>
       </section>
 
-      {/* The GPB flow */}
-      <section className="mt-10">
-        <div className="overflow-x-auto rounded-[28px] border border-border/60 bg-card p-5 shadow-sm">
-          <div className="flex min-w-max items-center gap-2">
-            {[
-              { s: "Snap", d: "Show the problem" },
-              { s: "Understand", d: "AI explains it" },
-              { s: "Scope", d: "One standard brief" },
-              { s: "Compare", d: "Like-for-like quotes" },
-              { s: "Book", d: "Pick your pro" },
-              { s: "Verify", d: "Before & after check" },
-              { s: "Proof", d: "Kept in your passport" },
-            ].map((x, i) => (
-              <div key={x.s} className="flex items-center gap-2">
-                <div className="rounded-2xl bg-muted/50 px-4 py-3">
-                  <div className="text-xs font-black">{x.s}</div>
-                  <div className="text-[11px] text-muted-foreground">{x.d}</div>
-                </div>
-                {i < 6 && <ArrowRight className="h-3.5 w-3.5 shrink-0 text-border" />}
-              </div>
-            ))}
-          </div>
+      <SectionConnector label="Pros behind the work" />
+
+      {/* Provider verticals */}
+      <section>
+        <SectionHeader title="Real pros, every vertical" cta={{ label: "Browse all pros", to: "/search" }} />
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          From at-home beauty to electrical, cleaning, lawn care, handyman work and mobile auto — GPB is onboarding
+          professionals category by category across the USA.
+        </p>
+        <div className="mt-6">
+          <ProVerticals />
         </div>
       </section>
 
       {/* Popular categories */}
-      <section className="mt-14">
+      <section className="mt-16">
         <SectionHeader
           title="Popular services"
           cta={{ label: `All ${TOTAL_SERVICES}+ services`, to: "/services" }}
