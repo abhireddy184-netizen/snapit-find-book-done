@@ -258,7 +258,7 @@ function ScanningOverlay({ image }: { image: string }) {
         className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl opacity-60"
         style={{ backgroundImage: `url(${image})` }}
       />
-      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(15,10,40,0.85), rgba(88,28,180,0.75) 60%, rgba(20,10,50,0.9))" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, oklch(0.274 0.084 322 / 0.88), oklch(0.45 0.19 350 / 0.78) 60%, oklch(0.274 0.084 322 / 0.92))" }} />
       {/* Floating orbs */}
       <div className="absolute -left-24 top-1/4 h-80 w-80 rounded-full bg-primary/30 blur-3xl animate-pulse" />
       <div className="absolute -right-24 bottom-1/4 h-96 w-96 rounded-full bg-fuchsia-500/20 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
