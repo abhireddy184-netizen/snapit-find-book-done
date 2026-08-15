@@ -32,6 +32,16 @@ const BROAD_TERMS = new Set([
 const ALIASES: Record<string, string> = {
   "hair removal": "beauty-at-home/waxing",
   "wax": "beauty-at-home/waxing",
+  "waxing": "beauty-at-home/waxing",
+  "body wax": "beauty-at-home/waxing",
+  "full body wax": "beauty-at-home/waxing",
+  "full-body wax": "beauty-at-home/waxing",
+  "full body waxing": "beauty-at-home/waxing",
+  "full body hair removal": "beauty-at-home/waxing",
+  "waxing service": "beauty-at-home/waxing",
+  "bikini wax": "beauty-at-home/waxing",
+  "leg wax": "beauty-at-home/waxing",
+  "brazilian wax": "beauty-at-home/waxing",
   "makeup artist": "beauty-at-home/makeup-application",
   "mua": "beauty-at-home/makeup-application",
   "blow dry": "beauty-at-home/blowout",
@@ -119,7 +129,7 @@ export function matchServiceIntent(raw: string): ServiceHit | null {
   const q = normalizeQuery(raw);
   if (!q) return null;
 
-  const aliasTarget = ALIASES[q];
+  const aliasTarget = ALIASES[q] ?? ALIASES[q.replace(/\bwaxing\b/g, "wax")];
   if (aliasTarget) {
     const [cat, svc] = aliasTarget.split("/");
     const found = buildIndex().find((e) => e.hit.category.slug === cat && e.hit.service.slug === svc);
@@ -155,10 +165,12 @@ export function rankServices(raw: string, limit = 6): ServiceHit[] {
   const q = normalizeQuery(raw);
   if (!q) return [];
   const qTokens = tokenize(q);
+  const aliasHit = matchServiceIntent(raw);
   const scored = buildIndex()
     .map((e) => {
       let score = 99;
-      if (e.nameKey === q || e.slugKey === q) score = 0;
+      if (aliasHit && e.hit.service.slug === aliasHit.service.slug && e.hit.category.slug === aliasHit.category.slug) score = -1;
+      else if (e.nameKey === q || e.slugKey === q) score = 0;
       else if (e.nameKey.startsWith(q)) score = 1;
       else if (e.nameKey.includes(q)) score = 2;
       else if (qTokens.length && qTokens.every((t) => e.tokens.has(t))) score = 3;
@@ -171,12 +183,41 @@ export function rankServices(raw: string, limit = 6): ServiceHit[] {
 
 const LOCATION_KEY = "gpb:last-location";
 
+/**
+ * True when a value the user put in a location field is really a GPB service
+ * phrase ("Full body wax", "Pedicure", "Plumber"). Such values must never be
+ * stored or used as a location.
+ */
+export function isServicePhrase(value: string): boolean {
+  const q = normalizeQuery(value);
+  if (!q) return false;
+  // A real location almost always contains digits (ZIP) or a comma (City, ST).
+  if (/\d/.test(value) || value.includes(",")) return false;
+  if (ALIASES[q]) return true;
+  if (isBroad(q)) return true;
+  return matchServiceIntent(q) !== null;
+}
+
+/** Location memory, guarded so a service phrase can never become a location. */
 export function rememberLocation(loc: string) {
-  if (typeof window === "undefined" || !loc.trim()) return;
-  try { window.localStorage.setItem(LOCATION_KEY, loc.trim()); } catch { /* ignore */ }
+  if (typeof window === "undefined") return;
+  const value = loc.trim();
+  if (!value) return;
+  if (isServicePhrase(value)) {
+    try { window.localStorage.removeItem(LOCATION_KEY); } catch { /* ignore */ }
+    return;
+  }
+  try { window.localStorage.setItem(LOCATION_KEY, value); } catch { /* ignore */ }
 }
 
 export function recallLocation(): string {
   if (typeof window === "undefined") return "";
-  try { return window.localStorage.getItem(LOCATION_KEY) ?? ""; } catch { return ""; }
+  try {
+    const value = window.localStorage.getItem(LOCATION_KEY) ?? "";
+    if (value && isServicePhrase(value)) {
+      window.localStorage.removeItem(LOCATION_KEY);
+      return "";
+    }
+    return value;
+  } catch { return ""; }
 }
