@@ -47,22 +47,25 @@ function Landing() {
   return (
     <AppShell>
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-[28px] px-6 py-16 md:px-14 md:py-24 fade-up" style={{ background: "var(--gradient-soft)" }}>
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full opacity-30 blur-3xl" style={{ background: "var(--gradient-primary)" }} />
-        <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full opacity-20 blur-3xl" style={{ background: "var(--gradient-primary)" }} />
+      <section className="aurora-veil relative overflow-hidden rounded-[32px] px-6 py-14 md:px-14 md:py-20 fade-up" style={{ backgroundColor: "color-mix(in oklab, var(--card) 88%, var(--background))" }}>
+        <div className="pointer-events-none absolute -right-28 -top-28 h-80 w-80 rounded-full opacity-25 blur-3xl float-slow" style={{ background: "var(--gradient-primary)" }} />
+        <div className="pointer-events-none absolute -bottom-32 -left-24 h-80 w-80 rounded-full opacity-20 blur-3xl float-slow" style={{ background: "var(--gradient-secondary)", animationDelay: "1.6s" }} />
         <div className="relative">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-primary shadow-sm backdrop-blur">
-            <Sparkles className="h-3.5 w-3.5" /> Show it. Tell us. Get it done.
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-card/80 px-3.5 py-1.5 text-xs font-bold text-primary shadow-sm backdrop-blur">
+            <Sparkles className="h-3.5 w-3.5" /> GetPerfectBoy.com · Show it. Tell us. Get it fixed.
           </div>
-          <h1 className="max-w-4xl text-[2.5rem] font-black leading-[1.05] tracking-tight text-foreground md:text-7xl">
+          <h1 className="max-w-4xl text-[2.6rem] font-black leading-[1.03] tracking-tight text-foreground md:text-7xl">
             Show the problem.{" "}
             <span className="text-gradient-hero">Get it fixed with proof.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-xl">
-            Send a photo, a short video, an upload — or just describe it in words. Our AI explains what it likely needs
-            and turns that into one standardized job scope, so quotes are comparable, booking is simple and every job
-            ends with a record you keep.
+            Upload a photo, record a short video, or just describe it in words. GPB works out what the job actually is,
+            turns it into one clear scope and connects you to the right local professional — with before &amp; after proof kept for you.
           </p>
+
+          <div className="mt-6">
+            <InputModes />
+          </div>
 
           <form
             onSubmit={(e) => {
