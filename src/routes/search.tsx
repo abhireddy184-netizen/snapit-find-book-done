@@ -5,6 +5,7 @@ import { Star, ShieldCheck, MapPin, Clock, Search as SearchIcon, AlertCircle, Lo
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { providers as demoProviders } from "@/lib/snapit-data";
 import { catalog, searchServices } from "@/lib/catalog";
+import { matchServiceIntent, rankServices, rememberLocation } from "@/lib/search-intent";
 import { fetchPublicProviders, matchProviders, type ProviderMatch } from "@/lib/providers";
 import { useResolvedLocation } from "@/lib/us-zip";
 
@@ -53,8 +54,20 @@ function SearchPage() {
   const resolved = useResolvedLocation(loc);
   const place = resolved.kind === "zip" ? resolved.place : null;
 
-  const serviceMatches = q.trim() ? searchServices(q, 6) : [];
+  const intentHit = q.trim() ? matchServiceIntent(q) : null;
+  const serviceMatches = q.trim() ? (rankServices(q, 6).length ? rankServices(q, 6) : searchServices(q, 6)) : [];
   const matchedCategoryName = serviceMatches[0]?.category.name;
+
+  // High-confidence exact sub-service intent: skip the browse step entirely.
+  useEffect(() => {
+    if (!intentHit) return;
+    rememberLocation(loc);
+    void navigate({
+      to: "/services/$category/$service",
+      params: { category: intentHit.category.slug, service: intentHit.service.slug },
+      replace: true,
+    });
+  }, [intentHit?.category.slug, intentHit?.service.slug, loc, navigate]);
 
   const { data: realProviders, isLoading: loadingProviders } = useQuery({
     queryKey: ["public-providers"],
