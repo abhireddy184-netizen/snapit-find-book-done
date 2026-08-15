@@ -210,6 +210,14 @@
   h1, h2, h3, h4 {
     letter-spacing: -0.03em;
   }
+
+  input[type="range"], input[type="checkbox"], input[type="radio"], progress {
+    accent-color: var(--primary);
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary) 25%, transparent);
+  }
 }
 
 @utility glass-card {
