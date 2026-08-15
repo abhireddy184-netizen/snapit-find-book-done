@@ -10,10 +10,23 @@ import { useResolvedLocation } from "@/lib/us-zip";
 
 type SearchParams = { q: string; loc: string };
 
+/**
+ * TanStack's default search parser JSON-decodes values, so `?loc=75034`
+ * arrives as the number 75034. Coerce back to a ZIP-shaped string.
+ */
+function toSearchString(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (typeof value === "number" && Number.isInteger(value) && value >= 0 && value < 100000) {
+    return String(value).padStart(5, "0");
+  }
+  if (typeof value === "number") return String(value);
+  return "";
+}
+
 export const Route = createFileRoute("/search")({
   validateSearch: (search: Record<string, unknown>): SearchParams => ({
-    q: typeof search['q'] === "string" ? search['q'] : "",
-    loc: typeof search['loc'] === "string" ? search['loc'] : "",
+    q: toSearchString(search['q']),
+    loc: toSearchString(search['loc']),
   }),
   head: () => ({
     meta: [
