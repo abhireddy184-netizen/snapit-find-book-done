@@ -43,9 +43,10 @@ import {
   Users,
 } from "lucide-react";
 
+/** Hard ceiling for a single AI diagnosis request before we bail out. */
+const ANALYSIS_TIMEOUT_MS = 40_000;
+
 export const Route = createFileRoute("/snap")({
-  // Hard ceiling for a single AI diagnosis request.
-  
   head: () => ({
     meta: [
       { title: "Snap a problem — AI diagnosis in seconds | SnapIt" },
