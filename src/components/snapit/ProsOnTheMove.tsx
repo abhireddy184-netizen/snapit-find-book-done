@@ -222,7 +222,7 @@ export function ProsOnTheMove() {
   return (
     <section className="mt-6" aria-label="GPB pros on the move">
       <div
-        className="relative overflow-hidden rounded-[24px] border border-border/50 px-4 py-3 md:px-6"
+        className="relative overflow-hidden rounded-[22px] border border-border/50 px-4 py-3 sm:rounded-[24px] md:px-6 lg:px-8 lg:py-4"
         style={{ backgroundColor: "color-mix(in oklab, var(--card) 86%, var(--background))" }}
       >
         {/* ambient wash */}
@@ -244,7 +244,7 @@ export function ProsOnTheMove() {
         </div>
 
         {/* stage */}
-        <div className="relative mt-1 h-[104px] md:h-[124px]">
+        <div className="relative mt-1 h-[100px] sm:h-[112px] md:h-[128px] lg:h-[152px]">
           <div
             key={`${pro.id}-${cycle}`}
             className="walk-across absolute bottom-3 left-0 flex items-end gap-2"
@@ -252,7 +252,7 @@ export function ProsOnTheMove() {
           >
             <svg
               viewBox="0 0 100 104"
-              className="h-[76px] w-[74px] md:h-[92px] md:w-[88px]"
+              className="h-[70px] w-[68px] sm:h-[80px] sm:w-[78px] md:h-[92px] md:w-[88px] lg:h-[112px] lg:w-[106px]"
               role="img"
               aria-label={`${pro.label} walking`}
             >
@@ -265,7 +265,7 @@ export function ProsOnTheMove() {
                 {pro.label}
               </span>
               <span
-                className="walk-bubble max-w-[190px] rounded-2xl rounded-bl-sm border border-primary/25 bg-card/95 px-3 py-1.5 text-[11px] font-medium leading-snug text-foreground shadow-sm backdrop-blur md:max-w-none"
+                className="walk-bubble max-w-[170px] sm:max-w-[210px] lg:text-xs rounded-2xl rounded-bl-sm border border-primary/25 bg-card/95 px-3 py-1.5 text-[11px] font-medium leading-snug text-foreground shadow-sm backdrop-blur md:max-w-none"
                 style={{ ["--walk-duration" as any]: `${WALK_MS}ms` }}
               >
                 {pro.bubble}

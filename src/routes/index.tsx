@@ -120,7 +120,7 @@ function Landing() {
 
       {/* One photo, many services */}
       <section
-        className="aurora-veil relative overflow-hidden rounded-[32px] border border-border/50 px-5 py-10 md:px-10 md:py-14"
+        className="aurora-veil relative overflow-hidden rounded-[26px] border border-border/50 px-5 py-9 sm:rounded-[32px] sm:px-7 md:px-10 md:py-14 lg:px-12"
         style={{ backgroundColor: "color-mix(in oklab, var(--card) 80%, var(--background))" }}
       >
         <div className="relative">
@@ -156,12 +156,12 @@ function Landing() {
       </section>
 
       {/* Popular categories */}
-      <section className="mt-16">
+      <section className="mt-14 md:mt-20 lg:mt-24">
         <SectionHeader
           title="Popular services"
           cta={{ label: `All ${TOTAL_SERVICES}+ services`, to: "/services" }}
         />
-        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 md:grid-cols-4 lg:grid-cols-6 lg:gap-5">
           {homepageCategories.map((cat) => {
             const Icon = cat.icon;
             return (
@@ -183,9 +183,9 @@ function Landing() {
       </section>
 
       {/* How it works */}
-      <section className="mt-16">
+      <section className="mt-14 md:mt-20 lg:mt-24">
         <SectionHeader title="How GPB works" />
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="mt-6 grid gap-4 md:grid-cols-3 lg:gap-6">
           {[
             { n: "01", t: "Snap & understand", d: "Show the problem. Our AI describes what it likely is, how urgent it is and what it typically costs." },
             { n: "02", t: "Standardize & compare", d: "We turn the diagnosis into one job scope every pro quotes against, so prices are comparable." },
@@ -201,18 +201,18 @@ function Landing() {
       </section>
 
       {/* Featured pros */}
-      <section className="mt-16">
+      <section className="mt-14 md:mt-20 lg:mt-24">
         <SectionHeader title="Sample professionals" cta={{ label: "Browse all", to: "/search" }} />
         <p className="mt-2 text-xs text-muted-foreground">Example listings shown while GPB onboards its first local pros.</p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {providers.slice(0, 3).map((p) => <ProviderCard key={p.id} p={p} />)}
         </div>
       </section>
 
       {/* Why GPB */}
-      <section className="mt-16">
+      <section className="mt-14 md:mt-20 lg:mt-24">
         <SectionHeader title="What GPB is built for" />
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <div className="mt-6 grid gap-4 md:grid-cols-3 lg:gap-6">
           {[
             { title: "AI that explains the problem", text: "Send a photo, a video or a written description and get a plain-language read on the likely category, urgency and typical cost range." },
             { title: "One scope, comparable quotes", text: "Every service pro receives the identical standardized brief, so you compare price, availability and warranty — not guesswork." },
@@ -254,7 +254,7 @@ const PRO_TYPES = [
 
 function ProviderRecruitment() {
   return (
-    <section className="mt-16 overflow-hidden rounded-[28px] px-6 py-12 text-white md:px-12 md:py-16" style={{ background: "var(--gradient-primary)" }}>
+    <section className="mt-14 md:mt-20 lg:mt-24 overflow-hidden rounded-[28px] px-6 py-12 text-white md:px-12 md:py-16" style={{ background: "var(--gradient-primary)" }}>
       <div className="grid gap-8 lg:grid-cols-[1.25fr_1fr] lg:items-start">
         <div>
           <div className="mb-3 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-bold backdrop-blur">For professionals</div>
@@ -314,7 +314,7 @@ function EmergencySectionInner() {
     { label: "Lockout", icon: Lock, color: "from-rose-500 to-red-500" },
   ];
   return (
-    <section className="mt-16 relative overflow-hidden rounded-[28px] border border-red-200/70 dark:border-red-500/30 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-red-950/40 dark:via-card dark:to-orange-950/30 p-6 md:p-10 shadow-[0_0_60px_-15px_rgba(239,68,68,0.35)]">
+    <section className="mt-14 md:mt-20 lg:mt-24 relative overflow-hidden rounded-[28px] border border-red-200/70 dark:border-red-500/30 bg-gradient-to-br from-red-50 via-white to-orange-50 dark:from-red-950/40 dark:via-card dark:to-orange-950/30 p-6 md:p-10 shadow-[0_0_60px_-15px_rgba(239,68,68,0.35)]">
       <div className="pointer-events-none absolute -inset-1 rounded-[32px] bg-red-500/10 blur-2xl -z-10 animate-pulse" />
       <div className="grid gap-6 md:grid-cols-[1.2fr_1fr] md:items-center">
         <div>
@@ -382,7 +382,7 @@ function FloatingSnapButton({ footerRef }: { footerRef: React.RefObject<HTMLElem
       to="/snap"
       aria-label="Snap a problem for AI diagnosis"
       className={cn(
-        "fixed bottom-24 right-4 z-50 flex items-center gap-1.5 rounded-full py-2.5 pl-3 pr-4 text-xs font-bold text-white transition-all duration-300 hover:scale-105 active:scale-95 md:bottom-6 md:right-6 pulse-soft",
+        "fixed bottom-28 right-4 z-50 flex items-center gap-1.5 rounded-full py-2.5 pl-3 pr-4 text-xs font-bold text-white transition-all duration-300 hover:scale-105 active:scale-95 md:bottom-6 md:right-6 pulse-soft",
         hidden ? "translate-y-24 opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
       )}
       style={{ background: "var(--gradient-primary)" }}

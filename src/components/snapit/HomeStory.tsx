@@ -130,7 +130,7 @@ export function RoomStory() {
   const pick = (id: string) => { setAuto(false); setActiveId(id); };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+    <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-8 xl:gap-10">
       {/* Canvas */}
       <div className="relative overflow-hidden rounded-[26px] border border-border/60 bg-card shadow-[var(--shadow-elevated)]">
         <div className="relative aspect-[4/3] w-full overflow-hidden">
@@ -260,7 +260,7 @@ const VERTICALS = [
 
 export function ProVerticals() {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 lg:gap-4 xl:grid-cols-7">
       {VERTICALS.map((v) => (
         <Link
           key={v.slug}
