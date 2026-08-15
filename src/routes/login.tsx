@@ -7,10 +7,10 @@ export const Route = createFileRoute("/login")({
   }),
   head: () => ({
     meta: [
-      { title: "Log in — SnapIt" },
-      { name: "description", content: "Log in to SnapIt as a customer or service provider." },
-      { property: "og:title", content: "Log in — SnapIt" },
-      { property: "og:description", content: "Log in to SnapIt." },
+      { title: "Log in — GPB" },
+      { name: "description", content: "Log in to GPB as a customer or service provider." },
+      { property: "og:title", content: "Log in — GPB" },
+      { property: "og:description", content: "Log in to GPB." },
     ],
   }),
   component: LoginPage,
@@ -24,7 +24,7 @@ function LoginPage() {
       title="Welcome back"
       subtitle="Log in to book services or manage your business."
       redirectTo={redirect}
-      footer={<p>New to SnapIt? <Link to="/register" search={{ redirect: undefined }} className="font-semibold text-primary">Create an account</Link></p>}
+      footer={<p>New to GPB? <Link to="/register" search={{ redirect: undefined }} className="font-semibold text-primary">Create an account</Link></p>}
     />
   );
 }

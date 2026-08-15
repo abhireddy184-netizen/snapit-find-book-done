@@ -1,9 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
+import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, Video, Upload, MessageCircle, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, Mail, Phone, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
-import { categories, providers } from "@/lib/snapit-data";
+import { providers } from "@/lib/snapit-data";
+import { popularCategories, TOTAL_SERVICES } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
 const SITE_URL = "https://id-preview--bca1ede1-6b69-4084-95f5-53bb43a6c24e.lovable.app";
@@ -12,9 +13,9 @@ const OG_IMAGE = `${SITE_URL}/__l5e/assets-v1/a199e0d6-211d-4b74-ab79-c58ffbd287
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SnapIt — Show the problem. Get it fixed with proof." },
-      { name: "description", content: "Snap a photo of any problem. SnapIt's AI explains what it likely needs, turns it into one standardized job scope, gets comparable quotes, books a pro and keeps a permanent record of the work." },
-      { property: "og:title", content: "SnapIt — Show the problem. Get it fixed with proof." },
+      { title: "GPB — Show the problem. Get it fixed with proof." },
+      { name: "description", content: "Snap a photo of any problem. GPB's AI explains what it likely needs, turns it into one standardized job scope, gets comparable quotes, books a pro and keeps a permanent record of the work." },
+      { property: "og:title", content: "GPB — Show the problem. Get it fixed with proof." },
       { property: "og:description", content: "AI diagnosis, one standardized scope, comparable quotes, booking and a permanent proof record for every job." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
@@ -22,7 +23,7 @@ export const Route = createFileRoute("/")({
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "SnapIt — Show the problem. Get it fixed with proof." },
+      { name: "twitter:title", content: "GPB — Show the problem. Get it fixed with proof." },
       { name: "twitter:description", content: "AI diagnosis, one standardized scope, comparable quotes, booking and a permanent proof record for every job." },
       { name: "twitter:image", content: OG_IMAGE },
     ],
@@ -30,6 +31,14 @@ export const Route = createFileRoute("/")({
   }),
   component: Landing,
 });
+
+/** Beauty & personal care is a headline GPB category, so it is hoisted into the first row. */
+const homepageCategories = (() => {
+  const list = [...popularCategories];
+  const i = list.findIndex((c) => c.slug === "beauty-at-home");
+  if (i > 0) list.unshift(list.splice(i, 1)[0]!);
+  return list.slice(0, 12);
+})();
 
 function Landing() {
   const navigate = useNavigate();
@@ -45,7 +54,7 @@ function Landing() {
         <div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full opacity-20 blur-3xl" style={{ background: "var(--gradient-primary)" }} />
         <div className="relative">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-card/80 px-3.5 py-1.5 text-xs font-semibold text-primary shadow-sm backdrop-blur">
-            <Sparkles className="h-3.5 w-3.5" /> Snap it. Book it. Done.
+            <Sparkles className="h-3.5 w-3.5" /> Show it. Tell us. Get it done.
           </div>
           <h1 className="max-w-4xl text-[2.5rem] font-black leading-[1.05] tracking-tight text-foreground md:text-7xl">
             Show the problem.{" "}
@@ -95,7 +104,38 @@ function Landing() {
         </div>
       </section>
 
-      {/* The SnapIt flow */}
+      {/* AI entry point */}
+      <section className="mt-10">
+        <div className="rounded-[28px] border border-border/60 bg-card p-6 shadow-sm md:p-8">
+          <h2 className="text-2xl font-black tracking-tight md:text-3xl">Show us what you need</h2>
+          <p className="mt-1 max-w-2xl text-sm text-muted-foreground md:text-base">
+            Take a photo, record a video, upload an image, or simply describe what you need. GPB figures out the service and
+            connects you with the right local professional. A photo is never required.
+          </p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { icon: Camera, label: "Take a photo", hint: "Use your camera" },
+              { icon: Video, label: "Record a video", hint: "Show the issue" },
+              { icon: Upload, label: "Upload an image", hint: "From your gallery" },
+              { icon: MessageCircle, label: "Describe the job", hint: "No photo needed" },
+            ].map((x) => (
+              <Link
+                key={x.label}
+                to="/snap"
+                className="group flex flex-col items-start gap-2 rounded-3xl border border-border/60 bg-background p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl"
+              >
+                <span className="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-md transition-transform group-hover:scale-110" style={{ background: "var(--gradient-primary)" }}>
+                  <x.icon className="h-5 w-5" />
+                </span>
+                <span className="mt-1 text-sm font-bold">{x.label}</span>
+                <span className="text-xs text-muted-foreground">{x.hint}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* The GPB flow */}
       <section className="mt-10">
         <div className="overflow-x-auto rounded-[28px] border border-border/60 bg-card p-5 shadow-sm">
           <div className="flex min-w-max items-center gap-2">
@@ -122,22 +162,25 @@ function Landing() {
 
       {/* Popular categories */}
       <section className="mt-14">
-        <SectionHeader title="Popular services" cta={{ label: "View all", to: "/categories" }} />
+        <SectionHeader
+          title="Popular services"
+          cta={{ label: `All ${TOTAL_SERVICES}+ services`, to: "/services" }}
+        />
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
-          {categories.slice(0, 10).map((cat) => {
+          {homepageCategories.map((cat) => {
             const Icon = cat.icon;
             return (
               <Link
                 key={cat.slug}
-                to="/search"
-                search={{ cat: cat.slug } as never}
+                to="/services/$category"
+                params={{ category: cat.slug }}
                 className="group flex h-full flex-col rounded-3xl border border-border/60 bg-card p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl active:scale-[0.98]"
               >
-                <div className={`grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br ${cat.color} text-white shadow-md transition-transform duration-300 group-hover:scale-110`}>
+                <div className={`grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br ${cat.gradient} text-white shadow-md transition-transform duration-300 group-hover:scale-110`}>
                   <Icon className="h-7 w-7" />
                 </div>
                 <div className="mt-4 text-sm font-semibold text-foreground">{cat.name}</div>
-                <div className="mt-1 text-xs text-muted-foreground line-clamp-1">{cat.description}</div>
+                <div className="mt-1 text-xs text-muted-foreground line-clamp-1">{cat.tagline}</div>
               </Link>
             );
           })}
@@ -146,7 +189,7 @@ function Landing() {
 
       {/* How it works */}
       <section className="mt-16">
-        <SectionHeader title="How SnapIt works" />
+        <SectionHeader title="How GPB works" />
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {[
             { n: "01", t: "Snap & understand", d: "Show the problem. Our AI describes what it likely is, how urgent it is and what it typically costs." },
@@ -165,15 +208,15 @@ function Landing() {
       {/* Featured pros */}
       <section className="mt-16">
         <SectionHeader title="Sample professionals" cta={{ label: "Browse all", to: "/search" }} />
-        <p className="mt-2 text-xs text-muted-foreground">Example listings shown while SnapIt onboards its first local pros.</p>
+        <p className="mt-2 text-xs text-muted-foreground">Example listings shown while GPB onboards its first local pros.</p>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {providers.slice(0, 3).map((p) => <ProviderCard key={p.id} p={p} />)}
         </div>
       </section>
 
-      {/* Why SnapIt */}
+      {/* Why GPB */}
       <section className="mt-16">
-        <SectionHeader title="What SnapIt is built for" />
+        <SectionHeader title="What GPB is built for" />
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {[
             { title: "AI that explains the problem", text: "Snap a photo and get a plain-language diagnosis with a likely category, urgency and typical cost range." },
@@ -199,7 +242,7 @@ function Landing() {
         <div className="grid gap-6 md:grid-cols-[1.4fr_1fr] md:items-center">
           <div>
             <div className="mb-3 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur">For pros</div>
-            <h2 className="text-3xl font-black md:text-4xl">Grow your business with SnapIt</h2>
+            <h2 className="text-3xl font-black md:text-4xl">Grow your business with GPB</h2>
             <p className="mt-3 max-w-xl text-white/90">Receive clear, standardized job briefs instead of vague enquiries — so you can quote accurately and win the right work.</p>
             <div className="mt-6">
               <Link
@@ -396,7 +439,7 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
       <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
         <div>
           <Logo />
-          <p className="mt-4 max-w-xs leading-relaxed">Snap it. Book it. Done. AI-powered matching between customers and trusted local pros.</p>
+          <p className="mt-4 max-w-xs leading-relaxed">Show it. Tell us. Get it done. AI-powered matching between customers and trusted local pros.</p>
           <div className="mt-5 flex items-center gap-2">
             {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
               <a key={i} href="#" aria-label="Social" className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary">
@@ -435,8 +478,8 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
       </div>
       <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-border/60 pt-8 text-xs md:flex-row md:items-center">
         <div className="flex flex-col gap-1">
-          <span className="text-base font-black tracking-tight text-foreground">SnapIt</span>
-          <span>© {new Date().getFullYear()} SnapIt Technologies, Inc. All rights reserved.</span>
+          <span className="text-base font-black tracking-tight text-foreground">GPB</span>
+          <span>© {new Date().getFullYear()} GPB Technologies, Inc. All rights reserved.</span>
         </div>
         <div className="flex flex-wrap gap-5"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a><a href="#">Accessibility</a><a href="#">Sitemap</a></div>
       </div>

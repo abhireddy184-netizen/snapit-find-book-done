@@ -122,15 +122,17 @@ export function buildSafetySteps(analysis: SnapAnalysis): string[] {
 export async function createJobFromAnalysis(params: {
   customerId: string;
   analysis: SnapAnalysis;
-  imageDataUrl: string;
+  imageDataUrl?: string | null;
   note?: string;
 }): Promise<Job> {
   const { customerId, analysis, imageDataUrl, note } = params;
   let beforePath: string | null = null;
-  try {
-    beforePath = await uploadJobMedia(customerId, imageDataUrl, "before");
-  } catch {
-    beforePath = null;
+  if (imageDataUrl) {
+    try {
+      beforePath = await uploadJobMedia(customerId, imageDataUrl, "before");
+    } catch {
+      beforePath = null;
+    }
   }
 
   const { data, error } = await supabase

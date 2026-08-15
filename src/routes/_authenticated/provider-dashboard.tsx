@@ -11,10 +11,10 @@ import { categories } from "@/lib/snapit-data";
 export const Route = createFileRoute("/_authenticated/provider-dashboard")({
   head: () => ({
     meta: [
-      { title: "Provider dashboard — SnapIt" },
-      { name: "description", content: "Manage jobs, appointments, availability and your provider profile on SnapIt." },
-      { property: "og:title", content: "Provider dashboard — SnapIt" },
-      { property: "og:description", content: "Manage your SnapIt business in one place." },
+      { title: "Provider dashboard — GPB" },
+      { name: "description", content: "Manage jobs, appointments, availability and your provider profile on GPB." },
+      { property: "og:title", content: "Provider dashboard — GPB" },
+      { property: "og:description", content: "Manage your GPB business in one place." },
     ],
   }),
   component: ProviderDashboard,
@@ -111,7 +111,7 @@ function Requests({ userId }: { userId: string | undefined }) {
 
   const bookings = (data ?? []).filter((b) => b.status === "pending");
   if (bookings.length === 0) {
-    return <EmptyJobs title="No job requests yet" body="When a customer books you on SnapIt, their request will appear here for you to accept or decline." />;
+    return <EmptyJobs title="No job requests yet" body="When a customer books you on GPB, their request will appear here for you to accept or decline." />;
   }
 
   return (
@@ -303,7 +303,7 @@ function BusinessProfile() {
             {data?.verification_status ?? "unverified"}
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            All new providers start unverified. Manual review by the SnapIt team is coming soon — until then no badge is shown to customers.
+            All new providers start unverified. Manual review by the GPB team is coming soon — until then no badge is shown to customers.
           </p>
         </div>
         <button

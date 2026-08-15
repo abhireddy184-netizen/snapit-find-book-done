@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SnapRouteImport } from './routes/snap'
+import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
@@ -19,15 +20,23 @@ import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as TrackingIdRouteImport } from './routes/tracking.$id'
 import { Route as ProviderIdRouteImport } from './routes/provider.$id'
 import { Route as AuthenticatedProviderDashboardRouteImport } from './routes/_authenticated/provider-dashboard'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as ServicesCategoryIndexRouteImport } from './routes/services.$category.index'
+import { Route as ServicesCategoryServiceRouteImport } from './routes/services.$category.$service'
 import { Route as AuthenticatedJobIdRouteImport } from './routes/_authenticated/job.$id'
 
 const SnapRoute = SnapRouteImport.update({
   id: '/snap',
   path: '/snap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SearchRoute = SearchRouteImport.update({
@@ -74,6 +83,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServicesIndexRoute = ServicesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ServicesRoute,
+} as any)
 const TrackingIdRoute = TrackingIdRouteImport.update({
   id: '/tracking/$id',
   path: '/tracking/$id',
@@ -95,6 +109,16 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ServicesCategoryIndexRoute = ServicesCategoryIndexRouteImport.update({
+  id: '/$category/',
+  path: '/$category/',
+  getParentRoute: () => ServicesRoute,
+} as any)
+const ServicesCategoryServiceRoute = ServicesCategoryServiceRouteImport.update({
+  id: '/$category/$service',
+  path: '/$category/$service',
+  getParentRoute: () => ServicesRoute,
+} as any)
 const AuthenticatedJobIdRoute = AuthenticatedJobIdRouteImport.update({
   id: '/job/$id',
   path: '/job/$id',
@@ -110,12 +134,16 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
+  '/services': typeof ServicesRouteWithChildren
   '/snap': typeof SnapRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
+  '/services/': typeof ServicesIndexRoute
   '/job/$id': typeof AuthenticatedJobIdRoute
+  '/services/$category/$service': typeof ServicesCategoryServiceRoute
+  '/services/$category/': typeof ServicesCategoryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -131,7 +159,10 @@ export interface FileRoutesByTo {
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
+  '/services': typeof ServicesIndexRoute
   '/job/$id': typeof AuthenticatedJobIdRoute
+  '/services/$category/$service': typeof ServicesCategoryServiceRoute
+  '/services/$category': typeof ServicesCategoryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -144,12 +175,16 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
+  '/services': typeof ServicesRouteWithChildren
   '/snap': typeof SnapRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
+  '/services/': typeof ServicesIndexRoute
   '/_authenticated/job/$id': typeof AuthenticatedJobIdRoute
+  '/services/$category/$service': typeof ServicesCategoryServiceRoute
+  '/services/$category/': typeof ServicesCategoryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -162,12 +197,16 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/search'
+    | '/services'
     | '/snap'
     | '/dashboard'
     | '/provider-dashboard'
     | '/provider/$id'
     | '/tracking/$id'
+    | '/services/'
     | '/job/$id'
+    | '/services/$category/$service'
+    | '/services/$category/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -183,7 +222,10 @@ export interface FileRouteTypes {
     | '/provider-dashboard'
     | '/provider/$id'
     | '/tracking/$id'
+    | '/services'
     | '/job/$id'
+    | '/services/$category/$service'
+    | '/services/$category'
   id:
     | '__root__'
     | '/'
@@ -195,12 +237,16 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/search'
+    | '/services'
     | '/snap'
     | '/_authenticated/dashboard'
     | '/_authenticated/provider-dashboard'
     | '/provider/$id'
     | '/tracking/$id'
+    | '/services/'
     | '/_authenticated/job/$id'
+    | '/services/$category/$service'
+    | '/services/$category/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -213,6 +259,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
   SearchRoute: typeof SearchRoute
+  ServicesRoute: typeof ServicesRouteWithChildren
   SnapRoute: typeof SnapRoute
   ProviderIdRoute: typeof ProviderIdRoute
   TrackingIdRoute: typeof TrackingIdRoute
@@ -225,6 +272,13 @@ declare module '@tanstack/react-router' {
       path: '/snap'
       fullPath: '/snap'
       preLoaderRoute: typeof SnapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/search': {
@@ -290,6 +344,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/services/': {
+      id: '/services/'
+      path: '/'
+      fullPath: '/services/'
+      preLoaderRoute: typeof ServicesIndexRouteImport
+      parentRoute: typeof ServicesRoute
+    }
     '/tracking/$id': {
       id: '/tracking/$id'
       path: '/tracking/$id'
@@ -318,6 +379,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/services/$category/': {
+      id: '/services/$category/'
+      path: '/$category'
+      fullPath: '/services/$category/'
+      preLoaderRoute: typeof ServicesCategoryIndexRouteImport
+      parentRoute: typeof ServicesRoute
+    }
+    '/services/$category/$service': {
+      id: '/services/$category/$service'
+      path: '/$category/$service'
+      fullPath: '/services/$category/$service'
+      preLoaderRoute: typeof ServicesCategoryServiceRouteImport
+      parentRoute: typeof ServicesRoute
+    }
     '/_authenticated/job/$id': {
       id: '/_authenticated/job/$id'
       path: '/job/$id'
@@ -343,6 +418,22 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface ServicesRouteChildren {
+  ServicesIndexRoute: typeof ServicesIndexRoute
+  ServicesCategoryServiceRoute: typeof ServicesCategoryServiceRoute
+  ServicesCategoryIndexRoute: typeof ServicesCategoryIndexRoute
+}
+
+const ServicesRouteChildren: ServicesRouteChildren = {
+  ServicesIndexRoute: ServicesIndexRoute,
+  ServicesCategoryServiceRoute: ServicesCategoryServiceRoute,
+  ServicesCategoryIndexRoute: ServicesCategoryIndexRoute,
+}
+
+const ServicesRouteWithChildren = ServicesRoute._addFileChildren(
+  ServicesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -353,6 +444,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   SearchRoute: SearchRoute,
+  ServicesRoute: ServicesRouteWithChildren,
   SnapRoute: SnapRoute,
   ProviderIdRoute: ProviderIdRoute,
   TrackingIdRoute: TrackingIdRoute,

@@ -7,9 +7,9 @@ import { providers } from "@/lib/snapit-data";
 export const Route = createFileRoute("/tracking/$id")({
   head: ({ params }) => ({
     meta: [
-      { title: `Tracking ${params.id} — SnapIt` },
-      { name: "description", content: "Track your SnapIt pro in real time — see their ETA, route and arrival status." },
-      { property: "og:title", content: "Live pro tracking — SnapIt" },
+      { title: `Tracking ${params.id} — GPB` },
+      { name: "description", content: "Track your GPB pro in real time — see their ETA, route and arrival status." },
+      { property: "og:title", content: "Live pro tracking — GPB" },
       { property: "og:description", content: "Real-time ETA and route updates for your booked pro." },
     ],
   }),
