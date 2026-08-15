@@ -236,8 +236,3 @@
   font-size: 0.875rem;
   outline: none;
 }
-@utility input-base {
-  &:focus {
-    border-color: var(--primary);
-  }
-}
