@@ -1,8 +1,11 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { CalendarDays, Heart, MessageCircle, User, MapPin, Star, ShieldCheck } from "lucide-react";
-import { AppShell, Avatar } from "@/components/snapit/AppShell";
-import { providers, type Provider } from "@/lib/snapit-data";
+import { CalendarDays, Heart, MessageCircle, User, MapPin, Star, ShieldCheck, Camera, LogOut, Loader2 } from "lucide-react";
+import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
+import { providers } from "@/lib/snapit-data";
+import { useAuth } from "@/lib/auth";
+import { fetchCustomerBookings, formatBookingDate, type Booking } from "@/lib/bookings";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -25,11 +28,19 @@ const tabs = [
 
 function Dashboard() {
   const [tab, setTab] = useState("bookings");
+  const { profile, user } = useAuth();
+  const firstName = (profile?.full_name || "").split(" ")[0] || "there";
+
   return (
     <AppShell>
       <div className="pt-4">
-        <h1 className="text-2xl font-black md:text-3xl">Welcome back, Jamie</h1>
+        <h1 className="text-2xl font-black md:text-3xl">Welcome back, {firstName}</h1>
         <p className="mt-1 text-sm text-muted-foreground">Here's what's happening with your bookings.</p>
+        {profile?.role === "provider" && (
+          <Link to="/provider-dashboard" className="mt-3 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-xs font-semibold hover:bg-muted">
+            Switch to provider dashboard
+          </Link>
+        )}
       </div>
 
       <div className="mt-6 flex gap-2 overflow-x-auto border-b border-border/60">
@@ -49,7 +60,7 @@ function Dashboard() {
       </div>
 
       <div className="mt-6">
-        {tab === "bookings" && <Bookings />}
+        {tab === "bookings" && <Bookings userId={user?.id} />}
         {tab === "saved" && <Saved />}
         {tab === "messages" && <Messages />}
         {tab === "profile" && <Profile />}
@@ -58,48 +69,96 @@ function Dashboard() {
   );
 }
 
-function Bookings() {
+function DemoNote({ children }: { children: string }) {
+  return (
+    <div className="mb-4 rounded-xl border border-border/60 bg-muted/40 px-3 py-2 text-xs text-muted-foreground">{children}</div>
+  );
+}
+
+function Bookings({ userId }: { userId: string | undefined }) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["bookings", "customer", userId],
+    queryFn: () => fetchCustomerBookings(userId as string),
+    enabled: Boolean(userId),
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center gap-2 py-10 text-sm text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin" /> Loading your bookings…
+      </div>
+    );
+  }
+  if (error) {
+    return <div className="rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">We couldn't load your bookings. Please refresh and try again.</div>;
+  }
+
+  const bookings = data ?? [];
+  if (bookings.length === 0) {
+    return (
+      <div className="rounded-3xl border border-border/60 bg-card p-10 text-center shadow-sm">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--gradient-primary)" }}>
+          <Camera className="h-6 w-6" />
+        </div>
+        <h2 className="mt-4 text-lg font-black">No bookings yet</h2>
+        <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">Snap a photo of your problem and we'll match you with a local pro in seconds.</p>
+        <div className="mt-5 flex justify-center">
+          <Link to="/snap"><GradientButton>Snap a Problem</GradientButton></Link>
+        </div>
+      </div>
+    );
+  }
+
+  const active = bookings.filter((b) => b.status === "pending" || b.status === "confirmed" || b.status === "in_progress");
+  const past = bookings.filter((b) => !active.includes(b));
+
   return (
     <div className="space-y-8">
-      <div>
-        <h2 className="text-lg font-black">Upcoming</h2>
-        <div className="mt-3 space-y-3">
-          {providers.slice(0, 2).map((p, i) => (
-            <BookingCard key={p.id} provider={p} status={i === 0 ? "confirmed" : "pending"} when={i === 0 ? "Tomorrow · 11:00 AM" : "Fri · 3:30 PM"} />
-          ))}
+      {active.length > 0 && (
+        <div>
+          <h2 className="text-lg font-black">Upcoming</h2>
+          <div className="mt-3 space-y-3">{active.map((b) => <BookingCard key={b.id} booking={b} />)}</div>
         </div>
-      </div>
-      <div>
-        <h2 className="text-lg font-black">Previous</h2>
-        <div className="mt-3 space-y-3">
-          {providers.slice(2, 5).map((p) => (
-            <BookingCard key={p.id} provider={p} status="completed" when="Sep 12 · 2:00 PM" />
-          ))}
+      )}
+      {past.length > 0 && (
+        <div>
+          <h2 className="text-lg font-black">Previous</h2>
+          <div className="mt-3 space-y-3">{past.map((b) => <BookingCard key={b.id} booking={b} />)}</div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
 
-function BookingCard({ provider: p, status, when }: { provider: Provider; status: "confirmed" | "pending" | "completed"; when: string }) {
-  const badgeStyle = {
-    confirmed: "bg-emerald-100 text-emerald-700",
-    pending: "bg-amber-100 text-amber-700",
-    completed: "bg-muted text-muted-foreground",
-  }[status];
+const statusStyle: Record<string, string> = {
+  pending: "bg-amber-100 text-amber-700",
+  confirmed: "bg-emerald-100 text-emerald-700",
+  in_progress: "bg-blue-100 text-blue-700",
+  completed: "bg-muted text-muted-foreground",
+  cancelled: "bg-muted text-muted-foreground",
+};
+
+function BookingCard({ booking }: { booking: Booking }) {
+  const name = booking.provider_name_snapshot || "Pro to be assigned";
+  const initials = name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   return (
     <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
-        <Avatar initials={p.initials} gradient={p.gradient} />
+        <Avatar initials={initials} gradient="from-blue-500 to-purple-600" />
         <div className="min-w-0">
-          <div className="truncate text-sm font-bold">{p.name}</div>
-          <div className="truncate text-xs text-muted-foreground">{p.business} · {when}</div>
+          <div className="truncate text-sm font-bold">{booking.service}</div>
+          <div className="truncate text-xs text-muted-foreground">
+            {name} · {formatBookingDate(booking.scheduled_date)} · {booking.scheduled_time}
+          </div>
         </div>
-        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold capitalize ${badgeStyle}`}>{status}</span>
+        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold capitalize ${statusStyle[booking.status] ?? "bg-muted"}`}>
+          {booking.status.replace("_", " ")}
+        </span>
       </div>
-      <div className="mt-3 flex gap-2">
-        <Link to="/provider/$id" params={{ id: p.id }} className="flex-1 rounded-full border border-border py-2 text-center text-xs font-semibold hover:bg-muted">View</Link>
-        <button className="flex-1 rounded-full py-2 text-center text-xs font-semibold text-white shadow-sm" style={{ background: "var(--gradient-primary)" }}>Message</button>
+      {booking.details && <p className="mt-3 line-clamp-2 text-xs text-muted-foreground">{booking.details}</p>}
+      <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+        <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
+        <span className="truncate">{booking.service_address}</span>
       </div>
     </div>
   );
@@ -107,82 +166,86 @@ function BookingCard({ provider: p, status, when }: { provider: Provider; status
 
 function Saved() {
   return (
-    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-      {providers.slice(0, 4).map((p) => (
-        <Link key={p.id} to="/provider/$id" params={{ id: p.id }} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm hover:shadow-md">
-          <div className="flex items-center gap-3">
-            <Avatar initials={p.initials} gradient={p.gradient} />
-            <div className="min-w-0">
-              <div className="flex items-center gap-1">
-                <div className="truncate text-sm font-bold">{p.name}</div>
-                {p.verified && <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-primary" />}
+    <div>
+      <DemoNote>Sample pros shown for demo browsing — saved lists become real once providers join SnapIt.</DemoNote>
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {providers.slice(0, 4).map((p) => (
+          <Link key={p.id} to="/provider/$id" params={{ id: p.id }} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm hover:shadow-md">
+            <div className="flex items-center gap-3">
+              <Avatar initials={p.initials} gradient={p.gradient} />
+              <div className="min-w-0">
+                <div className="flex items-center gap-1">
+                  <div className="truncate text-sm font-bold">{p.name}</div>
+                  {p.verified && <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-primary" />}
+                </div>
+                <div className="truncate text-xs text-muted-foreground">{p.business}</div>
               </div>
-              <div className="truncate text-xs text-muted-foreground">{p.business}</div>
             </div>
-          </div>
-          <div className="mt-3 flex items-center justify-between text-xs">
-            <span className="inline-flex items-center gap-1 font-semibold"><Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating}</span>
-            <span className="font-semibold text-primary">from ${p.startingPrice}</span>
-          </div>
-        </Link>
-      ))}
+            <div className="mt-3 flex items-center justify-between text-xs">
+              <span className="inline-flex items-center gap-1 font-semibold"><Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating}</span>
+              <span className="font-semibold text-primary">from ${p.startingPrice}</span>
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
 
 function Messages() {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card divide-y divide-border/60">
-      {providers.slice(0, 4).map((p, i) => (
-        <div key={p.id} className="flex items-center gap-3 p-4">
-          <Avatar initials={p.initials} gradient={p.gradient} />
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between gap-2">
-              <div className="truncate text-sm font-bold">{p.name}</div>
-              <div className="shrink-0 text-[10px] text-muted-foreground">{["Now", "2m", "1h", "Yesterday"][i]}</div>
+    <div>
+      <DemoNote>Messaging is not live yet — this is a sample preview of the inbox.</DemoNote>
+      <div className="rounded-2xl border border-border/60 bg-card divide-y divide-border/60">
+        {providers.slice(0, 4).map((p, i) => (
+          <div key={p.id} className="flex items-center gap-3 p-4">
+            <Avatar initials={p.initials} gradient={p.gradient} />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <div className="truncate text-sm font-bold">{p.name}</div>
+                <div className="shrink-0 text-[10px] text-muted-foreground">{["Now", "2m", "1h", "Yesterday"][i]}</div>
+              </div>
+              <div className="truncate text-xs text-muted-foreground">{["I'm on my way!", "Sounds good, see you at 11.", "Thanks for booking.", "Job complete — please rate!"][i]}</div>
             </div>
-            <div className="truncate text-xs text-muted-foreground">{["I'm on my way!", "Sounds good, see you at 11.", "Thanks for booking.", "Job complete — please rate!"][i]}</div>
           </div>
-          {i < 2 && <span className="h-2 w-2 shrink-0 rounded-full bg-primary" />}
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
 
 function Profile() {
+  const { profile, user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const initials = (profile?.full_name || user?.email || "?").split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
         <div className="flex items-center gap-4">
-          <Avatar initials="JM" gradient="from-blue-500 to-purple-600" size={64} />
-          <div>
-            <div className="text-lg font-bold">Jamie Morgan</div>
-            <div className="text-xs text-muted-foreground">jamie@snapit.example</div>
+          <Avatar initials={initials} gradient="from-blue-500 to-purple-600" size={64} />
+          <div className="min-w-0">
+            <div className="truncate text-lg font-bold">{profile?.full_name || "Your account"}</div>
+            <div className="truncate text-xs text-muted-foreground">{user?.email}</div>
           </div>
         </div>
         <div className="mt-6 space-y-2 text-sm">
-          <Field label="Phone" value="+1 (555) 010-2244" />
-          <Field label="Member since" value="March 2024" />
-          <Field label="Preferred payment" value="Visa ending in 4242" />
+          <Field label="Account type" value={profile?.role === "provider" ? "Service provider" : "Customer"} />
+          <Field label="Member since" value={user?.created_at ? new Date(user.created_at).toLocaleDateString("en", { month: "long", year: "numeric" }) : "—"} />
         </div>
+        <button
+          onClick={async () => {
+            await signOut();
+            await navigate({ to: "/" });
+          }}
+          className="mt-6 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold hover:bg-muted"
+        >
+          <LogOut className="h-4 w-4" /> Log out
+        </button>
       </div>
       <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
         <div className="text-sm font-bold">Saved addresses</div>
-        <div className="mt-3 space-y-2">
-          {[
-            { label: "Home", addr: "123 Maple Ave, Springfield" },
-            { label: "Work", addr: "500 Market St, Suite 12" },
-          ].map((a) => (
-            <div key={a.label} className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
-              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-              <div className="min-w-0">
-                <div className="text-sm font-semibold">{a.label}</div>
-                <div className="truncate text-xs text-muted-foreground">{a.addr}</div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <p className="mt-2 text-xs text-muted-foreground">Address book is coming soon. For now, you enter the service address with each booking.</p>
       </div>
     </div>
   );
