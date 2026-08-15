@@ -2,6 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { AuthForm } from "@/components/snapit/AuthForm";
 
 export const Route = createFileRoute("/register")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    redirect: typeof search['redirect'] === "string" ? (search['redirect'] as string) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Sign up — SnapIt" },
@@ -14,11 +17,13 @@ export const Route = createFileRoute("/register")({
 });
 
 function RegisterPage() {
+  const { redirect } = Route.useSearch();
   return (
     <AuthForm
       mode="register"
       title="Create your account"
       subtitle="Snap it. Book it. Done. Get started in seconds."
+      redirectTo={redirect}
       footer={<p>Already have an account? <Link to="/login" className="font-semibold text-primary">Log in</Link></p>}
     />
   );
