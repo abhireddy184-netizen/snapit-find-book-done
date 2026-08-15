@@ -114,7 +114,7 @@ function ServicePage() {
             </Link>
             <Link
               to="/search"
-              search={{ q: service.name, loc: savedLoc } as never}
+              search={{ q: service.name, loc: savedLoc, pros: 1 } as never}
               className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-border px-4 py-3 text-sm font-semibold hover:bg-muted"
             >
               {savedLoc ? `Browse ${service.name} pros in ${savedLoc}` : `Browse ${service.name} pros`} <ArrowRight className="h-4 w-4" />
