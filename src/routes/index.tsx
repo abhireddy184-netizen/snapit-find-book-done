@@ -1,5 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { subscribeToUpdates } from "@/lib/subscribe.functions";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import {
   Search, ArrowRight, CheckCircle2, Camera, ShieldAlert, Zap, Droplet, Wind, Lock,
