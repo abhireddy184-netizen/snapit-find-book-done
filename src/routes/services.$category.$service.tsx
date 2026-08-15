@@ -53,6 +53,19 @@ function ServicePage() {
 
       <section className="mt-4 grid gap-6 md:grid-cols-[1.4fr_1fr]">
         <div>
+          {serviceScene(category.slug, service.slug) && (
+            <div className="relative mb-5 aspect-[16/9] w-full overflow-hidden rounded-[28px] shadow-lg">
+              <img
+                src={serviceScene(category.slug, service.slug)}
+                alt={`${service.name} being carried out by a professional`}
+                width={768}
+                height={512}
+                decoding="async"
+                className="h-full w-full object-cover"
+              />
+              <div className={`pointer-events-none absolute inset-0 bg-gradient-to-tr ${category.gradient} opacity-20`} />
+            </div>
+          )}
           <div className={`inline-flex items-center gap-2 rounded-full bg-gradient-to-br ${category.gradient} px-3 py-1 text-xs font-bold text-white`}>
             <Icon className="h-3.5 w-3.5" /> {category.name}
           </div>
