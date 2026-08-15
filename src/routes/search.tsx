@@ -91,7 +91,18 @@ function SearchPage() {
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    void navigate({ to: "/search", search: { q: serviceInput.trim(), loc: locationInput.trim() } });
+    const nextQ = serviceInput.trim();
+    const nextLoc = locationInput.trim();
+    rememberLocation(nextLoc);
+    const hit = matchServiceIntent(nextQ);
+    if (hit) {
+      void navigate({
+        to: "/services/$category/$service",
+        params: { category: hit.category.slug, service: hit.service.slug },
+      });
+      return;
+    }
+    void navigate({ to: "/search", search: { q: nextQ, loc: nextLoc } });
   }
 
   return (
@@ -149,12 +160,16 @@ function SearchPage() {
         <section className="mt-6">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Matching GPB services</div>
           <div className="mt-2 flex flex-wrap gap-2">
-            {serviceMatches.map((hit) => (
+            {serviceMatches.map((hit, i) => (
               <Link
                 key={`${hit.category.slug}/${hit.service.slug}`}
                 to="/services/$category/$service"
                 params={{ category: hit.category.slug, service: hit.service.slug }}
-                className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary"
+                className={
+                  i === 0
+                    ? "rounded-full border border-primary bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary"
+                    : "rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary"
+                }
               >
                 {hit.service.name}
               </Link>
