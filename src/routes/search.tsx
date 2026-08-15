@@ -10,7 +10,7 @@ import { matchServiceIntent, rankServices, rememberLocation, isServicePhrase } f
 import { fetchPublicProviders, matchProviders, type ProviderMatch } from "@/lib/providers";
 import { useResolvedLocation } from "@/lib/us-zip";
 
-type SearchParams = { q: string; loc: string };
+type SearchParams = { q: string; loc: string; pros?: number };
 
 /**
  * TanStack's default search parser JSON-decodes values, so `?loc=75034`
@@ -29,6 +29,7 @@ export const Route = createFileRoute("/search")({
   validateSearch: (search: Record<string, unknown>): SearchParams => ({
     q: toSearchString(search['q']),
     loc: toSearchString(search['loc']),
+    ...(search['pros'] ? { pros: 1 } : {}),
   }),
   head: () => ({
     meta: [
@@ -58,7 +59,11 @@ function SearchPage() {
   const resolved = useResolvedLocation(loc);
   const place = resolved.kind === "zip" ? resolved.place : null;
 
-  const intentHit = q.trim() ? matchServiceIntent(q) : null;
+  // `pros=1` means the user explicitly asked to browse providers for this exact
+  // service, so we must not bounce them back to the service detail page.
+  const browseMode = search.pros === 1;
+  const intentHit = q.trim() && !browseMode ? matchServiceIntent(q) : null;
+  const exactHit = q.trim() ? matchServiceIntent(q) : null;
   const serviceMatches = q.trim() ? (rankServices(q, 6).length ? rankServices(q, 6) : searchServices(q, 6)) : [];
   const matchedCategoryName = serviceMatches[0]?.category.name;
 
@@ -86,7 +91,7 @@ function SearchPage() {
 
   const serving = matched?.serving ?? [];
 
-  const serviceLabel = intentHit?.service.name ?? serviceMatches[0]?.service.name ?? q.trim();
+  const serviceLabel = exactHit?.service.name ?? serviceMatches[0]?.service.name ?? q.trim();
   const placeLabel =
     resolved.kind === "zip" || resolved.kind === "text" ? resolved.label : "";
   const heading = serviceLabel
