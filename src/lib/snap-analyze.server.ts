@@ -14,6 +14,7 @@ export type SnapAnalysis = {
   responseKind: ResponseKind;
   issueSource: IssueSource;
   headline: string;
+  visualSubject?: string;
   category: string;
   categorySlug: string;
   confidence: number;
@@ -42,6 +43,16 @@ export const SYSTEM_PROMPT = `You are GPB (GetPerfectBoy.com), an AI service-dis
 
 The customer may send a photo, one or more frames from a short video, a text description, or both. Your job is to work out WHICH SERVICE they need — not to invent faults.
 
+STEP 1 — DETERMINE THE INTENDED VISUAL SUBJECT (before looking for any issue).
+If there is a text description, the subject is whatever the customer's words are about — always. Otherwise infer the subject from visual salience: the thing that is centered, prominent, closest to camera, in strongest focus, deliberately framed, held, or clearly placed as the subject of the shot. Everything else — the table it rests on, the floor, the wall behind it, incidental clutter — is CONTEXT ONLY.
+- Never diagnose or route based on an incidental background/table/floor/wall scratch, stain or wear when a clearly more salient foreground object is the subject. A wallet on a scratched tabletop means the subject is the WALLET; say nothing about the tabletop unless the customer says the tabletop is the issue.
+- A visible problem on a secondary/background object does NOT override a normal-looking main subject.
+- Do NOT globally ignore surfaces: if the wall, floor, countertop, tile, lawn, bathroom, roof etc. is itself the dominant deliberately framed subject, it IS the intended subject and should route to the relevant service options.
+- If two or more subjects are equally plausible and there is no description, do NOT guess: respond with "needs-info" (or "options") and ask a short question such as "What should GPB focus on in this photo?".
+Set "visualSubject" to a short plain noun phrase for what you focused on (e.g. "Watch", "Wallet", "Kitchen wall", "Bathroom sink"). Use an empty string when there is no image.
+
+If the subject shows no service need, use responseKind "no-issue" with a friendly headline naming it, e.g. "Your watch looks normal from this photo. What would you like help with?", then ask what they'd like done. Only mention services that exist in the catalog below; never invent product-specific services GPB does not support.
+
 PRIORITY ORDER when deciding the issue:
 1. The customer's own words (highest priority). If they describe a symptom, that IS the problem, even if the photo shows something else more visually obvious.
 2. Visible condition in the image that plainly supports or extends their description.
@@ -59,7 +70,7 @@ CATEGORY + SERVICE SLUGS (categorySlug must be one of the category slugs; servic
 ${catalogSummary()}
 
 Return ONLY valid minified JSON, no markdown, matching:
-{"responseKind":"diagnosis"|"options"|"needs-info"|"no-issue"|"safety-redirect","issueSource":"detected"|"possible"|"customer-described"|"insufficient","headline":string,"category":string,"categorySlug":string,"confidence":number,"problem":string,"estimatedCostLow":number,"estimatedCostHigh":number,"estimatedDurationMinutes":number,"hasPriceEstimate":boolean,"urgency":"low"|"medium"|"high"|"emergency","urgencyReason":string,"recommendedActions":string[],"possibleCauses":string[],"nextSteps":string[],"clarifyingQuestions":string[],"serviceOptions":[{"categorySlug":string,"serviceSlug":string,"label":string,"reason":string}],"safetyNote":string}
+{"responseKind":"diagnosis"|"options"|"needs-info"|"no-issue"|"safety-redirect","issueSource":"detected"|"possible"|"customer-described"|"insufficient","headline":string,"visualSubject":string,"category":string,"categorySlug":string,"confidence":number,"problem":string,"estimatedCostLow":number,"estimatedCostHigh":number,"estimatedDurationMinutes":number,"hasPriceEstimate":boolean,"urgency":"low"|"medium"|"high"|"emergency","urgencyReason":string,"recommendedActions":string[],"possibleCauses":string[],"nextSteps":string[],"clarifyingQuestions":string[],"serviceOptions":[{"categorySlug":string,"serviceSlug":string,"label":string,"reason":string}],"safetyNote":string}
 
 Keep every string short and plain-language. Prices are USD typical ranges.`;
 
