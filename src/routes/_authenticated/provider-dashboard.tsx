@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth";
 import { fetchProviderBookings, fetchMyProviderProfile, formatBookingDate, type Booking } from "@/lib/bookings";
 import { supabase } from "@/integrations/supabase/client";
 import { catalog } from "@/lib/catalog";
-import { useResolvedLocation } from "@/lib/us-zip";
+import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 
 export const Route = createFileRoute("/_authenticated/provider-dashboard")({
   head: () => ({
@@ -249,7 +249,7 @@ function BusinessProfile() {
       setError("Service ZIP must be a 5-digit US ZIP code.");
       return;
     }
-    if (form.service_zip && !zipPlace) {
+    if (form.service_zip && !(zipPlace ?? (await lookupZip(form.service_zip)))) {
       setError(`${form.service_zip} isn’t a recognized US ZIP code.`);
       return;
     }

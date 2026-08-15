@@ -4,7 +4,7 @@ import { ArrowRight, CheckCircle2, AlertCircle, Loader2, MapPin } from "lucide-r
 import { AppShell, GradientButton } from "@/components/snapit/AppShell";
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
 import { supabase } from "@/integrations/supabase/client";
-import { useResolvedLocation } from "@/lib/us-zip";
+import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 
 export const Route = createFileRoute("/provider-interest")({
   head: () => ({
@@ -42,19 +42,24 @@ function ProviderInterestPage() {
     if (fullName.trim().length < 2) return setError("Please enter your full name.");
     if (!/^\S+@\S+\.\S+$/.test(email.trim())) return setError("Please enter a valid email address.");
     if (!/^\d{5}$/.test(zip.trim())) return setError("Please enter a valid 5-digit US ZIP code.");
-    if (!place) return setError(`${zip.trim()} isn’t a recognized US ZIP code.`);
     if (!categorySlug) return setError("Please choose the service you offer.");
     if (note.length > 1000) return setError("Please keep your note under 1000 characters.");
 
     const category = catalog.find((c) => c.slug === categorySlug);
     setBusy(true);
+    // Resolve directly so a slow first dataset load can't fail a valid ZIP.
+    const resolvedPlace = place ?? (await lookupZip(zip.trim()));
+    if (!resolvedPlace) {
+      setBusy(false);
+      return setError(`${zip.trim()} isn’t a recognized US ZIP code.`);
+    }
     const { error: insertError } = await supabase.from("provider_interest").insert({
       full_name: fullName.trim().slice(0, 120),
       email: email.trim().slice(0, 255),
       phone: phone.trim() ? phone.trim().slice(0, 40) : null,
       zip: zip.trim(),
-      city: place.city.slice(0, 120),
-      state: place.state.slice(0, 2),
+      city: resolvedPlace.city.slice(0, 120),
+      state: resolvedPlace.state.slice(0, 2),
       category_slug: categorySlug,
       category_label: category?.name.slice(0, 160) ?? "",
       business_name: businessName.trim() ? businessName.trim().slice(0, 160) : null,
