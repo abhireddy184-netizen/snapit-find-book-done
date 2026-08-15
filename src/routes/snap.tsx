@@ -30,7 +30,8 @@ import {
 } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
-import { providers, categories, type Provider } from "@/lib/snapit-data";
+import { providers, type Provider } from "@/lib/snapit-data";
+import { getCategoryBySlug, providerPoolFor, formatPrice } from "@/lib/catalog";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
 import { useAuth } from "@/lib/auth";
 import { createJobFromAnalysis } from "@/lib/jobs";
@@ -543,7 +544,7 @@ function CaptureTile({
 
 type MatchedProvider = Provider & { eta: number };
 
-function JobScopeCta({ analysis, image }: { analysis: SnapAnalysis; image: string }) {
+function JobScopeCta({ analysis, image }: { analysis: SnapAnalysis; image: string | null }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
