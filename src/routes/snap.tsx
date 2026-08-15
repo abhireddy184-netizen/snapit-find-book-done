@@ -46,7 +46,7 @@ export const Route = createFileRoute("/snap")({
   head: () => ({
     meta: [
       { title: "Snap a problem — AI diagnosis in seconds | SnapIt" },
-      { name: "description", content: "Snap a photo or video of any home or personal service problem. SnapIt's AI diagnoses it and finds nearby verified pros in seconds." },
+      { name: "description", content: "Snap a photo or video of any problem. SnapIt's AI explains what it likely needs, builds a standardized job scope and helps you compare quotes from service pros." },
       { property: "og:title", content: "Snap a Problem — AI diagnosis | SnapIt" },
       { property: "og:description", content: "Point your camera. Get an instant diagnosis, estimate and matched pros." },
     ],
@@ -588,8 +588,8 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
       <div id="pros-list" className="scroll-mt-20">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-black">Top 5 verified pros nearby</h2>
-            <p className="text-xs text-muted-foreground">Sorted by rating and distance</p>
+            <h2 className="text-lg font-black">Service pros nearby</h2>
+            <p className="text-xs text-muted-foreground">Demo data — sample profiles shown while real pros are onboarded.</p>
           </div>
           <button
             onClick={() => {
