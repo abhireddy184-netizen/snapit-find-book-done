@@ -43,6 +43,10 @@
   --color-success: var(--success);
   --color-success-foreground: var(--success-foreground);
   --color-mint: var(--mint);
+  --color-mint-ink: var(--mint-ink);
+  --color-sky-ink: var(--sky-ink);
+  --color-lemon-ink: var(--lemon-ink);
+  --color-coral-ink: var(--coral-ink);
   --color-sky: var(--sky);
   --color-plum: var(--plum);
   --color-coral: var(--coral);
@@ -91,7 +95,11 @@
   --success: oklch(0.68 0.142 163);
   --success-foreground: oklch(1 0 0);
   --mint: oklch(0.788 0.142 163);
+  --mint-ink: oklch(0.50 0.115 163);
   --sky: oklch(0.798 0.117 237);
+  --sky-ink: oklch(0.52 0.13 245);
+  --lemon-ink: oklch(0.55 0.125 80);
+  --coral-ink: oklch(0.56 0.17 35);
   --plum: oklch(0.274 0.084 322);
   --coral: oklch(0.727 0.176 41);
   --lavender: oklch(0.726 0.166 298);
@@ -146,7 +154,11 @@
   --success: oklch(0.78 0.142 163);
   --success-foreground: oklch(0.20 0.058 322);
   --mint: oklch(0.80 0.142 163);
+  --mint-ink: oklch(0.84 0.13 163);
   --sky: oklch(0.81 0.117 237);
+  --sky-ink: oklch(0.84 0.11 240);
+  --lemon-ink: oklch(0.90 0.15 90);
+  --coral-ink: oklch(0.80 0.16 40);
   --plum: oklch(0.97 0.012 80);
   --coral: oklch(0.76 0.165 41);
   --lavender: oklch(0.75 0.16 298);
