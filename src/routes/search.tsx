@@ -6,11 +6,11 @@ import { Star, ShieldCheck, MapPin, Clock, Search as SearchIcon, AlertCircle, Lo
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { providers as demoProviders } from "@/lib/snapit-data";
 import { catalog, searchServices } from "@/lib/catalog";
-import { matchServiceIntent, rankServices, rememberLocation } from "@/lib/search-intent";
+import { matchServiceIntent, rankServices, rememberLocation, isServicePhrase } from "@/lib/search-intent";
 import { fetchPublicProviders, matchProviders, type ProviderMatch } from "@/lib/providers";
 import { useResolvedLocation } from "@/lib/us-zip";
 
-type SearchParams = { q: string; loc: string };
+type SearchParams = { q: string; loc: string; pros?: number };
 
 /**
  * TanStack's default search parser JSON-decodes values, so `?loc=75034`
@@ -29,6 +29,7 @@ export const Route = createFileRoute("/search")({
   validateSearch: (search: Record<string, unknown>): SearchParams => ({
     q: toSearchString(search['q']),
     loc: toSearchString(search['loc']),
+    ...(search['pros'] ? { pros: 1 } : {}),
   }),
   head: () => ({
     meta: [
@@ -45,7 +46,10 @@ export const Route = createFileRoute("/search")({
 
 function SearchPage() {
   const navigate = useNavigate();
-  const { q, loc } = Route.useSearch();
+  const search = Route.useSearch();
+  const q = search.q;
+  // A service phrase typed into the location field is never a place.
+  const loc = search.loc && isServicePhrase(search.loc) ? "" : search.loc;
   const [serviceInput, setServiceInput] = useState(q);
   const [locationInput, setLocationInput] = useState(loc);
 
@@ -55,7 +59,11 @@ function SearchPage() {
   const resolved = useResolvedLocation(loc);
   const place = resolved.kind === "zip" ? resolved.place : null;
 
-  const intentHit = q.trim() ? matchServiceIntent(q) : null;
+  // `pros=1` means the user explicitly asked to browse providers for this exact
+  // service, so we must not bounce them back to the service detail page.
+  const browseMode = search.pros === 1;
+  const intentHit = q.trim() && !browseMode ? matchServiceIntent(q) : null;
+  const exactHit = q.trim() ? matchServiceIntent(q) : null;
   const serviceMatches = q.trim() ? (rankServices(q, 6).length ? rankServices(q, 6) : searchServices(q, 6)) : [];
   const matchedCategoryName = serviceMatches[0]?.category.name;
 
@@ -83,17 +91,23 @@ function SearchPage() {
 
   const serving = matched?.serving ?? [];
 
-  const heading =
-    resolved.kind === "zip"
-      ? `Pros for ${resolved.label}`
-      : resolved.kind === "text"
-        ? `Pros for ${resolved.label}`
-        : "Find a pro";
+  const serviceLabel = exactHit?.service.name ?? q.trim();
+  const placeLabel =
+    resolved.kind === "zip" || resolved.kind === "text" ? resolved.label : "";
+  const heading = serviceLabel
+    ? placeLabel
+      ? `${serviceLabel} pros near ${placeLabel}`
+      : `${serviceLabel} pros`
+    : placeLabel
+      ? `Find a pro near ${placeLabel}`
+      : "Find a pro";
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const nextQ = serviceInput.trim();
-    const nextLoc = locationInput.trim();
+    const rawLoc = locationInput.trim();
+    const nextLoc = isServicePhrase(rawLoc) ? "" : rawLoc;
+    if (nextLoc !== rawLoc) setLocationInput("");
     rememberLocation(nextLoc);
     const hit = matchServiceIntent(nextQ);
     if (hit) {
@@ -137,6 +151,11 @@ function SearchPage() {
         <GradientButton type="submit" className="w-full md:w-auto">Update search</GradientButton>
       </form>
 
+      {search.loc && !loc && (
+        <p className="mt-3 inline-flex items-start gap-2 rounded-xl border border-border bg-muted/50 px-3 py-2 text-xs font-medium text-muted-foreground">
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" /> “{search.loc}” looks like a service, not a place. Add a ZIP code or city to see pros near you.
+        </p>
+      )}
       {resolved.kind === "loading" && (
         <p className="mt-3 inline-flex items-center gap-2 text-xs text-muted-foreground">
           <Loader2 className="h-3.5 w-3.5 animate-spin" /> Checking location…
