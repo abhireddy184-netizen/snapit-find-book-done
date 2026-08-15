@@ -36,8 +36,10 @@ function resolveDate(label: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
+type BookSearch = { provider?: string; job?: string; service?: string; pro?: string };
+
 export const Route = createFileRoute("/book")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): BookSearch => ({
     provider: typeof search['provider'] === "string" ? (search['provider'] as string) : undefined,
     job: typeof search['job'] === "string" ? (search['job'] as string) : undefined,
     service: typeof search['service'] === "string" ? (search['service'] as string) : undefined,
