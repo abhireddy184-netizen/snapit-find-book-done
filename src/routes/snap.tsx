@@ -89,6 +89,11 @@ function SnapPage() {
     // Invalidate any in-flight run when the page unmounts.
     runRef.current += 1;
   }, []);
+  // Release the temporary preview blob URL whenever it's replaced or cleared.
+  useEffect(() => {
+    if (!pendingPreview) return;
+    return () => URL.revokeObjectURL(pendingPreview);
+  }, [pendingPreview]);
 
   const runDiagnosis = async (dataUrl: string, noteText: string, token: number) => {
     setPhase("analyzing");
