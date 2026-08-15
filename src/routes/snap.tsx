@@ -68,56 +68,119 @@ function SnapPage() {
   const [analysis, setAnalysis] = useState<SnapAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"idle" | "preparing" | "analyzing">("idle");
+  const [pendingPreview, setPendingPreview] = useState<string | null>(null);
   const analyze = useServerFn(analyzeSnap);
   const cameraRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
+  // Monotonic token: only the newest run is allowed to write state.
+  const runRef = useRef(0);
+  const busyRef = useRef(false);
   const [recent, setRecent] = useState<SnapHistoryEntry[]>([]);
   useEffect(() => {
     setRecent(loadHistory().slice(0, 4));
   }, [analysis]);
+  useEffect(() => () => {
+    // Invalidate any in-flight run when the page unmounts.
+    runRef.current += 1;
+  }, []);
 
-  const handleFile = async (file: File, kind: "photo" | "video" | "upload") => {
-    setError(null);
-    setAnalysis(null);
-    // For videos, capture a thumbnail frame; for images use directly
-    const dataUrl = file.type.startsWith("video/")
-      ? await extractVideoFrame(file)
-      : await fileToDataUrl(file);
-    setImage(dataUrl);
-    setMediaKind(kind);
-    // Immediately kick off AI analysis — premium instant feel
-    setLoading(true);
+  const runDiagnosis = async (dataUrl: string, noteText: string, token: number) => {
+    setPhase("analyzing");
     try {
-      const result = await analyze({ data: { imageDataUrl: dataUrl, note: "" } });
+      const result = await withTimeout(
+        analyze({ data: { imageDataUrl: dataUrl, note: noteText } }),
+        ANALYSIS_TIMEOUT_MS,
+        "The AI is taking longer than usual. Please retry or retake the photo.",
+      );
+      if (runRef.current !== token) return;
       setAnalysis(result);
     } catch (e) {
+      if (runRef.current !== token) return;
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
-      setLoading(false);
+      if (runRef.current === token) {
+        setLoading(false);
+        setPhase("idle");
+        setPendingPreview(null);
+      }
+      if (runRef.current === token) busyRef.current = false;
     }
+  };
+
+  const handleFile = async (file: File, kind: "photo" | "video" | "upload") => {
+    if (busyRef.current) return; // no duplicate concurrent runs
+    busyRef.current = true;
+    const token = ++runRef.current;
+    setError(null);
+    setAnalysis(null);
+    setImage(null);
+    setMediaKind(kind);
+    setNote("");
+    // Show the working state immediately — no dead period after capture.
+    setLoading(true);
+    setPhase("preparing");
+    setPendingPreview(file.type.startsWith("video/") ? null : URL.createObjectURL(file));
+
+    let dataUrl: string;
+    try {
+      dataUrl = await prepareMediaForAnalysis(file);
+    } catch (e) {
+      if (runRef.current === token) {
+        setError(e instanceof Error ? e.message : "We couldn't prepare that file. Please try again.");
+        setLoading(false);
+        setPhase("idle");
+        setPendingPreview(null);
+        setMediaKind(null);
+      }
+      busyRef.current = false;
+      return;
+    }
+    if (runRef.current !== token) {
+      busyRef.current = false;
+      return;
+    }
+    setImage(dataUrl);
+    await runDiagnosis(dataUrl, "", token);
   };
 
   const runAnalysis = async () => {
-    if (!image) return;
+    if (!image || busyRef.current) return;
+    busyRef.current = true;
+    const token = ++runRef.current;
     setLoading(true);
     setError(null);
-    try {
-      const result = await analyze({ data: { imageDataUrl: image, note } });
-      setAnalysis(result);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    await runDiagnosis(image, note, token);
+  };
+
+  /** Abandon any in-flight work and go back to a usable screen. */
+  const cancelAnalysis = () => {
+    runRef.current += 1;
+    busyRef.current = false;
+    setLoading(false);
+    setPhase("idle");
+    setPendingPreview(null);
   };
 
   const reset = () => {
+    runRef.current += 1;
+    busyRef.current = false;
     setImage(null);
     setMediaKind(null);
     setNote("");
     setAnalysis(null);
     setError(null);
+    setLoading(false);
+    setPhase("idle");
+    setPendingPreview(null);
+  };
+
+  // Clearing the input value lets the user pick the exact same file again.
+  const onPick = (kind: "photo" | "video" | "upload") => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (file) void handleFile(file, kind);
   };
 
   return (
