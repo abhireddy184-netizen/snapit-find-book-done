@@ -11,9 +11,10 @@ export const analyzeSnap = createServerFn({ method: "POST" })
     z
       .object({
         imageDataUrl: z.string().min(10).optional(),
+        imageDataUrls: z.array(z.string().min(10)).max(4).optional(),
         note: z.string().optional(),
       })
-      .refine((v) => Boolean(v.imageDataUrl || v.note?.trim()), {
+      .refine((v) => Boolean(v.imageDataUrl || v.imageDataUrls?.length || v.note?.trim()), {
         message: "Add a photo, a video or a description so GPB can help.",
       })
       .parse(input),
@@ -22,13 +23,14 @@ export const analyzeSnap = createServerFn({ method: "POST" })
     const key = process.env['LOVABLE_API_KEY'];
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
     const gateway = createLovableAiGatewayProvider(key);
-    const hasMedia = Boolean(data.imageDataUrl);
+    const images = data.imageDataUrls?.length ? data.imageDataUrls : data.imageDataUrl ? [data.imageDataUrl] : [];
+    const hasMedia = images.length > 0;
     const note = data.note?.trim();
 
     const content: ({ type: "text"; text: string } | { type: "image"; image: string })[] = [
-      { type: "text", text: buildUserPrompt(note, hasMedia) },
+      { type: "text", text: buildUserPrompt(note, hasMedia, images.length) },
     ];
-    if (data.imageDataUrl) content.push({ type: "image", image: data.imageDataUrl });
+    for (const image of images) content.push({ type: "image", image });
 
     const { text } = await generateText({
       model: gateway("openai/gpt-5.5"),

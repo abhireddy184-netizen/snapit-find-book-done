@@ -96,7 +96,10 @@ function HistoryPage() {
                     <p className="mt-1.5 line-clamp-2 text-sm font-medium text-foreground">{entry.analysis.problem}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
                       <span className="inline-flex items-center gap-1 font-semibold text-foreground/80">
-                        <DollarSign className="h-3 w-3" /> ${entry.analysis.estimatedCostLow}–${entry.analysis.estimatedCostHigh}
+                        <DollarSign className="h-3 w-3" />{" "}
+                        {entry.analysis.hasPriceEstimate
+                          ? `$${entry.analysis.estimatedCostLow}–$${entry.analysis.estimatedCostHigh}`
+                          : "Needs more info"}
                       </span>
                       <span className="inline-flex items-center gap-1">
                         <Clock className="h-3 w-3" /> {entry.analysis.estimatedDurationMinutes} min

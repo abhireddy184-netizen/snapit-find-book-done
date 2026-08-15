@@ -40,7 +40,7 @@ function catalogSummary() {
 
 export const SYSTEM_PROMPT = `You are GPB (GetPerfectBoy.com), an AI service-discovery assistant for a USA-first home, outdoor, auto and at-home beauty services marketplace. GPB is NOT a dating service; it connects people with local service professionals.
 
-The customer may send a photo, a short video frame, a text description, or both. Your job is to work out WHICH SERVICE they need — not to invent faults.
+The customer may send a photo, one or more frames from a short video, a text description, or both. Your job is to work out WHICH SERVICE they need — not to invent faults.
 
 PRIORITY ORDER when deciding the issue:
 1. The customer's own words (highest priority). If they describe a symptom, that IS the problem, even if the photo shows something else more visually obvious.
@@ -63,14 +63,17 @@ Return ONLY valid minified JSON, no markdown, matching:
 
 Keep every string short and plain-language. Prices are USD typical ranges.`;
 
-export function buildUserPrompt(note: string | undefined, hasMedia: boolean) {
+export function buildUserPrompt(note: string | undefined, hasMedia: boolean, frameCount = 1) {
   const described = note?.trim();
   if (!hasMedia) {
     return `The customer sent NO photo — only this description: "${described}". Work out the service from their words alone. Respond with JSON only.`;
   }
+  const multi = frameCount > 1
+    ? ` The ${frameCount} images are frames sampled across one short video of the same scene — read them together, not as separate problems.`
+    : "";
   return described
-    ? `Customer description (HIGHEST PRIORITY — treat this as the real problem even if the image shows something else): "${described}". Use the image only as supporting context. Respond with JSON only.`
-    : `The customer sent an image with no description. Only report a problem if one is genuinely visible. Respond with JSON only.`;
+    ? `Customer description (HIGHEST PRIORITY — treat this as the real problem even if the image shows something else): "${described}". Use the image only as supporting context.${multi} Respond with JSON only.`
+    : `The customer sent ${frameCount > 1 ? `${frameCount} frames from one short video` : "an image"} with no description. Only report a problem if one is genuinely visible.${multi} Respond with JSON only.`;
 }
 
 const CATEGORY_SLUGS = new Set(catalog.map((c) => c.slug));
@@ -89,10 +92,12 @@ export function normalizeAnalysis(raw: string, hadNote: boolean): SnapAnalysis {
     : "handyman";
   const cat = catalog.find((c) => c.slug === categorySlug);
   const responseKind: ResponseKind = parsed.responseKind ?? (Object.keys(parsed).length ? "diagnosis" : "needs-info");
-  const withPrice = responseKind === "diagnosis" || responseKind === "options";
-  const hasPriceEstimate = Boolean(parsed.hasPriceEstimate ?? withPrice) &&
-    Number(parsed.estimatedCostLow ?? 0) > 0 &&
-    responseKind !== "no-issue" && responseKind !== "safety-redirect" && responseKind !== "needs-info";
+  // Only a confident, single-service diagnosis may carry a price or pro match.
+  // options / needs-info / no-issue / safety-redirect are discovery states.
+  const hasPriceEstimate =
+    responseKind === "diagnosis" &&
+    Boolean(parsed.hasPriceEstimate ?? true) &&
+    Number(parsed.estimatedCostLow ?? 0) > 0;
 
   return {
     responseKind,
