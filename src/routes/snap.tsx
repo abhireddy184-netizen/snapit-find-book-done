@@ -35,7 +35,7 @@ import { getCategoryBySlug, providerPoolFor } from "@/lib/catalog";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
 import { useAuth } from "@/lib/auth";
 import { createJobFromAnalysis } from "@/lib/jobs";
-import { prepareMediaForAnalysis, withTimeout } from "@/lib/snap-media";
+import { prepareMediaForAnalysis, withTimeout, type PreparedMedia } from "@/lib/snap-media";
 import {
   BadgeCheck,
   Lock,
@@ -68,6 +68,7 @@ const urgencyStyles: Record<string, { chip: string; label: string; icon: typeof 
 
 function SnapPage() {
   const [image, setImage] = useState<string | null>(null);
+  const [frames, setFrames] = useState<string[]>([]);
   const [mediaKind, setMediaKind] = useState<"photo" | "video" | "upload" | null>(null);
   const [note, setNote] = useState("");
   const [describeMode, setDescribeMode] = useState(false);
@@ -99,13 +100,13 @@ function SnapPage() {
     return () => URL.revokeObjectURL(pendingPreview);
   }, [pendingPreview]);
 
-  const runDiagnosis = async (dataUrl: string | null, noteText: string, token: number) => {
+  const runDiagnosis = async (frames: string[], noteText: string, token: number) => {
     setPhase("analyzing");
     try {
       const result = await withTimeout(
-        analyze({ data: dataUrl ? { imageDataUrl: dataUrl, note: noteText } : { note: noteText } }),
+        analyze({ data: frames.length ? { imageDataUrls: frames, note: noteText } : { note: noteText } }),
         ANALYSIS_TIMEOUT_MS,
-        "The AI is taking longer than usual. Please retry or retake the photo.",
+        "The AI is taking longer than usual. Please retry or send it again.",
       );
       if (runRef.current !== token) return;
       setAnalysis(result);
@@ -129,6 +130,7 @@ function SnapPage() {
     setError(null);
     setAnalysis(null);
     setImage(null);
+    setFrames([]);
     setTextOnly(false);
     setDescribeMode(false);
     setMediaKind(kind);
@@ -138,9 +140,9 @@ function SnapPage() {
     setPhase("preparing");
     setPendingPreview(file.type.startsWith("video/") ? null : URL.createObjectURL(file));
 
-    let dataUrl: string;
+    let prepared: PreparedMedia;
     try {
-      dataUrl = await prepareMediaForAnalysis(file);
+      prepared = await prepareMediaForAnalysis(file);
     } catch (e) {
       if (runRef.current === token) {
         setError(e instanceof Error ? e.message : "We couldn't prepare that file. Please try again.");
@@ -156,8 +158,9 @@ function SnapPage() {
       busyRef.current = false;
       return;
     }
-    setImage(dataUrl);
-    await runDiagnosis(dataUrl, "", token);
+    setImage(prepared.preview);
+    setFrames(prepared.frames);
+    await runDiagnosis(prepared.frames, "", token);
   };
 
   const runAnalysis = async () => {
@@ -166,7 +169,7 @@ function SnapPage() {
     const token = ++runRef.current;
     setLoading(true);
     setError(null);
-    await runDiagnosis(image, note, token);
+    await runDiagnosis(frames, note, token);
   };
 
   /** Text-only path — no photo required (essential on desktop). */
@@ -180,9 +183,10 @@ function SnapPage() {
     setImage(null);
     setMediaKind(null);
     setTextOnly(true);
+    setFrames([]);
     setNote(described);
     setLoading(true);
-    await runDiagnosis(null, described, token);
+    await runDiagnosis([], described, token);
   };
 
   /** Abandon any in-flight work and go back to a usable screen. */
@@ -205,13 +209,14 @@ function SnapPage() {
     setAnalysis(null);
     setError(null);
     setLoading(true);
-    await runDiagnosis(image, merged, token);
+    await runDiagnosis(frames, merged, token);
   };
 
   const reset = () => {
     runRef.current += 1;
     busyRef.current = false;
     setImage(null);
+    setFrames([]);
     setMediaKind(null);
     setNote("");
     setTextOnly(false);
@@ -409,11 +414,11 @@ function ScanningOverlay({
   onCancel: () => void;
 }) {
   const steps = [
-    "Preparing your photo…",
-    "AI is analyzing the problem…",
-    "Identifying the service…",
-    "Estimating repair cost…",
-    "Finding nearby professionals…",
+    "Understanding what you need…",
+    "Checking the visible details…",
+    "Matching possible services…",
+    "Checking confidence…",
+    "Preparing the next step…",
   ];
   const [stepIndex, setStepIndex] = useState(0);
   const [progress, setProgress] = useState(6);
@@ -471,7 +476,13 @@ function ScanningOverlay({
               <Sparkles className="h-3.5 w-3.5" /> GPB AI
             </div>
             <div className="mt-1 text-lg font-black text-white">
-              {phase === "preparing" ? "Preparing your photo" : "Diagnosing your problem"}
+              {phase === "preparing"
+                ? image
+                  ? "Preparing your media"
+                  : "Understanding your request"
+                : image
+                  ? "Analyzing what you sent"
+                  : "Analyzing your request"}
             </div>
           </div>
           <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white/15">
@@ -621,7 +632,9 @@ function AnalysisView({
   const category = getCategoryBySlug(analysis.categorySlug);
   const pool = providerPoolFor(analysis.categorySlug);
   const showPricing = analysis.hasPriceEstimate;
-  const showPros = analysis.responseKind === "diagnosis" || analysis.responseKind === "options";
+  // Discovery states (options / needs-info / no-issue / safety-redirect) must be
+  // narrowed by the customer before we show pricing, ETAs or professionals.
+  const showPros = analysis.responseKind === "diagnosis" && analysis.hasPriceEstimate;
   const sourceLabel: Record<string, string> = {
     detected: "Detected issue",
     possible: "Possible issue",
@@ -1321,7 +1334,9 @@ function RecentDiagnoses({ entries }: { entries: SnapHistoryEntry[] }) {
                 <div className="line-clamp-1 text-sm font-semibold">{entry.analysis.problem}</div>
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
                   <span className="font-semibold text-foreground/80">
-                    ${entry.analysis.estimatedCostLow}–${entry.analysis.estimatedCostHigh}
+                    {entry.analysis.hasPriceEstimate
+                      ? `$${entry.analysis.estimatedCostLow}–$${entry.analysis.estimatedCostHigh}`
+                      : "No estimate yet"}
                   </span>
                   <span>·</span>
                   <span>{formatRelative(entry.createdAt)}</span>
