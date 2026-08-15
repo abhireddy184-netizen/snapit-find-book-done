@@ -103,6 +103,8 @@ export const HOME_ROWS: { title: string; seeAll: string; items: RowItem[] }[] = 
 
 export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: string; items: RowItem[] }) {
   if (items.length === 0) return null;
+  // A scene photo is only shown once per row; repeats fall back to a clean icon tile.
+  const used = new Set<string>();
   return (
     <section className="mt-8">
       <div className="flex items-end justify-between gap-3">
@@ -113,7 +115,10 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
       </div>
       <div className="-mx-4 mt-3 flex snap-x gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
         {items.map(({ categorySlug, service }) => {
-          const img = serviceScene(categorySlug, service.slug);
+          const raw = serviceScene(categorySlug, service.slug);
+          const img = raw && !used.has(raw) ? raw : undefined;
+          if (raw) used.add(raw);
+          const CatIcon = getCategoryBySlug(categorySlug)?.icon ?? Sparkles;
           return (
             <Link
               key={`${categorySlug}/${service.slug}`}
@@ -122,7 +127,7 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
               className="group w-[152px] shrink-0 snap-start overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md sm:w-[190px] lg:w-[220px]"
             >
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
-                {img && (
+                {img ? (
                   <img
                     src={img}
                     alt={service.name}
@@ -130,6 +135,13 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
                     decoding="async"
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
+                ) : (
+                  <span
+                    className="grid h-full w-full place-items-center text-primary"
+                    style={{ background: "color-mix(in oklab, var(--primary) 8%, var(--card))" }}
+                  >
+                    <CatIcon className="h-7 w-7" />
+                  </span>
                 )}
               </div>
               <div className="p-3">
