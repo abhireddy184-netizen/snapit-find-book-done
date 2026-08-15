@@ -205,6 +205,32 @@ function SnapPage() {
           </p>
         </div>
 
+        {/* Hidden inputs stay mounted for every state so Retake works from
+            the review, error and result screens too. */}
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={onPick("photo")}
+        />
+        <input
+          ref={videoRef}
+          type="file"
+          accept="video/*"
+          capture="environment"
+          className="hidden"
+          onChange={onPick("video")}
+        />
+        <input
+          ref={uploadRef}
+          type="file"
+          accept="image/*,video/*"
+          className="hidden"
+          onChange={onPick("upload")}
+        />
+
         {!image && (
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
             <CaptureTile
@@ -224,29 +250,6 @@ function SnapPage() {
               label="Upload from Gallery"
               hint="Choose an image"
               onClick={() => uploadRef.current?.click()}
-            />
-            <input
-              ref={cameraRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={onPick("photo")}
-            />
-            <input
-              ref={videoRef}
-              type="file"
-              accept="video/*"
-              capture="environment"
-              className="hidden"
-              onChange={onPick("video")}
-            />
-            <input
-              ref={uploadRef}
-              type="file"
-              accept="image/*,video/*"
-              className="hidden"
-              onChange={onPick("upload")}
             />
           </div>
         )}
