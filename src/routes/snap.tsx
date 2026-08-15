@@ -758,11 +758,11 @@ function AnalysisView({
             {analysis.serviceOptions!.map((opt) => (
               <button
                 key={opt.label}
-                onClick={() => onAnswer?.(`I want help with: ${opt.label}. ${opt.description ?? ""}`)}
+                onClick={() => onAnswer?.(`I want help with: ${opt.label}. ${opt.reason ?? ""}`)}
                 className="rounded-2xl border border-border/60 bg-background p-3 text-left transition-all hover:-translate-y-0.5 hover:border-secondary hover:shadow-md"
               >
                 <div className="text-sm font-bold">{opt.label}</div>
-                {opt.description && <div className="mt-0.5 text-xs text-muted-foreground">{opt.description}</div>}
+                {opt.reason && <div className="mt-0.5 text-xs text-muted-foreground">{opt.reason}</div>}
               </button>
             ))}
           </div>
@@ -925,9 +925,6 @@ function AnalysisView({
             ? "Estimates are AI-generated — the final price is confirmed by your pro after inspection."
             : "No price shown yet — GPB avoids guessing a price until we understand the job."}
         </div>
-        <div className="hidden">
-          Diagnosis is an estimate — the final price is confirmed by your pro after inspection.
-        </div>
         <div className="flex flex-wrap gap-2">
           <Link
             to="/history"
@@ -963,6 +960,38 @@ function AnalysisView({
           onClose={() => setCallingId(null)}
         />
       )}
+    </div>
+  );
+}
+
+function ClarifyPanel({ questions, onAnswer }: { questions: string[]; onAnswer?: (text: string) => void }) {
+  const [answer, setAnswer] = useState("");
+  return (
+    <div className="rounded-3xl border border-secondary/30 bg-card p-5 shadow-sm">
+      <div className="inline-flex items-center gap-1.5 text-sm font-black">
+        <Sparkles className="h-4 w-4 text-secondary" /> A couple of quick questions
+      </div>
+      <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
+        {questions.map((q) => (
+          <li key={q} className="flex gap-2">
+            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" /> {q}
+          </li>
+        ))}
+      </ul>
+      <textarea
+        value={answer}
+        onChange={(e) => setAnswer(e.target.value)}
+        rows={3}
+        placeholder="Answer here and we'll narrow it down…"
+        className="mt-3 w-full resize-none rounded-2xl border border-border/60 bg-background p-3 text-sm outline-none focus:border-secondary"
+      />
+      <GradientButton
+        onClick={() => onAnswer?.(answer.trim())}
+        disabled={answer.trim().length < 2}
+        className="mt-3 w-full justify-center"
+      >
+        <ArrowRight className="h-4 w-4" /> Continue
+      </GradientButton>
     </div>
   );
 }
