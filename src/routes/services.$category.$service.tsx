@@ -79,7 +79,10 @@ function ServicePage() {
               <Faq q="How fast can someone come out?" a="Availability depends on your area and how many GPB pros are onboarded there. Urgent issues can be flagged through emergency dispatch." />
               <Faq q="Do I need a photo?" a="No. You can simply describe the job. A photo or short video usually gets you a sharper match, but text alone works fine on desktop." />
               {needsLicense && (
-                <Faq q="Is a licensed professional required?" a={`Yes. In ${market.name}, ${category.name.toLowerCase()} work is matched only to providers who hold the required license or qualification.`} />
+                <Faq
+                  q="Could this work need a licensed professional?"
+                  a="Local licensing or qualification requirements may apply depending on the job and location. GPB should match regulated work only to appropriately qualified providers where required by local law."
+                />
               )}
             </div>
           </div>
@@ -93,7 +96,10 @@ function ServicePage() {
             <div className="mt-4 space-y-2 text-xs text-muted-foreground">
               <div className="flex items-center gap-2"><Clock className="h-3.5 w-3.5 text-primary" /> Most visits complete in a single appointment</div>
               {needsLicense && (
-                <div className="flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5 text-primary" /> Licensed providers only in {market.name}</div>
+                <div className="flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5 text-primary" /> License/qualification checks where required</div>
+              )}
+              {category.slug === "beauty-at-home" && (
+                <div className="flex items-start gap-2"><Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" /> At-home beauty availability varies by state/local rules and provider licensing.</div>
               )}
               <div className="flex items-start gap-2"><Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" /> Guidance only — the real quote comes from your pro.</div>
             </div>

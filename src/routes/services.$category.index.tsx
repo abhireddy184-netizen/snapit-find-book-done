@@ -52,7 +52,7 @@ function CategoryPage() {
           <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur">Available in {market.name}</span>
           {licenseRequired && (
             <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-3 py-1 backdrop-blur">
-              <ShieldCheck className="h-3 w-3" /> Licensed providers only
+              <ShieldCheck className="h-3 w-3" /> License/qualification checks where required
             </span>
           )}
         </div>
@@ -63,6 +63,14 @@ function CategoryPage() {
           <Camera className="h-4 w-4" /> Show us the problem
         </Link>
       </section>
+
+      {(licenseRequired || slug === "beauty-at-home") && (
+        <p className="mt-4 rounded-2xl border border-border/60 bg-card px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+          {slug === "beauty-at-home"
+            ? "At-home beauty availability varies by state/local rules and provider licensing."
+            : "Local licensing or qualification requirements may apply depending on the job and location. GPB should match regulated work only to appropriately qualified providers where required by local law."}
+        </p>
+      )}
 
       <section className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {category.services.map((sv) => (

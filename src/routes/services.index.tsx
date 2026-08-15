@@ -87,7 +87,7 @@ function AllServicesPage() {
                     <h2 className="text-xl font-black">{cat.name}</h2>
                     {licenseRequired && (
                       <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                        <ShieldCheck className="h-3 w-3" /> Licensed pros
+                        <ShieldCheck className="h-3 w-3" /> License/qualification checks where required
                       </span>
                     )}
                   </div>

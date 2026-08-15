@@ -57,8 +57,9 @@ function Landing() {
             <span className="text-gradient-hero">Get it fixed with proof.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-xl">
-            Show it and our AI explains what it likely needs. We turn that into one standardized job scope, so quotes are
-            comparable, booking is simple and every job ends with a record you keep.
+            Send a photo, a short video, an upload — or just describe it in words. Our AI explains what it likely needs
+            and turns that into one standardized job scope, so quotes are comparable, booking is simple and every job
+            ends with a record you keep.
           </p>
 
           <form
@@ -215,7 +216,7 @@ function Landing() {
         <SectionHeader title="What GPB is built for" />
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           {[
-            { title: "AI that explains the problem", text: "Snap a photo and get a plain-language diagnosis with a likely category, urgency and typical cost range." },
+            { title: "AI that explains the problem", text: "Send a photo, a video or a written description and get a plain-language read on the likely category, urgency and typical cost range." },
             { title: "One scope, comparable quotes", text: "Every service pro receives the identical standardized brief, so you compare price, availability and warranty — not guesswork." },
             { title: "Proof that stays with you", text: "Before and after photos, the accepted quote, receipts and warranty notes are kept in a permanent job record." },
           ].map((c) => (
