@@ -5,6 +5,7 @@ import { Star, ShieldCheck, MapPin, Clock, Search as SearchIcon, AlertCircle, Lo
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { providers as demoProviders } from "@/lib/snapit-data";
 import { catalog, searchServices } from "@/lib/catalog";
+import { matchServiceIntent, rankServices, rememberLocation } from "@/lib/search-intent";
 import { fetchPublicProviders, matchProviders, type ProviderMatch } from "@/lib/providers";
 import { useResolvedLocation } from "@/lib/us-zip";
 
@@ -53,8 +54,20 @@ function SearchPage() {
   const resolved = useResolvedLocation(loc);
   const place = resolved.kind === "zip" ? resolved.place : null;
 
-  const serviceMatches = q.trim() ? searchServices(q, 6) : [];
+  const intentHit = q.trim() ? matchServiceIntent(q) : null;
+  const serviceMatches = q.trim() ? (rankServices(q, 6).length ? rankServices(q, 6) : searchServices(q, 6)) : [];
   const matchedCategoryName = serviceMatches[0]?.category.name;
+
+  // High-confidence exact sub-service intent: skip the browse step entirely.
+  useEffect(() => {
+    if (!intentHit) return;
+    rememberLocation(loc);
+    void navigate({
+      to: "/services/$category/$service",
+      params: { category: intentHit.category.slug, service: intentHit.service.slug },
+      replace: true,
+    });
+  }, [intentHit?.category.slug, intentHit?.service.slug, loc, navigate]);
 
   const { data: realProviders, isLoading: loadingProviders } = useQuery({
     queryKey: ["public-providers"],
@@ -78,7 +91,18 @@ function SearchPage() {
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    void navigate({ to: "/search", search: { q: serviceInput.trim(), loc: locationInput.trim() } });
+    const nextQ = serviceInput.trim();
+    const nextLoc = locationInput.trim();
+    rememberLocation(nextLoc);
+    const hit = matchServiceIntent(nextQ);
+    if (hit) {
+      void navigate({
+        to: "/services/$category/$service",
+        params: { category: hit.category.slug, service: hit.service.slug },
+      });
+      return;
+    }
+    void navigate({ to: "/search", search: { q: nextQ, loc: nextLoc } });
   }
 
   return (
@@ -136,12 +160,16 @@ function SearchPage() {
         <section className="mt-6">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Matching GPB services</div>
           <div className="mt-2 flex flex-wrap gap-2">
-            {serviceMatches.map((hit) => (
+            {serviceMatches.map((hit, i) => (
               <Link
                 key={`${hit.category.slug}/${hit.service.slug}`}
                 to="/services/$category/$service"
                 params={{ category: hit.category.slug, service: hit.service.slug }}
-                className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary"
+                className={
+                  i === 0
+                    ? "rounded-full border border-primary bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary"
+                    : "rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary"
+                }
               >
                 {hit.service.name}
               </Link>

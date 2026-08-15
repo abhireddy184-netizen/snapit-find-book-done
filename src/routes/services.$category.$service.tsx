@@ -1,7 +1,9 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { ArrowRight, Camera, CheckCircle2, ShieldCheck, Clock, Info } from "lucide-react";
 import { AppShell, GradientButton } from "@/components/snapit/AppShell";
 import { getService, serviceEligibility, formatPrice, providerPoolFor } from "@/lib/catalog";
+import { recallLocation } from "@/lib/search-intent";
 import { providers } from "@/lib/snapit-data";
 
 export const Route = createFileRoute("/services/$category/$service")({
@@ -37,6 +39,8 @@ function ServicePage() {
   const pool = providerPoolFor(category.slug);
   const matched = providers.filter((p) => p.category === pool).slice(0, 3);
   const Icon = category.icon;
+  const [savedLoc, setSavedLoc] = useState("");
+  useEffect(() => setSavedLoc(recallLocation()), []);
 
   return (
     <AppShell>
@@ -110,10 +114,10 @@ function ServicePage() {
             </Link>
             <Link
               to="/search"
-              search={{ q: service.name, loc: "" } as never}
+              search={{ q: `${category.name} pros`, loc: savedLoc } as never}
               className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-border px-4 py-3 text-sm font-semibold hover:bg-muted"
             >
-              Browse pros <ArrowRight className="h-4 w-4" />
+              {savedLoc ? `Browse pros in ${savedLoc}` : "Browse pros"} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
