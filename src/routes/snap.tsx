@@ -512,16 +512,20 @@ function CaptureTile({
   label,
   hint,
   onClick,
+  active = false,
 }: {
   icon: typeof Camera;
   label: string;
   hint: string;
   onClick: () => void;
+  active?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
-      className="group flex flex-col items-center justify-center gap-3 rounded-3xl border border-border/60 bg-card p-6 text-center shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
+      className={`card-lift group flex flex-col items-center justify-center gap-3 rounded-3xl border bg-card p-6 text-center shadow-sm hover:-translate-y-0.5 hover:shadow-lg ${
+        active ? "border-secondary ring-2 ring-secondary/30" : "border-border/60 hover:border-secondary/40"
+      }`}
     >
       <div
         className="grid h-14 w-14 place-items-center rounded-2xl text-white shadow-md"
