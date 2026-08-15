@@ -67,6 +67,80 @@ export function formatPlaceShort(place: ZipPlace): string {
   return `${place.city}, ${place.state}`;
 }
 
+/* ------------------------------------------------------------------ *
+ * Suggestions (offline autocomplete)
+ * ------------------------------------------------------------------ */
+
+const US_STATES = new Set([
+  "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+  "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+  "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC","PR","VI","GU","AS","MP",
+]);
+
+/**
+ * Offline autocomplete over the ZIP dataset.
+ * Supports ZIP prefixes ("774"), full ZIPs, city names ("frisco") and
+ * city + state ("katy tx").
+ */
+export async function searchPlaces(raw: string, limit = 5): Promise<ZipPlace[]> {
+  const query = raw.trim().toLowerCase();
+  if (query.length < 2) return [];
+  const index = await loadZipIndex();
+  const all = Array.from(index.values());
+
+  // Digits → ZIP prefix search
+  const digits = query.replace(/[^0-9]/g, "");
+  if (digits && /^[0-9\s-]+$/.test(query)) {
+    if (digits.length < 3) return [];
+    const exact = index.get(digits.padStart(5, "0"));
+    const out: ZipPlace[] = [];
+    if (digits.length === 5 && exact) out.push(exact);
+    for (const p of all) {
+      if (out.length >= limit) break;
+      if (p.zip.startsWith(digits) && !out.some((o) => o.zip === p.zip)) out.push(p);
+    }
+    return out.slice(0, limit);
+  }
+
+  // Text → city (+ optional state) search
+  const cleaned = query.replace(/,/g, " ").replace(/\s+/g, " ").trim();
+  const tokens = cleaned.split(" ");
+  let state: string | null = null;
+  const last = tokens[tokens.length - 1]?.toUpperCase();
+  if (tokens.length > 1 && last && US_STATES.has(last)) {
+    state = last;
+    tokens.pop();
+  }
+  const cityQuery = tokens.join(" ");
+  if (!cityQuery) return [];
+
+  const starts: ZipPlace[] = [];
+  const contains: ZipPlace[] = [];
+  const seen = new Set<string>();
+  for (const p of all) {
+    if (state && p.state !== state) continue;
+    const city = p.city.toLowerCase();
+    const key = `${city}|${p.state}`;
+    if (seen.has(key)) continue;
+    if (city.startsWith(cityQuery)) {
+      seen.add(key);
+      starts.push(p);
+    } else if (city.includes(cityQuery)) {
+      contains.push(p);
+    }
+    if (starts.length >= limit) break;
+  }
+  const merged = [...starts];
+  for (const p of contains) {
+    if (merged.length >= limit) break;
+    const key = `${p.city.toLowerCase()}|${p.state}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(p);
+  }
+  return merged.slice(0, limit);
+}
+
 const EARTH_RADIUS_MILES = 3958.7613;
 const toRad = (deg: number) => (deg * Math.PI) / 180;
 
