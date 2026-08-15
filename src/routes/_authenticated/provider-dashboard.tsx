@@ -219,6 +219,8 @@ function BusinessProfile() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const zipResolved = useResolvedLocation(form.service_zip);
+  const zipPlace = zipResolved.kind === "zip" ? zipResolved.place : null;
 
   useEffect(() => {
     if (!data) return;
