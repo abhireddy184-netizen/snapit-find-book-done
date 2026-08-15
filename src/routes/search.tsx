@@ -43,6 +43,7 @@ function SearchPage() {
           </button>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">{results.length} pros match your filters</p>
+        <p className="mt-1 text-xs font-medium text-muted-foreground">Demo data — sample profiles shown while we onboard real local pros.</p>
       </div>
 
       <div className="mt-6 grid gap-6 md:grid-cols-[280px_1fr]">
