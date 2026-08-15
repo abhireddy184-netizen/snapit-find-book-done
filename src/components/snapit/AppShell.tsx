@@ -104,7 +104,7 @@ function AuthNav() {
       </Link>
       <Link
         to="/register"
-        search={{ role: undefined, redirect: undefined }}
+        search={{ redirect: undefined }}
         className="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] hover:shadow-lg"
         style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px rgba(37,99,235,0.55)" }}
       >

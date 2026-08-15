@@ -178,6 +178,7 @@ function Landing() {
             <div className="mt-6">
               <Link
                 to="/register"
+                search={{ redirect: undefined }}
                 className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-primary shadow-lg transition-transform hover:scale-[1.02]"
               >
                 Become a Provider <ArrowRight className="h-4 w-4" />

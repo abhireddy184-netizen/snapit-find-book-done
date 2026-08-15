@@ -24,7 +24,7 @@ function LoginPage() {
       title="Welcome back"
       subtitle="Log in to book services or manage your business."
       redirectTo={redirect}
-      footer={<p>New to SnapIt? <Link to="/register" className="font-semibold text-primary">Create an account</Link></p>}
+      footer={<p>New to SnapIt? <Link to="/register" search={{ redirect: undefined }} className="font-semibold text-primary">Create an account</Link></p>}
     />
   );
 }
