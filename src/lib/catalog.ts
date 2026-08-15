@@ -433,7 +433,7 @@ export const catalog: MasterCategory[] = [
     ],
   },
   {
-    slug: "pest-control", name: "Pest Control", tagline: "Licensed treatment and prevention.",
+    slug: "pest-control", name: "Pest Control", tagline: "Treatment and prevention, done safely.",
     icon: Bug, hex: "#8DD35F", gradient: "from-[#8DD35F] to-[#4FC59A]", providerCategory: "handyman",
     services: [
       s("general-pest-treatment", "General Pest Treatment", "Ants, roaches and common household pests.", 120, 400, { licensed: true }),
