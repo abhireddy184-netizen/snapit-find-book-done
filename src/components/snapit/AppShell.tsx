@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Home, Search, CalendarDays, User, Camera, ShieldAlert, History, LogOut, LayoutDashboard } from "lucide-react";
+import { Home, Search, CalendarDays, User, Camera, ShieldAlert, LogOut, LayoutDashboard } from "lucide-react";
 import { Logo } from "./Logo";
 import { ThemeToggle } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
@@ -13,7 +13,7 @@ export function AppShell({ children, hideBottomNav = false }: { children: ReactN
       <main
         className={cn(
           "mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6 md:pt-6 lg:px-8 xl:max-w-7xl",
-          hideBottomNav ? "pb-10 md:pb-16" : "pb-32 md:pb-16"
+          hideBottomNav ? "pb-10 md:pb-16" : "pb-[calc(7.5rem+env(safe-area-inset-bottom))] md:pb-16"
         )}
       >
         {children}
@@ -123,13 +123,13 @@ function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
     { to: "/", label: "Home", icon: Home },
-    { to: "/services", label: "Services", icon: Search },
-    { to: "/snap", label: "Show us", icon: Camera, highlight: true },
-    { to: "/history", label: "History", icon: History },
-    { to: "/dashboard", label: "Profile", icon: User, hash: "profile" },
+    { to: "/search", label: "Search", icon: Search },
+    { to: "/snap", label: "Show GPB", icon: Camera, highlight: true },
+    { to: "/dashboard", label: "Bookings", icon: CalendarDays },
+    { to: "/dashboard", label: "Profile", icon: User },
   ];
   return (
-    <nav className="fixed inset-x-0 bottom-3 z-40 mx-auto max-w-md px-4 md:hidden">
+    <nav className="fixed inset-x-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md px-4 md:hidden">
       <div className="glass-strong mx-auto flex items-stretch justify-around rounded-full px-2 py-2 shadow-[0_20px_60px_-20px_color-mix(in oklab, var(--plum) 22%, transparent)]">
         {items.map((it, i) => {
           const active = pathname === it.to && (i === 0 ? pathname === "/" : true);
@@ -140,6 +140,7 @@ function BottomNav() {
                 key={i}
                 to={it.to}
                 className="-mt-7 flex flex-col items-center gap-1"
+                aria-label="Show GPB — camera diagnosis"
               >
                 <span
                   className="grid h-14 w-14 place-items-center rounded-full text-white shadow-xl ring-4 ring-white transition-transform hover:scale-105"
@@ -155,13 +156,14 @@ function BottomNav() {
             <Link
               key={i}
               to={it.to}
+              {...(it.to === "/search" ? { search: { q: "", loc: "" } } : {})}
               className={cn(
                 "flex flex-1 flex-col items-center gap-1 rounded-full px-2 py-1.5 text-[10px] font-medium transition-colors",
                 active ? "text-primary" : "text-muted-foreground"
               )}
             >
               <Icon className="h-5 w-5" />
-              {it.label}
+              <span className="truncate">{it.label}</span>
             </Link>
           );
         })}

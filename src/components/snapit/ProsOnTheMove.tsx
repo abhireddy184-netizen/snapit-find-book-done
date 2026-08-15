@@ -247,7 +247,7 @@ export function ProsOnTheMove({ slim = false }: { slim?: boolean } = {}) {
         <div className={slim ? "relative mt-1 h-[84px] sm:h-[96px] md:h-[104px] lg:h-[120px]" : "relative mt-1 h-[100px] sm:h-[112px] md:h-[128px] lg:h-[152px]"}>
           <div
             key={`${pro.id}-${cycle}`}
-            className="walk-across absolute bottom-3 left-0 flex items-end gap-2"
+            className="walk-across pointer-events-none absolute bottom-3 left-0 flex items-end gap-2"
             style={{ ["--walk-duration" as any]: `${WALK_MS}ms` }}
           >
             <svg
