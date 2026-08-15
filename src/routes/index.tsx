@@ -231,7 +231,37 @@ function ProviderRecruitment() {
 
 export function Footer() {
   const [email, setEmail] = useState("");
-  const [subscribed, setSubscribed] = useState(false);
+  const subscribe = useServerFn(subscribeToUpdates);
+  const [state, setState] = useState<"idle" | "submitting" | "success" | "already" | "error">("idle");
+  const [message, setMessage] = useState("");
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (state === "submitting") return;
+    const value = email.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
+      setState("error");
+      setMessage("Please enter a valid email address.");
+      return;
+    }
+    setState("submitting");
+    setMessage("");
+    try {
+      const res = await subscribe({ data: { email: value, source: "website_footer" } });
+      if (res.status === "already_subscribed") {
+        setState("already");
+        setMessage("You're already subscribed — thanks for being with GPB.");
+      } else {
+        setState("success");
+        setMessage("You're subscribed. Check your inbox for a welcome note.");
+        setEmail("");
+      }
+    } catch {
+      setState("error");
+      setMessage("We couldn't save your subscription. Please try again.");
+    }
+  };
+
   return (
     <footer className="mt-14 border-t border-border/60 pt-10 pb-6 text-sm text-muted-foreground">
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
@@ -251,22 +281,44 @@ export function Footer() {
         <FooterCol title="Company" links={["About", "Careers", "Press", "Blog"]} />
         <FooterCol title="Support" links={["Help center", "Contact", "Trust & safety", "Cancellation"]} />
         <div className="min-w-0">
-          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">Stay in the loop</div>
+          <div className="mb-2 text-xs font-bold uppercase tracking-wider text-foreground">Get GPB updates</div>
+          <p className="mb-3 text-[11px] leading-relaxed">
+            GPB updates, new services and launch news. Unsubscribe anytime.
+          </p>
           <form
-            onSubmit={(e) => { e.preventDefault(); if (email) { setSubscribed(true); setEmail(""); } }}
+            onSubmit={submit}
+            noValidate
             className="flex min-w-0 overflow-hidden rounded-full border border-border/60 bg-card p-1 shadow-sm"
           >
+            <label htmlFor="gpb-newsletter-email" className="sr-only">Email address for GPB updates</label>
             <input
+              id="gpb-newsletter-email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => { setEmail(e.target.value); if (state !== "idle") { setState("idle"); setMessage(""); } }}
+              autoComplete="email"
+              aria-invalid={state === "error"}
+              aria-describedby="gpb-newsletter-status"
               placeholder="you@email.com"
               className="min-w-0 flex-1 bg-transparent px-3 text-xs outline-none placeholder:text-muted-foreground"
             />
-            <button type="submit" className="shrink-0 rounded-full px-4 py-2 text-xs font-bold text-white" style={{ background: "var(--gradient-primary)" }}>
-              {subscribed ? "Done" : "Subscribe"}
+            <button
+              type="submit"
+              disabled={state === "submitting"}
+              className="shrink-0 rounded-full px-4 py-2 text-xs font-bold text-white disabled:opacity-70"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              {state === "submitting" ? "Subscribing…" : "Subscribe"}
             </button>
           </form>
+          <p
+            id="gpb-newsletter-status"
+            role="status"
+            aria-live="polite"
+            className={`mt-2 min-h-[1rem] text-[11px] font-semibold ${state === "error" ? "text-destructive" : "text-foreground"}`}
+          >
+            {message}
+          </p>
         </div>
       </div>
       <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-border/60 pt-6 text-xs md:flex-row md:items-center">

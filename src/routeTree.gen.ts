@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as SnapRouteImport } from './routes/snap'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SearchRouteImport } from './routes/search'
@@ -30,6 +31,11 @@ import { Route as ServicesCategoryIndexRouteImport } from './routes/services.$ca
 import { Route as ServicesCategoryServiceRouteImport } from './routes/services.$category.$service'
 import { Route as AuthenticatedJobIdRouteImport } from './routes/_authenticated/job.$id'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SnapRoute = SnapRouteImport.update({
   id: '/snap',
   path: '/snap',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/services': typeof ServicesRouteWithChildren
   '/snap': typeof SnapRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/search': typeof SearchRoute
   '/snap': typeof SnapRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/services': typeof ServicesRouteWithChildren
   '/snap': typeof SnapRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/provider/$id': typeof ProviderIdRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/services'
     | '/snap'
+    | '/unsubscribe'
     | '/dashboard'
     | '/provider-dashboard'
     | '/provider/$id'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/search'
     | '/snap'
+    | '/unsubscribe'
     | '/dashboard'
     | '/provider-dashboard'
     | '/provider/$id'
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/services'
     | '/snap'
+    | '/unsubscribe'
     | '/_authenticated/dashboard'
     | '/_authenticated/provider-dashboard'
     | '/provider/$id'
@@ -274,12 +286,20 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   ServicesRoute: typeof ServicesRouteWithChildren
   SnapRoute: typeof SnapRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   ProviderIdRoute: typeof ProviderIdRoute
   TrackingIdRoute: typeof TrackingIdRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/snap': {
       id: '/snap'
       path: '/snap'
@@ -467,6 +487,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   ServicesRoute: ServicesRouteWithChildren,
   SnapRoute: SnapRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   ProviderIdRoute: ProviderIdRoute,
   TrackingIdRoute: TrackingIdRoute,
 }
