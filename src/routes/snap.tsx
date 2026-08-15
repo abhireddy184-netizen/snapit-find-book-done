@@ -69,6 +69,9 @@ function SnapPage() {
   const [image, setImage] = useState<string | null>(null);
   const [mediaKind, setMediaKind] = useState<"photo" | "video" | "upload" | null>(null);
   const [note, setNote] = useState("");
+  const [describeMode, setDescribeMode] = useState(false);
+  const [describeText, setDescribeText] = useState("");
+  const [textOnly, setTextOnly] = useState(false);
   const [analysis, setAnalysis] = useState<SnapAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -95,11 +98,11 @@ function SnapPage() {
     return () => URL.revokeObjectURL(pendingPreview);
   }, [pendingPreview]);
 
-  const runDiagnosis = async (dataUrl: string, noteText: string, token: number) => {
+  const runDiagnosis = async (dataUrl: string | null, noteText: string, token: number) => {
     setPhase("analyzing");
     try {
       const result = await withTimeout(
-        analyze({ data: { imageDataUrl: dataUrl, note: noteText } }),
+        analyze({ data: dataUrl ? { imageDataUrl: dataUrl, note: noteText } : { note: noteText } }),
         ANALYSIS_TIMEOUT_MS,
         "The AI is taking longer than usual. Please retry or retake the photo.",
       );
@@ -125,6 +128,8 @@ function SnapPage() {
     setError(null);
     setAnalysis(null);
     setImage(null);
+    setTextOnly(false);
+    setDescribeMode(false);
     setMediaKind(kind);
     setNote("");
     // Show the working state immediately — no dead period after capture.
@@ -163,6 +168,22 @@ function SnapPage() {
     await runDiagnosis(image, note, token);
   };
 
+  /** Text-only path — no photo required (essential on desktop). */
+  const runTextAnalysis = async () => {
+    const described = describeText.trim();
+    if (described.length < 4 || busyRef.current) return;
+    busyRef.current = true;
+    const token = ++runRef.current;
+    setError(null);
+    setAnalysis(null);
+    setImage(null);
+    setMediaKind(null);
+    setTextOnly(true);
+    setNote(described);
+    setLoading(true);
+    await runDiagnosis(null, described, token);
+  };
+
   /** Abandon any in-flight work and go back to a usable screen. */
   const cancelAnalysis = () => {
     runRef.current += 1;
@@ -178,6 +199,9 @@ function SnapPage() {
     setImage(null);
     setMediaKind(null);
     setNote("");
+    setTextOnly(false);
+    setDescribeMode(false);
+    setDescribeText("");
     setAnalysis(null);
     setError(null);
     setLoading(false);
