@@ -6,7 +6,7 @@ import { Star, ShieldCheck, MapPin, Clock, Search as SearchIcon, AlertCircle, Lo
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { providers as demoProviders } from "@/lib/snapit-data";
 import { catalog, searchServices } from "@/lib/catalog";
-import { matchServiceIntent, rankServices, rememberLocation } from "@/lib/search-intent";
+import { matchServiceIntent, rankServices, rememberLocation, isServicePhrase } from "@/lib/search-intent";
 import { fetchPublicProviders, matchProviders, type ProviderMatch } from "@/lib/providers";
 import { useResolvedLocation } from "@/lib/us-zip";
 
@@ -45,7 +45,10 @@ export const Route = createFileRoute("/search")({
 
 function SearchPage() {
   const navigate = useNavigate();
-  const { q, loc } = Route.useSearch();
+  const search = Route.useSearch();
+  const q = search.q;
+  // A service phrase typed into the location field is never a place.
+  const loc = search.loc && isServicePhrase(search.loc) ? "" : search.loc;
   const [serviceInput, setServiceInput] = useState(q);
   const [locationInput, setLocationInput] = useState(loc);
 
@@ -83,17 +86,23 @@ function SearchPage() {
 
   const serving = matched?.serving ?? [];
 
-  const heading =
-    resolved.kind === "zip"
-      ? `Pros for ${resolved.label}`
-      : resolved.kind === "text"
-        ? `Pros for ${resolved.label}`
-        : "Find a pro";
+  const serviceLabel = intentHit?.service.name ?? serviceMatches[0]?.service.name ?? q.trim();
+  const placeLabel =
+    resolved.kind === "zip" || resolved.kind === "text" ? resolved.label : "";
+  const heading = serviceLabel
+    ? placeLabel
+      ? `${serviceLabel} pros near ${placeLabel}`
+      : `${serviceLabel} pros`
+    : placeLabel
+      ? `Find a pro near ${placeLabel}`
+      : "Find a pro";
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const nextQ = serviceInput.trim();
-    const nextLoc = locationInput.trim();
+    const rawLoc = locationInput.trim();
+    const nextLoc = isServicePhrase(rawLoc) ? "" : rawLoc;
+    if (nextLoc !== rawLoc) setLocationInput("");
     rememberLocation(nextLoc);
     const hit = matchServiceIntent(nextQ);
     if (hit) {
