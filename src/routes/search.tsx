@@ -91,7 +91,7 @@ function SearchPage() {
 
   const serving = matched?.serving ?? [];
 
-  const serviceLabel = exactHit?.service.name ?? serviceMatches[0]?.service.name ?? q.trim();
+  const serviceLabel = exactHit?.service.name ?? q.trim();
   const placeLabel =
     resolved.kind === "zip" || resolved.kind === "text" ? resolved.label : "";
   const heading = serviceLabel
