@@ -389,6 +389,42 @@ export type Database = {
         }
         Relationships: []
       }
+      subscribers: {
+        Row: {
+          consent_at: string
+          created_at: string
+          email: string
+          email_normalized: string
+          id: string
+          source: string
+          status: string
+          unsubscribe_token: string
+          updated_at: string
+        }
+        Insert: {
+          consent_at?: string
+          created_at?: string
+          email: string
+          email_normalized: string
+          id?: string
+          source?: string
+          status?: string
+          unsubscribe_token?: string
+          updated_at?: string
+        }
+        Update: {
+          consent_at?: string
+          created_at?: string
+          email?: string
+          email_normalized?: string
+          id?: string
+          source?: string
+          status?: string
+          unsubscribe_token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
