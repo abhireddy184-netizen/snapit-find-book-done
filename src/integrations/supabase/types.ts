@@ -20,6 +20,7 @@ export type Database = {
           customer_id: string
           details: string | null
           id: string
+          job_id: string | null
           provider_id: string | null
           provider_name_snapshot: string | null
           scheduled_date: string
@@ -34,6 +35,7 @@ export type Database = {
           customer_id: string
           details?: string | null
           id?: string
+          job_id?: string | null
           provider_id?: string | null
           provider_name_snapshot?: string | null
           scheduled_date: string
@@ -48,6 +50,7 @@ export type Database = {
           customer_id?: string
           details?: string | null
           id?: string
+          job_id?: string | null
           provider_id?: string | null
           provider_name_snapshot?: string | null
           scheduled_date?: string
@@ -57,7 +60,62 @@ export type Database = {
           status?: Database["public"]["Enums"]["booking_status"]
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bookings_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      job_documents: {
+        Row: {
+          created_at: string
+          customer_id: string
+          external_url: string | null
+          id: string
+          job_id: string
+          kind: Database["public"]["Enums"]["job_document_kind"]
+          metadata: Json
+          storage_path: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          external_url?: string | null
+          id?: string
+          job_id: string
+          kind?: Database["public"]["Enums"]["job_document_kind"]
+          metadata?: Json
+          storage_path?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          external_url?: string | null
+          id?: string
+          job_id?: string
+          kind?: Database["public"]["Enums"]["job_document_kind"]
+          metadata?: Json
+          storage_path?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_documents_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -125,6 +183,161 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_quotes: {
+        Row: {
+          created_at: string
+          currency: string
+          earliest_availability: string
+          id: string
+          included_work: string[]
+          is_demo: boolean
+          job_id: string
+          notes: string | null
+          price: number
+          provider_id: string | null
+          provider_name_snapshot: string
+          status: Database["public"]["Enums"]["quote_status"]
+          updated_at: string
+          warranty: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          earliest_availability?: string
+          id?: string
+          included_work?: string[]
+          is_demo?: boolean
+          job_id: string
+          notes?: string | null
+          price?: number
+          provider_id?: string | null
+          provider_name_snapshot?: string
+          status?: Database["public"]["Enums"]["quote_status"]
+          updated_at?: string
+          warranty?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          earliest_availability?: string
+          id?: string
+          included_work?: string[]
+          is_demo?: boolean
+          job_id?: string
+          notes?: string | null
+          price?: number
+          provider_id?: string | null
+          provider_name_snapshot?: string
+          status?: Database["public"]["Enums"]["quote_status"]
+          updated_at?: string
+          warranty?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_quotes_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_requests: {
+        Row: {
+          accepted_quote_id: string | null
+          after_image_path: string | null
+          ai_confidence: number | null
+          ai_diagnosis: Json | null
+          before_image_path: string | null
+          category_label: string
+          category_slug: string
+          completed_at: string | null
+          created_at: string
+          currency: string
+          customer_id: string
+          customer_note: string
+          estimated_minutes: number
+          expected_price_high: number
+          expected_price_low: number
+          id: string
+          preferred_date: string | null
+          preferred_time: string | null
+          problem_statement: string
+          safety_steps: string[]
+          scope_of_work: string[]
+          service_address: string
+          status: Database["public"]["Enums"]["job_status"]
+          updated_at: string
+          urgency: string
+          verification_note: string | null
+          verification_status: Database["public"]["Enums"]["verification_result"]
+          verified_at: string | null
+          warranty_notes: string | null
+        }
+        Insert: {
+          accepted_quote_id?: string | null
+          after_image_path?: string | null
+          ai_confidence?: number | null
+          ai_diagnosis?: Json | null
+          before_image_path?: string | null
+          category_label?: string
+          category_slug?: string
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          customer_id: string
+          customer_note?: string
+          estimated_minutes?: number
+          expected_price_high?: number
+          expected_price_low?: number
+          id?: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          problem_statement?: string
+          safety_steps?: string[]
+          scope_of_work?: string[]
+          service_address?: string
+          status?: Database["public"]["Enums"]["job_status"]
+          updated_at?: string
+          urgency?: string
+          verification_note?: string | null
+          verification_status?: Database["public"]["Enums"]["verification_result"]
+          verified_at?: string | null
+          warranty_notes?: string | null
+        }
+        Update: {
+          accepted_quote_id?: string | null
+          after_image_path?: string | null
+          ai_confidence?: number | null
+          ai_diagnosis?: Json | null
+          before_image_path?: string | null
+          category_label?: string
+          category_slug?: string
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          customer_id?: string
+          customer_note?: string
+          estimated_minutes?: number
+          expected_price_high?: number
+          expected_price_low?: number
+          id?: string
+          preferred_date?: string | null
+          preferred_time?: string | null
+          problem_statement?: string
+          safety_steps?: string[]
+          scope_of_work?: string[]
+          service_address?: string
+          status?: Database["public"]["Enums"]["job_status"]
+          updated_at?: string
+          urgency?: string
+          verification_note?: string | null
+          verification_status?: Database["public"]["Enums"]["verification_result"]
+          verified_at?: string | null
+          warranty_notes?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -140,6 +353,27 @@ export type Database = {
         | "in_progress"
         | "completed"
         | "cancelled"
+      job_document_kind:
+        | "before_photo"
+        | "after_photo"
+        | "receipt"
+        | "warranty"
+        | "other"
+      job_status:
+        | "diagnosed"
+        | "quotes_requested"
+        | "booked"
+        | "in_progress"
+        | "needs_verification"
+        | "completed"
+        | "cancelled"
+      quote_status: "pending" | "accepted" | "declined" | "withdrawn"
+      verification_result:
+        | "not_started"
+        | "pending"
+        | "appears_completed"
+        | "needs_manual_review"
+        | "unable_to_verify"
       verification_status: "unverified" | "pending" | "verified"
     }
     CompositeTypes: {
@@ -275,6 +509,30 @@ export const Constants = {
         "in_progress",
         "completed",
         "cancelled",
+      ],
+      job_document_kind: [
+        "before_photo",
+        "after_photo",
+        "receipt",
+        "warranty",
+        "other",
+      ],
+      job_status: [
+        "diagnosed",
+        "quotes_requested",
+        "booked",
+        "in_progress",
+        "needs_verification",
+        "completed",
+        "cancelled",
+      ],
+      quote_status: ["pending", "accepted", "declined", "withdrawn"],
+      verification_result: [
+        "not_started",
+        "pending",
+        "appears_completed",
+        "needs_manual_review",
+        "unable_to_verify",
       ],
       verification_status: ["unverified", "pending", "verified"],
     },
