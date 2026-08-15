@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
-import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, Video, Upload, MessageCircle, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
+import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCircle2, Camera, ShieldAlert, Zap, Droplet, Wind, Lock, Facebook, Instagram, Twitter, Youtube, MapPin as MapPinIcon, BadgeCheck, Timer, Award } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
 import { JourneyRail, InputModes, RoomStory, ProVerticals, SectionConnector } from "@/components/snapit/HomeStory";
@@ -465,7 +465,7 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
       <div className="grid gap-10 md:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
         <div>
           <Logo />
-          <p className="mt-4 max-w-xs leading-relaxed">Show it. Tell us. Get it done. AI-powered matching between customers and trusted local pros.</p>
+          <p className="mt-4 max-w-xs leading-relaxed">Show it. Tell us. Get it fixed. AI-powered matching between customers and trusted local pros.</p>
           <div className="mt-5 flex items-center gap-2">
             {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
               <a key={i} href="#" aria-label="Social" className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary">
