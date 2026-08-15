@@ -292,11 +292,16 @@ function BusinessProfile() {
           <Input label="Business name" value={form.business_name} onChange={(v) => setForm({ ...form, business_name: v })} placeholder="Rivera Plumbing Co." />
           <Select label="Service category" value={form.service_category} onChange={(v) => setForm({ ...form, service_category: v })} />
           <div>
-            <Input
-              label="Service ZIP code"
+            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Service ZIP code</span>
+            <LocationAutocomplete
+              mode="zip"
               value={form.service_zip}
-              onChange={(v) => setForm({ ...form, service_zip: v.replace(/[^0-9]/g, "").slice(0, 5) })}
+              onChange={(v) => setForm({ ...form, service_zip: v })}
+              aria-label="Service ZIP code"
               placeholder="75034"
+              showIcon={false}
+              className="mt-1"
+              fieldClassName="rounded-xl border border-border bg-background px-3 py-2.5 focus-within:border-primary"
             />
             {zipPlace && (
               <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-primary">
