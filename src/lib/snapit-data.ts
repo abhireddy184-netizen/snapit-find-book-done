@@ -23,16 +23,16 @@ export type Category = {
 };
 
 export const categories: Category[] = [
-  { slug: "plumbing", name: "Plumbing", description: "Leaks, drains, water heaters and installs.", icon: Wrench, color: "from-blue-500 to-blue-600", accent: "blue", hex: "#2563EB" },
-  { slug: "electrical", name: "Electrical", description: "Wiring, outlets, lighting and safety checks.", icon: Zap, color: "from-orange-400 to-orange-600", accent: "orange", hex: "#F97316" },
-  { slug: "hvac", name: "HVAC", description: "Heating, cooling, tune-ups and repair.", icon: Wind, color: "from-cyan-400 to-cyan-600", accent: "cyan", hex: "#06B6D4" },
-  { slug: "house-cleaning", name: "House Cleaning", description: "Deep cleans, recurring and move-outs.", icon: Sparkles, color: "from-purple-500 to-purple-700", accent: "purple", hex: "#8B5CF6" },
-  { slug: "handyman", name: "Handyman", description: "Small repairs, mounting and assembly.", icon: Hammer, color: "from-red-500 to-red-600", accent: "red", hex: "#EF4444" },
-  { slug: "lawn-care", name: "Lawn Care", description: "Mowing, trimming and yard cleanups.", icon: Trees, color: "from-emerald-500 to-green-600", accent: "emerald", hex: "#10B981" },
-  { slug: "appliance-repair", name: "Appliance Repair", description: "Fridge, washer, dryer and dishwasher fixes.", icon: Refrigerator, color: "from-slate-500 to-slate-700", accent: "slate", hex: "#64748B" },
-  { slug: "beauty-spa", name: "Beauty & Spa", description: "In-home beauty, massage and wellness.", icon: Scissors, color: "from-pink-400 to-pink-600", accent: "pink", hex: "#EC4899" },
-  { slug: "moving-help", name: "Moving Help", description: "Loaders, movers and packing pros.", icon: Truck, color: "from-indigo-500 to-indigo-700", accent: "indigo", hex: "#6366F1" },
-  { slug: "auto-services", name: "Auto Services", description: "Mobile mechanics and detailing.", icon: Car, color: "from-blue-600 to-blue-800", accent: "blue", hex: "#1D4ED8" },
+  { slug: "plumbing", name: "Plumbing", description: "Leaks, drains, water heaters and installs.", icon: Wrench, color: "from-[#FF3D8D] to-[#FF7A45]", accent: "pink", hex: "#FF3D8D" },
+  { slug: "electrical", name: "Electrical", description: "Wiring, outlets, lighting and safety checks.", icon: Zap, color: "from-[#FFD83D] to-[#FF9E2C]", accent: "yellow", hex: "#F0A81E" },
+  { slug: "hvac", name: "HVAC", description: "Heating, cooling, tune-ups and repair.", icon: Wind, color: "from-[#6EC8FF] to-[#3AA6F0]", accent: "sky", hex: "#3AA6F0" },
+  { slug: "house-cleaning", name: "House Cleaning", description: "Deep cleans, recurring and move-outs.", icon: Sparkles, color: "from-[#4ED6A0] to-[#22B486]", accent: "mint", hex: "#22B486" },
+  { slug: "handyman", name: "Handyman", description: "Small repairs, mounting and assembly.", icon: Hammer, color: "from-[#FF7A45] to-[#FF3D8D]", accent: "coral", hex: "#FF7A45" },
+  { slug: "lawn-care", name: "Lawn Care", description: "Mowing, trimming and yard cleanups.", icon: Trees, color: "from-[#8BDD5B] to-[#4ED6A0]", accent: "lime", hex: "#4ED6A0" },
+  { slug: "appliance-repair", name: "Appliance Repair", description: "Fridge, washer, dryer and dishwasher fixes.", icon: Refrigerator, color: "from-[#B58CFF] to-[#8A5CF0]", accent: "lavender", hex: "#8A5CF0" },
+  { slug: "beauty-spa", name: "Beauty & Spa", description: "In-home beauty, massage and wellness.", icon: Scissors, color: "from-[#FF3D8D] to-[#B58CFF]", accent: "magenta", hex: "#FF3D8D" },
+  { slug: "moving-help", name: "Moving Help", description: "Loaders, movers and packing pros.", icon: Truck, color: "from-[#6EC8FF] to-[#B58CFF]", accent: "periwinkle", hex: "#6EC8FF" },
+  { slug: "auto-services", name: "Auto Services", description: "Mobile mechanics and detailing.", icon: Car, color: "from-[#3A163F] to-[#8A5CF0]", accent: "plum", hex: "#8A5CF0" },
 ];
 
 export function getCategory(slug: string) {
@@ -63,12 +63,12 @@ export type Provider = {
 };
 
 const gradients = [
-  "from-blue-500 to-purple-600",
-  "from-indigo-500 to-violet-600",
-  "from-purple-500 to-pink-500",
-  "from-sky-500 to-blue-600",
-  "from-violet-500 to-indigo-600",
-  "from-fuchsia-500 to-purple-600",
+  "from-[#FF3D8D] to-[#FF7A45]",
+  "from-[#FFD83D] to-[#FF9E2C]",
+  "from-[#4ED6A0] to-[#6EC8FF]",
+  "from-[#6EC8FF] to-[#B58CFF]",
+  "from-[#B58CFF] to-[#FF3D8D]",
+  "from-[#FF7A45] to-[#FFD83D]",
 ];
 
 export const providers: Provider[] = [
