@@ -92,7 +92,7 @@ function Landing() {
                 className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
             </label>
-            <GradientButton type="submit" className="w-full sm:w-auto">
+            <GradientButton type="submit" className="w-full shrink-0 whitespace-nowrap px-5 sm:w-auto">
               Find a Pro <ArrowRight className="h-4 w-4" />
             </GradientButton>
           </form>
