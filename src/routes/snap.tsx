@@ -1207,7 +1207,7 @@ function RecentDiagnoses({ entries }: { entries: SnapHistoryEntry[] }) {
       </div>
       <div className="grid gap-2 sm:grid-cols-2">
         {entries.map((entry) => {
-          const cat = categories.find((c) => c.slug === entry.analysis.categorySlug);
+          const cat = getCategoryBySlug(entry.analysis.categorySlug);
           const u = urgencyStyles[entry.analysis.urgency] ?? urgencyStyles.medium;
           return (
             <Link
@@ -1216,10 +1216,14 @@ function RecentDiagnoses({ entries }: { entries: SnapHistoryEntry[] }) {
               className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="relative shrink-0">
-                <img src={entry.thumbnail} alt="" className="h-14 w-14 rounded-xl object-cover" />
+                {entry.thumbnail ? (
+                  <img src={entry.thumbnail} alt="" className="h-14 w-14 rounded-xl object-cover" />
+                ) : (
+                  <div className="grid h-14 w-14 place-items-center rounded-xl bg-muted text-muted-foreground"><MessageCircle className="h-5 w-5" /></div>
+                )}
                 {cat && (
                   <div
-                    className={`absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br ${cat.color} text-white shadow ring-2 ring-card`}
+                    className={`absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full bg-gradient-to-br ${cat.gradient} text-white shadow ring-2 ring-card`}
                   >
                     <cat.icon className="h-3 w-3" />
                   </div>
