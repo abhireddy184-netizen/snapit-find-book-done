@@ -83,13 +83,13 @@ export function buildUserPrompt(note: string | undefined, hasMedia: boolean, fra
     ? ` The ${frameCount} images are frames sampled across one short video of the same scene — read them together, not as separate problems.`
     : "";
   return described
-    ? `Customer description (HIGHEST PRIORITY — treat this as the real problem even if the image shows something else): "${described}". Use the image only as supporting context.${multi} Respond with JSON only.`
-    : `The customer sent ${frameCount > 1 ? `${frameCount} frames from one short video` : "an image"} with no description. Only report a problem if one is genuinely visible.${multi} Respond with JSON only.`;
+    ? `Customer description (HIGHEST PRIORITY — treat this as the real problem even if the image shows something else): "${described}". Their words define the subject. Use the image only as supporting context.${multi} Respond with JSON only.`
+    : `The customer sent ${frameCount > 1 ? `${frameCount} frames from one short video` : "an image"} with no description. First decide the intended visual subject from salience, then only report a problem if one is genuinely visible on THAT subject. Ignore incidental marks on surrounding surfaces.${multi} Respond with JSON only.`;
 }
 
 const CATEGORY_SLUGS = new Set(catalog.map((c) => c.slug));
 
-export function normalizeAnalysis(raw: string, hadNote: boolean): SnapAnalysis {
+export function normalizeAnalysis(raw: string, hadNote: boolean, hasMedia = false): SnapAnalysis {
   const match = raw.match(/\{[\s\S]*\}/);
   let parsed: Partial<SnapAnalysis> = {};
   try {
@@ -113,6 +113,7 @@ export function normalizeAnalysis(raw: string, hadNote: boolean): SnapAnalysis {
   return {
     responseKind,
     issueSource: parsed.issueSource ?? (hadNote ? "customer-described" : "possible"),
+    visualSubject: hasMedia ? parsed.visualSubject?.trim() || undefined : undefined,
     headline: parsed.headline?.trim() ||
       (responseKind === "no-issue"
         ? "Nothing obvious looks wrong from this photo."
