@@ -589,33 +589,42 @@ function JobScopeCta({ analysis, image }: { analysis: SnapAnalysis; image: strin
   );
 }
 
-function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; image: string; onReset: () => void }) {
+function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; image: string | null; onReset: () => void }) {
   const navigate = useNavigate();
   const u = urgencyStyles[analysis.urgency] ?? urgencyStyles.medium;
   const UrgencyIcon = u.icon;
-  const category = categories.find((c) => c.slug === analysis.categorySlug);
+  const category = getCategoryBySlug(analysis.categorySlug);
+  const pool = providerPoolFor(analysis.categorySlug);
+  const showPricing = analysis.hasPriceEstimate;
+  const showPros = analysis.responseKind === "diagnosis" || analysis.responseKind === "options";
+  const sourceLabel: Record<string, string> = {
+    detected: "Detected issue",
+    possible: "Possible issue",
+    "customer-described": "Customer-described issue",
+    insufficient: "Need more information",
+  };
   const duration = analysis.estimatedDurationMinutes ?? 60;
   const durationLabel =
     duration >= 60 ? `${(duration / 60).toFixed(duration % 60 === 0 ? 0 : 1)} hr` : `${duration} min`;
   const confidencePct = Math.round((analysis.confidence ?? 0.7) * 100);
 
   const matched: MatchedProvider[] = useMemo(() => {
-    const inCat = providers.filter((p) => p.category === analysis.categorySlug);
-    const others = providers.filter((p) => p.category !== analysis.categorySlug);
+    const inCat = providers.filter((p) => p.category === pool);
+    const others = providers.filter((p) => p.category !== pool);
     const merged = [...inCat, ...others];
     // Sort in-category first by rating desc then distance asc, then top up with adjacent pros
     const sorted = merged
       .slice()
       .sort((a, b) => {
-        const catA = a.category === analysis.categorySlug ? 0 : 1;
-        const catB = b.category === analysis.categorySlug ? 0 : 1;
+        const catA = a.category === pool ? 0 : 1;
+        const catB = b.category === pool ? 0 : 1;
         if (catA !== catB) return catA - catB;
         if (b.rating !== a.rating) return b.rating - a.rating;
         return a.distance - b.distance;
       })
       .slice(0, 5);
     return sorted.map((p, i) => ({ ...p, eta: [7, 12, 18, 26, 34][i] ?? 40 }));
-  }, [analysis.categorySlug]);
+  }, [pool]);
 
   const recommended = matched[0];
   const others = matched.slice(1);
@@ -626,7 +635,7 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
     if (savedRef.current) return;
     savedRef.current = true;
     try {
-      saveHistoryEntry({ thumbnail: image, analysis });
+      saveHistoryEntry({ thumbnail: image ?? "", analysis });
     } catch {
       /* ignore */
     }
@@ -654,32 +663,44 @@ function AnalysisView({ analysis, image, onReset }: { analysis: SnapAnalysis; im
 
   return (
     <div className="mt-6 space-y-5 animate-fade-in">
-      <div className="grid gap-4 md:grid-cols-[240px_1fr]">
-        <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
-          <img src={image} alt="Diagnosed" className="h-full max-h-[240px] w-full object-cover" />
-        </div>
+      <div className={`grid gap-4 ${image ? "md:grid-cols-[240px_1fr]" : ""}`}>
+        {image && (
+          <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
+            <img src={image} alt="Diagnosed" className="h-full max-h-[240px] w-full object-cover" />
+          </div>
+        )}
         <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
           <div className="flex flex-wrap items-center gap-2">
             {category && (
               <span
-                className={`inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br ${category.color} px-3 py-1 text-xs font-semibold text-white`}
+                className={`inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br ${category.gradient} px-3 py-1 text-xs font-semibold text-white`}
               >
                 <category.icon className="h-3.5 w-3.5" /> {analysis.category}
               </span>
             )}
-            <span
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${u.chip}`}
-            >
-              <UrgencyIcon className="h-3.5 w-3.5" /> {u.label}
+            {showPricing && (
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold ${u.chip}`}
+              >
+                <UrgencyIcon className="h-3.5 w-3.5" /> {u.label}
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-muted px-3 py-1 text-xs font-semibold text-muted-foreground">
+              {sourceLabel[analysis.issueSource] ?? "Possible issue"}
             </span>
             <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground">
               <HistoryIcon className="h-3 w-3" /> Saved to history
             </span>
           </div>
           <div className="mt-3">
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Detected problem</div>
-            <p className="mt-1 text-sm text-foreground">{analysis.problem}</p>
+            <h2 className="text-lg font-black leading-snug">{analysis.headline}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{analysis.problem}</p>
           </div>
+          {analysis.safetyNote && (
+            <div className="mt-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
+              {analysis.safetyNote}
+            </div>
+          )}
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs">
               <span className="font-semibold text-muted-foreground">AI confidence</span>
