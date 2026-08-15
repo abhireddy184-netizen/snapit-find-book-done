@@ -30,7 +30,7 @@ const stages = [
 ];
 
 function TrackingPage() {
-  const { provider } = Route.useLoaderData();
+  const { provider } = Route.useLoaderData() as { provider: (typeof providers)[number] };
   const [progress, setProgress] = useState(0.05);
   const [stageIdx, setStageIdx] = useState(2);
   const [eta, setEta] = useState(12);
