@@ -34,6 +34,7 @@ import { providers, categories, type Provider } from "@/lib/snapit-data";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
 import { useAuth } from "@/lib/auth";
 import { createJobFromAnalysis } from "@/lib/jobs";
+import { prepareMediaForAnalysis, withTimeout } from "@/lib/snap-media";
 import {
   BadgeCheck,
   Lock,
@@ -43,6 +44,8 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/snap")({
+  // Hard ceiling for a single AI diagnosis request.
+  
   head: () => ({
     meta: [
       { title: "Snap a problem — AI diagnosis in seconds | SnapIt" },
