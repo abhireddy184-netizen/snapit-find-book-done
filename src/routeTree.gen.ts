@@ -25,6 +25,8 @@ import { Route as TrackingIdRouteImport } from './routes/tracking.$id'
 import { Route as ProviderIdRouteImport } from './routes/provider.$id'
 import { Route as AuthenticatedProviderDashboardRouteImport } from './routes/_authenticated/provider-dashboard'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as ServicesCategoryIndexRouteImport } from './routes/services.$category.index'
+import { Route as ServicesCategoryServiceRouteImport } from './routes/services.$category.$service'
 import { Route as AuthenticatedJobIdRouteImport } from './routes/_authenticated/job.$id'
 
 const SnapRoute = SnapRouteImport.update({
@@ -107,6 +109,16 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ServicesCategoryIndexRoute = ServicesCategoryIndexRouteImport.update({
+  id: '/$category/',
+  path: '/$category/',
+  getParentRoute: () => ServicesRoute,
+} as any)
+const ServicesCategoryServiceRoute = ServicesCategoryServiceRouteImport.update({
+  id: '/$category/$service',
+  path: '/$category/$service',
+  getParentRoute: () => ServicesRoute,
+} as any)
 const AuthenticatedJobIdRoute = AuthenticatedJobIdRouteImport.update({
   id: '/job/$id',
   path: '/job/$id',
@@ -130,6 +142,8 @@ export interface FileRoutesByFullPath {
   '/tracking/$id': typeof TrackingIdRoute
   '/services/': typeof ServicesIndexRoute
   '/job/$id': typeof AuthenticatedJobIdRoute
+  '/services/$category/$service': typeof ServicesCategoryServiceRoute
+  '/services/$category/': typeof ServicesCategoryIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -147,6 +161,8 @@ export interface FileRoutesByTo {
   '/tracking/$id': typeof TrackingIdRoute
   '/services': typeof ServicesIndexRoute
   '/job/$id': typeof AuthenticatedJobIdRoute
+  '/services/$category/$service': typeof ServicesCategoryServiceRoute
+  '/services/$category': typeof ServicesCategoryIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -167,6 +183,8 @@ export interface FileRoutesById {
   '/tracking/$id': typeof TrackingIdRoute
   '/services/': typeof ServicesIndexRoute
   '/_authenticated/job/$id': typeof AuthenticatedJobIdRoute
+  '/services/$category/$service': typeof ServicesCategoryServiceRoute
+  '/services/$category/': typeof ServicesCategoryIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -187,6 +205,8 @@ export interface FileRouteTypes {
     | '/tracking/$id'
     | '/services/'
     | '/job/$id'
+    | '/services/$category/$service'
+    | '/services/$category/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -204,6 +224,8 @@ export interface FileRouteTypes {
     | '/tracking/$id'
     | '/services'
     | '/job/$id'
+    | '/services/$category/$service'
+    | '/services/$category'
   id:
     | '__root__'
     | '/'
@@ -223,6 +245,8 @@ export interface FileRouteTypes {
     | '/tracking/$id'
     | '/services/'
     | '/_authenticated/job/$id'
+    | '/services/$category/$service'
+    | '/services/$category/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -355,6 +379,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/services/$category/': {
+      id: '/services/$category/'
+      path: '/$category'
+      fullPath: '/services/$category/'
+      preLoaderRoute: typeof ServicesCategoryIndexRouteImport
+      parentRoute: typeof ServicesRoute
+    }
+    '/services/$category/$service': {
+      id: '/services/$category/$service'
+      path: '/$category/$service'
+      fullPath: '/services/$category/$service'
+      preLoaderRoute: typeof ServicesCategoryServiceRouteImport
+      parentRoute: typeof ServicesRoute
+    }
     '/_authenticated/job/$id': {
       id: '/_authenticated/job/$id'
       path: '/job/$id'
@@ -382,10 +420,14 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface ServicesRouteChildren {
   ServicesIndexRoute: typeof ServicesIndexRoute
+  ServicesCategoryServiceRoute: typeof ServicesCategoryServiceRoute
+  ServicesCategoryIndexRoute: typeof ServicesCategoryIndexRoute
 }
 
 const ServicesRouteChildren: ServicesRouteChildren = {
   ServicesIndexRoute: ServicesIndexRoute,
+  ServicesCategoryServiceRoute: ServicesCategoryServiceRoute,
+  ServicesCategoryIndexRoute: ServicesCategoryIndexRoute,
 }
 
 const ServicesRouteWithChildren = ServicesRoute._addFileChildren(
