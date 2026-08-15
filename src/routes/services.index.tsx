@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Search, ArrowRight, Sparkles, ShieldCheck, MapPin } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { catalog, searchServices, TOTAL_SERVICES, getMarket, serviceEligibility, formatPrice } from "@/lib/catalog";
+import { categoryScene } from "@/lib/scenes";
 
 export const Route = createFileRoute("/services/")({
   head: () => ({
@@ -79,9 +80,27 @@ function AllServicesPage() {
           return (
             <div key={cat.slug} id={cat.slug} className="scroll-mt-24">
               <div className="flex items-start gap-4">
-                <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${cat.gradient} text-white shadow-md`}>
-                  <Icon className="h-6 w-6" />
-                </div>
+                {categoryScene(cat.slug) ? (
+                  <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-2xl shadow-md">
+                    <img
+                      src={categoryScene(cat.slug)}
+                      alt={`${cat.name} professional at work`}
+                      loading="lazy"
+                      decoding="async"
+                      width={768}
+                      height={512}
+                      className="h-full w-full object-cover"
+                    />
+                    <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${cat.gradient} opacity-25`} />
+                    <div className="absolute bottom-1 left-1 grid h-6 w-6 place-items-center rounded-lg bg-card/85 backdrop-blur">
+                      <Icon className="h-3.5 w-3.5 text-primary" />
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${cat.gradient} text-white shadow-md`}>
+                    <Icon className="h-6 w-6" />
+                  </div>
+                )}
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-xl font-black">{cat.name}</h2>
