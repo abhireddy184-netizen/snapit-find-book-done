@@ -50,7 +50,7 @@ const ANALYSIS_TIMEOUT_MS = 40_000;
 export const Route = createFileRoute("/snap")({
   head: () => ({
     meta: [
-      { title: "Snap a problem — AI diagnosis in seconds | GPB" },
+      { title: "Show us the problem — AI diagnosis in seconds | GPB" },
       { name: "description", content: "Snap a photo or video of any problem. GPB's AI explains what it likely needs, builds a standardized job scope and helps you compare quotes from service pros." },
       { property: "og:title", content: "Snap a Problem — AI diagnosis | GPB" },
       { property: "og:description", content: "Point your camera. Get an instant diagnosis, estimate and matched pros." },
