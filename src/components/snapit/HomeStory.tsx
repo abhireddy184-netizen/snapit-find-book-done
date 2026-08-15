@@ -16,7 +16,7 @@ const JOURNEY = [
   { icon: ShieldCheck, label: "Fixed, with proof", detail: "Before & after kept for you", tint: "var(--coral)" },
 ];
 
-export function JourneyRail({ onColor = false }: { onColor?: boolean }) {
+export function JourneyRail({ onColor = false, stacked = false }: { onColor?: boolean; stacked?: boolean }) {
   const [active, setActive] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setActive((a) => (a + 1) % JOURNEY.length), 2600);
@@ -24,7 +24,7 @@ export function JourneyRail({ onColor = false }: { onColor?: boolean }) {
   }, []);
 
   return (
-    <ol className="relative grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
+    <ol className={stacked ? "relative grid gap-2.5 sm:grid-cols-2 lg:grid-cols-1" : "relative grid gap-2.5 sm:grid-cols-2 lg:grid-cols-4"}>
       {JOURNEY.map((s, i) => {
         const on = i === active;
         return (
