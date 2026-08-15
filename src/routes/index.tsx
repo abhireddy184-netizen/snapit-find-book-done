@@ -57,7 +57,7 @@ function Landing() {
             <span className="text-gradient-hero">Get it fixed with proof.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-xl">
-            Snap it and our AI explains what it likely needs. We turn that into one standardized job scope, so quotes are
+            Show it and our AI explains what it likely needs. We turn that into one standardized job scope, so quotes are
             comparable, booking is simple and every job ends with a record you keep.
           </p>
 
