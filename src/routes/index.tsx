@@ -7,8 +7,8 @@ import { providers } from "@/lib/snapit-data";
 import { popularCategories, TOTAL_SERVICES } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
 
-const SITE_URL = "https://id-preview--bca1ede1-6b69-4084-95f5-53bb43a6c24e.lovable.app";
-const OG_IMAGE = `${SITE_URL}/__l5e/assets-v1/a199e0d6-211d-4b74-ab79-c58ffbd2870e/og-snapit.jpg`;
+const SITE_URL = "https://getperfectboy.com";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,13 +19,9 @@ export const Route = createFileRoute("/")({
       { property: "og:description", content: "AI diagnosis, one standardized scope, comparable quotes, booking and a permanent proof record for every job." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
-      { property: "og:image", content: OG_IMAGE },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "GPB — Show the problem. Get it fixed with proof." },
       { name: "twitter:description", content: "AI diagnosis, one standardized scope, comparable quotes, booking and a permanent proof record for every job." },
-      { name: "twitter:image", content: OG_IMAGE },
     ],
     links: [{ rel: "canonical", href: SITE_URL + "/" }],
   }),
@@ -448,8 +444,8 @@ export function Footer({ footerRef }: { footerRef?: React.RefObject<HTMLElement 
             ))}
           </div>
           <div className="mt-5 space-y-1.5 text-xs">
-            <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-primary" /> hello@snapit.app</div>
-            <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-primary" /> +1 (415) 555-SNAP</div>
+            <div className="flex items-center gap-2"><Mail className="h-3.5 w-3.5 text-primary" /> hello@getperfectboy.com</div>
+            <div className="flex items-center gap-2"><Phone className="h-3.5 w-3.5 text-primary" /> +1 (415) 1 (888) 555-0142</div>
             <div className="flex items-center gap-2"><MapPinIcon className="h-3.5 w-3.5 text-primary" /> San Francisco, CA</div>
           </div>
         </div>
