@@ -37,7 +37,7 @@ function TopBar() {
         <Logo />
         <nav className="hidden items-center gap-1 text-sm font-medium text-muted-foreground md:flex">
           <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-primary hover:bg-primary/5 transition-colors">
-            <Camera className="h-4 w-4" /> Snap
+            <Camera className="h-4 w-4" /> Show us
           </Link>
           <Link to="/emergency" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[color:var(--color-accent)] hover:bg-[color:var(--color-accent)]/10 transition-colors">
             <ShieldAlert className="h-4 w-4" /> Emergency
@@ -45,7 +45,7 @@ function TopBar() {
           <Link to="/history" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">
             <History className="h-4 w-4" /> History
           </Link>
-          <Link to="/categories" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Services</Link>
+          <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">All Services</Link>
           <Link to="/search" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Find a Pro</Link>
           <Link to="/provider-dashboard" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">For Providers</Link>
           <Link to="/dashboard" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Dashboard</Link>
@@ -118,8 +118,8 @@ function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const items = [
     { to: "/", label: "Home", icon: Home },
-    { to: "/search", label: "Search", icon: Search },
-    { to: "/snap", label: "Snap", icon: Camera, highlight: true },
+    { to: "/services", label: "Services", icon: Search },
+    { to: "/snap", label: "Show us", icon: Camera, highlight: true },
     { to: "/history", label: "History", icon: History },
     { to: "/dashboard", label: "Profile", icon: User, hash: "profile" },
   ];
