@@ -32,6 +32,14 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
+/** Beauty & personal care is a headline GPB category, so it is hoisted into the first row. */
+const homepageCategories = (() => {
+  const list = [...popularCategories];
+  const i = list.findIndex((c) => c.slug === "beauty-at-home");
+  if (i > 0) list.unshift(list.splice(i, 1)[0]!);
+  return list.slice(0, 12);
+})();
+
 function Landing() {
   const navigate = useNavigate();
   const [location, setLocation] = useState("");
@@ -159,7 +167,7 @@ function Landing() {
           cta={{ label: `All ${TOTAL_SERVICES}+ services`, to: "/services" }}
         />
         <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-5">
-          {popularCategories.slice(0, 10).map((cat) => {
+          {homepageCategories.map((cat) => {
             const Icon = cat.icon;
             return (
               <Link
