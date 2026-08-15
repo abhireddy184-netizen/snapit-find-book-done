@@ -33,6 +33,8 @@ const CATEGORY_SCENES: Record<string, string> = {
 
 /** "categorySlug/serviceSlug" -> scene, for sub-services worth their own image. */
 const SERVICE_SCENES: Record<string, string> = {
+  "plumbing/drain-clearing": plumbing,
+  "cleaning/standard-cleaning": cleaning,
   "beauty-at-home/pedicure": pedicure,
   "appliances/refrigerator-repair": appliances,
   "auto-mobile/mobile-car-detailing": auto,
@@ -48,5 +50,5 @@ export function categoryScene(categorySlug: string): string | undefined {
 }
 
 export function serviceScene(categorySlug: string, serviceSlug: string): string | undefined {
-  return SERVICE_SCENES[`${categorySlug}/${serviceSlug}`] ?? CATEGORY_SCENES[categorySlug];
+  return SERVICE_SCENES[`${categorySlug}/${serviceSlug}`];
 }
