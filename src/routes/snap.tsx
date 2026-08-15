@@ -34,6 +34,7 @@ import { providers, categories, type Provider } from "@/lib/snapit-data";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
 import { useAuth } from "@/lib/auth";
 import { createJobFromAnalysis } from "@/lib/jobs";
+import { prepareMediaForAnalysis, withTimeout } from "@/lib/snap-media";
 import {
   BadgeCheck,
   Lock,
@@ -41,6 +42,9 @@ import {
   Tag,
   Users,
 } from "lucide-react";
+
+/** Hard ceiling for a single AI diagnosis request before we bail out. */
+const ANALYSIS_TIMEOUT_MS = 40_000;
 
 export const Route = createFileRoute("/snap")({
   head: () => ({
@@ -68,56 +72,124 @@ function SnapPage() {
   const [analysis, setAnalysis] = useState<SnapAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"idle" | "preparing" | "analyzing">("idle");
+  const [pendingPreview, setPendingPreview] = useState<string | null>(null);
   const analyze = useServerFn(analyzeSnap);
   const cameraRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
   const uploadRef = useRef<HTMLInputElement>(null);
+  // Monotonic token: only the newest run is allowed to write state.
+  const runRef = useRef(0);
+  const busyRef = useRef(false);
   const [recent, setRecent] = useState<SnapHistoryEntry[]>([]);
   useEffect(() => {
     setRecent(loadHistory().slice(0, 4));
   }, [analysis]);
+  useEffect(() => () => {
+    // Invalidate any in-flight run when the page unmounts.
+    runRef.current += 1;
+  }, []);
+  // Release the temporary preview blob URL whenever it's replaced or cleared.
+  useEffect(() => {
+    if (!pendingPreview) return;
+    return () => URL.revokeObjectURL(pendingPreview);
+  }, [pendingPreview]);
 
-  const handleFile = async (file: File, kind: "photo" | "video" | "upload") => {
-    setError(null);
-    setAnalysis(null);
-    // For videos, capture a thumbnail frame; for images use directly
-    const dataUrl = file.type.startsWith("video/")
-      ? await extractVideoFrame(file)
-      : await fileToDataUrl(file);
-    setImage(dataUrl);
-    setMediaKind(kind);
-    // Immediately kick off AI analysis — premium instant feel
-    setLoading(true);
+  const runDiagnosis = async (dataUrl: string, noteText: string, token: number) => {
+    setPhase("analyzing");
     try {
-      const result = await analyze({ data: { imageDataUrl: dataUrl, note: "" } });
+      const result = await withTimeout(
+        analyze({ data: { imageDataUrl: dataUrl, note: noteText } }),
+        ANALYSIS_TIMEOUT_MS,
+        "The AI is taking longer than usual. Please retry or retake the photo.",
+      );
+      if (runRef.current !== token) return;
       setAnalysis(result);
     } catch (e) {
+      if (runRef.current !== token) return;
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
-      setLoading(false);
+      if (runRef.current === token) {
+        setLoading(false);
+        setPhase("idle");
+        setPendingPreview(null);
+      }
+      if (runRef.current === token) busyRef.current = false;
     }
+  };
+
+  const handleFile = async (file: File, kind: "photo" | "video" | "upload") => {
+    if (busyRef.current) return; // no duplicate concurrent runs
+    busyRef.current = true;
+    const token = ++runRef.current;
+    setError(null);
+    setAnalysis(null);
+    setImage(null);
+    setMediaKind(kind);
+    setNote("");
+    // Show the working state immediately — no dead period after capture.
+    setLoading(true);
+    setPhase("preparing");
+    setPendingPreview(file.type.startsWith("video/") ? null : URL.createObjectURL(file));
+
+    let dataUrl: string;
+    try {
+      dataUrl = await prepareMediaForAnalysis(file);
+    } catch (e) {
+      if (runRef.current === token) {
+        setError(e instanceof Error ? e.message : "We couldn't prepare that file. Please try again.");
+        setLoading(false);
+        setPhase("idle");
+        setPendingPreview(null);
+        setMediaKind(null);
+      }
+      busyRef.current = false;
+      return;
+    }
+    if (runRef.current !== token) {
+      busyRef.current = false;
+      return;
+    }
+    setImage(dataUrl);
+    await runDiagnosis(dataUrl, "", token);
   };
 
   const runAnalysis = async () => {
-    if (!image) return;
+    if (!image || busyRef.current) return;
+    busyRef.current = true;
+    const token = ++runRef.current;
     setLoading(true);
     setError(null);
-    try {
-      const result = await analyze({ data: { imageDataUrl: image, note } });
-      setAnalysis(result);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    await runDiagnosis(image, note, token);
+  };
+
+  /** Abandon any in-flight work and go back to a usable screen. */
+  const cancelAnalysis = () => {
+    runRef.current += 1;
+    busyRef.current = false;
+    setLoading(false);
+    setPhase("idle");
+    setPendingPreview(null);
   };
 
   const reset = () => {
+    runRef.current += 1;
+    busyRef.current = false;
     setImage(null);
     setMediaKind(null);
     setNote("");
     setAnalysis(null);
     setError(null);
+    setLoading(false);
+    setPhase("idle");
+    setPendingPreview(null);
+  };
+
+  // Clearing the input value lets the user pick the exact same file again.
+  const onPick = (kind: "photo" | "video" | "upload") => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (file) void handleFile(file, kind);
   };
 
   return (
@@ -132,6 +204,32 @@ function SnapPage() {
             Show us what's going on. Our AI identifies the service, estimates the cost and builds a standardized job scope and matches you with pros nearby.
           </p>
         </div>
+
+        {/* Hidden inputs stay mounted for every state so Retake works from
+            the review, error and result screens too. */}
+        <input
+          ref={cameraRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={onPick("photo")}
+        />
+        <input
+          ref={videoRef}
+          type="file"
+          accept="video/*"
+          capture="environment"
+          className="hidden"
+          onChange={onPick("video")}
+        />
+        <input
+          ref={uploadRef}
+          type="file"
+          accept="image/*,video/*"
+          className="hidden"
+          onChange={onPick("upload")}
+        />
 
         {!image && (
           <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -153,29 +251,27 @@ function SnapPage() {
               hint="Choose an image"
               onClick={() => uploadRef.current?.click()}
             />
-            <input
-              ref={cameraRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0], "photo")}
-            />
-            <input
-              ref={videoRef}
-              type="file"
-              accept="video/*"
-              capture="environment"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0], "video")}
-            />
-            <input
-              ref={uploadRef}
-              type="file"
-              accept="image/*,video/*"
-              className="hidden"
-              onChange={(e) => e.target.files?.[0] && handleFile(e.target.files[0], "upload")}
-            />
+          </div>
+        )}
+
+        {!image && error && (
+          <div className="mt-4 rounded-2xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+            <p className="font-semibold">We couldn't finish that</p>
+            <p className="mt-1 text-destructive/90">{error}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                onClick={() => cameraRef.current?.click()}
+                className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground"
+              >
+                <Camera className="h-3.5 w-3.5" /> Retake photo
+              </button>
+              <button
+                onClick={() => uploadRef.current?.click()}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-bold"
+              >
+                <Upload className="h-3.5 w-3.5" /> Choose another
+              </button>
+            </div>
           </div>
         )}
 
@@ -217,8 +313,12 @@ function SnapPage() {
           </div>
         )}
 
-        {loading && image && (
-          <ScanningOverlay image={image} />
+        {loading && (
+          <ScanningOverlay
+            image={image ?? pendingPreview}
+            phase={phase}
+            onCancel={cancelAnalysis}
+          />
         )}
 
         {analysis && image && (
@@ -229,9 +329,17 @@ function SnapPage() {
   );
 }
 
-function ScanningOverlay({ image }: { image: string }) {
+function ScanningOverlay({
+  image,
+  phase,
+  onCancel,
+}: {
+  image: string | null;
+  phase: "idle" | "preparing" | "analyzing";
+  onCancel: () => void;
+}) {
   const steps = [
-    "Uploading image…",
+    "Preparing your photo…",
     "AI is analyzing the problem…",
     "Identifying the service…",
     "Estimating repair cost…",
@@ -240,6 +348,7 @@ function ScanningOverlay({ image }: { image: string }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [progress, setProgress] = useState(6);
   useEffect(() => {
+    if (phase === "preparing") return;
     const stepTimer = setInterval(() => {
       setStepIndex((i) => (i < steps.length - 1 ? i + 1 : i));
     }, 1200);
@@ -250,13 +359,13 @@ function ScanningOverlay({ image }: { image: string }) {
       clearInterval(stepTimer);
       clearInterval(progressTimer);
     };
-  }, [steps.length]);
+  }, [steps.length, phase]);
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden animate-fade-in">
       {/* Ambient blurred image + gradient wash */}
       <div
         className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl opacity-60"
-        style={{ backgroundImage: `url(${image})` }}
+        style={image ? { backgroundImage: `url(${image})` } : undefined}
       />
       <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, oklch(0.274 0.084 322 / 0.88), oklch(0.45 0.19 350 / 0.78) 60%, oklch(0.274 0.084 322 / 0.92))" }} />
       {/* Floating orbs */}
@@ -265,7 +374,13 @@ function ScanningOverlay({ image }: { image: string }) {
 
       <div className="relative mx-4 w-full max-w-md rounded-[28px] border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-2xl animate-scale-in">
         <div className="relative overflow-hidden rounded-2xl border border-white/20">
-          <img src={image} alt="Analyzing" className="h-64 w-full object-cover" />
+          {image ? (
+            <img src={image} alt="Analyzing" className="h-64 w-full object-cover" />
+          ) : (
+            <div className="grid h-64 w-full place-items-center bg-plum/40">
+              <Loader2 className="h-8 w-8 animate-spin text-white/80" />
+            </div>
+          )}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 animate-[scanline_1.8s_ease-in-out_infinite]" style={{ background: "var(--gradient-primary)", boxShadow: "0 0 32px color-mix(in oklab, var(--primary) 85%, transparent)" }} />
           <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-primary/30 mix-blend-overlay" />
           {/* Corner brackets */}
@@ -285,7 +400,9 @@ function ScanningOverlay({ image }: { image: string }) {
             <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white/80">
               <Sparkles className="h-3.5 w-3.5" /> SnapIt AI
             </div>
-            <div className="mt-1 text-lg font-black text-white">Diagnosing your problem</div>
+            <div className="mt-1 text-lg font-black text-white">
+              {phase === "preparing" ? "Preparing your photo" : "Diagnosing your problem"}
+            </div>
           </div>
           <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white/15">
             <div
@@ -317,6 +434,17 @@ function ScanningOverlay({ image }: { image: string }) {
               );
             })}
           </div>
+          <button
+            type="button"
+            onClick={onCancel}
+            data-testid="snap-cancel"
+            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+          >
+            <X className="h-4 w-4" /> Cancel
+          </button>
+          <p className="mt-2 text-center text-[11px] text-white/60">
+            This usually takes a few seconds. You can cancel any time.
+          </p>
         </div>
         <style>{`@keyframes scanline{0%{transform:translateY(0)}50%{transform:translateY(216px)}100%{transform:translateY(0)}}`}</style>
       </div>
@@ -943,40 +1071,6 @@ function Stat({
       {hint && <div className="mt-1 text-xs text-muted-foreground line-clamp-2">{hint}</div>}
     </div>
   );
-}
-
-function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const r = new FileReader();
-    r.onload = () => resolve(String(r.result));
-    r.onerror = reject;
-    r.readAsDataURL(file);
-  });
-}
-
-function extractVideoFrame(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const video = document.createElement("video");
-    video.preload = "metadata";
-    video.muted = true;
-    video.playsInline = true;
-    video.src = url;
-    video.onloadeddata = () => {
-      video.currentTime = Math.min(1, video.duration / 2);
-    };
-    video.onseeked = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = video.videoWidth || 640;
-      canvas.height = video.videoHeight || 480;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return reject(new Error("Canvas unavailable"));
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      URL.revokeObjectURL(url);
-      resolve(canvas.toDataURL("image/jpeg", 0.85));
-    };
-    video.onerror = () => reject(new Error("Could not read video"));
-  });
 }
 
 // Placeholder so ArrowRight import isn't unused when adjusting the layout later.
