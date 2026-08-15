@@ -1,3 +1,4 @@
+import * as React from "react";
 import { useEffect, useState } from "react";
 
 type Pro = {
@@ -10,7 +11,7 @@ type Pro = {
   outfitDark: string;
   accent: string;
   hair: string;
-  Figure: (p: { skin: string; outfit: string; outfitDark: string; accent: string; hair: string }) => JSX.Element;
+  Figure: (p: { skin: string; outfit: string; outfitDark: string; accent: string; hair: string }) => React.ReactElement;
 };
 
 /* ---------- shared silhouette pieces ---------- */

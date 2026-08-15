@@ -5,6 +5,7 @@ import { MapPin, Search, Star, ShieldCheck, Clock, Sparkles, ArrowRight, CheckCi
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
 import { JourneyRail, InputModes, RoomStory, ProVerticals, SectionConnector, SectionBridge } from "@/components/snapit/HomeStory";
+import { ProsOnTheMove } from "@/components/snapit/ProsOnTheMove";
 import { providers } from "@/lib/snapit-data";
 import { catalog, popularCategories, TOTAL_SERVICES } from "@/lib/catalog";
 import { cn } from "@/lib/utils";
