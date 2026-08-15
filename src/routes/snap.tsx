@@ -916,8 +916,16 @@ function AnalysisView({
         </div>
       </div>
 
+      </>
+      )}
+
       <div className="flex flex-col gap-2 rounded-2xl border border-border/60 bg-muted/40 p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="text-xs text-muted-foreground">
+          {showPricing
+            ? "Estimates are AI-generated — the final price is confirmed by your pro after inspection."
+            : "No price shown yet — GPB avoids guessing a price until we understand the job."}
+        </div>
+        <div className="hidden">
           Diagnosis is an estimate — the final price is confirmed by your pro after inspection.
         </div>
         <div className="flex flex-wrap gap-2">
