@@ -30,6 +30,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as ServicesCategoryIndexRouteImport } from './routes/services.$category.index'
 import { Route as ServicesCategoryServiceRouteImport } from './routes/services.$category.$service'
 import { Route as AuthenticatedJobIdRouteImport } from './routes/_authenticated/job.$id'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -136,6 +137,12 @@ const AuthenticatedJobIdRoute = AuthenticatedJobIdRouteImport.update({
   path: '/job/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category/': typeof ServicesCategoryIndexRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -179,6 +187,7 @@ export interface FileRoutesByTo {
   '/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category': typeof ServicesCategoryIndexRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -203,6 +212,7 @@ export interface FileRoutesById {
   '/_authenticated/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category/': typeof ServicesCategoryIndexRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/job/$id'
     | '/services/$category/$service'
     | '/services/$category/'
+    | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/job/$id'
     | '/services/$category/$service'
     | '/services/$category'
+    | '/lovable/email/transactional/preview'
   id:
     | '__root__'
     | '/'
@@ -271,6 +283,7 @@ export interface FileRouteTypes {
     | '/_authenticated/job/$id'
     | '/services/$category/$service'
     | '/services/$category/'
+    | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -289,6 +302,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   ProviderIdRoute: typeof ProviderIdRoute
   TrackingIdRoute: typeof TrackingIdRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -440,6 +454,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJobIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -490,6 +511,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   ProviderIdRoute: ProviderIdRoute,
   TrackingIdRoute: TrackingIdRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
