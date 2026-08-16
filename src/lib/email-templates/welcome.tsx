@@ -36,6 +36,9 @@ const Email = ({ siteUrl = SITE_URL }: Props) => (
         </Button>
         <Hr style={hr} />
         <Text style={footer}>
+          GPB / GetPerfectBoy.com
+        </Text>
+        <Text style={footer}>
           You&apos;re receiving this because you subscribed on GetPerfectBoy.com.
         </Text>
       </Container>
