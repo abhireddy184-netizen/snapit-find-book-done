@@ -1,9 +1,10 @@
 // Server-only: subscription persistence + welcome email delivery.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { sendTemplateEmail } from "@/lib/email-templates/send-email";
 
 export type SubscribeOutcome = {
   status: "subscribed" | "already_subscribed" | "resubscribed";
-  emailDelivery: "sent" | "unconfigured" | "failed";
+  emailDelivery: "sent" | "skipped" | "suppressed" | "failed";
 };
 
 export function normalizeEmail(raw: string): string {
@@ -53,7 +54,7 @@ export async function subscribeEmail(rawEmail: string, source: string): Promise<
   }
 
   const emailDelivery =
-    status === "already_subscribed" ? "unconfigured" : await sendWelcomeEmail(email, token);
+    status === "already_subscribed" ? "skipped" : await sendWelcomeEmail(email, existing?.id ?? email);
 
   return { status, emailDelivery };
 }
@@ -69,54 +70,18 @@ export async function unsubscribeByToken(token: string): Promise<"unsubscribed" 
   return data && data.length > 0 ? "unsubscribed" : "not_found";
 }
 
-async function sendWelcomeEmail(email: string, token: string): Promise<"sent" | "unconfigured" | "failed"> {
-  const apiKey = process.env["RESEND_API_KEY"];
-  const from = process.env["GPB_FROM_EMAIL"] || "GPB <info@getperfectboy.com>";
-  if (!apiKey) {
-    console.warn("[subscribe] Welcome email pending: RESEND_API_KEY is not configured.");
-    return "unconfigured";
-  }
-
-  const unsubscribeUrl = `${SITE_URL}/unsubscribe?token=${token}`;
+async function sendWelcomeEmail(
+  email: string,
+  subscriberId: string,
+): Promise<"sent" | "suppressed" | "failed"> {
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from,
-        to: [email],
-        reply_to: "info@getperfectboy.com",
-        subject: "Welcome to GPB 👋",
-        html: welcomeHtml(unsubscribeUrl),
-      }),
+    const result = await sendTemplateEmail("welcome", email, {
+      templateData: { siteUrl: SITE_URL },
+      idempotencyKey: `welcome-${subscriberId}`,
     });
-    if (!res.ok) {
-      console.error(`[subscribe] Welcome email failed with status ${res.status}`);
-      return "failed";
-    }
-    return "sent";
-  } catch {
-    console.error("[subscribe] Welcome email request threw.");
+    return result.sent ? "sent" : "suppressed";
+  } catch (error) {
+    console.error("[subscribe] Welcome email failed:", error);
     return "failed";
   }
-}
-
-function welcomeHtml(unsubscribeUrl: string): string {
-  return `<!doctype html><html><body style="margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#2b1030">
-  <div style="max-width:520px;margin:0 auto;padding:32px 24px">
-    <div style="font-size:28px;font-weight:800;letter-spacing:-.02em">GPB</div>
-    <div style="font-size:13px;font-weight:700;color:#6b5b6e;margin-top:2px">GetPerfectBoy.com</div>
-    <h1 style="font-size:22px;margin:24px 0 8px">Show it. We'll handle the rest.</h1>
-    <p style="font-size:15px;line-height:1.6;color:#4a3550">
-      Thanks for joining GPB. We'll keep you updated on launches, new services and important GPB updates.
-    </p>
-    <p style="margin-top:28px">
-      <a href="${SITE_URL}" style="display:inline-block;background:#e6187f;color:#ffffff;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:700;font-size:14px">Explore GPB</a>
-    </p>
-    <hr style="border:none;border-top:1px solid #ece5ef;margin:32px 0 16px" />
-    <p style="font-size:12px;color:#8a7c8e">
-      You're receiving this because you subscribed on GetPerfectBoy.com.
-      <a href="${unsubscribeUrl}" style="color:#8a7c8e">Unsubscribe</a>.
-    </p>
-  </div></body></html>`;
 }
