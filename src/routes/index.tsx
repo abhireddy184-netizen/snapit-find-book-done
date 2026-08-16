@@ -255,7 +255,11 @@ export function Footer() {
         setMessage("You're already subscribed — thanks for being with GPB.");
       } else {
         setState("success");
-        setMessage("You're subscribed. Check your inbox for a welcome note.");
+        setMessage(
+          res.emailDelivery === "sent"
+            ? "You're subscribed. Check your inbox for a welcome note."
+            : "You're subscribed. We couldn't send the welcome email right now, but you're on the list.",
+        );
         setEmail("");
       }
     } catch {
