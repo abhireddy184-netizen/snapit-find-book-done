@@ -304,15 +304,27 @@ function BusinessProfile() {
     await queryClient.invalidateQueries({ queryKey: ["provider-profile", user.id] });
   }
 
-  const verified = data?.verification_status === "verified";
+  const status = data?.verification_status ?? "unverified";
+  const verified = status === "verified";
   if (isLoading) return <Loading />;
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
       <form onSubmit={save} className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm">
-        <h2 className="text-lg font-black">Business profile</h2>
-        <p className="mt-1 text-sm text-muted-foreground">This is what customers will see once provider listings go live.</p>
+        <div className="flex items-center gap-3">
+          <GpbMark />
+          <div>
+            <h2 className="text-lg font-black">Business profile</h2>
+            <p className="text-sm text-muted-foreground">This is what customers will see once provider listings go live.</p>
+          </div>
+        </div>
+        {prefillNote && (
+          <p className="mt-4 rounded-xl border border-primary/25 bg-primary/5 px-3 py-2 text-xs font-medium text-primary">
+            {prefillNote}
+          </p>
+        )}
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
+
           <Input label="Business name" value={form.business_name} onChange={(v) => setForm({ ...form, business_name: v })} placeholder="Rivera Plumbing Co." />
           <Select label="Service category" value={form.service_category} onChange={(v) => setForm({ ...form, service_category: v })} />
           <div>
