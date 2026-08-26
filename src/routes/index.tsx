@@ -46,32 +46,34 @@ function Landing() {
   return (
     <AppShell>
       {/* Hero — brand lockup, search, camera-first visual */}
-      <section className="fade-up relative overflow-hidden rounded-[26px] border border-border/50 px-4 py-6 sm:rounded-[30px] sm:px-6 sm:py-8 lg:px-10 lg:py-10" style={{ backgroundColor: "color-mix(in oklab, var(--card) 92%, var(--background))" }}>
+      <section className="gpb-bleed fade-up relative -mt-4 overflow-hidden border-b border-border/50 py-8 sm:py-10 lg:py-16 xl:py-20 md:-mt-6" style={{ backgroundColor: "color-mix(in oklab, var(--card) 92%, var(--background))" }}>
         <div
-          className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full opacity-20 blur-3xl"
+          className="pointer-events-none absolute -right-24 -top-28 h-[26rem] w-[26rem] rounded-full opacity-20 blur-3xl"
           style={{ background: "var(--gradient-primary)" }}
           aria-hidden="true"
         />
-        <div className="relative grid items-center gap-7 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+        <div className="gpb-shell relative grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 xl:gap-20">
+
           <div className="min-w-0">
             <div className="flex flex-col items-start">
               <Wordmark size="clamp(2.6rem, 9vw, 3.6rem)" />
               <span className="mt-1 text-sm font-bold tracking-tight text-foreground sm:text-base">GetPerfectBoy.com</span>
             </div>
 
-            <h1 className="mt-4 max-w-[15ch] text-[2rem] font-black leading-[1.06] tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+            <h1 className="mt-4 max-w-[16ch] text-[clamp(2rem,5.2vw,4rem)] font-black leading-[1.05] tracking-tight text-foreground">
               Show it. <span className="text-gradient-hero">We'll handle the rest.</span>
             </h1>
-            <p className="mt-2.5 max-w-[46ch] text-sm text-muted-foreground">
+            <p className="mt-3 max-w-[52ch] text-[clamp(0.9rem,1.15vw,1.125rem)] text-muted-foreground">
               Show GPB a photo, video or description and we'll route you to the right service.
             </p>
+
 
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 void navigate({ to: "/search", search: { q: service.trim(), loc: location.trim() } });
               }}
-              className="mt-5 grid gap-2 rounded-[20px] border border-border/60 bg-card p-2 shadow-lg sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_auto] sm:gap-2.5 sm:rounded-full sm:p-2"
+              className="mt-6 grid max-w-2xl gap-2 rounded-[20px] border border-border/60 bg-card p-2 shadow-lg sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_auto] sm:gap-2.5 sm:rounded-full sm:p-2"
             >
               <div className="min-w-0">
               <LocationAutocomplete
@@ -131,7 +133,7 @@ function Landing() {
           </div>
 
           {/* Camera-first visual */}
-          <div className="relative mx-auto w-full max-w-[300px] lg:max-w-[340px]">
+          <div className="relative mx-auto w-full max-w-[300px] lg:max-w-[360px] xl:max-w-[420px]">
             <div className="relative overflow-hidden rounded-[30px] border-[6px] border-foreground/85 bg-foreground/85 shadow-[var(--shadow-elevated)]">
               <div className="relative aspect-[9/14] w-full overflow-hidden rounded-[24px] bg-muted">
                 <img

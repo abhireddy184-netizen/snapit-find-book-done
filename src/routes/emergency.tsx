@@ -54,7 +54,7 @@ function EmergencyPage() {
 
       <section className="mt-8">
         <h2 className="text-lg font-black">What's happening?</h2>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {emergencyTypes.map((t) => (
             <Link
               key={t.slug}
