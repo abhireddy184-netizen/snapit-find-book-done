@@ -17,9 +17,12 @@ type Props = {
   fieldClassName?: string;
   showIcon?: boolean;
   required?: boolean;
+  /** Set when the parent already renders its own invalid-ZIP message. */
+  suppressInvalidMessage?: boolean;
   id?: string;
   "aria-label"?: string;
 };
+
 
 export function LocationAutocomplete({
   value,
