@@ -290,8 +290,10 @@ function BusinessProfile() {
       service_radius_miles: radius,
       starting_price: form.starting_price ? Number(form.starting_price) : null,
       availability: form.availability || null,
+      phone: form.phone.trim() || null,
       bio: form.bio || null,
     };
+
     const { error: upsertError } = await supabase.from("provider_profiles").upsert(payload, { onConflict: "user_id" });
     setSaving(false);
     if (upsertError) {
