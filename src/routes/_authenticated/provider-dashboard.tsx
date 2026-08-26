@@ -404,18 +404,11 @@ function BusinessProfile() {
   );
 }
 
-/** Small GPB monogram used to badge dashboard sections. */
+/** The real GPB app icon, reused to badge dashboard sections. */
 function GpbMark() {
-  return (
-    <span
-      aria-hidden
-      className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-[11px] font-black tracking-tight text-white shadow-sm"
-      style={{ background: "var(--gradient-primary)" }}
-    >
-      GPB
-    </span>
-  );
+  return <BrandMark size={36} aria-hidden />;
 }
+
 
 function VerificationCard({ status, verified, hasProfile }: { status: string; verified: boolean; hasProfile: boolean }) {
   const steps = [
