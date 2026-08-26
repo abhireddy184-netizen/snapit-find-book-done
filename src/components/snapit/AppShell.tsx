@@ -12,12 +12,13 @@ export function AppShell({ children, hideBottomNav = false }: { children: ReactN
       <TopBar />
       <main
         className={cn(
-          "mx-auto w-full max-w-6xl px-4 pt-4 sm:px-6 md:pt-6 lg:px-8 xl:max-w-7xl",
+          "gpb-shell pt-4 md:pt-6",
           hideBottomNav ? "pb-10 md:pb-16" : "pb-[calc(7.5rem+env(safe-area-inset-bottom))] md:pb-16"
         )}
       >
         {children}
       </main>
+
       {!hideBottomNav && <BottomNav />}
     </div>
   );
