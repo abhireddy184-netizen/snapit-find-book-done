@@ -73,7 +73,7 @@ function Landing() {
                 e.preventDefault();
                 void navigate({ to: "/search", search: { q: service.trim(), loc: location.trim() } });
               }}
-              className="mt-5 grid gap-2 rounded-[20px] border border-border/60 bg-card p-2 shadow-lg sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_auto] sm:gap-2.5 sm:rounded-full sm:p-2"
+              className="mt-6 grid max-w-2xl gap-2 rounded-[20px] border border-border/60 bg-card p-2 shadow-lg sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_auto] sm:gap-2.5 sm:rounded-full sm:p-2"
             >
               <div className="min-w-0">
               <LocationAutocomplete
