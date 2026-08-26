@@ -320,13 +320,44 @@ export function Footer() {
             ))}
           </div>
         </div>
-        <FooterCol title="Company" links={["About", "Careers", "Press", "Blog"]} />
+        <div>
+          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">Get started</div>
+          <ul className="space-y-2">
+            <li>
+              <a
+                href="/#early-access"
+                id="footer-early-access-link"
+                data-analytics-id="early_access_cta"
+                data-analytics-location="footer"
+                className="font-semibold text-primary hover:underline"
+              >
+                Early Access
+              </a>
+            </li>
+            <li>
+              <Link
+                to="/provider-interest"
+                id="footer-for-pros-link"
+                data-analytics-id="provider_interest_cta"
+                data-analytics-location="footer"
+                className="hover:text-foreground"
+              >
+                For Pros
+              </Link>
+            </li>
+            <li><Link to="/snap" data-analytics-id="show_gpb_cta" data-analytics-location="footer" className="hover:text-foreground">Show GPB</Link></li>
+            <li><Link to="/services" className="hover:text-foreground">All services</Link></li>
+          </ul>
+        </div>
         <FooterCol title="Support" links={["Help center", "Contact", "Trust & safety", "Cancellation"]} />
         <div className="min-w-0">
-          <div className="mb-2 text-xs font-bold uppercase tracking-wider text-foreground">Get GPB updates</div>
+          <div className="mb-2 text-xs font-bold uppercase tracking-wider text-foreground">Newsletter</div>
           <p className="mb-3 text-[11px] leading-relaxed">
-            GPB updates, new services and launch news. Unsubscribe anytime.
+            General GPB news and new services — this is not the early access list.{" "}
+            <a href="/#early-access" className="font-semibold text-primary hover:underline">Join early access</a> to
+            be notified when pros go live near you. Unsubscribe anytime.
           </p>
+
           <form
             onSubmit={submit}
             noValidate
