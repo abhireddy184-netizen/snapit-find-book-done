@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { CalendarDays, User, Wrench, Check, X, Loader2, MapPin, LogOut, ShieldAlert, Inbox, ShieldCheck, Clock3, BadgeCheck } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { Wordmark } from "@/components/snapit/Logo";
+
 import { useAuth } from "@/lib/auth";
 import { fetchProviderBookings, fetchMyProviderProfile, formatBookingDate, type Booking } from "@/lib/bookings";
 import { supabase } from "@/integrations/supabase/client";
