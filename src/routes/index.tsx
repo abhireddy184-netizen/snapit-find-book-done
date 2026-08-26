@@ -46,13 +46,14 @@ function Landing() {
   return (
     <AppShell>
       {/* Hero — brand lockup, search, camera-first visual */}
-      <section className="fade-up relative overflow-hidden rounded-[26px] border border-border/50 px-4 py-6 sm:rounded-[30px] sm:px-6 sm:py-8 lg:px-10 lg:py-10" style={{ backgroundColor: "color-mix(in oklab, var(--card) 92%, var(--background))" }}>
+      <section className="gpb-bleed fade-up relative -mt-4 overflow-hidden border-b border-border/50 py-8 sm:py-10 lg:py-16 xl:py-20 md:-mt-6" style={{ backgroundColor: "color-mix(in oklab, var(--card) 92%, var(--background))" }}>
         <div
-          className="pointer-events-none absolute -right-24 -top-28 h-72 w-72 rounded-full opacity-20 blur-3xl"
+          className="pointer-events-none absolute -right-24 -top-28 h-[26rem] w-[26rem] rounded-full opacity-20 blur-3xl"
           style={{ background: "var(--gradient-primary)" }}
           aria-hidden="true"
         />
-        <div className="relative grid items-center gap-7 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
+        <div className="relative grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 xl:gap-20">
+
           <div className="min-w-0">
             <div className="flex flex-col items-start">
               <Wordmark size="clamp(2.6rem, 9vw, 3.6rem)" />
