@@ -167,6 +167,10 @@ export type Database = {
           created_at: string
           full_name: string
           id: string
+          is_provider: boolean
+          phone: string | null
+          phone_e164: string | null
+          provider_since: string | null
           role: Database["public"]["Enums"]["app_role"]
           updated_at: string
         }
@@ -174,6 +178,10 @@ export type Database = {
           created_at?: string
           full_name?: string
           id: string
+          is_provider?: boolean
+          phone?: string | null
+          phone_e164?: string | null
+          provider_since?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
         }
@@ -181,6 +189,10 @@ export type Database = {
           created_at?: string
           full_name?: string
           id?: string
+          is_provider?: boolean
+          phone?: string | null
+          phone_e164?: string | null
+          provider_since?: string | null
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string
         }
@@ -346,6 +358,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      provider_services: {
+        Row: {
+          category_label: string
+          category_slug: string
+          created_at: string
+          id: string
+          is_primary: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category_label?: string
+          category_slug: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category_label?: string
+          category_slug?: string
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       service_requests: {
         Row: {
