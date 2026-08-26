@@ -331,6 +331,8 @@ function BusinessProfile() {
             <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Service ZIP code</span>
             <LocationAutocomplete
               mode="zip"
+              suppressInvalidMessage
+
               value={form.service_zip}
               onChange={(v: string) => setForm({ ...form, service_zip: v })}
               aria-label="Service ZIP code"
