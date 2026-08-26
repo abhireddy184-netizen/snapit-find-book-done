@@ -201,9 +201,23 @@ function BusinessProfile() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const claimInterest = useServerFn(claimProviderInterest);
+  const [prefillNote, setPrefillNote] = useState<string | null>(null);
   const { data, isLoading } = useQuery({
     queryKey: ["provider-profile", user?.id],
-    queryFn: () => fetchMyProviderProfile(user?.id as string),
+    queryFn: async () => {
+      // Carry a previous "Register your interest" submission (matched on the
+      // account email) into the business profile, without overwriting edits.
+      try {
+        const claim = await claimInterest({ data: undefined });
+        if (claim?.applied && claim.fields.length) {
+          setPrefillNote(`We pre-filled your ${claim.fields.join(", ")} from your provider interest registration. Review and save.`);
+        }
+      } catch {
+        /* continuity is best-effort — never block the profile */
+      }
+      return fetchMyProviderProfile(user?.id as string);
+    },
     enabled: Boolean(user?.id),
   });
 
@@ -215,6 +229,7 @@ function BusinessProfile() {
     service_radius_miles: "",
     starting_price: "",
     availability: "",
+    phone: "",
     bio: "",
   });
   const [saving, setSaving] = useState(false);
@@ -233,9 +248,11 @@ function BusinessProfile() {
       service_radius_miles: data.service_radius_miles != null ? String(data.service_radius_miles) : "",
       starting_price: data.starting_price != null ? String(data.starting_price) : "",
       availability: data.availability ?? "",
+      phone: data.phone ?? "",
       bio: data.bio ?? "",
     });
   }, [data]);
+
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
