@@ -436,3 +436,28 @@
   }
   .walk-across { transform: translateX(38%); opacity: 1; }
 }
+
+/* ---- Fluid layout system -------------------------------------------------
+ * gpb-shell: the single page container. Fluid gutters that grow with the
+ * viewport so content uses the full screen on laptop/desktop without ever
+ * touching the edges on mobile.
+ * gpb-bleed: lets a section span the full viewport width from inside the
+ * shell (used for immersive bands like the hero).
+ */
+@utility gpb-shell {
+  width: 100%;
+  margin-inline: auto;
+  max-width: 1560px;
+  padding-inline: clamp(1rem, 4vw, 4.5rem);
+}
+
+@utility gpb-bleed {
+  width: 100%;
+  margin-inline: calc(50% - 50vw);
+  padding-inline: calc(50vw - 50%);
+  max-width: 100vw;
+}
+
+@utility gpb-section {
+  margin-top: clamp(2.25rem, 5vw, 4.5rem);
+}
