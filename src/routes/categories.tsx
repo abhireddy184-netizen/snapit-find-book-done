@@ -23,7 +23,7 @@ function CategoriesPage() {
         <h1 className="text-3xl font-black md:text-4xl">Service categories</h1>
         <p className="mt-2 max-w-xl text-muted-foreground">{catalog.length} master categories covering {TOTAL_SERVICES} GPB services. Pick a category to see every sub-service.</p>
       </div>
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {catalog.map((cat) => {
           const Icon = cat.icon;
           return (

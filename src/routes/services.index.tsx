@@ -59,7 +59,7 @@ function AllServicesPage() {
           <h2 className="text-lg font-black">
             {results.length} match{results.length === 1 ? "" : "es"} for “{q.trim()}”
           </h2>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {results.map(({ category, service }) => (
               <ServiceRow key={`${category.slug}/${service.slug}`} categorySlug={category.slug} categoryName={category.name} slug={service.slug} name={service.name} blurb={service.blurb} price={formatPrice(service.priceLow, service.priceHigh)} />
             ))}
@@ -120,7 +120,7 @@ function AllServicesPage() {
                   View <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {cat.services.map((sv) => (
                   <ServiceRow
                     key={sv.slug}

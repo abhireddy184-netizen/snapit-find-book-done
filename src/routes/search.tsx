@@ -194,7 +194,7 @@ function SearchPage() {
         </section>
       )}
 
-      <div className="mt-8 grid gap-8 md:grid-cols-[240px_1fr]">
+      <div className="mt-8 grid gap-8 md:grid-cols-[240px_minmax(0,1fr)] xl:gap-10">
         <aside className="h-fit rounded-3xl border border-border/60 bg-card p-5 shadow-sm md:sticky md:top-20">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Browse all categories</div>
           <div className="mt-3 flex flex-wrap gap-1.5">
