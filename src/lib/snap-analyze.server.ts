@@ -1,4 +1,6 @@
 import { catalog } from "./catalog";
+import { matchServiceIntent, rankServices } from "./search-intent";
+
 
 export type IssueSource = "detected" | "possible" | "customer-described" | "insufficient";
 export type ResponseKind = "diagnosis" | "options" | "needs-info" | "no-issue" | "safety-redirect";
