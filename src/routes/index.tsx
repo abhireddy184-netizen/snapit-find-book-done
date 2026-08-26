@@ -52,7 +52,7 @@ function Landing() {
           style={{ background: "var(--gradient-primary)" }}
           aria-hidden="true"
         />
-        <div className="relative grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 xl:gap-20">
+        <div className="gpb-shell relative grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 xl:gap-20">
 
           <div className="min-w-0">
             <div className="flex flex-col items-start">
