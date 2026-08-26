@@ -71,7 +71,95 @@ const ALIASES: Record<string, string> = {
   "ceiling fan": "electrical/ceiling-fan-installation",
   "install ceiling fan": "electrical/ceiling-fan-installation",
   "pressure washing": "exterior-cleaning/pressure-washing",
+
+  /* Plumbing */
+  "drain cleaning": "plumbing/drain-clearing",
+  "drain clearing": "plumbing/drain-clearing",
+  "clogged drain": "plumbing/drain-clearing",
+  "blocked drain": "plumbing/drain-clearing",
+  "clogged sink": "plumbing/drain-clearing",
+  "slow drain": "plumbing/drain-clearing",
+  "unclog drain": "plumbing/drain-clearing",
+  "snake drain": "plumbing/drain-clearing",
+  "clogged toilet": "plumbing/toilet-repair",
+  "running toilet": "plumbing/toilet-repair",
+  "toilet leak": "plumbing/toilet-repair",
+  "leaky faucet": "plumbing/faucet-replacement",
+  "dripping faucet": "plumbing/faucet-replacement",
+  "tap leaking": "plumbing/faucet-replacement",
+  "faucet leak": "plumbing/faucet-replacement",
+  "no hot water": "plumbing/water-heater-service",
+  "hot water heater": "plumbing/water-heater-service",
+  "water heater": "plumbing/water-heater-service",
+  "garbage disposal": "plumbing/garbage-disposal-repair",
+  "burst pipe": "plumbing/pipe-repair",
+  "water leak": "plumbing/leak-detection",
+
+  /* Electrical */
+  "light installation": "electrical/light-fixture-installation",
+  "install light": "electrical/light-fixture-installation",
+  "install lights": "electrical/light-fixture-installation",
+  "light fitting": "electrical/light-fixture-installation",
+  "chandelier": "electrical/light-fixture-installation",
+  "pendant light": "electrical/light-fixture-installation",
+  "dead outlet": "electrical/outlet-switch-repair",
+  "outlet not working": "electrical/outlet-switch-repair",
+  "power outlet": "electrical/outlet-switch-repair",
+  "light switch": "electrical/outlet-switch-repair",
+  "breaker tripping": "electrical/outlet-switch-repair",
+  "ev charger": "electrical/ev-charger-installation",
+  "recessed lighting": "electrical/recessed-lighting",
+
+  /* Handyman */
+  "handyman": "handyman/handyman-hour",
+  "handy man": "handyman/handyman-hour",
+  "handywoman": "handyman/handyman-hour",
+  "odd jobs": "handyman/small-repairs",
+  "small repairs": "handyman/small-repairs",
+  "punch list": "handyman/handyman-hour",
+  "door repair": "handyman/door-alignment",
+  "sticking door": "handyman/door-alignment",
+  "cabinet repair": "handyman/cabinet-repair",
+  "caulking": "handyman/caulking",
+  "recaulk": "handyman/caulking",
+
+  /* HVAC */
+  "ac repair": "hvac/ac-repair",
+  "air conditioning repair": "hvac/ac-repair",
+  "aircon": "hvac/ac-repair",
+  "ac not cooling": "hvac/ac-repair",
+  "ac tune up": "hvac/ac-tune-up",
+  "furnace repair": "hvac/furnace-repair",
+  "no heat": "hvac/furnace-repair",
+  "thermostat": "hvac/thermostat-installation",
+
+  /* Appliances */
+  "washing machine repair": "appliances/washer-repair",
+  "washer repair": "appliances/washer-repair",
+  "dryer repair": "appliances/dryer-repair",
+  "dishwasher repair": "appliances/dishwasher-service",
+  "oven repair": "appliances/oven-range-repair",
+  "stove repair": "appliances/oven-range-repair",
+  "appliance installation": "appliances/appliance-installation",
+
+  /* Cleaning */
+  "deep cleaning": "cleaning/deep-cleaning",
+  "deep clean": "cleaning/deep-cleaning",
+  "house cleaning": "cleaning/standard-cleaning",
+  "home cleaning": "cleaning/standard-cleaning",
+  "maid": "cleaning/standard-cleaning",
+  "move out cleaning": "cleaning/move-in-out-cleaning",
+  "move in cleaning": "cleaning/move-in-out-cleaning",
+  "carpet cleaning": "carpet-upholstery-cleaning/carpet-cleaning",
+  "sofa cleaning": "carpet-upholstery-cleaning/upholstery-cleaning",
+  "couch cleaning": "carpet-upholstery-cleaning/upholstery-cleaning",
+
+  /* Mounting */
+  "shelf installation": "mounting-installation/shelf-installation",
+  "hang shelves": "mounting-installation/shelf-installation",
+  "hang mirror": "mounting-installation/mirror-hanging",
 };
+
 
 export function normalizeQuery(raw: string): string {
   let q = raw.toLowerCase().replace(/[^a-z0-9\s]+/g, " ").replace(/\s+/g, " ").trim();
