@@ -359,7 +359,9 @@ function BusinessProfile() {
           <Input label="Service area (description)" value={form.service_area} onChange={(v) => setForm({ ...form, service_area: v })} placeholder="Frisco, Plano & north Dallas" />
           <Input label="Starting price ($)" value={form.starting_price} onChange={(v) => setForm({ ...form, starting_price: v.replace(/[^0-9.]/g, "") })} placeholder="89" />
           <Input label="Availability" value={form.availability} onChange={(v) => setForm({ ...form, availability: v })} placeholder="Mon–Fri, 8am–6pm" />
+          <Input label="Contact phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v.slice(0, 40) })} placeholder="(214) 555-0142" />
         </div>
+
         <p className="mt-2 text-xs text-muted-foreground">
           Your ZIP and radius decide which customer searches you appear in. Leave them blank and you won’t show up in
           location-based results.
