@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, CheckCircle2, AlertCircle, Loader2, MapPin } from "lucide-react";
 import { AppShell, GradientButton } from "@/components/snapit/AppShell";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
-import { supabase } from "@/integrations/supabase/client";
+import { registerProviderInterest } from "@/lib/provider-interest.functions";
 import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
+
 
 export const Route = createFileRoute("/provider-interest")({
   head: () => ({
@@ -32,7 +34,9 @@ function ProviderInterestPage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
 
+  const submitInterest = useServerFn(registerProviderInterest);
   const resolved = useResolvedLocation(zip);
   const place = resolved.kind === "zip" ? resolved.place : null;
 
@@ -54,24 +58,28 @@ function ProviderInterestPage() {
       setBusy(false);
       return setError(`${zip.trim()} isn’t a recognized US ZIP code.`);
     }
-    const { error: insertError } = await supabase.from("provider_interest").insert({
-      full_name: fullName.trim().slice(0, 120),
-      email: email.trim().slice(0, 255),
-      phone: phone.trim() ? phone.trim().slice(0, 40) : null,
-      zip: zip.trim(),
-      city: resolvedPlace.city.slice(0, 120),
-      state: resolvedPlace.state.slice(0, 2),
-      category_slug: categorySlug,
-      category_label: category?.name.slice(0, 160) ?? "",
-      business_name: businessName.trim() ? businessName.trim().slice(0, 160) : null,
-      note: note.trim() ? note.trim().slice(0, 1000) : null,
-    });
-    setBusy(false);
-    if (insertError) {
+    try {
+      const result = await submitInterest({
+        data: {
+          fullName: fullName.trim(),
+          email: email.trim(),
+          phone: phone.trim() || null,
+          zip: zip.trim(),
+          city: resolvedPlace.city,
+          state: resolvedPlace.state,
+          categorySlug,
+          categoryLabel: category?.name ?? "",
+          businessName: businessName.trim() || null,
+          note: note.trim() || null,
+        },
+      });
+      setEmailSent(result.emailDelivery === "sent");
+      setDone(true);
+    } catch {
       setError("We couldn’t submit that just now. Please try again in a moment.");
-      return;
+    } finally {
+      setBusy(false);
     }
-    setDone(true);
   }
 
   if (done) {
@@ -84,10 +92,16 @@ function ProviderInterestPage() {
           <h1 className="mt-6 text-3xl font-black">You’re on the list</h1>
           <p className="mt-3 text-muted-foreground">
             You’re on the GPB provider interest list. We’ll contact you as onboarding opens in your area.
+            {emailSent ? " A confirmation email is on its way." : ""}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
             This isn’t an approval or a verification — it just tells us where to open next.
           </p>
+          <p className="mt-3 text-sm font-semibold">
+            Next step: create your provider account with <span className="text-primary">{email.trim().toLowerCase()}</span> and we’ll
+            carry these details into your business profile automatically.
+          </p>
+
           <div className="mt-6 flex flex-wrap justify-center gap-2">
             <Link to="/" className="rounded-full border border-border px-5 py-2.5 text-sm font-semibold hover:bg-muted">Back to home</Link>
             <Link
@@ -137,6 +151,8 @@ function ProviderInterestPage() {
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Service ZIP code</span>
               <LocationAutocomplete
                 mode="zip"
+                suppressInvalidMessage
+
                 value={zip}
                 onChange={setZip}
                 required
