@@ -203,6 +203,11 @@
     border-color: var(--color-border);
   }
 
+  html, body {
+    overflow-x: clip;
+    max-width: 100%;
+  }
+
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
@@ -211,6 +216,11 @@
     letter-spacing: -0.01em;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
+
+  img, video, canvas, svg {
+    max-width: 100%;
+  }
+
 
   h1, h2, h3, h4 {
     letter-spacing: -0.03em;
