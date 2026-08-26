@@ -93,13 +93,39 @@ function Landing() {
               </GradientButton>
             </form>
 
+            <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+              <a
+                href="#early-access"
+                id="hero-early-access-cta"
+                data-analytics-id="early_access_cta"
+                data-analytics-location="hero"
+                className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
+                style={{ background: "var(--gradient-primary)" }}
+              >
+                Get Early Access <ArrowRight className="h-4 w-4" />
+              </a>
+              <Link
+                to="/provider-interest"
+                id="hero-provider-interest-cta"
+                data-analytics-id="provider_interest_cta"
+                data-analytics-location="hero"
+                className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary/40 bg-card px-6 py-3.5 text-sm font-black text-primary transition-colors hover:bg-primary/5"
+              >
+                Join GPB as a Pro
+              </Link>
+            </div>
+
             <Link
               to="/snap"
-              className="pulse-soft mt-4 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
-              style={{ background: "var(--gradient-primary)" }}
+              id="hero-show-gpb-cta"
+              data-analytics-id="show_gpb_cta"
+              data-analytics-location="hero"
+              className="mt-3.5 inline-flex items-center gap-2 rounded-full border border-border/70 bg-card px-5 py-3 text-sm font-bold text-foreground shadow-sm transition-transform hover:scale-[1.02]"
             >
-              <Camera className="h-5 w-5" /> Show GPB
+              <Camera className="h-5 w-5 text-primary" />
+              <span>Not sure what service you need? <span className="text-primary">Show GPB.</span></span>
             </Link>
+
           </div>
 
           {/* Camera-first visual */}
