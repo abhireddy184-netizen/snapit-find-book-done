@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, CheckCircle2, AlertCircle, Loader2, MapPin } from "lucide-react";
 import { AppShell, GradientButton } from "@/components/snapit/AppShell";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
-import { supabase } from "@/integrations/supabase/client";
+import { registerProviderInterest } from "@/lib/provider-interest.functions";
 import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
+
 
 export const Route = createFileRoute("/provider-interest")({
   head: () => ({
