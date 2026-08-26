@@ -194,6 +194,7 @@ export type Database = {
           city: string | null
           created_at: string
           email: string
+          email_normalized: string | null
           full_name: string
           id: string
           note: string | null
@@ -208,6 +209,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           email: string
+          email_normalized?: string | null
           full_name: string
           id?: string
           note?: string | null
@@ -222,6 +224,7 @@ export type Database = {
           city?: string | null
           created_at?: string
           email?: string
+          email_normalized?: string | null
           full_name?: string
           id?: string
           note?: string | null
@@ -238,6 +241,8 @@ export type Database = {
           business_name: string
           created_at: string
           id: string
+          interest_claimed_at: string | null
+          phone: string | null
           service_area: string | null
           service_category: string | null
           service_radius_miles: number | null
@@ -253,6 +258,8 @@ export type Database = {
           business_name?: string
           created_at?: string
           id?: string
+          interest_claimed_at?: string | null
+          phone?: string | null
           service_area?: string | null
           service_category?: string | null
           service_radius_miles?: number | null
@@ -268,6 +275,8 @@ export type Database = {
           business_name?: string
           created_at?: string
           id?: string
+          interest_claimed_at?: string | null
+          phone?: string | null
           service_area?: string | null
           service_category?: string | null
           service_radius_miles?: number | null
