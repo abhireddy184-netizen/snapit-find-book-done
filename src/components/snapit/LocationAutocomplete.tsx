@@ -1,7 +1,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { MapPin, Loader2 } from "lucide-react";
-import { searchPlaces, formatPlace, formatPlaceShort, type ZipPlace } from "@/lib/us-zip";
+import { searchPlaces, formatPlace, formatPlaceShort, lookupZip, type ZipPlace } from "@/lib/us-zip";
 import { cn } from "@/lib/utils";
+
 
 type Props = {
   value: string;
