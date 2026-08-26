@@ -462,8 +462,22 @@
   margin-top: clamp(2.25rem, 5vw, 4.5rem);
 }
 
-/* Horizontal scrollers that should bleed to the shell gutter on small screens */
-@utility gpb-edge {
+/* Horizontal scrollers that bleed to the shell gutter on small screens and
+ * snap back to the content box once they become grids. */
+@utility gpb-edge-sm {
   margin-inline: calc(-1 * clamp(1rem, 4vw, 4.5rem));
   padding-inline: clamp(1rem, 4vw, 4.5rem);
+  @media (width >= 40rem) {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+}
+
+@utility gpb-edge-md {
+  margin-inline: calc(-1 * clamp(1rem, 4vw, 4.5rem));
+  padding-inline: clamp(1rem, 4vw, 4.5rem);
+  @media (width >= 48rem) {
+    margin-inline: 0;
+    padding-inline: 0;
+  }
 }
