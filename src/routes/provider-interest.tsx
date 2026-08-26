@@ -151,6 +151,8 @@ function ProviderInterestPage() {
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Service ZIP code</span>
               <LocationAutocomplete
                 mode="zip"
+                suppressInvalidMessage
+
                 value={zip}
                 onChange={setZip}
                 required
