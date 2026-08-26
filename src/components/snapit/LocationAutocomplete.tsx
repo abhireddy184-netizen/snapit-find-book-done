@@ -35,6 +35,7 @@ export function LocationAutocomplete({
   fieldClassName,
   showIcon = true,
   required,
+  suppressInvalidMessage = false,
   id,
   ...rest
 }: Props) {
@@ -44,6 +45,8 @@ export function LocationAutocomplete({
   const [loading, setLoading] = useState(false);
   const [active, setActive] = useState(-1);
   const [touched, setTouched] = useState(false);
+  /** Authoritative ZIP check, always tied to the exact value it was run for. */
+  const [zipCheck, setZipCheck] = useState<{ value: string; valid: boolean } | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const skipRef = useRef(false);
 
@@ -75,6 +78,23 @@ export function LocationAutocomplete({
     };
   }, [value, touched]);
 
+  // Validate 5-digit ZIPs against the dataset itself rather than inferring
+  // validity from suggestion state, which can be stale mid-typing.
+  useEffect(() => {
+    const raw = value.trim();
+    if (!/^\d{5}$/.test(raw)) {
+      setZipCheck(null);
+      return;
+    }
+    let alive = true;
+    void lookupZip(raw).then((place) => {
+      if (alive) setZipCheck({ value: raw, valid: Boolean(place) });
+    });
+    return () => {
+      alive = false;
+    };
+  }, [value]);
+
   useEffect(() => {
     function onDocDown(e: MouseEvent | TouchEvent) {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) setOpen(false);
@@ -93,11 +113,16 @@ export function LocationAutocomplete({
     onSelect?.(place);
     setOpen(false);
     setItems([]);
+    setZipCheck({ value: place.zip, valid: true });
   }
 
-  const digits = value.replace(/[^0-9]/g, "");
   const invalidZip =
-    touched && !loading && /^\d{5}$/.test(value.trim()) && items.length === 0 && digits.length === 5;
+    !suppressInvalidMessage &&
+    touched &&
+    zipCheck !== null &&
+    zipCheck.value === value.trim() &&
+    !zipCheck.valid;
+
 
   return (
     <div ref={wrapRef} className={cn("relative", className)}>
