@@ -10,7 +10,9 @@ import {
 import { AppShell, GradientButton } from "@/components/snapit/AppShell";
 import { Logo, Wordmark } from "@/components/snapit/Logo";
 import { AiJourneyStrip, CategoryIconRow, HomeRows } from "@/components/snapit/HomeSections";
+import { EarlyAccessSection, ShowGpbCallout } from "@/components/snapit/EarlyAccess";
 import { ProsOnTheMove } from "@/components/snapit/ProsOnTheMove";
+
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
 import heroProblemAsset from "@/assets/uploaded-services/plumbing-service.png.asset.json";
 
@@ -93,13 +95,39 @@ function Landing() {
               </GradientButton>
             </form>
 
+            <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+              <a
+                href="#early-access"
+                id="hero-early-access-cta"
+                data-analytics-id="early_access_cta"
+                data-analytics-location="hero"
+                className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
+                style={{ background: "var(--gradient-primary)" }}
+              >
+                Get Early Access <ArrowRight className="h-4 w-4" />
+              </a>
+              <Link
+                to="/provider-interest"
+                id="hero-provider-interest-cta"
+                data-analytics-id="provider_interest_cta"
+                data-analytics-location="hero"
+                className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary/40 bg-card px-6 py-3.5 text-sm font-black text-primary transition-colors hover:bg-primary/5"
+              >
+                Join GPB as a Pro
+              </Link>
+            </div>
+
             <Link
               to="/snap"
-              className="pulse-soft mt-4 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
-              style={{ background: "var(--gradient-primary)" }}
+              id="hero-show-gpb-cta"
+              data-analytics-id="show_gpb_cta"
+              data-analytics-location="hero"
+              className="mt-3.5 inline-flex items-center gap-2 rounded-full border border-border/70 bg-card px-5 py-3 text-sm font-bold text-foreground shadow-sm transition-transform hover:scale-[1.02]"
             >
-              <Camera className="h-5 w-5" /> Show GPB
+              <Camera className="h-5 w-5 text-primary" />
+              <span>Not sure what service you need? <span className="text-primary">Show GPB.</span></span>
             </Link>
+
           </div>
 
           {/* Camera-first visual */}
@@ -145,13 +173,16 @@ function Landing() {
       {/* Compact discovery rows */}
       <HomeRows />
 
+      <ShowGpbCallout />
       <EmergencyStrip />
       <ProviderRecruitment />
+      <EarlyAccessSection />
 
       <Footer />
     </AppShell>
   );
 }
+
 
 function EmergencyStrip() {
   const items = [
@@ -195,25 +226,30 @@ function ProviderRecruitment() {
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-center">
         <div className="min-w-0">
           <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">For professionals</div>
-          <h2 className="text-2xl font-black tracking-tight md:text-3xl">Offer your services on GPB</h2>
+          <h2 className="text-2xl font-black tracking-tight md:text-3xl">Become a Founding Provider</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90">
-            {catalog.length} categories, {TOTAL_SERVICES}+ services. You get a clear, standardized job brief instead of a vague enquiry.
+            {catalog.length} categories, {TOTAL_SERVICES}+ services. Register your interest before launch and
+            you get a clear, standardized job brief instead of a vague enquiry.
           </p>
-          <div className="mt-5 flex flex-wrap gap-2.5">
+          <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2.5">
+            <Link
+              to="/provider-interest"
+              id="provider-recruitment-cta"
+              data-analytics-id="provider_interest_cta"
+              data-analytics-location="homepage_provider_section"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-lg transition-transform hover:scale-[1.02]"
+            >
+              Register Your Interest <ArrowRight className="h-4 w-4" />
+            </Link>
             <Link
               to="/register"
               search={{ redirect: undefined, role: "provider" }}
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-lg transition-transform hover:scale-[1.02]"
+              className="text-sm font-semibold text-white/85 underline underline-offset-4 transition-colors hover:text-white"
             >
-              Join as a Pro <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              to="/provider-interest"
-              className="inline-flex items-center gap-2 rounded-full border border-white/50 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-white/15"
-            >
-              Register interest
+              Or create a full pro account
             </Link>
           </div>
+
         </div>
         <ul className="space-y-2 text-sm">
           {[
@@ -284,13 +320,44 @@ export function Footer() {
             ))}
           </div>
         </div>
-        <FooterCol title="Company" links={["About", "Careers", "Press", "Blog"]} />
+        <div>
+          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">Get started</div>
+          <ul className="space-y-2">
+            <li>
+              <a
+                href="/#early-access"
+                id="footer-early-access-link"
+                data-analytics-id="early_access_cta"
+                data-analytics-location="footer"
+                className="font-semibold text-primary hover:underline"
+              >
+                Early Access
+              </a>
+            </li>
+            <li>
+              <Link
+                to="/provider-interest"
+                id="footer-for-pros-link"
+                data-analytics-id="provider_interest_cta"
+                data-analytics-location="footer"
+                className="hover:text-foreground"
+              >
+                For Pros
+              </Link>
+            </li>
+            <li><Link to="/snap" data-analytics-id="show_gpb_cta" data-analytics-location="footer" className="hover:text-foreground">Show GPB</Link></li>
+            <li><Link to="/services" className="hover:text-foreground">All services</Link></li>
+          </ul>
+        </div>
         <FooterCol title="Support" links={["Help center", "Contact", "Trust & safety", "Cancellation"]} />
         <div className="min-w-0">
-          <div className="mb-2 text-xs font-bold uppercase tracking-wider text-foreground">Get GPB updates</div>
+          <div className="mb-2 text-xs font-bold uppercase tracking-wider text-foreground">Newsletter</div>
           <p className="mb-3 text-[11px] leading-relaxed">
-            GPB updates, new services and launch news. Unsubscribe anytime.
+            General GPB news and new services — this is not the early access list.{" "}
+            <a href="/#early-access" className="font-semibold text-primary hover:underline">Join early access</a> to
+            be notified when pros go live near you. Unsubscribe anytime.
           </p>
+
           <form
             onSubmit={submit}
             noValidate
