@@ -404,6 +404,79 @@ function BusinessProfile() {
   );
 }
 
+/** Small GPB monogram used to badge dashboard sections. */
+function GpbMark() {
+  return (
+    <span
+      aria-hidden
+      className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-[11px] font-black tracking-tight text-white shadow-sm"
+      style={{ background: "var(--gradient-primary)" }}
+    >
+      GPB
+    </span>
+  );
+}
+
+function VerificationCard({ status, verified, hasProfile }: { status: string; verified: boolean; hasProfile: boolean }) {
+  const steps = [
+    { label: "Account created", done: true },
+    { label: "Business profile added", done: hasProfile },
+    { label: "GPB team review", done: verified },
+  ];
+  const completed = steps.filter((s) => s.done).length;
+  const pct = Math.round((completed / steps.length) * 100);
+
+  return (
+    <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
+      <div className="flex items-center gap-3">
+        <GpbMark />
+        <div>
+          <div className="text-sm font-bold">Verification</div>
+          <div className="text-xs text-muted-foreground">GPB provider trust check</div>
+        </div>
+      </div>
+
+      <div
+        className={`mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold ${
+          verified ? "bg-mint/20 text-mint-ink" : "bg-amber-500/15 text-amber-700"
+        }`}
+      >
+        {verified ? <ShieldCheck className="h-3.5 w-3.5" /> : <Clock3 className="h-3.5 w-3.5" />}
+        {verified ? "Verified provider" : "Verification pending"}
+      </div>
+
+      <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+        <div
+          className="h-full rounded-full transition-all"
+          style={{ width: `${pct}%`, background: "var(--gradient-primary)" }}
+        />
+      </div>
+      <p className="mt-1.5 text-[11px] font-semibold text-muted-foreground">{completed} of {steps.length} steps complete</p>
+
+      <ul className="mt-4 space-y-2">
+        {steps.map((s) => (
+          <li key={s.label} className="flex items-center gap-2 text-xs font-medium">
+            {s.done ? (
+              <BadgeCheck className="h-4 w-4 shrink-0 text-mint-ink" />
+            ) : (
+              <Clock3 className="h-4 w-4 shrink-0 text-muted-foreground" />
+            )}
+            <span className={s.done ? "" : "text-muted-foreground"}>{s.label}</span>
+          </li>
+        ))}
+      </ul>
+
+      <p className="mt-4 text-xs text-muted-foreground">
+        {verified
+          ? "Your verified badge is visible to customers."
+          : "Your application is in the queue. Reviews are done manually by the GPB team — no badge is shown to customers until it clears."}
+      </p>
+      <p className="mt-1 text-[11px] text-muted-foreground">Status: <span className="capitalize">{status.replace(/_/g, " ")}</span></p>
+    </div>
+  );
+}
+
+
 function Input({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
   return (
     <label className="block">
