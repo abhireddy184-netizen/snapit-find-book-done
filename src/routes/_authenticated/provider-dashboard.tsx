@@ -411,14 +411,32 @@ function GpbMark() {
 }
 
 
-function VerificationCard({ status, verified, hasProfile }: { status: string; verified: boolean; hasProfile: boolean }) {
+function VerificationCard({
+  status,
+  verified,
+  profileComplete,
+}: {
+  status: string;
+  verified: boolean;
+  profileComplete: boolean;
+}) {
+  const inReview = !verified && (status === "pending" || status === "in_review" || status === "submitted");
   const steps = [
     { label: "Account created", done: true },
-    { label: "Business profile added", done: hasProfile },
+    { label: "Business profile completed", done: profileComplete },
     { label: "GPB team review", done: verified },
   ];
   const completed = steps.filter((s) => s.done).length;
   const pct = Math.round((completed / steps.length) * 100);
+
+  const state = verified
+    ? { label: "Verified provider", tone: "bg-mint/20 text-mint-ink", icon: ShieldCheck }
+    : !profileComplete
+      ? { label: "Complete your business profile", tone: "bg-muted text-foreground", icon: ShieldAlert }
+      : inReview
+        ? { label: "Verification pending", tone: "bg-amber-500/15 text-amber-700", icon: Clock3 }
+        : { label: "Ready for GPB review", tone: "bg-amber-500/15 text-amber-700", icon: Clock3 };
+  const StateIcon = state.icon;
 
   return (
     <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
@@ -430,13 +448,9 @@ function VerificationCard({ status, verified, hasProfile }: { status: string; ve
         </div>
       </div>
 
-      <div
-        className={`mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold ${
-          verified ? "bg-mint/20 text-mint-ink" : "bg-amber-500/15 text-amber-700"
-        }`}
-      >
-        {verified ? <ShieldCheck className="h-3.5 w-3.5" /> : <Clock3 className="h-3.5 w-3.5" />}
-        {verified ? "Verified provider" : "Verification pending"}
+      <div className={`mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold ${state.tone}`}>
+        <StateIcon className="h-3.5 w-3.5" />
+        {state.label}
       </div>
 
       <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-muted">
@@ -463,12 +477,17 @@ function VerificationCard({ status, verified, hasProfile }: { status: string; ve
       <p className="mt-4 text-xs text-muted-foreground">
         {verified
           ? "Your verified badge is visible to customers."
-          : "Your application is in the queue. Reviews are done manually by the GPB team — no badge is shown to customers until it clears."}
+          : !profileComplete
+            ? "Add your business name, service category and service ZIP so GPB can review your listing. Nothing has been submitted yet."
+            : inReview
+              ? "Your details are with the GPB team. No badge is shown to customers until the review completes."
+              : "Your profile is complete. Manual GPB review isn’t open yet — we’ll contact you when it starts, and no badge is shown to customers until then."}
       </p>
       <p className="mt-1 text-[11px] text-muted-foreground">Status: <span className="capitalize">{status.replace(/_/g, " ")}</span></p>
     </div>
   );
 }
+
 
 
 function Input({ label, value, onChange, placeholder }: { label: string; value: string; onChange: (v: string) => void; placeholder?: string }) {
