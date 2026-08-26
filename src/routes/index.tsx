@@ -60,12 +60,13 @@ function Landing() {
               <span className="mt-1 text-sm font-bold tracking-tight text-foreground sm:text-base">GetPerfectBoy.com</span>
             </div>
 
-            <h1 className="mt-4 max-w-[15ch] text-[2rem] font-black leading-[1.06] tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+            <h1 className="mt-4 max-w-[16ch] text-[clamp(2rem,5.2vw,4rem)] font-black leading-[1.05] tracking-tight text-foreground">
               Show it. <span className="text-gradient-hero">We'll handle the rest.</span>
             </h1>
-            <p className="mt-2.5 max-w-[46ch] text-sm text-muted-foreground">
+            <p className="mt-3 max-w-[52ch] text-[clamp(0.9rem,1.15vw,1.125rem)] text-muted-foreground">
               Show GPB a photo, video or description and we'll route you to the right service.
             </p>
+
 
             <form
               onSubmit={(e) => {
