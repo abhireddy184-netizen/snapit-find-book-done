@@ -389,7 +389,12 @@ function BusinessProfile() {
       </form>
 
       <div className="space-y-4">
-        <VerificationCard status={status} verified={verified} hasProfile={Boolean(data?.business_name)} />
+        <VerificationCard
+          status={status}
+          verified={verified}
+          profileComplete={Boolean(data?.business_name && data?.service_category && data?.service_zip)}
+        />
+
 
         <button
           onClick={async () => {
