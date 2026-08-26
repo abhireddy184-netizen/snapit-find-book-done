@@ -461,3 +461,9 @@
 @utility gpb-section {
   margin-top: clamp(2.25rem, 5vw, 4.5rem);
 }
+
+/* Horizontal scrollers that should bleed to the shell gutter on small screens */
+@utility gpb-edge {
+  margin-inline: calc(-1 * clamp(1rem, 4vw, 4.5rem));
+  padding-inline: clamp(1rem, 4vw, 4.5rem);
+}

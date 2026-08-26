@@ -14,7 +14,7 @@ const STEPS = [
 
 export function AiJourneyStrip() {
   return (
-    <ol className="-mx-4 flex snap-x snap-mandatory gap-2.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0 md:grid md:grid-cols-4 md:overflow-visible">
+    <ol className="gpb-edge flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-1 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0">
       {STEPS.map((s, i) => (
         <li
           key={s.label}
@@ -50,7 +50,7 @@ const QUICK = [
 
 export function CategoryIconRow() {
   return (
-    <div className="-mx-4 flex gap-2.5 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-8 sm:gap-3 sm:overflow-visible sm:px-0">
+    <div className="gpb-edge flex gap-2.5 overflow-x-auto pb-1 sm:mx-0 sm:grid sm:grid-cols-8 sm:gap-3 sm:overflow-visible sm:px-0">
       {QUICK.map((c) => (
         <Link
           key={c.slug}
@@ -113,7 +113,7 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
           See all <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
-      <div className="-mx-4 mt-3 flex snap-x gap-3 overflow-x-auto px-4 pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0 xl:grid-cols-6">
+      <div className="gpb-edge mt-3 flex snap-x gap-3 overflow-x-auto pb-2 md:mx-0 md:grid md:grid-cols-4 md:overflow-visible md:px-0 xl:grid-cols-5 2xl:grid-cols-6">
         {items.map(({ categorySlug, service }) => {
           const raw = serviceScene(categorySlug, service.slug);
           const img = raw && !used.has(raw) ? raw : undefined;
