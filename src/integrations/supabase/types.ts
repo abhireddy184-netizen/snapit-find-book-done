@@ -70,6 +70,51 @@ export type Database = {
           },
         ]
       }
+      early_access: {
+        Row: {
+          city: string | null
+          created_at: string
+          email: string
+          email_normalized: string
+          full_name: string
+          id: string
+          location: string
+          service_interest: string
+          service_slug: string | null
+          source: string
+          state: string | null
+          zip: string | null
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          email: string
+          email_normalized: string
+          full_name: string
+          id?: string
+          location: string
+          service_interest?: string
+          service_slug?: string | null
+          source?: string
+          state?: string | null
+          zip?: string | null
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          email?: string
+          email_normalized?: string
+          full_name?: string
+          id?: string
+          location?: string
+          service_interest?: string
+          service_slug?: string | null
+          source?: string
+          state?: string | null
+          zip?: string | null
+        }
+        Relationships: []
+      }
       job_documents: {
         Row: {
           created_at: string
