@@ -185,7 +185,7 @@ export function normalizeAnalysis(
     possibleCauses: Array.isArray(parsed.possibleCauses) ? parsed.possibleCauses.filter(Boolean).slice(0, 4) : [],
     nextSteps: Array.isArray(parsed.nextSteps) ? parsed.nextSteps.filter(Boolean).slice(0, 4) : [],
     clarifyingQuestions: Array.isArray(parsed.clarifyingQuestions) ? parsed.clarifyingQuestions.filter(Boolean).slice(0, 3) : [],
-    serviceOptions: Array.isArray(parsed.serviceOptions)
+    serviceOptions: Array.isArray(parsed.serviceOptions) && parsed.serviceOptions.length
       ? parsed.serviceOptions
           .filter((o) => o && CATEGORY_SLUGS.has(o.categorySlug))
           .slice(0, 6)
@@ -197,7 +197,8 @@ export function normalizeAnalysis(
             label: o.label,
             reason: o.reason,
           }))
-      : [],
+      : inferredOptions,
+
     safetyNote: parsed.safetyNote?.trim() || undefined,
   };
 }
