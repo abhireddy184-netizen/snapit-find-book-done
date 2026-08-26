@@ -1,4 +1,6 @@
 import { catalog } from "./catalog";
+import { matchServiceIntent, rankServices } from "./search-intent";
+
 
 export type IssueSource = "detected" | "possible" | "customer-described" | "insufficient";
 export type ResponseKind = "diagnosis" | "options" | "needs-info" | "no-issue" | "safety-redirect";
@@ -89,7 +91,16 @@ export function buildUserPrompt(note: string | undefined, hasMedia: boolean, fra
 
 const CATEGORY_SLUGS = new Set(catalog.map((c) => c.slug));
 
-export function normalizeAnalysis(raw: string, hadNote: boolean, hasMedia = false): SnapAnalysis {
+/** Words that genuinely signal general handyman / odd-jobs intent. */
+const HANDYMAN_INTENT =
+  /\b(handy\s?man|handywoman|handyperson|odd jobs?|punch list|general repairs?|small repairs?|misc(ellaneous)? repairs?|fix ?it|to-?do list)\b/i;
+
+export function normalizeAnalysis(
+  raw: string,
+  hadNote: boolean,
+  hasMedia = false,
+  note?: string,
+): SnapAnalysis {
   const match = raw.match(/\{[\s\S]*\}/);
   let parsed: Partial<SnapAnalysis> = {};
   try {
@@ -98,11 +109,47 @@ export function normalizeAnalysis(raw: string, hadNote: boolean, hasMedia = fals
     parsed = {};
   }
 
-  const categorySlug = parsed.categorySlug && CATEGORY_SLUGS.has(parsed.categorySlug)
-    ? parsed.categorySlug
-    : "handyman";
+  const noteText = note?.trim() ?? "";
+  const aiCategory =
+    parsed.categorySlug && CATEGORY_SLUGS.has(parsed.categorySlug) ? parsed.categorySlug : null;
+
+  // Never silently label an unclassified request "Handyman". When the AI gave
+  // no valid category, try the customer's own words against the catalog first.
+  let inferredService: { categorySlug: string; serviceSlug: string; label: string } | null = null;
+  let inferredOptions: ServiceOption[] = [];
+  if (!aiCategory && noteText) {
+    const hit = matchServiceIntent(noteText);
+    if (hit) {
+      inferredService = {
+        categorySlug: hit.category.slug,
+        serviceSlug: hit.service.slug,
+        label: hit.service.name,
+      };
+    } else if (HANDYMAN_INTENT.test(noteText)) {
+      inferredService = { categorySlug: "handyman", serviceSlug: "handyman-hour", label: "General Handyman" };
+    } else {
+      inferredOptions = rankServices(noteText, 4).map((h) => ({
+        categorySlug: h.category.slug,
+        serviceSlug: h.service.slug,
+        label: h.service.name,
+        reason: h.category.name,
+      }));
+    }
+  }
+
+  // Empty slug = deliberately unclassified; the UI hides category chips, pricing
+  // and pro matches for discovery states.
+  const categorySlug = aiCategory ?? inferredService?.categorySlug ?? "";
   const cat = catalog.find((c) => c.slug === categorySlug);
-  const responseKind: ResponseKind = parsed.responseKind ?? (Object.keys(parsed).length ? "diagnosis" : "needs-info");
+  const unclassified = !categorySlug;
+  const parsedKind: ResponseKind | undefined = parsed.responseKind;
+  const responseKind: ResponseKind = unclassified
+    ? parsedKind === "no-issue" || parsedKind === "safety-redirect"
+      ? parsedKind
+      : inferredOptions.length > 1
+        ? "options"
+        : "needs-info"
+    : (parsedKind ?? (Object.keys(parsed).length ? "diagnosis" : "needs-info"));
   // Only a confident, single-service diagnosis may carry a price or pro match.
   // options / needs-info / no-issue / safety-redirect are discovery states.
   const hasPriceEstimate =
@@ -119,9 +166,12 @@ export function normalizeAnalysis(raw: string, hadNote: boolean, hasMedia = fals
         ? "Nothing obvious looks wrong from this photo."
         : responseKind === "needs-info"
           ? "We need a little more detail."
-          : cat?.name ?? "Let's narrow this down"),
-    category: parsed.category?.trim() || cat?.name || "Handyman",
+          : responseKind === "options"
+            ? "A few GPB services could fit — which one sounds right?"
+            : cat?.name ?? "Let's narrow this down"),
+    category: (aiCategory ? parsed.category?.trim() : inferredService?.label) || cat?.name || "",
     categorySlug,
+
     confidence: Math.min(1, Math.max(0, Number(parsed.confidence ?? 0.5))),
     problem: parsed.problem?.trim() ||
       "Tell us what you're noticing and we'll narrow it down to the right service.",
@@ -135,7 +185,7 @@ export function normalizeAnalysis(raw: string, hadNote: boolean, hasMedia = fals
     possibleCauses: Array.isArray(parsed.possibleCauses) ? parsed.possibleCauses.filter(Boolean).slice(0, 4) : [],
     nextSteps: Array.isArray(parsed.nextSteps) ? parsed.nextSteps.filter(Boolean).slice(0, 4) : [],
     clarifyingQuestions: Array.isArray(parsed.clarifyingQuestions) ? parsed.clarifyingQuestions.filter(Boolean).slice(0, 3) : [],
-    serviceOptions: Array.isArray(parsed.serviceOptions)
+    serviceOptions: Array.isArray(parsed.serviceOptions) && parsed.serviceOptions.length
       ? parsed.serviceOptions
           .filter((o) => o && CATEGORY_SLUGS.has(o.categorySlug))
           .slice(0, 6)
@@ -147,7 +197,8 @@ export function normalizeAnalysis(raw: string, hadNote: boolean, hasMedia = fals
             label: o.label,
             reason: o.reason,
           }))
-      : [],
+      : inferredOptions,
+
     safetyNote: parsed.safetyNote?.trim() || undefined,
   };
 }

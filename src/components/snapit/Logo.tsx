@@ -27,7 +27,40 @@ export function Wordmark({
   );
 }
 
+/**
+ * The GPB app-icon tile (gradient rounded square + dropped-P wordmark),
+ * without the link/home behaviour. Use to badge in-app sections.
+ */
+export function BrandMark({
+  size = 36,
+  className = "",
+  onColor = false,
+}: {
+  size?: number;
+  className?: string;
+  onColor?: boolean;
+}) {
+  return (
+    <span
+      className={`relative grid shrink-0 place-items-center overflow-hidden rounded-[13px] pb-0.5 shadow-md ${className}`}
+      style={{
+        width: size,
+        height: size,
+        ...(onColor
+          ? { background: "var(--card)" }
+          : {
+              background: "var(--gradient-hero)",
+              boxShadow: "0 10px 26px -14px color-mix(in oklab, var(--secondary) 70%, transparent)",
+            }),
+      }}
+    >
+      <Wordmark size={Math.round(size * 0.36)} gradient={false} className={onColor ? "text-primary" : "text-white"} />
+    </span>
+  );
+}
+
 export function Logo({ compact = false, onColor = false }: { compact?: boolean; onColor?: boolean }) {
+
   return (
     <Link to="/" className="flex min-w-0 items-center gap-2.5" aria-label="GPB — GetPerfectBoy.com home">
       <span
