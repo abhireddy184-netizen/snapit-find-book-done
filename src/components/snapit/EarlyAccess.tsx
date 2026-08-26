@@ -73,8 +73,8 @@ export function EarlyAccessSection() {
       city: resolvedPlace?.city.slice(0, 120) ?? null,
       state: resolvedPlace?.state.slice(0, 2) ?? null,
       zip,
-
       service_interest: interest.slice(0, 160),
+
       source: "homepage_early_access",
     });
     setBusy(false);
