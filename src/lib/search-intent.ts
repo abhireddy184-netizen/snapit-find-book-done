@@ -145,9 +145,6 @@ const ALIASES: Record<string, string> = {
   /* Cleaning */
   "deep cleaning": "cleaning/deep-cleaning",
   "deep clean": "cleaning/deep-cleaning",
-  "house cleaning": "cleaning/standard-cleaning",
-  "home cleaning": "cleaning/standard-cleaning",
-  "maid": "cleaning/standard-cleaning",
   "move out cleaning": "cleaning/move-in-out-cleaning",
   "move in cleaning": "cleaning/move-in-out-cleaning",
   "carpet cleaning": "carpet-upholstery-cleaning/carpet-cleaning",
@@ -159,6 +156,25 @@ const ALIASES: Record<string, string> = {
   "hang shelves": "mounting-installation/shelf-installation",
   "hang mirror": "mounting-installation/mirror-hanging",
 };
+
+/**
+ * Queries that legitimately cover several sub-services. These must NOT resolve
+ * to a single service (that traps the user on one page) — instead they promote
+ * their members to the top of the ranked results.
+ */
+const ALIAS_GROUPS: Record<string, string[]> = {
+  "house cleaning": ["cleaning/standard-cleaning", "cleaning/deep-cleaning", "cleaning/move-in-out-cleaning"],
+  "home cleaning": ["cleaning/standard-cleaning", "cleaning/deep-cleaning", "cleaning/move-in-out-cleaning"],
+  "cleaning": ["cleaning/standard-cleaning", "cleaning/deep-cleaning", "cleaning/move-in-out-cleaning"],
+  "house cleaner": ["cleaning/standard-cleaning", "cleaning/deep-cleaning", "cleaning/move-in-out-cleaning"],
+  "cleaner": ["cleaning/standard-cleaning", "cleaning/deep-cleaning", "cleaning/move-in-out-cleaning"],
+  "maid": ["cleaning/standard-cleaning", "cleaning/deep-cleaning", "cleaning/recurring-cleaning"],
+  "apartment cleaning": ["cleaning/standard-cleaning", "cleaning/deep-cleaning", "cleaning/move-in-out-cleaning"],
+};
+
+function groupFor(q: string): string[] | null {
+  return ALIAS_GROUPS[q] ?? null;
+}
 
 
 export function normalizeQuery(raw: string): string {
@@ -217,6 +233,8 @@ export function matchServiceIntent(raw: string): ServiceHit | null {
   const q = normalizeQuery(raw);
   if (!q) return null;
 
+  if (groupFor(q)) return null;
+
   const aliasTarget = ALIASES[q] ?? ALIASES[q.replace(/\bwaxing\b/g, "wax")];
   if (aliasTarget) {
     const [cat, svc] = aliasTarget.split("/");
@@ -254,10 +272,13 @@ export function rankServices(raw: string, limit = 6): ServiceHit[] {
   if (!q) return [];
   const qTokens = tokenize(q);
   const aliasHit = matchServiceIntent(raw);
+  const group = groupFor(q) ?? [];
   const scored = buildIndex()
     .map((e) => {
       let score = 99;
-      if (aliasHit && e.hit.service.slug === aliasHit.service.slug && e.hit.category.slug === aliasHit.category.slug) score = -1;
+      const groupRank = group.indexOf(`${e.hit.category.slug}/${e.hit.service.slug}`);
+      if (groupRank >= 0) score = -10 + groupRank;
+      else if (aliasHit && e.hit.service.slug === aliasHit.service.slug && e.hit.category.slug === aliasHit.category.slug) score = -1;
       else if (e.nameKey === q || e.slugKey === q) score = 0;
       else if (e.nameKey.startsWith(q)) score = 1;
       else if (e.nameKey.includes(q)) score = 2;
@@ -281,7 +302,7 @@ export function isServicePhrase(value: string): boolean {
   if (!q) return false;
   // A real location almost always contains digits (ZIP) or a comma (City, ST).
   if (/\d/.test(value) || value.includes(",")) return false;
-  if (ALIASES[q]) return true;
+  if (ALIASES[q] || groupFor(q)) return true;
   if (isBroad(q)) return true;
   return matchServiceIntent(q) !== null;
 }
