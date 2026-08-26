@@ -41,7 +41,7 @@ function TopBar() {
           : "border-transparent bg-background/60"
       )}
     >
-      <div className="mx-auto grid h-14 max-w-6xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 sm:px-6 md:h-16 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-6 lg:px-8 xl:max-w-7xl">
+      <div className="gpb-shell grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 md:h-16 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-6">
         <div className="min-w-0">
           <Logo />
         </div>
