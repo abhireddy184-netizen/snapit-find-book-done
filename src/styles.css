@@ -452,9 +452,7 @@
 }
 
 @utility gpb-bleed {
-  width: 100%;
   margin-inline: calc(50% - 50vw);
-  padding-inline: calc(50vw - 50%);
   max-width: 100vw;
 }
 
