@@ -10,7 +10,9 @@ import {
 import { AppShell, GradientButton } from "@/components/snapit/AppShell";
 import { Logo, Wordmark } from "@/components/snapit/Logo";
 import { AiJourneyStrip, CategoryIconRow, HomeRows } from "@/components/snapit/HomeSections";
+import { EarlyAccessSection, ShowGpbCallout } from "@/components/snapit/EarlyAccess";
 import { ProsOnTheMove } from "@/components/snapit/ProsOnTheMove";
+
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
 import heroProblemAsset from "@/assets/uploaded-services/plumbing-service.png.asset.json";
 
@@ -171,13 +173,16 @@ function Landing() {
       {/* Compact discovery rows */}
       <HomeRows />
 
+      <ShowGpbCallout />
       <EmergencyStrip />
       <ProviderRecruitment />
+      <EarlyAccessSection />
 
       <Footer />
     </AppShell>
   );
 }
+
 
 function EmergencyStrip() {
   const items = [
