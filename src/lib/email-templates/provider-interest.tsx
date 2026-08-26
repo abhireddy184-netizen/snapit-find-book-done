@@ -5,13 +5,13 @@ import {
   Container,
   Head,
   Heading,
-  Hr,
   Html,
   Preview,
   Section,
   Text,
 } from '@react-email/components'
 import type { TemplateEntry } from './registry'
+import { EmailFooter, EmailHeader, SITE_URL, brand, emailStyles } from './brand'
 
 interface Props {
   fullName?: string
@@ -20,8 +20,6 @@ interface Props {
   state?: string
   siteUrl?: string
 }
-
-const SITE_URL = 'https://getperfectboy.com'
 
 const Email = ({
   fullName = 'there',
@@ -33,12 +31,11 @@ const Email = ({
   <Html lang="en" dir="ltr">
     <Head />
     <Preview>We&apos;ve received your GPB provider interest registration.</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Text style={monogram}>GPB</Text>
-        <Text style={brand}>GetPerfectBoy.com</Text>
-        <Heading style={heading}>Thanks, {fullName} — we&apos;ve got your details.</Heading>
-        <Text style={paragraph}>
+    <Body style={emailStyles.main}>
+      <Container style={emailStyles.container}>
+        <EmailHeader siteUrl={siteUrl} />
+        <Heading style={emailStyles.heading}>Thanks, {fullName} — we&apos;ve got your details.</Heading>
+        <Text style={emailStyles.paragraph}>
           You registered your interest in joining GPB as a professional for{' '}
           <strong>{categoryLabel}</strong>
           {city ? ` around ${city}${state ? `, ${state}` : ''}` : ''}.
@@ -53,13 +50,13 @@ const Email = ({
           </Text>
         </Section>
 
-        <Text style={paragraph}>
+        <Text style={emailStyles.paragraph}>
           <strong>Your next step:</strong> create your free provider account with this same
           email address. We&apos;ll carry the details you just gave us straight into your
           business profile so you don&apos;t have to type them twice.
         </Text>
 
-        <Button style={button} href={`${siteUrl}/register?role=provider`}>
+        <Button style={emailStyles.button} href={`${siteUrl}/register?role=provider`}>
           Create your provider account
         </Button>
 
@@ -68,12 +65,10 @@ const Email = ({
           3. Complete your business profile &nbsp;→&nbsp; 4. GPB review
         </Text>
 
-        <Hr style={hr} />
-        <Text style={footer}>GPB / GetPerfectBoy.com</Text>
-        <Text style={footer}>
-          You&apos;re receiving this because you registered provider interest on
-          GetPerfectBoy.com.
-        </Text>
+        <EmailFooter
+          siteUrl={siteUrl}
+          reason="You're receiving this because you registered provider interest on GetPerfectBoy.com."
+        />
       </Container>
     </Body>
   </Html>
@@ -92,32 +87,13 @@ export const template = {
   },
 } satisfies TemplateEntry
 
-const main = { backgroundColor: '#ffffff', fontFamily: 'Arial, Helvetica, sans-serif', color: '#2b1030' }
-const container = { maxWidth: '520px', margin: '0 auto', padding: '32px 24px' }
-const monogram = { fontSize: '28px', fontWeight: 800 as const, letterSpacing: '-0.02em', margin: '0' }
-const brand = { fontSize: '13px', fontWeight: 700 as const, color: '#6b5b6e', margin: '2px 0 0' }
-const heading = { fontSize: '22px', margin: '24px 0 8px', color: '#2b1030' }
-const paragraph = { fontSize: '15px', lineHeight: '1.6', color: '#4a3550' }
 const notice = {
-  backgroundColor: '#fdf3f8',
+  backgroundColor: brand.surface,
   border: '1px solid #f6d6e7',
   borderRadius: '14px',
   padding: '14px 16px',
   margin: '18px 0',
 }
 const noticeTitle = { fontSize: '13px', fontWeight: 700 as const, color: '#b0155f', margin: '0 0 6px' }
-const noticeBody = { fontSize: '13px', lineHeight: '1.6', color: '#4a3550', margin: 0 }
-const button = {
-  display: 'inline-block',
-  backgroundColor: '#e6187f',
-  color: '#ffffff',
-  textDecoration: 'none',
-  padding: '12px 22px',
-  borderRadius: '999px',
-  fontWeight: 700 as const,
-  fontSize: '14px',
-  marginTop: '12px',
-}
-const steps = { fontSize: '12px', color: '#8a7c8e', marginTop: '20px', lineHeight: '1.8' }
-const hr = { border: 'none', borderTop: '1px solid #ece5ef', margin: '32px 0 16px' }
-const footer = { fontSize: '12px', color: '#8a7c8e' }
+const noticeBody = { fontSize: '13px', lineHeight: '1.6', color: brand.body, margin: 0 }
+const steps = { fontSize: '12px', color: brand.muted, marginTop: '20px', lineHeight: '1.8' }
