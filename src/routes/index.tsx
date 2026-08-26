@@ -133,7 +133,7 @@ function Landing() {
           </div>
 
           {/* Camera-first visual */}
-          <div className="relative mx-auto w-full max-w-[300px] lg:max-w-[340px]">
+          <div className="relative mx-auto w-full max-w-[300px] lg:max-w-[360px] xl:max-w-[420px]">
             <div className="relative overflow-hidden rounded-[30px] border-[6px] border-foreground/85 bg-foreground/85 shadow-[var(--shadow-elevated)]">
               <div className="relative aspect-[9/14] w-full overflow-hidden rounded-[24px] bg-muted">
                 <img
