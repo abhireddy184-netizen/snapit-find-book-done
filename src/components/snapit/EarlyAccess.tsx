@@ -5,7 +5,7 @@ import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { GradientButton } from "@/components/snapit/AppShell";
 import { catalog } from "@/lib/catalog";
 import { supabase } from "@/integrations/supabase/client";
-import { useResolvedLocation } from "@/lib/us-zip";
+import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 
 /** Show GPB callout — concise, mobile-first. */
 export function ShowGpbCallout() {
@@ -62,14 +62,18 @@ export function EarlyAccessSection() {
 
     setBusy(true);
     const normalized = email.trim().toLowerCase();
+    const zip = /^\d{5}$/.test(loc.trim()) ? loc.trim() : null;
+    // Resolve directly so a slow first dataset load still records city/state.
+    const resolvedPlace = place ?? (zip ? await lookupZip(zip) : null);
     const { error: insertError } = await supabase.from("early_access").insert({
       full_name: fullName.trim().slice(0, 120),
       email: email.trim().slice(0, 255),
       email_normalized: normalized.slice(0, 255),
       location: loc.trim().slice(0, 160),
-      city: place?.city.slice(0, 120) ?? null,
-      state: place?.state.slice(0, 2) ?? null,
-      zip: /^\d{5}$/.test(loc.trim()) ? loc.trim() : null,
+      city: resolvedPlace?.city.slice(0, 120) ?? null,
+      state: resolvedPlace?.state.slice(0, 2) ?? null,
+      zip,
+
       service_interest: interest.slice(0, 160),
       source: "homepage_early_access",
     });
