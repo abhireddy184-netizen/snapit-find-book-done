@@ -17,9 +17,10 @@ export const transcribeVoice = createServerFn({ method: "POST" })
     z
       .object({
         audioDataBase64: z.string().min(100).max(MAX_AUDIO_B64),
+        // Recorder MIME types may carry codec params, e.g. "audio/webm;codecs=opus".
         mimeType: z
           .string()
-          .regex(/^audio\/[a-z0-9.+-]+$/i)
+          .regex(/^audio\/[a-z0-9.+-]+(?:\s*;.*)?$/i)
           .default("audio/mp4"),
       })
       .parse(input),
