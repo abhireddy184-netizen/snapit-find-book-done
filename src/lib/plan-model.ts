@@ -68,7 +68,7 @@ export const CHANNEL_META: Record<
     label: "GPB local pro",
     short: "GPB pro",
     live: true,
-    blurb: "Routed to a verified GPB professional in your area.",
+    blurb: "Links into the current GPB service catalogue and provider booking flow.",
   },
   "food-partner": {
     label: "Food partner",
