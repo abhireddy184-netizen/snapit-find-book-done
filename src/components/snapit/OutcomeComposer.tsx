@@ -42,11 +42,12 @@ function getSpeechRecognition(): SpeechRecognitionCtor | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
-type VoiceStatus = "idle" | "listening" | "denied" | "no-speech" | "error";
+type VoiceStatus = "idle" | "listening" | "denied" | "no-speech" | "unsupported" | "error";
 
 const VOICE_MESSAGES: Record<Exclude<VoiceStatus, "idle" | "listening">, string> = {
   denied: "Microphone access was blocked. Allow it in your browser settings to use voice input.",
   "no-speech": "I didn’t catch that — tap the mic and try again.",
+  unsupported: "Voice input isn’t supported in this browser — type your request instead.",
   error: "Voice input had trouble. Please try again or type instead.",
 };
 
@@ -103,7 +104,10 @@ export function OutcomeComposer() {
       stopListening();
       return;
     }
-    if (!SR) return;
+    if (!SR) {
+      setVoiceStatus("unsupported");
+      return;
+    }
 
     const rec = new SR();
     recRef.current = rec;
@@ -211,13 +215,9 @@ export function OutcomeComposer() {
         {listening ? "Listening… speak your request, then tap the mic again to stop." : ""}
       </p>
 
-      {(listening || (!voiceSupported && voiceStatus !== "idle") || voiceStatus in VOICE_MESSAGES) && (
+      {(listening || voiceStatus in VOICE_MESSAGES) && (
         <p className={`mt-1.5 text-xs font-semibold ${listening ? "text-primary" : "text-muted-foreground"}`}>
-          {listening
-            ? "Listening… tap the mic again when you’re done."
-            : voiceStatus in VOICE_MESSAGES
-              ? VOICE_MESSAGES[voiceStatus as keyof typeof VOICE_MESSAGES]
-              : "Voice input isn’t supported in this browser — type your request instead."}
+          {listening ? "Listening… tap the mic again when you’re done." : VOICE_MESSAGES[voiceStatus as keyof typeof VOICE_MESSAGES]}
         </p>
       )}
 
