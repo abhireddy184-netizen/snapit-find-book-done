@@ -429,6 +429,5 @@ export function normalizePlan(
     },
     nowClock,
 
-    nowClock,
   );
 }
