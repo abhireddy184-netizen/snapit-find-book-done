@@ -397,6 +397,8 @@ export function OutcomeComposer() {
         : null;
 
 
+  const voiceActive = listening || transcribing;
+
   return (
     <form
       onSubmit={submit}
@@ -418,9 +420,21 @@ export function OutcomeComposer() {
           onFocus={() => (paused.current = true)}
           onBlur={() => (paused.current = false)}
           rows={3}
-          placeholder={EXAMPLES[i]}
-          className="min-h-[112px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pe-[3.25rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:pe-14"
+          /* While the mic is active the rotating examples stop competing with
+             what the person is actually saying. */
+          placeholder={voiceActive ? "" : EXAMPLES[i]}
+          className={`min-h-[112px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pe-[3.75rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:pe-16 ${
+            voiceActive ? "bg-primary/5 ring-2 ring-primary/60" : ""
+          }`}
         />
+        {voiceActive && !request && (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-x-4 top-3.5 text-[15px] leading-relaxed text-primary/70"
+          >
+            {listening ? "Listening… speak now" : "Transcribing…"}
+          </span>
+        )}
         <button
           type="button"
           onClick={toggleVoice}
@@ -428,7 +442,7 @@ export function OutcomeComposer() {
           title={micTitle}
           aria-pressed={listening}
           disabled={transcribing}
-          className={`absolute end-2 top-2 grid h-10 w-10 shrink-0 place-items-center rounded-full border transition-all sm:end-2.5 sm:top-2.5 ${
+          className={`absolute end-2 top-2 grid h-12 w-12 shrink-0 place-items-center rounded-full border transition-all sm:end-2.5 sm:top-2.5 ${
 
             listening
               ? "animate-pulse border-primary bg-primary text-primary-foreground shadow-md"
@@ -439,7 +453,13 @@ export function OutcomeComposer() {
                   : "cursor-not-allowed border-border/70 bg-background text-muted-foreground opacity-50"
           }`}
         >
-          <Mic className="h-4 w-4" />
+          {listening ? (
+            <Square className="h-4 w-4 fill-current" />
+          ) : transcribing ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Mic className="h-4 w-4" />
+          )}
         </button>
       </div>
 
@@ -455,6 +475,7 @@ export function OutcomeComposer() {
           {statusLine}
         </p>
       )}
+
 
       <div className="mt-2.5 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
         <div className="min-w-0">
