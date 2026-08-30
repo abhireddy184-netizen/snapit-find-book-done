@@ -37,6 +37,16 @@ type SpeechRecognitionLike = {
 };
 type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
 
+/**
+ * Script-range test rather than a language list: matches Arabic, Hebrew,
+ * Syriac, Thaana, N'Ko and the Arabic supplements/presentation forms.
+ */
+const RTL_RANGE =
+  /[\u0590-\u05FF\u0600-\u06FF\u0700-\u074F\u0780-\u07BF\u07C0-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
+export function isRtlText(text: string): boolean {
+  return RTL_RANGE.test(text);
+}
+
 function getSpeechRecognition(): SpeechRecognitionCtor | null {
   if (typeof window === "undefined") return null;
   const w = window as unknown as {
@@ -396,11 +406,13 @@ export function OutcomeComposer() {
       <label htmlFor="gpb-outcome" className="sr-only">
         Describe the outcome or the day you need handled
       </label>
-      {/* dir="auto" resolves per content, so RTL scripts (Arabic, Hebrew, Urdu)
-          flip both the text and the logical padding/mic placement below. */}
-      <div dir="auto" className="relative">
+      {/* Direction follows what the person actually typed: any RTL script
+          (Arabic, Hebrew, Urdu, Persian, …) flips the text and the logical
+          padding so the mic button never sits on top of the first characters. */}
+      <div dir={isRtlText(request) ? "rtl" : "ltr"} className="relative">
         <textarea
           id="gpb-outcome"
+          dir="auto"
           value={request}
           onChange={(e) => setRequest(e.target.value)}
           onFocus={() => (paused.current = true)}
