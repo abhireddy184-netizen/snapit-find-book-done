@@ -21,7 +21,7 @@ function tokenize(text: string): { tokens: string[]; mode: Mode } {
   const words = text.split(/\s+/u).filter(Boolean);
   // Scriptio continua (CJK/Thai) yields one huge "word" — compare per character
   // so the committed prefix can still grow smoothly.
-  if (words.length < 4 && text.replace(/\s+/gu, "").length > 12) {
+  if (words.length <= 1 && text.replace(/\s+/gu, "").length > 8) {
     return { tokens: Array.from(text.replace(/\s+/gu, "")), mode: "char" };
   }
   return { tokens: words, mode: "word" };
