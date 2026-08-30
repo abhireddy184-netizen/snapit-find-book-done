@@ -177,10 +177,11 @@ function ProviderRecruitment() {
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-center">
         <div className="min-w-0">
           <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">For professionals</div>
-          <h2 className="text-2xl font-black tracking-tight md:text-3xl">Become a Founding Provider</h2>
+          <h2 className="text-2xl font-black tracking-tight md:text-3xl">Get clearer jobs, not vague leads.</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90">
-            {catalog.length} categories, {TOTAL_SERVICES}+ services. Register your interest before launch and
-            you get a clear, standardized job brief instead of a vague enquiry.
+            Customers tell GPB the outcome; you receive a structured job brief with scope and location.
+            {" "}{catalog.length} categories, {TOTAL_SERVICES}+ services — register your interest before launch
+            and set your own radius, availability and pricing.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2.5">
             <Link
@@ -261,7 +262,7 @@ export function Footer() {
         <div className="min-w-0">
           <Logo />
           <p className="mt-3 max-w-xs text-xs leading-relaxed">
-            AI-powered services marketplace connecting customers with trusted local pros.
+            You tell us the outcome. We handle the work — with trusted local professionals.
           </p>
           <div className="mt-4 flex items-center gap-2">
             {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
