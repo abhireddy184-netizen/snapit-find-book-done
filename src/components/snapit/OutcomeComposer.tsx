@@ -317,14 +317,19 @@ export function OutcomeComposer() {
       else stopRecordingAndTranscribe();
       return;
     }
+    // AI transcription is the preferred path everywhere it can run: it auto-detects
+    // the spoken language and copes with accents and code-switched speech.
+    if (canRecordAudio()) {
+      void startRecording();
+      return;
+    }
     const Ctor = getSpeechRecognition();
     if (Ctor) {
       startSpeechRecognition(Ctor);
-    } else if (canRecordAudio()) {
-      void startRecording();
     } else {
       setVoiceStatus("unsupported");
     }
+
   };
 
   const submit = (e: React.FormEvent) => {
