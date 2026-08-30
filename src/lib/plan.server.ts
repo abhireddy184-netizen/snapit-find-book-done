@@ -277,10 +277,17 @@ export function buildFallbackPlan(request: string, location: string, nowClock: s
 
 /* ---------------- shared finishing pass ---------------- */
 
+function isEnglish(plan: GpbPlan) {
+  const code = plan.understanding?.languageCode ?? "en";
+  return !code || code.toLowerCase().startsWith("en");
+}
+
 function withReplan(plan: GpbPlan): GpbPlan {
   const swappable = plan.tasks.find((t) => t.channel === "grocery-partner" || t.swappable);
   const hasRide = plan.tasks.some((t) => t.channel === "ride-partner");
-  if (!swappable || !hasRide || !plan.deadline) return plan;
+  // The simulated traffic re-plan copy only exists in English; suppress it rather
+  // than leaking English into a non-English plan.
+  if (!swappable || !hasRide || !plan.deadline || !isEnglish(plan)) return plan;
   return {
     ...plan,
     tasks: plan.tasks.map((t) => (t.id === swappable.id ? { ...t, swappable: true } : t)),
@@ -309,16 +316,23 @@ export function finalizePlan(plan: GpbPlan, nowClock: string): GpbPlan {
     startClock = toClockString(Math.max(earliest, Math.min(parseClock(startClock), latestStart)));
   }
 
+  // Disclaimers come from the planner in the customer's own language; the
+  // English strings are a fallback only.
   const notes = new Set(plan.notes.filter(Boolean));
-  notes.add("This is a plan, not a confirmed booking. Nothing has been ordered or dispatched.");
+  notes.add(
+    plan.bookingDisclaimer?.trim() ||
+      "This is a plan, not a confirmed booking. Nothing has been ordered or dispatched.",
+  );
   if (tasks.some((t) => !["gpb-pro", "user-action"].includes(t.channel))) {
     notes.add(
-      "Food, grocery and ride steps sit in GPB's expanding orchestration network — those partner integrations are not live yet.",
+      plan.partnerDisclaimer?.trim() ||
+        "Food, grocery and ride steps sit in GPB's expanding orchestration network — those partner integrations are not live yet.",
     );
   }
 
   return withReplan({ ...plan, tasks, startClock, notes: [...notes] });
 }
+
 
 /* ---------------- AI output normalizer ---------------- */
 
