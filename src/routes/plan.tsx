@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
   ArrowRight, ArrowUp, ArrowDown, Clock, Loader2, MapPin, RotateCcw, Sparkles,
-  TriangleAlert, Undo2, HardHat, ShoppingBasket, UtensilsCrossed, CarFront, UserRound, CircleSlash,
+  TriangleAlert, Undo2, HardHat, Languages, HelpCircle, ShoppingBasket, UtensilsCrossed, CarFront, UserRound, CircleSlash,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
@@ -256,6 +256,7 @@ function PlanSkeleton({ request }: { request: string }) {
 /* ---------------- summary ---------------- */
 
 function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
+  const c = uiCopy(plan);
   const end = planEndMinutes(plan);
   const deadline = plan.deadline ? parseClock(plan.deadline) : null;
   const slack = deadline == null ? null : deadline - end;
@@ -268,25 +269,31 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
             Example plan
           </span>
         )}
+        {plan.understanding && !plan.understanding.languageCode.toLowerCase().startsWith("en") && (
+          <span className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-border/60 bg-background px-2.5 py-1 text-[10px] font-bold text-muted-foreground">
+            <Languages className="h-3 w-3 shrink-0 text-primary" />
+            <span className="truncate">{plan.understanding.languageName}</span>
+          </span>
+        )}
       </div>
       <h2 className="mt-2 text-lg font-black leading-snug tracking-tight sm:text-xl">{plan.outcome}</h2>
       <p className="mt-1.5 max-w-[70ch] text-sm leading-relaxed text-muted-foreground">{plan.summary}</p>
 
       <dl className="mt-4 grid gap-2 sm:grid-cols-3">
-        <Stat label="Plan starts" value={formatClock(parseClock(plan.startClock))} icon={Clock} />
+        <Stat label={c.planStartsLabel} value={formatClock(parseClock(plan.startClock))} icon={Clock} />
         <Stat
-          label={plan.deadline ? "Target" : "Plan ends"}
+          label={plan.deadline ? c.targetLabel : c.planEndsLabel}
           value={formatClock(plan.deadline ? parseClock(plan.deadline) : end)}
           icon={Clock}
         />
         <Stat
-          label={slack == null ? "Steps" : "Buffer"}
+          label={slack == null ? c.stepsLabel : c.bufferLabel}
           value={
             slack == null
-              ? `${plan.tasks.filter((t) => t.status !== "skipped").length} tasks`
+              ? `${plan.tasks.filter((t) => t.status !== "skipped").length} ${c.tasksWord}`
               : slack >= 0
-                ? `${slack} min spare`
-                : `${Math.abs(slack)} min over`
+                ? `${slack} ${c.spareSuffix}`
+                : `${Math.abs(slack)} ${c.overSuffix}`
           }
           icon={slack != null && slack < 0 ? TriangleAlert : MapPin}
           tone={slack != null && slack < 0 ? "danger" : undefined}
@@ -306,6 +313,71 @@ function Stat({
       </dt>
       <dd className={`mt-0.5 text-base font-black tracking-tight ${tone === "danger" ? "text-destructive" : ""}`}>{value}</dd>
     </div>
+  );
+}
+
+/* ---------------- clarification card ---------------- */
+
+/**
+ * Shown only when the understanding layer flagged a genuinely critical
+ * ambiguity (AM vs PM, which airport, pickup vs dropoff, which person).
+ * The answer may be written in any language; it is merged with the original
+ * request and the plan is rebuilt.
+ */
+function ClarifyCard({
+  plan, onAnswer, onDismiss,
+}: { plan: GpbPlan; onAnswer: (answer: string) => void; onDismiss: () => void }) {
+  const c = uiCopy(plan);
+  const [answer, setAnswer] = useState("");
+  const question = plan.understanding?.clarificationQuestion ?? "";
+
+  return (
+    <section
+      aria-live="polite"
+      className="mt-4 overflow-hidden rounded-[24px] border border-primary/30 bg-card p-5 shadow-sm"
+    >
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+          <HelpCircle className="h-5 w-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h3 className="text-sm font-black tracking-tight sm:text-base">{c.clarifyTitle}</h3>
+          <p className="mt-1 text-sm leading-relaxed break-words hyphens-auto text-foreground">{question}</p>
+          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{c.clarifyHint}</p>
+
+          <form
+            onSubmit={(e) => { e.preventDefault(); if (answer.trim()) onAnswer(answer.trim()); }}
+            className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
+          >
+            <label htmlFor="gpb-clarify" className="sr-only">{c.clarifyTitle}</label>
+            <input
+              id="gpb-clarify"
+              value={answer}
+              onChange={(e) => setAnswer(e.target.value)}
+              placeholder={c.clarifyPlaceholder}
+              className="w-full min-w-0 rounded-2xl bg-muted/40 px-4 py-3 text-sm outline-none placeholder:text-muted-foreground focus:bg-muted/60"
+            />
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="submit"
+                data-analytics-id="clarify_submit"
+                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-black text-white shadow-md transition-transform hover:scale-[1.01] sm:flex-none"
+                style={{ background: "var(--gradient-primary)" }}
+              >
+                {c.clarifySubmit} <ArrowRight className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={onDismiss}
+                className="inline-flex min-h-11 items-center justify-center rounded-2xl border border-border bg-background px-4 py-2.5 text-sm font-bold hover:bg-muted"
+              >
+                {c.clarifyDismiss}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -369,19 +441,20 @@ function Timeline({
   plan, onChange, onReset,
 }: { plan: GpbPlan; onChange: (t: PlanTask[]) => void; onReset: () => void }) {
   const start = parseClock(plan.startClock);
+  const c = uiCopy(plan);
 
   return (
     <section className="mt-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-[clamp(1.25rem,2.6vw,1.7rem)] font-black tracking-tight">Your steps</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Reorder, skip or restore any step.</p>
+          <h2 className="text-[clamp(1.25rem,2.6vw,1.7rem)] font-black tracking-tight">{c.stepsHeading}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{c.stepsHint}</p>
         </div>
         <button
           onClick={onReset}
           className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-bold hover:bg-muted"
         >
-          <Undo2 className="h-3.5 w-3.5" /> Reset plan
+          <Undo2 className="h-3.5 w-3.5" /> {c.resetLabel}
         </button>
       </header>
 
@@ -389,6 +462,7 @@ function Timeline({
         {plan.tasks.map((task, i) => (
           <TaskRow
             key={task.id}
+            c={c}
             task={task}
             index={i}
             clock={formatClock(start + task.startOffsetMinutes)}
@@ -415,9 +489,9 @@ function Timeline({
 }
 
 function TaskRow({
-  task, index, clock, isLast, onMove, onToggleSkip, onRename, onDuration,
+  c, task, index, clock, isLast, onMove, onToggleSkip, onRename, onDuration,
 }: {
-  task: PlanTask; index: number; clock: string; isLast: boolean;
+  c: Copy; task: PlanTask; index: number; clock: string; isLast: boolean;
   onMove: (dir: number) => void; onToggleSkip: () => void;
   onRename: (title: string) => void; onDuration: (minutes: number) => void;
 }) {
@@ -436,7 +510,7 @@ function TaskRow({
         <div className="flex items-center gap-2 sm:block">
           <span className="text-sm font-black tracking-tight text-foreground">{skipped ? "—" : clock}</span>
           <span className="block text-[11px] font-semibold text-muted-foreground">
-            {task.durationMinutes > 0 ? `${task.durationMinutes} min` : "arrival"}
+            {task.durationMinutes > 0 ? `${task.durationMinutes} ${c.minutesShort}` : ""}
           </span>
         </div>
 
@@ -478,7 +552,7 @@ function TaskRow({
                 params={{ category: task.categorySlug }}
                 className="font-bold text-primary hover:underline"
               >
-                Find a pro
+                {c.findProLabel}
               </Link>
             )}
           </div>
@@ -488,10 +562,10 @@ function TaskRow({
               onClick={() => setEditing((v) => !v)}
               className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-bold hover:bg-muted"
             >
-              {editing ? "Done" : "Edit"}
+              {editing ? c.doneLabel : c.editLabel}
             </button>
             <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
-              <span className="sr-only sm:not-sr-only">Duration</span>
+              <span className="sr-only sm:not-sr-only">{c.durationLabel}</span>
               <input
                 type="number"
                 min={0}
@@ -502,13 +576,13 @@ function TaskRow({
                 aria-label={`Duration in minutes for ${task.title}`}
                 className="w-16 rounded-full border border-border bg-background px-2.5 py-1.5 text-[11px] font-bold outline-none"
               />
-              min
+              {c.minutesShort}
             </label>
             <button
               onClick={onToggleSkip}
               className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-bold hover:bg-muted"
             >
-              {skipped ? "Restore" : "Skip"}
+              {skipped ? c.restoreLabel : c.skipLabel}
             </button>
           </div>
         </div>
@@ -539,6 +613,7 @@ function TaskRow({
 /* ---------------- channels + notes ---------------- */
 
 function PlanDetails({ plan }: { plan: GpbPlan }) {
+  const c = uiCopy(plan);
   const used = new Set(plan.tasks.map((t) => t.channel));
   const channels = (Object.keys(CHANNEL_META) as ExecutionChannel[]).filter(
     (c) => used.has(c) && c !== "not-supported",
@@ -556,7 +631,7 @@ function PlanDetails({ plan }: { plan: GpbPlan }) {
 
       <details className="group rounded-[24px] border border-border/60 bg-card p-5 shadow-sm">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-black tracking-tight">
-          How this will be handled
+          {c.detailsHeading}
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border/60 text-muted-foreground transition-transform group-open:rotate-90">
             <ArrowRight className="h-4 w-4" />
           </span>
