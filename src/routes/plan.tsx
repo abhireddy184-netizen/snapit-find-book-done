@@ -10,7 +10,8 @@ import type { LucideIcon } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { buildPlan } from "@/lib/plan.functions";
 import {
-  CHANNEL_META, demoAirportPlan, formatClock, move, parseClock, planEndMinutes, resequence, uiCopy,
+  CHANNEL_META, DEFAULT_UI_COPY, demoAirportPlan, formatClock, move, parseClock, planEndMinutes,
+  planLocale, resequence, uiCopy,
   type ExecutionChannel, type GpbPlan, type PlanTask, type PlanUiCopy,
 } from "@/lib/plan-model";
 
@@ -123,9 +124,14 @@ function PlanPage() {
     setReplanDismissed(false);
   };
 
+  // Before a plan exists the language is unknown, so the header falls back to
+  // neutral English defaults; it re-renders in the user's language on arrival.
+  const c = plan ? uiCopy(plan) : DEFAULT_UI_COPY;
+
   return (
     <AppShell>
       <PlanHeader
+        c={c}
         request={search.q}
         loc={search.loc}
         isDemo={isDemo}
@@ -135,12 +141,12 @@ function PlanPage() {
       {!isDemo && query.isPending && <PlanSkeleton request={search.q} />}
       {!isDemo && query.isError && (
         <div className="mt-6 rounded-[24px] border border-destructive/30 bg-card p-5">
-          <p className="text-sm font-bold text-destructive">We couldn't build that plan just now.</p>
+          <p className="text-sm font-bold text-destructive">{c.errorTitle}</p>
           <button
             onClick={() => void query.refetch()}
             className="mt-3 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-bold hover:bg-muted"
           >
-            <RotateCcw className="h-4 w-4" /> Try again
+            <RotateCcw className="h-4 w-4" /> {c.retryLabel}
           </button>
         </div>
       )}
@@ -173,7 +179,7 @@ function PlanPage() {
 
           <Timeline plan={plan} onChange={update} onReset={resetPlan} />
           <PlanDetails plan={plan} />
-          <NextSteps />
+          <NextSteps c={c} />
         </>
       )}
     </AppShell>
@@ -183,8 +189,8 @@ function PlanPage() {
 /* ---------------- header / composer ---------------- */
 
 function PlanHeader({
-  request, loc, isDemo, onSubmit,
-}: { request: string; loc: string; isDemo: boolean; onSubmit: (q: string, loc: string) => void }) {
+  c, request, loc, isDemo, onSubmit,
+}: { c: Copy; request: string; loc: string; isDemo: boolean; onSubmit: (q: string, loc: string) => void }) {
   const [q, setQ] = useState(request);
   const [l, setL] = useState(loc);
   useEffect(() => setQ(request), [request]);
@@ -193,12 +199,12 @@ function PlanHeader({
   return (
     <section className="fade-up">
       <h1 className="text-[clamp(1.6rem,4vw,2.6rem)] font-black leading-tight tracking-tight">
-        Your GPB Plan
+        {c.pageTitle}
       </h1>
       <p className="mt-2 max-w-[58ch] text-sm text-muted-foreground sm:text-base">
         {isDemo
           ? "Here's an example plan. Describe what you need below to build your own."
-          : "Here's your plan. Change the order, the timing or any step — nothing is booked."}
+          : c.pageIntro}
       </p>
 
       <form
@@ -206,21 +212,21 @@ function PlanHeader({
         className="mt-5 grid gap-2 rounded-[24px] border border-border/60 bg-card p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start"
       >
         <div className="grid min-w-0 gap-2">
-          <label htmlFor="plan-request" className="sr-only">Describe your outcome or day</label>
+          <label htmlFor="plan-request" className="sr-only">{c.requestPlaceholder}</label>
           <textarea
             id="plan-request"
             rows={2}
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="I need dinner, groceries, and to be at DFW by 6 PM."
+            placeholder={c.requestPlaceholder}
             className="min-h-[62px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3 text-[15px] leading-relaxed outline-none placeholder:text-muted-foreground focus:bg-muted/60"
           />
-          <label htmlFor="plan-loc" className="sr-only">ZIP or city</label>
+          <label htmlFor="plan-loc" className="sr-only">{c.locationPlaceholder}</label>
           <input
             id="plan-loc"
             value={l}
             onChange={(e) => setL(e.target.value)}
-            placeholder="ZIP or city"
+            placeholder={c.locationPlaceholder}
             className="w-full rounded-2xl bg-muted/40 px-4 py-2.5 text-sm outline-none placeholder:text-muted-foreground focus:bg-muted/60"
           />
         </div>
@@ -230,7 +236,7 @@ function PlanHeader({
           className="inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.01]"
           style={{ background: "var(--gradient-primary)" }}
         >
-          <Sparkles className="h-4 w-4" /> Build my plan
+          <Sparkles className="h-4 w-4" /> {c.buildLabel}
         </button>
       </form>
     </section>
@@ -257,6 +263,7 @@ function PlanSkeleton({ request }: { request: string }) {
 
 function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
   const c = uiCopy(plan);
+  const locale = planLocale(plan);
   const end = planEndMinutes(plan);
   const deadline = plan.deadline ? parseClock(plan.deadline) : null;
   const slack = deadline == null ? null : deadline - end;
@@ -280,10 +287,10 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
       <p className="mt-1.5 max-w-[70ch] text-sm leading-relaxed text-muted-foreground">{plan.summary}</p>
 
       <dl className="mt-4 grid gap-2 sm:grid-cols-3">
-        <Stat label={c.planStartsLabel} value={formatClock(parseClock(plan.startClock))} icon={Clock} />
+        <Stat label={c.planStartsLabel} value={formatClock(parseClock(plan.startClock), locale)} icon={Clock} />
         <Stat
           label={plan.deadline ? c.targetLabel : c.planEndsLabel}
-          value={formatClock(plan.deadline ? parseClock(plan.deadline) : end)}
+          value={formatClock(plan.deadline ? parseClock(plan.deadline) : end, locale)}
           icon={Clock}
         />
         <Stat
@@ -442,6 +449,7 @@ function Timeline({
 }: { plan: GpbPlan; onChange: (t: PlanTask[]) => void; onReset: () => void }) {
   const start = parseClock(plan.startClock);
   const c = uiCopy(plan);
+  const locale = planLocale(plan);
 
   return (
     <section className="mt-6">
@@ -465,7 +473,7 @@ function Timeline({
             c={c}
             task={task}
             index={i}
-            clock={formatClock(start + task.startOffsetMinutes)}
+            clock={formatClock(start + task.startOffsetMinutes, locale)}
             isLast={i === plan.tasks.length - 1}
             onMove={(dir) => onChange(move(plan.tasks, i, i + dir))}
             onToggleSkip={() =>
@@ -640,7 +648,10 @@ function PlanDetails({ plan }: { plan: GpbPlan }) {
           </span>
         </summary>
 
-        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        {/* Channel labels/blurbs only exist in English; on a localized plan the
+            same information is already carried by the localized task titles and
+            notes, so the grid is suppressed rather than shown in English. */}
+        <div className={english ? "mt-4 grid gap-2 sm:grid-cols-2" : "hidden"}>
           {channels.map((c) => {
             const meta = CHANNEL_META[c];
             const Icon = CHANNEL_ICON[c];
@@ -674,7 +685,7 @@ function PlanDetails({ plan }: { plan: GpbPlan }) {
   );
 }
 
-function NextSteps() {
+function NextSteps({ c }: { c: Copy }) {
   return (
     <section className="mt-6 grid gap-3 sm:grid-cols-2">
       <Link
@@ -684,8 +695,8 @@ function NextSteps() {
         className="flex items-center justify-between gap-3 rounded-[22px] border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30"
       >
         <span>
-          <span className="block text-sm font-black tracking-tight">Easier to show than say it?</span>
-          <span className="mt-1 block text-xs text-muted-foreground">Send GPB a photo or video instead.</span>
+          <span className="block text-sm font-black tracking-tight">{c.snapCtaTitle}</span>
+          <span className="mt-1 block text-xs text-muted-foreground">{c.snapCtaBody}</span>
         </span>
         <ArrowRight className="h-4 w-4 shrink-0 text-primary" />
       </Link>
@@ -696,8 +707,8 @@ function NextSteps() {
         className="flex items-center justify-between gap-3 rounded-[22px] border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30"
       >
         <span>
-          <span className="block text-sm font-black tracking-tight">Want GPB to run plans like this?</span>
-          <span className="mt-1 block text-xs text-muted-foreground">Join early access — launching city by city.</span>
+          <span className="block text-sm font-black tracking-tight">{c.earlyCtaTitle}</span>
+          <span className="mt-1 block text-xs text-muted-foreground">{c.earlyCtaBody}</span>
         </span>
         <ArrowRight className="h-4 w-4 shrink-0 text-primary" />
       </a>
