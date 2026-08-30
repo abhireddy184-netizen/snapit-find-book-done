@@ -280,6 +280,9 @@ export function OutcomeComposer() {
     baseTextRef.current = request.trim();
     stopRequestedRef.current = false;
     discardRef.current = false;
+    finalizedRef.current = false;
+    partialInFlightRef.current = false;
+    partialSeqRef.current += 1;
     let stream: MediaStream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
