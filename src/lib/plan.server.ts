@@ -144,7 +144,13 @@ export function buildPlanUserPrompt(
       ? `Canonical intent (internal English restatement — use for meaning, never copy its wording into output): "${understanding.normalizedRequest}"`
       : "",
     understanding
-      ? `Detected language: ${understanding.languageName} (${understanding.languageCode})${understanding.codeSwitched ? " — code-switched/mixed; mirror that mixed style" : ""}. Write ALL customer-facing text in this language.`
+      ? `Detected language: ${understanding.languageName} (${understanding.languageCode})${understanding.codeSwitched ? " — code-switched/mixed; mirror that mixed style" : ""}. Writing style: ${
+          understanding.script === "latin"
+            ? "romanized/transliterated in Latin letters — reply in the SAME romanized style, do not switch to another script"
+            : understanding.script === "mixed"
+              ? "mixed native script and Latin letters — mirror that same mixed style"
+              : "the language's own script — reply in that script"
+        }. Write ALL customer-facing text in this language and style.`
       : "",
     location ? `Location context: ${location}` : "No location given.",
     `Current local time is roughly ${formatClock(parseClock(nowClock))}.`,
