@@ -37,6 +37,16 @@ type SpeechRecognitionLike = {
 };
 type SpeechRecognitionCtor = new () => SpeechRecognitionLike;
 
+/**
+ * Script-range test rather than a language list: matches Arabic, Hebrew,
+ * Syriac, Thaana, N'Ko and the Arabic supplements/presentation forms.
+ */
+const RTL_RANGE =
+  /[\u0590-\u05FF\u0600-\u06FF\u0700-\u074F\u0780-\u07BF\u07C0-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]/;
+export function isRtlText(text: string): boolean {
+  return RTL_RANGE.test(text);
+}
+
 function getSpeechRecognition(): SpeechRecognitionCtor | null {
   if (typeof window === "undefined") return null;
   const w = window as unknown as {
@@ -396,16 +406,20 @@ export function OutcomeComposer() {
       <label htmlFor="gpb-outcome" className="sr-only">
         Describe the outcome or the day you need handled
       </label>
-      <div className="relative">
+      {/* Direction follows what the person actually typed: any RTL script
+          (Arabic, Hebrew, Urdu, Persian, …) flips the text and the logical
+          padding so the mic button never sits on top of the first characters. */}
+      <div dir={isRtlText(request) ? "rtl" : "ltr"} className="relative">
         <textarea
           id="gpb-outcome"
+          dir="auto"
           value={request}
           onChange={(e) => setRequest(e.target.value)}
           onFocus={() => (paused.current = true)}
           onBlur={() => (paused.current = false)}
           rows={3}
           placeholder={EXAMPLES[i]}
-          className="min-h-[112px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pr-[3.25rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:pr-14"
+          className="min-h-[112px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pe-[3.25rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:pe-14"
         />
         <button
           type="button"
@@ -414,7 +428,7 @@ export function OutcomeComposer() {
           title={micTitle}
           aria-pressed={listening}
           disabled={transcribing}
-          className={`absolute right-2 top-2 grid h-10 w-10 shrink-0 place-items-center rounded-full border transition-all sm:right-2.5 sm:top-2.5 ${
+          className={`absolute end-2 top-2 grid h-10 w-10 shrink-0 place-items-center rounded-full border transition-all sm:end-2.5 sm:top-2.5 ${
 
             listening
               ? "animate-pulse border-primary bg-primary text-primary-foreground shadow-md"
@@ -437,7 +451,7 @@ export function OutcomeComposer() {
       </p>
 
       {statusLine && (
-        <p className={`mt-1.5 text-xs font-semibold ${listening || transcribing ? "text-primary" : "text-muted-foreground"}`}>
+        <p dir="auto" className={`mt-1.5 text-xs font-semibold ${listening || transcribing ? "text-primary" : "text-muted-foreground"}`}>
           {statusLine}
         </p>
       )}
