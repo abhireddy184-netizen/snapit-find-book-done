@@ -4,6 +4,8 @@ import { Camera, Loader2, Mic, Sparkles, Square } from "lucide-react";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { transcribeVoice } from "@/lib/transcribe-voice.functions";
 import { startVoiceActivityMonitor, type VoiceActivityMonitor } from "@/lib/voice-activity";
+import { StableTranscript } from "@/lib/stable-transcript";
+
 
 const EXAMPLES = [
   "I need dinner, groceries, and to be at DFW by 6 PM.",
