@@ -176,7 +176,9 @@ export function OutcomeComposer() {
     const rec = new Ctor();
     recRef.current = rec;
     baseTextRef.current = request.trim();
-    rec.lang = "en-US";
+    // Use the visitor's own browser locale rather than a hard-coded en-US.
+    rec.lang = (typeof navigator !== "undefined" && navigator.language) || "en-US";
+
     rec.interimResults = true;
     rec.continuous = false;
     rec.maxAlternatives = 1;
@@ -241,9 +243,17 @@ export function OutcomeComposer() {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
       const name = (err as { name?: string } | null)?.name ?? "";
-      setVoiceStatus(name === "NotAllowedError" || name === "SecurityError" ? "denied" : "error");
+      if (name === "NotAllowedError" || name === "SecurityError") {
+        setVoiceStatus("denied");
+        return;
+      }
+      // No usable recorder (no mic, hardware busy) — fall back to browser speech recognition.
+      const Ctor = getSpeechRecognition();
+      if (Ctor) startSpeechRecognition(Ctor);
+      else setVoiceStatus("error");
       return;
     }
+
 
     const mimeType = pickMimeType();
     let recorder: MediaRecorder;
@@ -307,14 +317,19 @@ export function OutcomeComposer() {
       else stopRecordingAndTranscribe();
       return;
     }
+    // AI transcription is the preferred path everywhere it can run: it auto-detects
+    // the spoken language and copes with accents and code-switched speech.
+    if (canRecordAudio()) {
+      void startRecording();
+      return;
+    }
     const Ctor = getSpeechRecognition();
     if (Ctor) {
       startSpeechRecognition(Ctor);
-    } else if (canRecordAudio()) {
-      void startRecording();
     } else {
       setVoiceStatus("unsupported");
     }
+
   };
 
   const submit = (e: React.FormEvent) => {
@@ -333,15 +348,16 @@ export function OutcomeComposer() {
       ? "Stop voice input"
       : transcribing
         ? "Transcribing your voice…"
-        : "Use voice input";
+        : "Use voice input — speak any language";
 
   const statusLine = listening
-    ? "Listening… tap the mic again when you’re done."
+    ? "Listening… speak in any language, then tap the mic again."
     : transcribing
       ? "Transcribing your voice…"
       : voiceStatus in VOICE_MESSAGES
         ? VOICE_MESSAGES[voiceStatus as keyof typeof VOICE_MESSAGES]
         : null;
+
 
   return (
     <form
@@ -361,7 +377,7 @@ export function OutcomeComposer() {
           onBlur={() => (paused.current = false)}
           rows={3}
           placeholder={EXAMPLES[i]}
-          className="min-h-[102px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pr-12 text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60"
+          className="min-h-[112px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pr-[3.25rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:pr-14"
         />
         <button
           type="button"
@@ -370,7 +386,8 @@ export function OutcomeComposer() {
           title={micTitle}
           aria-pressed={listening}
           disabled={transcribing}
-          className={`absolute right-2.5 top-2.5 grid h-9 w-9 place-items-center rounded-full border transition-all ${
+          className={`absolute right-2 top-2 grid h-10 w-10 shrink-0 place-items-center rounded-full border transition-all sm:right-2.5 sm:top-2.5 ${
+
             listening
               ? "animate-pulse border-primary bg-primary text-primary-foreground shadow-md"
               : transcribing

@@ -3,7 +3,12 @@ import { z } from "zod";
 
 const MAX_AUDIO_B64 = 8 * 1024 * 1024;
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/audio/transcriptions";
-const STT_MODEL = "openai/gpt-4o-mini-transcribe";
+const STT_MODEL = "openai/gpt-4o-transcribe";
+// No `language` field is sent: the model auto-detects the spoken language and
+// handles accents plus code-switched speech (e.g. Telugu+English, Hindi+English).
+const STT_PROMPT =
+  "Everyday spoken request about errands, chores, home services, food, groceries, rides or appointments. The speaker may mix languages (for example English with Telugu, Hindi, Tamil or Spanish), have a strong accent, use broken grammar or filler words. Transcribe verbatim in the language actually spoken; do not translate, correct or add anything.";
+
 
 function extFor(mimeType: string): string {
   if (mimeType.includes("mp4") || mimeType.includes("m4a")) return "m4a";
@@ -43,6 +48,8 @@ export const transcribeVoice = createServerFn({ method: "POST" })
     const form = new FormData();
     form.append("file", file);
     form.append("model", STT_MODEL);
+    form.append("prompt", STT_PROMPT);
+
 
     const res = await fetch(GATEWAY_URL, {
       method: "POST",
