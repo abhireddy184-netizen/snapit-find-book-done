@@ -48,14 +48,28 @@ export const transcribeVoice = createServerFn({ method: "POST" })
     });
 
     let text = "";
-    for await (const part of result.fullStream) {
-      if (part.type === "text-delta") {
-        text += part.text;
-      } else if (part.type === "error") {
-        const e = part.error as { message?: string; statusCode?: number; responseBody?: unknown };
-        const detail = typeof e?.responseBody === "string" ? e.responseBody.slice(0, 500) : e?.message;
-        throw new Error(`Transcription failed: ${e?.statusCode ?? ""} ${detail ?? "unknown"}`);
+    try {
+      for await (const part of result.fullStream) {
+        if (part.type === "text-delta") {
+          text += part.text;
+        } else if (part.type === "error") {
+          throw (part.error as Error) ?? new Error("stream error");
+        }
       }
+    } catch (err) {
+      // Surface the underlying provider/gateway detail for debugging.
+      const seen: string[] = [];
+      let cur: unknown = err;
+      for (let depth = 0; cur && depth < 4; depth++) {
+        const c = cur as { name?: string; message?: string; statusCode?: number; responseBody?: unknown; cause?: unknown };
+        seen.push(
+          `${c.name ?? "Error"}: ${c.message ?? String(cur)}${c.statusCode ? ` [${c.statusCode}]` : ""}${
+            typeof c.responseBody === "string" ? ` body=${c.responseBody.slice(0, 300)}` : ""
+          }`,
+        );
+        cur = c.cause;
+      }
+      throw new Error(`Transcription failed :: ${seen.join(" <- ")}`);
     }
     return { text: text.trim() };
   });
