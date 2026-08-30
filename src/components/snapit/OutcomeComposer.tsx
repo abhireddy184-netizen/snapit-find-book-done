@@ -301,7 +301,9 @@ export function OutcomeComposer() {
     discardRef.current = false;
     finalizedRef.current = false;
     partialInFlightRef.current = false;
+    stableRef.current = new StableTranscript();
     partialSeqRef.current += 1;
+
     let stream: MediaStream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
