@@ -5,10 +5,11 @@ const MAX_AUDIO_B64 = 8 * 1024 * 1024;
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/audio/transcriptions";
 const STT_MODEL = "openai/gpt-4o-transcribe";
 // No `language` field is sent: the model auto-detects the spoken language.
-// The prompt is deliberately language-agnostic — any human language, dialect or
-// mixture is expected, and no language list is implied.
+// The examples below are illustrative only — ANY human language, dialect or
+// mixture is expected and no language is preferred or excluded.
 const STT_PROMPT =
-  "Everyday spoken request about errands, chores, home services, food, groceries, rides, appointments, airports and flights. The speaker may use ANY human language, dialect or regional variety, and may switch between languages within a single sentence; no language is unexpected. They may have a strong accent, speak quickly, use slang, broken grammar, incomplete phrases or filler words. Transcribe verbatim in the language and script actually spoken, keeping each code-switched word in its own language and script; never translate, transliterate, summarise, correct grammar, or add anything. Preserve proper nouns exactly as spoken: city and country names, airport codes (e.g. DFW, JFK, LHR, BLR), business or store names, street names, people's names, clock times with AM/PM, dates and quantities.";
+  "Everyday spoken request about errands, chores, home services, food, groceries, rides, appointments, airports and flights. It often contains city names, airport codes (DFW, DAL, JFK, LAX, LHR, BLR, HYD), business or store names, street names, people's names, clock times with AM/PM, dates and quantities — transcribe those exactly as spoken. The speaker may use ANY human language, dialect or regional variety, and may mix two languages within one sentence — for example English with Telugu, Hindi, Kannada, Malayalam, Tamil, Bengali, Marathi, Gujarati, Punjabi, Urdu, Spanish, Arabic, French, Portuguese, Tagalog, Vietnamese, Chinese, Japanese or Korean; these are examples, not a limit, and no language is unexpected. Telugu, Kannada, Malayalam and Tamil speech must never be mistaken for Spanish or another European language: identify the language from the actual words, and when the speech is a South Asian language write it in its own native script (Telugu in Telugu script, Hindi/Marathi in Devanagari, Urdu in Arabic script) unless the speaker is clearly using romanized spelling. The speaker may have a strong accent, speak quickly, use slang, broken grammar, incomplete phrases or filler words. Transcribe verbatim in the language and script actually spoken, keeping each code-switched word in its own language and script; never translate, transliterate, summarise, correct grammar, or add anything.";
+
 
 
 function extFor(mimeType: string): string {
