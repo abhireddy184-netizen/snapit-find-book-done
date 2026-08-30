@@ -4,6 +4,8 @@ import { Camera, Loader2, Mic, Sparkles, Square } from "lucide-react";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { transcribeVoice } from "@/lib/transcribe-voice.functions";
 import { startVoiceActivityMonitor, type VoiceActivityMonitor } from "@/lib/voice-activity";
+import { StableTranscript } from "@/lib/stable-transcript";
+
 
 const EXAMPLES = [
   "I need dinner, groceries, and to be at DFW by 6 PM.",
@@ -16,8 +18,12 @@ const EXAMPLES = [
 const MAX_RECORD_MS = 60_000;
 // Rolling provisional transcription while the user is still speaking.
 const PARTIAL_CHUNK_MS = 1_000;
-const PARTIAL_INTERVAL_MS = 2_500;
+// Adaptive cadence: quick first feedback, backing off as the clip grows so a
+// long recording doesn't re-upload big audio every couple of seconds.
+const PARTIAL_MIN_MS = 1_800;
+const PARTIAL_MAX_MS = 4_000;
 const MIN_PARTIAL_BYTES = 6_000;
+
 
 type SpeechRecognitionResultLike = {
   isFinal: boolean;
@@ -138,8 +144,11 @@ export function OutcomeComposer() {
   const partialSeqRef = useRef(0);
   const partialInFlightRef = useRef(false);
   const finalizedRef = useRef(false);
+  // Append-only merge of provisional passes, so committed words never vanish.
+  const stableRef = useRef<StableTranscript | null>(null);
   // Text the recognition session started with — finals append onto this.
   const baseTextRef = useRef("");
+
   const listening = voiceStatus === "listening";
   const transcribing = voiceStatus === "transcribing";
 
@@ -164,7 +173,7 @@ export function OutcomeComposer() {
       recordTimerRef.current = null;
     }
     if (partialTimerRef.current !== null) {
-      window.clearInterval(partialTimerRef.current);
+      window.clearTimeout(partialTimerRef.current);
       partialTimerRef.current = null;
     }
     vadRef.current?.stop();
@@ -272,7 +281,7 @@ export function OutcomeComposer() {
     // Any provisional transcription still in flight is now stale.
     partialSeqRef.current += 1;
     if (partialTimerRef.current !== null) {
-      window.clearInterval(partialTimerRef.current);
+      window.clearTimeout(partialTimerRef.current);
       partialTimerRef.current = null;
     }
     vadRef.current?.stop();
@@ -292,7 +301,9 @@ export function OutcomeComposer() {
     discardRef.current = false;
     finalizedRef.current = false;
     partialInFlightRef.current = false;
+    stableRef.current = new StableTranscript();
     partialSeqRef.current += 1;
+
     let stream: MediaStream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -355,12 +366,12 @@ export function OutcomeComposer() {
     };
 
     /**
-     * Rolling provisional transcript: every PARTIAL_INTERVAL_MS we transcribe the
+     * Rolling provisional transcript: on an adaptive cadence we transcribe the
      * audio captured *so far* (all timeslice chunks concatenated, so the container
      * header from the first chunk is always present — valid on both webm/Chrome and
-     * fragmented mp4/iOS Safari). The result replaces the provisional text so it
-     * never duplicates, and any response that lands after the final transcription
-     * (or from an older session) is dropped.
+     * fragmented mp4/iOS Safari). Each pass is merged append-only through
+     * StableTranscript, so words the user has already seen never disappear when
+     * the model rewords the tail. Stale/late responses are dropped.
      */
     const runPartial = async () => {
       const seq = partialSeqRef.current;
@@ -379,8 +390,10 @@ export function OutcomeComposer() {
         if (seq !== partialSeqRef.current || finalizedRef.current) return;
         const spoken = res.text.trim();
         if (!spoken) return;
+        const merged = (stableRef.current ??= new StableTranscript()).push(spoken);
+        if (!merged) return;
         const base = baseTextRef.current;
-        setRequest(base ? `${base} ${spoken}` : spoken);
+        setRequest(base ? `${base} ${merged}` : merged);
       } catch {
         // Provisional only — silence failures and let the final transcription decide.
       } finally {
@@ -388,12 +401,26 @@ export function OutcomeComposer() {
       }
     };
 
+    // Self-scheduling instead of a fixed interval: the clip grows with time, so
+    // back the cadence off as the upload gets larger (bounded API usage).
+    const startedAt = Date.now();
+    const scheduleNextPartial = () => {
+      const elapsed = Date.now() - startedAt;
+      const delay = Math.min(PARTIAL_MAX_MS, Math.max(PARTIAL_MIN_MS, elapsed / 4));
+      partialTimerRef.current = window.setTimeout(() => {
+        void runPartial().finally(() => {
+          if (!finalizedRef.current && !stopRequestedRef.current) scheduleNextPartial();
+        });
+      }, delay);
+    };
+
     mediaRef.current = { recorder, stream };
     try {
       // Timeslice so partial data is available while the user is still speaking.
       recorder.start(PARTIAL_CHUNK_MS);
       setVoiceStatus("listening");
-      partialTimerRef.current = window.setInterval(() => void runPartial(), PARTIAL_INTERVAL_MS);
+      scheduleNextPartial();
+
       // Hard maximum, unchanged.
       recordTimerRef.current = window.setTimeout(() => stopRecordingAndTranscribe(), MAX_RECORD_MS);
       // Local level detection: stop on end-of-speech, or if nothing is ever said.
