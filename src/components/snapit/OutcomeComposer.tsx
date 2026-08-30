@@ -348,15 +348,16 @@ export function OutcomeComposer() {
       ? "Stop voice input"
       : transcribing
         ? "Transcribing your voice…"
-        : "Use voice input";
+        : "Use voice input — speak any language";
 
   const statusLine = listening
-    ? "Listening… tap the mic again when you’re done."
+    ? "Listening… speak in any language, then tap the mic again."
     : transcribing
       ? "Transcribing your voice…"
       : voiceStatus in VOICE_MESSAGES
         ? VOICE_MESSAGES[voiceStatus as keyof typeof VOICE_MESSAGES]
         : null;
+
 
   return (
     <form
