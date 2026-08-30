@@ -13,6 +13,7 @@ import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
 import { OutcomeComposer } from "@/components/snapit/OutcomeComposer";
 import {
   HowItWorks, OutcomeBundles, DailyLifeModules, ShowGpbBand, TrustSection, BrowseFallback,
+  OrchestratorBand,
 } from "@/components/snapit/V2Sections";
 
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
