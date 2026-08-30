@@ -141,7 +141,7 @@ function PlanPage() {
       {!isDemo && query.isPending && <PlanSkeleton request={search.q} />}
       {!isDemo && query.isError && (
         <div className="mt-6 rounded-[24px] border border-destructive/30 bg-card p-5">
-          <p className="text-sm font-bold text-destructive">{c.errorTitle}</p>
+          <p dir="auto" className="text-sm font-bold text-destructive">{c.errorTitle}</p>
           <button
             onClick={() => void query.refetch()}
             className="mt-3 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-bold hover:bg-muted"
@@ -198,10 +198,10 @@ function PlanHeader({
 
   return (
     <section className="fade-up">
-      <h1 className="text-[clamp(1.6rem,4vw,2.6rem)] font-black leading-tight tracking-tight">
+      <h1 dir="auto" className="text-[clamp(1.6rem,4vw,2.6rem)] font-black leading-tight tracking-tight">
         {c.pageTitle}
       </h1>
-      <p className="mt-2 max-w-[58ch] text-sm text-muted-foreground sm:text-base">
+      <p dir="auto" className="mt-2 max-w-[58ch] text-sm text-muted-foreground sm:text-base">
         {isDemo
           ? "Here's an example plan. Describe what you need below to build your own."
           : c.pageIntro}
@@ -215,6 +215,7 @@ function PlanHeader({
           <label htmlFor="plan-request" className="sr-only">{c.requestPlaceholder}</label>
           <textarea
             id="plan-request"
+            dir="auto"
             rows={2}
             value={q}
             onChange={(e) => setQ(e.target.value)}
@@ -224,6 +225,7 @@ function PlanHeader({
           <label htmlFor="plan-loc" className="sr-only">{c.locationPlaceholder}</label>
           <input
             id="plan-loc"
+            dir="auto"
             value={l}
             onChange={(e) => setL(e.target.value)}
             placeholder={c.locationPlaceholder}
@@ -249,7 +251,7 @@ function PlanSkeleton({ request }: { request: string }) {
       <p className="flex items-center gap-2 text-sm font-bold">
         <Loader2 className="h-4 w-4 animate-spin text-primary" /> GPB is sequencing your plan…
       </p>
-      <p className="mt-1 text-xs text-muted-foreground">“{request}”</p>
+      <p dir="auto" className="mt-1 text-xs text-muted-foreground">“{request}”</p>
       <div className="mt-4 space-y-2">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="h-14 animate-pulse rounded-2xl bg-muted/60" />
@@ -279,12 +281,12 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
         {plan.understanding && !plan.understanding.languageCode.toLowerCase().startsWith("en") && (
           <span className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-border/60 bg-background px-2.5 py-1 text-[10px] font-bold text-muted-foreground">
             <Languages className="h-3 w-3 shrink-0 text-primary" />
-            <span className="truncate">{plan.understanding.languageName}</span>
+            <span dir="auto" className="truncate">{plan.understanding.languageName}</span>
           </span>
         )}
       </div>
-      <h2 className="mt-2 text-lg font-black leading-snug tracking-tight sm:text-xl">{plan.outcome}</h2>
-      <p className="mt-1.5 max-w-[70ch] text-sm leading-relaxed text-muted-foreground">{plan.summary}</p>
+      <h2 dir="auto" className="mt-2 text-lg font-black leading-snug tracking-tight sm:text-xl">{plan.outcome}</h2>
+      <p dir="auto" className="mt-1.5 max-w-[70ch] text-sm leading-relaxed text-muted-foreground">{plan.summary}</p>
 
       <dl className="mt-4 grid gap-2 sm:grid-cols-3">
         <Stat label={c.planStartsLabel} value={formatClock(parseClock(plan.startClock), locale)} icon={Clock} />
@@ -315,10 +317,10 @@ function Stat({
 }: { label: string; value: string; icon: LucideIcon; tone?: "danger" }) {
   return (
     <div className={`rounded-2xl border px-4 py-3 ${tone === "danger" ? "border-destructive/40 bg-destructive/5" : "border-border/60 bg-background"}`}>
-      <dt className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+      <dt dir="auto" className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
         <Icon className={`h-3.5 w-3.5 ${tone === "danger" ? "text-destructive" : "text-primary"}`} /> {label}
       </dt>
-      <dd className={`mt-0.5 text-base font-black tracking-tight ${tone === "danger" ? "text-destructive" : ""}`}>{value}</dd>
+      <dd dir="auto" className={`mt-0.5 text-base font-black tracking-tight ${tone === "danger" ? "text-destructive" : ""}`}>{value}</dd>
     </div>
   );
 }
@@ -348,9 +350,9 @@ function ClarifyCard({
           <HelpCircle className="h-5 w-5" />
         </span>
         <div className="min-w-0 flex-1">
-          <h3 className="text-sm font-black tracking-tight sm:text-base">{c.clarifyTitle}</h3>
-          <p className="mt-1 text-sm leading-relaxed break-words hyphens-auto text-foreground">{question}</p>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{c.clarifyHint}</p>
+          <h3 dir="auto" className="text-sm font-black tracking-tight sm:text-base">{c.clarifyTitle}</h3>
+          <p dir="auto" className="mt-1 text-sm leading-relaxed break-words hyphens-auto text-foreground">{question}</p>
+          <p dir="auto" className="mt-1 text-xs leading-relaxed text-muted-foreground">{c.clarifyHint}</p>
 
           <form
             onSubmit={(e) => { e.preventDefault(); if (answer.trim()) onAnswer(answer.trim()); }}
@@ -359,6 +361,7 @@ function ClarifyCard({
             <label htmlFor="gpb-clarify" className="sr-only">{c.clarifyTitle}</label>
             <input
               id="gpb-clarify"
+              dir="auto"
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder={c.clarifyPlaceholder}
@@ -455,8 +458,8 @@ function Timeline({
     <section className="mt-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-[clamp(1.25rem,2.6vw,1.7rem)] font-black tracking-tight">{c.stepsHeading}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{c.stepsHint}</p>
+          <h2 dir="auto" className="text-[clamp(1.25rem,2.6vw,1.7rem)] font-black tracking-tight">{c.stepsHeading}</h2>
+          <p dir="auto" className="mt-1 text-sm text-muted-foreground">{c.stepsHint}</p>
         </div>
         <button
           onClick={onReset}
@@ -534,6 +537,7 @@ function TaskRow({
             {editing ? (
               <input
                 autoFocus
+                dir="auto"
                 value={task.title}
                 onChange={(e) => onRename(e.target.value)}
                 onBlur={() => setEditing(false)}
@@ -542,17 +546,17 @@ function TaskRow({
                 className="min-w-0 flex-1 rounded-xl bg-muted/50 px-3 py-1.5 text-sm font-bold outline-none"
               />
             ) : (
-              <h3 className={`text-sm font-black tracking-tight sm:text-base ${skipped ? "line-through" : ""}`}>
+              <h3 dir="auto" className={`text-sm font-black tracking-tight sm:text-base ${skipped ? "line-through" : ""}`}>
                 {task.title}
               </h3>
             )}
           </div>
 
-          {task.detail && <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{task.detail}</p>}
+          {task.detail && <p dir="auto" className="mt-1 text-sm leading-relaxed text-muted-foreground">{task.detail}</p>}
 
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-muted-foreground">
             {task.locationNote && (
-              <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {task.locationNote}</span>
+              <span dir="auto" className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {task.locationNote}</span>
             )}
             {task.categorySlug && (
               <Link
@@ -641,7 +645,7 @@ function PlanDetails({ plan }: { plan: GpbPlan }) {
       )}
 
       <details className="group rounded-[24px] border border-border/60 bg-card p-5 shadow-sm">
-        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-black tracking-tight">
+        <summary dir="auto" className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-black tracking-tight">
           {c.detailsHeading}
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border/60 text-muted-foreground transition-transform group-open:rotate-90">
             <ArrowRight className="h-4 w-4" />
@@ -674,7 +678,7 @@ function PlanDetails({ plan }: { plan: GpbPlan }) {
 
         <ul className="mt-4 space-y-1.5 text-xs leading-relaxed text-muted-foreground">
           {plan.notes.map((n) => (
-            <li key={n}>· {n}</li>
+            <li key={n} dir="auto">· {n}</li>
           ))}
           {english && (
             <li>· Home and local tasks link into the GPB service catalogue, where you choose and book a pro.</li>
@@ -695,8 +699,8 @@ function NextSteps({ c }: { c: Copy }) {
         className="flex items-center justify-between gap-3 rounded-[22px] border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30"
       >
         <span>
-          <span className="block text-sm font-black tracking-tight">{c.snapCtaTitle}</span>
-          <span className="mt-1 block text-xs text-muted-foreground">{c.snapCtaBody}</span>
+          <span dir="auto" className="block text-sm font-black tracking-tight">{c.snapCtaTitle}</span>
+          <span dir="auto" className="mt-1 block text-xs text-muted-foreground">{c.snapCtaBody}</span>
         </span>
         <ArrowRight className="h-4 w-4 shrink-0 text-primary" />
       </Link>
@@ -707,8 +711,8 @@ function NextSteps({ c }: { c: Copy }) {
         className="flex items-center justify-between gap-3 rounded-[22px] border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30"
       >
         <span>
-          <span className="block text-sm font-black tracking-tight">{c.earlyCtaTitle}</span>
-          <span className="mt-1 block text-xs text-muted-foreground">{c.earlyCtaBody}</span>
+          <span dir="auto" className="block text-sm font-black tracking-tight">{c.earlyCtaTitle}</span>
+          <span dir="auto" className="mt-1 block text-xs text-muted-foreground">{c.earlyCtaBody}</span>
         </span>
         <ArrowRight className="h-4 w-4 shrink-0 text-primary" />
       </a>
