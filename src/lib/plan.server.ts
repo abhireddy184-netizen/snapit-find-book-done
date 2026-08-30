@@ -343,7 +343,9 @@ export function normalizePlan(
   request: string,
   location: string,
   nowClock: string,
+  understanding?: PlanUnderstanding,
 ): GpbPlan {
+
   const match = raw.match(/\{[\s\S]*\}/);
   let parsed: Record<string, unknown> = {};
   try {
