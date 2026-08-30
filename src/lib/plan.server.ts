@@ -28,7 +28,7 @@ function catalogSummary() {
 
 /* ================= stage 1 — universal language understanding ================= */
 
-export const UNDERSTAND_SYSTEM_PROMPT = `You are GPB's universal language understanding layer. You receive ONE real-world request that a person typed or spoke. It may be in ANY language on earth, in a mix of languages (code-switching such as Telugu+English, Hindi+English, Kannada+English, Malayalam+English, Tamil+English, Spanish+English), in a regional script or romanized, with a strong accent transcribed imperfectly, with broken grammar, slang, filler words, missing articles or tense, or as an incomplete phrase.
+export const UNDERSTAND_SYSTEM_PROMPT = `You are GPB's universal language understanding layer. You receive ONE real-world request that a person typed or spoke. Treat the input as fully language-agnostic: it may be in ANY human language, dialect or regional variety, written in ANY Unicode script, romanized/transliterated into Latin letters (phonetic spelling of a non-English language, e.g. "inti daggara", "ghar ke paas", "vanakkam"), written in a mix of native script and Latin letters, or mixing two or more languages inside one sentence. It may contain slang, dialect words, misspellings, broken grammar, missing articles or tense, filler words, incomplete phrases, or imperfect voice-transcription noise. Never assume a fixed list of supported languages; any examples given here are illustrative only. Do not rely on phrase dictionaries — infer the underlying language and meaning from phonetics, morphology and context.
 
 YOUR JOB: convert it into a canonical intent the planner can act on, WITHOUT losing or inventing meaning.
 
@@ -37,12 +37,13 @@ RULES
 2. Preserve EVERY hard constraint exactly as stated: clock times and whether AM/PM was stated, deadlines, dates, city/airport/neighbourhood names, named businesses, people's names or relationships, quantities, pickup vs dropoff, and the order of events. Never silently add a constraint the person did not state.
 3. Repair only obvious transcription noise (e.g. "D F W" -> "DFW"). If a proper noun is uncertain, keep it as heard rather than replacing it with a guess.
 4. Write "normalizedRequest" in clear ENGLISH for the planner (an internal canonical form), listing the tasks in intended order and stating each hard constraint explicitly. This is internal only; it is never shown to the user.
-5. Detect the language actually used. "languageCode" = best-effort code of the DOMINANT language ("te", "hi", "kn", "ml", "ta", "es", "en", ...). "languageName" = its name written in that language. "codeSwitched" = true when two or more languages are genuinely mixed.
-6. "confidence" 0-1: how sure you are of the intent. Grammar problems alone should NOT lower confidence.
-7. Ask for clarification ONLY when a single critical detail would materially change execution and cannot be inferred: an impossible-to-infer AM vs PM, two genuinely plausible airports/cities, pickup vs dropoff, or which person. In that case set "criticalAmbiguity" (short, English, internal) and "clarificationQuestion" (ONE short question written in the USER'S OWN language / code-switched style). Otherwise leave both as empty strings. Never ask about minor uncertainty; a sensible default is better than a question.
+5. Detect the language actually used, whatever it is. "languageCode" = best-effort BCP-47/ISO code of the DOMINANT language (any language, not only common ones). "languageName" = its name written in that language, in the same script the user wrote in. "codeSwitched" = true when two or more languages are genuinely mixed.
+6. Detect HOW it was written and report it as "script": "native" when the language's own script is used, "latin" when a non-English language is romanized/transliterated into Latin letters, "mixed" when both appear. If the text is genuine English, set languageCode "en" and script "native" — do NOT misclassify ordinary English as transliteration just because some words look phonetic. Judge by whether the words actually mean something in English as written.
+7. "confidence" 0-1: how sure you are of the intent. Grammar problems, romanization, dialect or misspellings alone should NOT lower confidence. Lower it only when the actual meaning is unclear.
+8. Ask for clarification ONLY when a single critical detail would materially change execution and cannot be inferred: an impossible-to-infer AM vs PM, two genuinely plausible airports/cities, pickup vs dropoff, or which person. In that case set "criticalAmbiguity" (short, English, internal) and "clarificationQuestion" (ONE short question written in the USER'S OWN language AND their own script/romanization style). Otherwise leave both as empty strings. Never ask about minor uncertainty; a sensible default is better than a question.
 
 Return ONLY minified JSON, no markdown:
-{"languageCode":string,"languageName":string,"codeSwitched":boolean,"normalizedRequest":string,"confidence":number,"criticalAmbiguity":string,"clarificationQuestion":string}`;
+{"languageCode":string,"languageName":string,"script":"native"|"latin"|"mixed","codeSwitched":boolean,"normalizedRequest":string,"confidence":number,"criticalAmbiguity":string,"clarificationQuestion":string}`;
 
 export function buildUnderstandUserPrompt(request: string, location: string, nowClock: string) {
   return [
@@ -66,10 +67,16 @@ export function normalizeUnderstanding(raw: string, request: string): PlanUnders
   const confidence = Math.min(1, Math.max(0, Number(p['confidence'] ?? 0.7)));
   const ambiguity = str("criticalAmbiguity");
   const question = str("clarificationQuestion");
+  const rawScript = str("script").toLowerCase();
+  const script =
+    rawScript === "latin" || rawScript === "mixed" || rawScript === "native"
+      ? (rawScript as "latin" | "mixed" | "native")
+      : undefined;
   return {
     languageCode: str("languageCode").slice(0, 12) || "en",
     languageName: str("languageName").slice(0, 40) || "English",
     codeSwitched: Boolean(p['codeSwitched']),
+    ...(script ? { script } : {}),
     normalizedRequest: str("normalizedRequest") || request,
     confidence,
     // Only surface a question when it is tied to a genuinely critical ambiguity.
@@ -108,6 +115,8 @@ HONESTY RULES
 LANGUAGE OF THE OUTPUT (critical)
 - You are given the customer's VERBATIM request, a canonical English restatement of it, and the detected language.
 - Every customer-facing string you write — outcome, summary, task titles, details, locationNote, notes, bookingDisclaimer, partnerDisclaimer and every value in uiCopy — MUST be written in the customer's own language (the detected language). If the request was code-switched, write in that same natural mixed style.
+- MIRROR THE CUSTOMER'S SCRIPT AND STYLE. If they wrote in their language's own script, reply in that script. If they wrote their language romanized in Latin letters (transliteration), reply in the SAME natural romanized style — do not surprise them by switching to a script they did not use. If they mixed scripts or languages, mix in the same natural proportion. If the style is unclear, prefer the script the customer actually used; if still unclear, plain English is the safe fallback.
+- This applies to ANY language, dialect or regional variety — never fall back to English just because a language is uncommon.
 - Never translate away named places, businesses or people: keep them as the customer said them.
 - Machine values (id, channel, categorySlug, serviceSlug, times, numbers) stay in English/ASCII and must never be translated.
 - "uiCopy" is short interface wording for the plan screen (page title, intro line, input placeholders, buttons, card labels); write EVERY value in the customer's language. If the customer's language is English, return the English wording. Keep each value under ~8 words so it fits small phone screens. "pageIntro" is one short sentence reminding them they can change the order/timing and that nothing is booked. "snapCtaTitle"/"snapCtaBody" invite sending a photo or video instead; "earlyCtaTitle"/"earlyCtaBody" invite joining early access, launching city by city.
@@ -135,7 +144,13 @@ export function buildPlanUserPrompt(
       ? `Canonical intent (internal English restatement — use for meaning, never copy its wording into output): "${understanding.normalizedRequest}"`
       : "",
     understanding
-      ? `Detected language: ${understanding.languageName} (${understanding.languageCode})${understanding.codeSwitched ? " — code-switched/mixed; mirror that mixed style" : ""}. Write ALL customer-facing text in this language.`
+      ? `Detected language: ${understanding.languageName} (${understanding.languageCode})${understanding.codeSwitched ? " — code-switched/mixed; mirror that mixed style" : ""}. Writing style: ${
+          understanding.script === "latin"
+            ? "romanized/transliterated in Latin letters — reply in the SAME romanized style, do not switch to another script"
+            : understanding.script === "mixed"
+              ? "mixed native script and Latin letters — mirror that same mixed style"
+              : "the language's own script — reply in that script"
+        }. Write ALL customer-facing text in this language and style.`
       : "",
     location ? `Location context: ${location}` : "No location given.",
     `Current local time is roughly ${formatClock(parseClock(nowClock))}.`,
