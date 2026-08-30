@@ -67,10 +67,16 @@ export function normalizeUnderstanding(raw: string, request: string): PlanUnders
   const confidence = Math.min(1, Math.max(0, Number(p['confidence'] ?? 0.7)));
   const ambiguity = str("criticalAmbiguity");
   const question = str("clarificationQuestion");
+  const rawScript = str("script").toLowerCase();
+  const script =
+    rawScript === "latin" || rawScript === "mixed" || rawScript === "native"
+      ? (rawScript as "latin" | "mixed" | "native")
+      : undefined;
   return {
     languageCode: str("languageCode").slice(0, 12) || "en",
     languageName: str("languageName").slice(0, 40) || "English",
     codeSwitched: Boolean(p['codeSwitched']),
+    ...(script ? { script } : {}),
     normalizedRequest: str("normalizedRequest") || request,
     confidence,
     // Only surface a question when it is tied to a genuinely critical ambiguity.
