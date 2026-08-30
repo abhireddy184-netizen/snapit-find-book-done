@@ -190,7 +190,12 @@ function nextId(prefix: string) {
 }
 
 /** Rule-based plan used when AI is unavailable or returns nothing usable. */
-export function buildFallbackPlan(request: string, location: string, nowClock: string): GpbPlan {
+export function buildFallbackPlan(
+  request: string,
+  location: string,
+  nowClock: string,
+  understanding?: PlanUnderstanding,
+): GpbPlan {
   const fragments = splitFragments(request);
   const tasks: PlanTask[] = [];
 
@@ -270,6 +275,8 @@ export function buildFallbackPlan(request: string, location: string, nowClock: s
       tasks,
       notes: [],
       source: "fallback",
+      originalRequest: request,
+      ...(understanding ? { understanding } : {}),
     },
     nowClock,
   );
@@ -351,7 +358,7 @@ export function normalizePlan(
   try {
     parsed = JSON.parse(match ? match[0] : raw) as Record<string, unknown>;
   } catch {
-    return buildFallbackPlan(request, location, nowClock);
+    return buildFallbackPlan(request, location, nowClock, understanding);
   }
 
   const rawTasks = Array.isArray(parsed['tasks']) ? (parsed['tasks'] as RawTask[]) : [];
@@ -387,7 +394,7 @@ export function normalizePlan(
       };
     });
 
-  if (!tasks.length) return buildFallbackPlan(request, location, nowClock);
+  if (!tasks.length) return buildFallbackPlan(request, location, nowClock, understanding);
 
   const deadline =
     typeof parsed['deadline'] === "string" && /^\d{1,2}:\d{2}$/.test(parsed['deadline'] as string)
