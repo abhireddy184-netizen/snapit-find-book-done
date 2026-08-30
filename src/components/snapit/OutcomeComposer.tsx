@@ -142,8 +142,11 @@ export function OutcomeComposer() {
   const partialSeqRef = useRef(0);
   const partialInFlightRef = useRef(false);
   const finalizedRef = useRef(false);
+  // Append-only merge of provisional passes, so committed words never vanish.
+  const stableRef = useRef<StableTranscript | null>(null);
   // Text the recognition session started with — finals append onto this.
   const baseTextRef = useRef("");
+
   const listening = voiceStatus === "listening";
   const transcribing = voiceStatus === "transcribing";
 
