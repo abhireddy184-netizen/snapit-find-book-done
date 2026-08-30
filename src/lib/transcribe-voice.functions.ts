@@ -47,6 +47,17 @@ export const transcribeVoice = createServerFn({ method: "POST" })
       ],
     });
 
-    const text = (await result.text).trim();
-    return { text };
+    try {
+      const text = (await result.text).trim();
+      return { text };
+    } catch (err) {
+      const e = err as { message?: string; cause?: unknown; statusCode?: number; responseBody?: unknown };
+      console.error(
+        "[transcribeVoice] gateway error",
+        e?.statusCode,
+        e?.message,
+        typeof e?.responseBody === "string" ? e.responseBody.slice(0, 2000) : undefined,
+      );
+      throw err;
+    }
   });
