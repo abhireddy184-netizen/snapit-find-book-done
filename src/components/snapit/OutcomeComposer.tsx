@@ -176,7 +176,9 @@ export function OutcomeComposer() {
     const rec = new Ctor();
     recRef.current = rec;
     baseTextRef.current = request.trim();
-    rec.lang = "en-US";
+    // Use the visitor's own browser locale rather than a hard-coded en-US.
+    rec.lang = (typeof navigator !== "undefined" && navigator.language) || "en-US";
+
     rec.interimResults = true;
     rec.continuous = false;
     rec.maxAlternatives = 1;
