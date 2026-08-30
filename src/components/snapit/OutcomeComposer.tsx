@@ -318,6 +318,7 @@ export function OutcomeComposer() {
     recorder.onstop = async () => {
       const blob = new Blob(chunks, { type: recorder.mimeType || mimeType || "audio/mp4" });
       const discarded = discardRef.current;
+      finalizedRef.current = true;
       stopRecordingResources();
       if (discarded || blob.size < 200) {
         setVoiceStatus("no-speech");
@@ -343,10 +344,46 @@ export function OutcomeComposer() {
       }
     };
 
+    /**
+     * Rolling provisional transcript: every PARTIAL_INTERVAL_MS we transcribe the
+     * audio captured *so far* (all timeslice chunks concatenated, so the container
+     * header from the first chunk is always present — valid on both webm/Chrome and
+     * fragmented mp4/iOS Safari). The result replaces the provisional text so it
+     * never duplicates, and any response that lands after the final transcription
+     * (or from an older session) is dropped.
+     */
+    const runPartial = async () => {
+      const seq = partialSeqRef.current;
+      if (finalizedRef.current || stopRequestedRef.current) return;
+      if (partialInFlightRef.current) return;
+      if (chunks.length === 0) return;
+      const blob = new Blob(chunks.slice(), { type: recorder.mimeType || mimeType || "audio/mp4" });
+      if (blob.size < MIN_PARTIAL_BYTES) return;
+      partialInFlightRef.current = true;
+      try {
+        const audioDataBase64 = await blobToBase64(blob);
+        const res = await transcribeVoice({
+          data: { audioDataBase64, mimeType: blob.type || "audio/mp4" },
+        });
+        // Drop stale responses: newer session, or the final transcript already won.
+        if (seq !== partialSeqRef.current || finalizedRef.current) return;
+        const spoken = res.text.trim();
+        if (!spoken) return;
+        const base = baseTextRef.current;
+        setRequest(base ? `${base} ${spoken}` : spoken);
+      } catch {
+        // Provisional only — silence failures and let the final transcription decide.
+      } finally {
+        partialInFlightRef.current = false;
+      }
+    };
+
     mediaRef.current = { recorder, stream };
     try {
-      recorder.start();
+      // Timeslice so partial data is available while the user is still speaking.
+      recorder.start(PARTIAL_CHUNK_MS);
       setVoiceStatus("listening");
+      partialTimerRef.current = window.setInterval(() => void runPartial(), PARTIAL_INTERVAL_MS);
       // Hard maximum, unchanged.
       recordTimerRef.current = window.setTimeout(() => stopRecordingAndTranscribe(), MAX_RECORD_MS);
       // Local level detection: stop on end-of-speech, or if nothing is ever said.
