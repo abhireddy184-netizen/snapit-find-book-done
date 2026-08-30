@@ -239,7 +239,25 @@ function SnapPage() {
   return (
     <AppShell>
       <div className="mx-auto max-w-3xl">
+        {(image || analysis) && (
+          <div className="sticky top-0 z-20 -mx-1 mb-1 flex items-center justify-between gap-2 bg-background/85 px-1 py-2 backdrop-blur">
+            <button
+              type="button"
+              onClick={reset}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-4 text-sm font-bold hover:bg-muted"
+            >
+              <ArrowRight className="h-4 w-4 rotate-180" /> Back
+            </button>
+            <Link
+              to="/"
+              className="inline-flex min-h-11 items-center rounded-full px-3 text-sm font-semibold text-muted-foreground hover:text-primary"
+            >
+              Home
+            </Link>
+          </div>
+        )}
         <div className="pt-2">
+
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
             <Sparkles className="h-3.5 w-3.5" /> One way to talk to GPB
           </div>
