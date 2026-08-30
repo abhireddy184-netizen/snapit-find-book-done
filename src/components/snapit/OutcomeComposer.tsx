@@ -269,6 +269,12 @@ export function OutcomeComposer() {
     stopRequestedRef.current = true;
     discardRef.current = discard;
     // Stop the analyser immediately; the recorder's onstop does the rest.
+    // Any provisional transcription still in flight is now stale.
+    partialSeqRef.current += 1;
+    if (partialTimerRef.current !== null) {
+      window.clearInterval(partialTimerRef.current);
+      partialTimerRef.current = null;
+    }
     vadRef.current?.stop();
     vadRef.current = null;
     try {
