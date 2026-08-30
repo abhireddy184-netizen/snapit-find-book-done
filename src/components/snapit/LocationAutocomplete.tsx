@@ -130,6 +130,7 @@ export function LocationAutocomplete({
         {showIcon && <MapPin className="h-4 w-4 shrink-0 text-primary" />}
         <input
           id={id}
+          dir="auto"
           value={value}
           required={required}
           autoComplete="off"
