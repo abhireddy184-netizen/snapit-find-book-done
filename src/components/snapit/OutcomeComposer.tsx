@@ -243,9 +243,17 @@ export function OutcomeComposer() {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     } catch (err) {
       const name = (err as { name?: string } | null)?.name ?? "";
-      setVoiceStatus(name === "NotAllowedError" || name === "SecurityError" ? "denied" : "error");
+      if (name === "NotAllowedError" || name === "SecurityError") {
+        setVoiceStatus("denied");
+        return;
+      }
+      // No usable recorder (no mic, hardware busy) — fall back to browser speech recognition.
+      const Ctor = getSpeechRecognition();
+      if (Ctor) startSpeechRecognition(Ctor);
+      else setVoiceStatus("error");
       return;
     }
+
 
     const mimeType = pickMimeType();
     let recorder: MediaRecorder;
