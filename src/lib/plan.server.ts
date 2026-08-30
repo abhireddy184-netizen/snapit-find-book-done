@@ -8,6 +8,8 @@ import {
   type ExecutionChannel,
   type GpbPlan,
   type PlanTask,
+  type PlanUiCopy,
+  type PlanUnderstanding,
 } from "./plan-model";
 
 const CATEGORY_SLUGS = new Set(catalog.map((c) => c.slug));
@@ -24,6 +26,59 @@ function catalogSummary() {
   return catalog.map((c) => `${c.slug}: ${c.services.map((s) => s.slug).join(", ")}`).join("\n");
 }
 
+/* ================= stage 1 — universal language understanding ================= */
+
+export const UNDERSTAND_SYSTEM_PROMPT = `You are GPB's universal language understanding layer. You receive ONE real-world request that a person typed or spoke. It may be in ANY language on earth, in a mix of languages (code-switching such as Telugu+English, Hindi+English, Kannada+English, Malayalam+English, Tamil+English, Spanish+English), in a regional script or romanized, with a strong accent transcribed imperfectly, with broken grammar, slang, filler words, missing articles or tense, or as an incomplete phrase.
+
+YOUR JOB: convert it into a canonical intent the planner can act on, WITHOUT losing or inventing meaning.
+
+RULES
+1. Understand by MEANING, never by grammar or keyword matching. "Me airport go 6, before food eat, grocery pickup also" = eat first, then pick up groceries on the way, then reach the airport by 6 PM.
+2. Preserve EVERY hard constraint exactly as stated: clock times and whether AM/PM was stated, deadlines, dates, city/airport/neighbourhood names, named businesses, people's names or relationships, quantities, pickup vs dropoff, and the order of events. Never silently add a constraint the person did not state.
+3. Repair only obvious transcription noise (e.g. "D F W" -> "DFW"). If a proper noun is uncertain, keep it as heard rather than replacing it with a guess.
+4. Write "normalizedRequest" in clear ENGLISH for the planner (an internal canonical form), listing the tasks in intended order and stating each hard constraint explicitly. This is internal only; it is never shown to the user.
+5. Detect the language actually used. "languageCode" = best-effort code of the DOMINANT language ("te", "hi", "kn", "ml", "ta", "es", "en", ...). "languageName" = its name written in that language. "codeSwitched" = true when two or more languages are genuinely mixed.
+6. "confidence" 0-1: how sure you are of the intent. Grammar problems alone should NOT lower confidence.
+7. Ask for clarification ONLY when a single critical detail would materially change execution and cannot be inferred: an impossible-to-infer AM vs PM, two genuinely plausible airports/cities, pickup vs dropoff, or which person. In that case set "criticalAmbiguity" (short, English, internal) and "clarificationQuestion" (ONE short question written in the USER'S OWN language / code-switched style). Otherwise leave both as empty strings. Never ask about minor uncertainty; a sensible default is better than a question.
+
+Return ONLY minified JSON, no markdown:
+{"languageCode":string,"languageName":string,"codeSwitched":boolean,"normalizedRequest":string,"confidence":number,"criticalAmbiguity":string,"clarificationQuestion":string}`;
+
+export function buildUnderstandUserPrompt(request: string, location: string, nowClock: string) {
+  return [
+    `Raw request (verbatim): "${request}"`,
+    location ? `Location context: ${location}` : "No location given.",
+    `Current local time is roughly ${formatClock(parseClock(nowClock))}.`,
+    "Return JSON only.",
+  ].join("\n");
+}
+
+/** Parse the understanding stage; always returns something usable. */
+export function normalizeUnderstanding(raw: string, request: string): PlanUnderstanding {
+  const match = raw.match(/\{[\s\S]*\}/);
+  let p: Record<string, unknown> = {};
+  try {
+    p = JSON.parse(match ? match[0] : raw) as Record<string, unknown>;
+  } catch {
+    p = {};
+  }
+  const str = (k: string) => (typeof p[k] === "string" ? (p[k] as string).trim() : "");
+  const confidence = Math.min(1, Math.max(0, Number(p['confidence'] ?? 0.7)));
+  const ambiguity = str("criticalAmbiguity");
+  const question = str("clarificationQuestion");
+  return {
+    languageCode: str("languageCode").slice(0, 12) || "en",
+    languageName: str("languageName").slice(0, 40) || "English",
+    codeSwitched: Boolean(p['codeSwitched']),
+    normalizedRequest: str("normalizedRequest") || request,
+    confidence,
+    // Only surface a question when it is tied to a genuinely critical ambiguity.
+    ...(ambiguity && question ? { criticalAmbiguity: ambiguity, clarificationQuestion: question } : {}),
+  };
+}
+
+/* ================= stage 2 — planning ================= */
+
 export const PLAN_SYSTEM_PROMPT = `You are GPB (GetPerfectBoy.com), a real-world execution planner. GPB is NOT a dating service and NOT a single-service directory: the customer describes an OUTCOME or a whole part of their day, and you turn it into ONE coordinated plan of linked tasks with sequencing and timing.
 
 Break the request into 2-8 child tasks. For each task decide:
@@ -36,7 +91,7 @@ Break the request into 2-8 child tasks. For each task decide:
   * "user-action" — something only the customer can do (leave home, be at the gate, unlock the door).
   * "not-supported" — GPB cannot coordinate it. Be honest rather than inventing capability.
 - durationMinutes: realistic, including travel where the task involves moving.
-- parallel: true when it can run at the same time as the previous task (e.g. a cleaner working while the customer drives), false when it must follow it.
+- parallel: true when it can run at the same time as the previous task, false when it must follow it.
 - dependsOn: ids of tasks that must finish first (use the ids you assign).
 - locationNote: short route/location hint when relevant ("On route to DFW", "At home").
 
@@ -50,30 +105,46 @@ HONESTY RULES
 - Never invent faults, prices, or providers.
 - Only use categorySlug/serviceSlug values from the catalog below, and only for "gpb-pro" tasks.
 
-LANGUAGE AND MESSY INPUT
-- The request may arrive in ANY language, in mixed/code-switched speech (Telugu+English, Hindi+English, Spanish+English, Tamil+English, etc.), or as voice transcription with filler words, wrong grammar, missing articles/tense, or incomplete phrases.
-- Infer intent from MEANING, never from grammar. Example: "Me airport go 6, before food eat, grocery pickup also" means: eat/get food, then grocery pickup, then reach the airport by 18:00.
-- Keep every hard constraint exactly as stated: times, deadlines, locations, named places, quantities, people.
-- Do not invent details the customer did not say. If something essential is genuinely ambiguous, still produce the best coordinated plan and put the open question in "notes" — do not stall.
-- Always write the plan output ("outcome", "summary", task titles, notes) in the customer's own language when the request is clearly in a non-English language; use English for mixed/code-switched or English requests.
+LANGUAGE OF THE OUTPUT (critical)
+- You are given the customer's VERBATIM request, a canonical English restatement of it, and the detected language.
+- Every customer-facing string you write — outcome, summary, task titles, details, locationNote, notes, bookingDisclaimer, partnerDisclaimer and every value in uiCopy — MUST be written in the customer's own language (the detected language). If the request was code-switched, write in that same natural mixed style.
+- Never translate away named places, businesses or people: keep them as the customer said them.
+- Machine values (id, channel, categorySlug, serviceSlug, times, numbers) stay in English/ASCII and must never be translated.
+- "uiCopy" is short interface wording for the plan screen; translate each value into the customer's language. If the customer's language is English, return the English wording.
 
-
+MEANING FIRST
+- Infer intent from meaning, never grammar. Keep every hard constraint (times, AM/PM, deadlines, locations, people, quantities, pickup vs dropoff, order).
+- Do not invent details the customer did not say. If something is still open, put it in "notes" — do not stall.
 
 CATALOG (categorySlug: serviceSlugs)
 ${catalogSummary()}
 
 Return ONLY minified JSON, no markdown:
-{"outcome":string,"summary":string,"deadline":string,"startClock":string,"bufferMinutes":number,"tasks":[{"id":string,"title":string,"detail":string,"channel":string,"categorySlug":string,"serviceSlug":string,"durationMinutes":number,"parallel":boolean,"dependsOn":[string],"locationNote":string}],"notes":[string]}
+{"outcome":string,"summary":string,"deadline":string,"startClock":string,"bufferMinutes":number,"tasks":[{"id":string,"title":string,"detail":string,"channel":string,"categorySlug":string,"serviceSlug":string,"durationMinutes":number,"parallel":boolean,"dependsOn":[string],"locationNote":string}],"notes":[string],"bookingDisclaimer":string,"partnerDisclaimer":string,"uiCopy":{"stepsHeading":string,"stepsHint":string,"resetLabel":string,"editLabel":string,"doneLabel":string,"skipLabel":string,"restoreLabel":string,"durationLabel":string,"minutesShort":string,"findProLabel":string,"planStartsLabel":string,"targetLabel":string,"planEndsLabel":string,"stepsLabel":string,"bufferLabel":string,"tasksWord":string,"spareSuffix":string,"overSuffix":string,"detailsHeading":string,"clarifyTitle":string,"clarifyHint":string,"clarifyPlaceholder":string,"clarifySubmit":string,"clarifyDismiss":string}}
 Keep every string short and plain-language.`;
 
-export function buildPlanUserPrompt(request: string, location: string, nowClock: string) {
+export function buildPlanUserPrompt(
+  request: string,
+  location: string,
+  nowClock: string,
+  understanding?: PlanUnderstanding,
+) {
   return [
-    `Customer request: "${request}"`,
+    `Customer request (verbatim, in their own words): "${request}"`,
+    understanding
+      ? `Canonical intent (internal English restatement — use for meaning, never copy its wording into output): "${understanding.normalizedRequest}"`
+      : "",
+    understanding
+      ? `Detected language: ${understanding.languageName} (${understanding.languageCode})${understanding.codeSwitched ? " — code-switched/mixed; mirror that mixed style" : ""}. Write ALL customer-facing text in this language.`
+      : "",
     location ? `Location context: ${location}` : "No location given.",
     `Current local time is roughly ${formatClock(parseClock(nowClock))}.`,
     "Return JSON only.",
-  ].join("\n");
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
+
 
 /* ---------------- deterministic fallback ---------------- */
 
