@@ -43,6 +43,91 @@ export type ReplanSuggestion = {
   delayMinutes: number;
 };
 
+/**
+ * Language + understanding metadata produced by the normalization stage that
+ * runs before planning. Kept separate from the plan body so the original user
+ * wording is always preserved for display/audit.
+ */
+export type PlanUnderstanding = {
+  /** BCP-47-ish code, best effort (e.g. "te", "hi", "en", "es"). */
+  languageCode: string;
+  /** Human-readable language name, in the user's own language when possible. */
+  languageName: string;
+  /** True when the request mixes languages (code-switching). */
+  codeSwitched: boolean;
+  /** Canonical, meaning-preserving restatement of the request for the planner. */
+  normalizedRequest: string;
+  /** 0-1 confidence that the intent was understood correctly. */
+  confidence: number;
+  /** Short description of a critical ambiguity, when one exists. */
+  criticalAmbiguity?: string;
+  /** One concise question, in the user's language, when confirmation is required. */
+  clarificationQuestion?: string;
+};
+
+/**
+ * Language-aware UI copy returned by the planner so the plan page can speak the
+ * user's language without maintaining a hard-coded translation table.
+ * Every field is optional; the UI falls back to English.
+ */
+export type PlanUiCopy = Partial<{
+  stepsHeading: string;
+  stepsHint: string;
+  resetLabel: string;
+  editLabel: string;
+  doneLabel: string;
+  skipLabel: string;
+  restoreLabel: string;
+  durationLabel: string;
+  minutesShort: string;
+  findProLabel: string;
+  planStartsLabel: string;
+  targetLabel: string;
+  planEndsLabel: string;
+  stepsLabel: string;
+  bufferLabel: string;
+  tasksWord: string;
+  spareSuffix: string;
+  overSuffix: string;
+  detailsHeading: string;
+  clarifyTitle: string;
+  clarifyHint: string;
+  clarifyPlaceholder: string;
+  clarifySubmit: string;
+  clarifyDismiss: string;
+}>;
+
+export const DEFAULT_UI_COPY: Required<PlanUiCopy> = {
+  stepsHeading: "Your steps",
+  stepsHint: "Reorder, skip or restore any step.",
+  resetLabel: "Reset plan",
+  editLabel: "Edit",
+  doneLabel: "Done",
+  skipLabel: "Skip",
+  restoreLabel: "Restore",
+  durationLabel: "Duration",
+  minutesShort: "min",
+  findProLabel: "Find a pro",
+  planStartsLabel: "Plan starts",
+  targetLabel: "Target",
+  planEndsLabel: "Plan ends",
+  stepsLabel: "Steps",
+  bufferLabel: "Buffer",
+  tasksWord: "tasks",
+  spareSuffix: "min spare",
+  overSuffix: "min over",
+  detailsHeading: "How this will be handled",
+  clarifyTitle: "One detail to confirm",
+  clarifyHint: "Answer in any language — GPB will rebuild the plan.",
+  clarifyPlaceholder: "Your answer…",
+  clarifySubmit: "Update plan",
+  clarifyDismiss: "Keep as is",
+};
+
+export function uiCopy(plan: Pick<GpbPlan, "uiCopy">): Required<PlanUiCopy> {
+  return { ...DEFAULT_UI_COPY, ...(plan.uiCopy ?? {}) };
+}
+
 export type GpbPlan = {
   outcome: string;
   summary: string;
@@ -56,7 +141,16 @@ export type GpbPlan = {
   notes: string[];
   replan?: ReplanSuggestion;
   source: "ai" | "fallback" | "demo";
+  /** Exactly what the user typed/said, never rewritten. */
+  originalRequest?: string;
+  understanding?: PlanUnderstanding;
+  uiCopy?: PlanUiCopy;
+  /** Localized "nothing is booked" disclaimer. */
+  bookingDisclaimer?: string;
+  /** Localized partner-integration disclaimer. */
+  partnerDisclaimer?: string;
 };
+
 
 /* ---------------- channel presentation ---------------- */
 
