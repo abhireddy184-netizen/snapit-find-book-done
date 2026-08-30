@@ -182,10 +182,10 @@ function ProviderRecruitment() {
           <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">For professionals</div>
           <h2 className="text-2xl font-black tracking-tight md:text-3xl">Get clearer jobs, not vague leads.</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90">
-            Pros register their capabilities, service area, availability, team size and pricing — then GPB
-            routes only the relevant subtask of a customer's plan to you, with scope and location attached.
-            {" "}{catalog.length} categories, {TOTAL_SERVICES}+ services — register your interest before launch
-            and set your own radius, availability and pricing.
+            Pros set their service category, service area/radius, availability and starting price — and as GPB
+            orchestration expands, relevant subtasks of a customer's plan can be routed into the provider flow,
+            with scope and location attached.
+            {" "}{catalog.length} categories, {TOTAL_SERVICES}+ services — register your interest before launch.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2.5">
             <Link
@@ -210,7 +210,7 @@ function ProviderRecruitment() {
         <ul className="space-y-2 text-sm">
           {[
             "Free profile with your service ZIP and radius",
-            "Only the subtasks that match your capabilities",
+            "Only subtasks that match your category and service area",
             "Set your own prices, availability and coverage",
           ].map((l) => (
             <li key={l} className="flex items-start gap-2 rounded-2xl bg-white/10 px-4 py-2.5 backdrop-blur">

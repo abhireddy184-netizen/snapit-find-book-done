@@ -579,7 +579,7 @@ function ChannelLegend({ plan }: { plan: GpbPlan }) {
                 <div className="flex flex-wrap items-center gap-1.5">
                   <span className="text-sm font-black tracking-tight">{meta.label}</span>
                   <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${meta.live ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                    {meta.live ? "Live on GPB" : "Future integration"}
+                    {meta.live ? (c === "user-action" ? "Your step" : "GPB service flow") : "Future integration"}
                   </span>
                 </div>
                 <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{meta.blurb}</p>
@@ -600,7 +600,7 @@ function PlanNotes({ plan }: { plan: GpbPlan }) {
         {plan.notes.map((n) => (
           <li key={n}>· {n}</li>
         ))}
-        <li>· GPB local pro tasks connect to the live GPB service catalogue and provider flow.</li>
+        <li>· GPB-local tasks link into the current service catalogue and provider booking flow — the plan itself does not route or dispatch a pro.</li>
       </ul>
     </section>
   );

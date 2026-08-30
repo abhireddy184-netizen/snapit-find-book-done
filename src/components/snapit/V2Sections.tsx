@@ -333,7 +333,7 @@ export function BrowseFallback() {
 /* ---------------- 7) Orchestrator: one outcome, many channels ---------------- */
 
 const CHANNELS: { icon: LucideIcon; title: string; body: string; live: boolean }[] = [
-  { icon: HardHat, title: "GPB local pros", body: "Cleaning, handyman, moving, errands, auto and more — live on GPB today.", live: true },
+  { icon: HardHat, title: "GPB local pros", body: "Cleaning, handyman, moving, errands, auto and more — through the current GPB service flow.", live: true },
   { icon: UtensilsCrossed, title: "Food ordering", body: "Meals timed around the rest of your plan.", live: false },
   { icon: ShoppingBasket, title: "Grocery pickup or delivery", body: "Kept on your route, or switched to delivery when timing gets tight.", live: false },
   { icon: CarFront, title: "Rides & transport", body: "Departure times worked backwards from your deadline.", live: false },
@@ -382,7 +382,7 @@ export function OrchestratorBand() {
                 <span className="flex flex-wrap items-center gap-1.5">
                   <span className="text-sm font-black tracking-tight">{c.title}</span>
                   <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${c.live ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                    {c.live ? "Live on GPB" : "Future integration"}
+                    {c.live ? "GPB service flow" : "Future integration"}
                   </span>
                 </span>
                 <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">{c.body}</span>
