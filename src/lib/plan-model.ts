@@ -95,6 +95,17 @@ export type PlanUiCopy = Partial<{
   clarifyPlaceholder: string;
   clarifySubmit: string;
   clarifyDismiss: string;
+  pageTitle: string;
+  pageIntro: string;
+  requestPlaceholder: string;
+  locationPlaceholder: string;
+  buildLabel: string;
+  errorTitle: string;
+  retryLabel: string;
+  snapCtaTitle: string;
+  snapCtaBody: string;
+  earlyCtaTitle: string;
+  earlyCtaBody: string;
 }>;
 
 export const DEFAULT_UI_COPY: Required<PlanUiCopy> = {
@@ -122,6 +133,17 @@ export const DEFAULT_UI_COPY: Required<PlanUiCopy> = {
   clarifyPlaceholder: "Your answer…",
   clarifySubmit: "Update plan",
   clarifyDismiss: "Keep as is",
+  pageTitle: "Your GPB Plan",
+  pageIntro: "Here's your plan. Change the order, the timing or any step — nothing is booked.",
+  requestPlaceholder: "I need dinner, groceries, and to be at DFW by 6 PM.",
+  locationPlaceholder: "ZIP or city",
+  buildLabel: "Build my plan",
+  errorTitle: "We couldn't build that plan just now.",
+  retryLabel: "Try again",
+  snapCtaTitle: "Easier to show than say it?",
+  snapCtaBody: "Send GPB a photo or video instead.",
+  earlyCtaTitle: "Want GPB to run plans like this?",
+  earlyCtaBody: "Join early access — launching city by city.",
 };
 
 export function uiCopy(plan: Pick<GpbPlan, "uiCopy">): Required<PlanUiCopy> {
@@ -204,13 +226,33 @@ export function parseClock(hhmm: string): number {
   return Math.min(24 * 60 - 1, Number(m[1]) * 60 + Number(m[2]));
 }
 
-export function formatClock(minutes: number): string {
+/**
+ * Display-only clock formatting. Timing logic always works on the raw minute
+ * values / "HH:MM" strings — this never feeds back into scheduling.
+ * When a locale is given, the platform formats the time for that language;
+ * anything unsupported falls back to the 12-hour English form.
+ */
+export function formatClock(minutes: number, locale?: string): string {
   const total = ((Math.round(minutes) % 1440) + 1440) % 1440;
   const h24 = Math.floor(total / 60);
   const mm = total % 60;
+  if (locale) {
+    try {
+      const d = new Date(2000, 0, 1, h24, mm);
+      return new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(d);
+    } catch {
+      /* fall through to the English form */
+    }
+  }
   const suffix = h24 >= 12 ? "PM" : "AM";
   const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
   return `${h12}:${String(mm).padStart(2, "0")} ${suffix}`;
+}
+
+/** BCP-47-ish locale for display formatting, derived from the detected language. */
+export function planLocale(plan: Pick<GpbPlan, "understanding">): string | undefined {
+  const code = plan.understanding?.languageCode?.trim();
+  return code && /^[a-zA-Z]{2,3}([-_][A-Za-z0-9]{2,8})*$/.test(code) ? code.replace("_", "-") : undefined;
 }
 
 export function toClockString(minutes: number): string {
