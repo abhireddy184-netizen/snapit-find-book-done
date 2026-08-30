@@ -79,7 +79,7 @@ export function Logo({ compact = false, onColor = false }: { compact?: boolean; 
             GetPerfectBoy.com
           </span>
           <span className={`mt-1 hidden truncate text-[10px] font-medium sm:block ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
-            Show it. We'll handle the rest.
+            Whatever you need. Consider it done.
           </span>
         </span>
       )}

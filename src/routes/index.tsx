@@ -1,37 +1,36 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { subscribeToUpdates } from "@/lib/subscribe.functions";
-import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import {
-  Search, ArrowRight, CheckCircle2, Camera, ShieldAlert, Zap, Droplet, Wind, Lock,
+  ArrowRight, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
   Facebook, Instagram, Twitter, Youtube, Sparkles,
 } from "lucide-react";
-import { AppShell, GradientButton } from "@/components/snapit/AppShell";
+import { AppShell } from "@/components/snapit/AppShell";
 import { Logo, Wordmark } from "@/components/snapit/Logo";
-import { AiJourneyStrip, CategoryIconRow, HomeRows } from "@/components/snapit/HomeSections";
-import { EarlyAccessSection, ShowGpbCallout } from "@/components/snapit/EarlyAccess";
-import { ProsOnTheMove } from "@/components/snapit/ProsOnTheMove";
+import { CategoryIconRow, HomeRows } from "@/components/snapit/HomeSections";
+import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
+import { OutcomeComposer } from "@/components/snapit/OutcomeComposer";
+import {
+  HowItWorks, OutcomeBundles, DailyLifeModules, ShowGpbBand, TrustSection, BrowseFallback,
+} from "@/components/snapit/V2Sections";
 
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
-import heroProblemAsset from "@/assets/uploaded-services/plumbing-service.png.asset.json";
-
-const heroProblem = heroProblemAsset.url;
 
 const SITE_URL = "https://getperfectboy.com";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GPB — Show it. We'll handle the rest." },
-      { name: "description", content: "Show GPB a photo, video or description and we'll route you to the right local service professional — with before & after proof." },
-      { property: "og:title", content: "GPB — Show it. We'll handle the rest." },
-      { property: "og:description", content: "Show GPB a photo, video or description and we'll route you to the right local service." },
+      { title: "GPB — Whatever you need. Consider it done." },
+      { name: "description", content: "Tell GetPerfectBoy the outcome you want and we'll work out the tasks, then route the job to trusted local professionals. Photo, video or plain text." },
+      { property: "og:title", content: "GPB — Whatever you need. Consider it done." },
+      { property: "og:description", content: "You tell us the outcome. We handle the work. GPB turns your request into a clear job brief for trusted local pros." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "GPB — Show it. We'll handle the rest." },
-      { name: "twitter:description", content: "Show GPB a photo, video or description and we'll route you to the right local service." },
+      { name: "twitter:title", content: "GPB — Whatever you need. Consider it done." },
+      { name: "twitter:description", content: "You tell us the outcome. We handle the work." },
     ],
     links: [{ rel: "canonical", href: SITE_URL + "/" }],
   }),
@@ -39,65 +38,44 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
-  const navigate = useNavigate();
-  const [location, setLocation] = useState("");
-  const [service, setService] = useState("");
-
   return (
     <AppShell>
-      {/* Hero — brand lockup, search, camera-first visual */}
-      <section className="gpb-bleed fade-up relative -mt-4 overflow-hidden border-b border-border/50 py-8 sm:py-10 lg:py-16 xl:py-20 md:-mt-6" style={{ backgroundColor: "color-mix(in oklab, var(--card) 92%, var(--background))" }}>
+      {/* Hero — outcome-first composer */}
+      <section
+        className="gpb-bleed fade-up relative -mt-4 overflow-hidden border-b border-border/50 py-9 sm:py-12 lg:py-16 xl:py-20 md:-mt-6"
+        style={{ backgroundColor: "color-mix(in oklab, var(--card) 92%, var(--background))" }}
+      >
         <div
           className="pointer-events-none absolute -right-24 -top-28 h-[26rem] w-[26rem] rounded-full opacity-20 blur-3xl"
           style={{ background: "var(--gradient-primary)" }}
           aria-hidden="true"
         />
-        <div className="gpb-shell relative grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-14 xl:gap-20">
-
+        <div
+          className="pointer-events-none absolute -bottom-40 -left-32 h-[24rem] w-[24rem] rounded-full opacity-[0.13] blur-3xl"
+          style={{ background: "var(--gradient-secondary)" }}
+          aria-hidden="true"
+        />
+        <div className="gpb-shell relative grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-14 xl:gap-20">
           <div className="min-w-0">
             <div className="flex flex-col items-start">
-              <Wordmark size="clamp(2.6rem, 9vw, 3.6rem)" />
-              <span className="mt-1 text-sm font-bold tracking-tight text-foreground sm:text-base">GetPerfectBoy.com</span>
+              <Wordmark size="clamp(2.2rem, 7.5vw, 3rem)" />
+              <span className="mt-1 text-xs font-bold tracking-tight text-muted-foreground sm:text-sm">
+                GetPerfectBoy.com
+              </span>
             </div>
 
-            <h1 className="mt-4 max-w-[16ch] text-[clamp(2rem,5.2vw,4rem)] font-black leading-[1.05] tracking-tight text-foreground">
-              Show it. <span className="text-gradient-hero">We'll handle the rest.</span>
+            <h1 className="mt-5 max-w-[15ch] text-[clamp(2.2rem,5.6vw,4.2rem)] font-black leading-[1.03] tracking-tight text-foreground">
+              What do you <span className="text-gradient-hero">need done?</span>
             </h1>
-            <p className="mt-3 max-w-[52ch] text-[clamp(0.9rem,1.15vw,1.125rem)] text-muted-foreground">
-              Show GPB a photo, video or description and we'll route you to the right service.
+            <p className="mt-3 max-w-[48ch] text-[clamp(0.95rem,1.2vw,1.15rem)] leading-relaxed text-muted-foreground">
+              Tell GPB the outcome. We’ll figure out the work — and route it to trusted local pros.
             </p>
 
+            <div className="mt-6 lg:hidden">
+              <OutcomeComposer />
+            </div>
 
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                void navigate({ to: "/search", search: { q: service.trim(), loc: location.trim() } });
-              }}
-              className="mt-6 grid max-w-2xl gap-2 rounded-[20px] border border-border/60 bg-card p-2 shadow-lg sm:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)_auto] sm:gap-2.5 sm:rounded-full sm:p-2"
-            >
-              <div className="min-w-0">
-              <LocationAutocomplete
-                value={location}
-                onChange={setLocation}
-                aria-label="Location"
-                placeholder="ZIP or city"
-              />
-              </div>
-              <label className="flex min-w-0 items-center gap-2 rounded-xl bg-muted/50 px-4 py-3 sm:rounded-full">
-                <Search className="h-4 w-4 shrink-0 text-primary" />
-                <input
-                  value={service}
-                  onChange={(e) => setService(e.target.value)}
-                  placeholder="What do you need?"
-                  className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
-                />
-              </label>
-              <GradientButton type="submit" className="w-full shrink-0 whitespace-nowrap px-5 sm:w-auto">
-                Search <ArrowRight className="h-4 w-4" />
-              </GradientButton>
-            </form>
-
-            <div className="mt-5 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+            <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
               <a
                 href="#early-access"
                 id="hero-early-access-cta"
@@ -119,63 +97,33 @@ function Landing() {
               </Link>
             </div>
 
-            <Link
-              to="/snap"
-              id="hero-show-gpb-cta"
-              data-analytics-id="show_gpb_cta"
-              data-analytics-location="hero"
-              className="mt-3.5 inline-flex items-center gap-2 rounded-full border border-border/70 bg-card px-5 py-3 text-sm font-bold text-foreground shadow-sm transition-transform hover:scale-[1.02]"
-            >
-              <Camera className="h-5 w-5 text-primary" />
-              <span>Not sure what service you need? <span className="text-primary">Show GPB.</span></span>
-            </Link>
-
+            <p className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+              <Sparkles className="h-3.5 w-3.5 text-primary" />
+              Early access · launching city by city
+            </p>
           </div>
 
-          {/* Camera-first visual */}
-          <div className="relative mx-auto w-full max-w-[300px] lg:max-w-[360px] xl:max-w-[420px]">
-            <div className="relative overflow-hidden rounded-[30px] border-[6px] border-foreground/85 bg-foreground/85 shadow-[var(--shadow-elevated)]">
-              <div className="relative aspect-[9/14] w-full overflow-hidden rounded-[24px] bg-muted">
-                <img
-                  src={heroProblem}
-                  alt="Framing a leaking pipe under a sink with the GPB camera"
-                  className="h-full w-full object-cover"
-                  fetchPriority="high"
-                />
-                <div className="scan-sweep" aria-hidden="true" />
-                {/* viewfinder corners */}
-                <div className="pointer-events-none absolute inset-6 rounded-2xl border-2 border-white/70" aria-hidden="true" />
-                <div className="absolute inset-x-3 bottom-3">
-                  <div className="glass-strong flex items-center gap-2 rounded-2xl px-3 py-2">
-                    <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg text-white" style={{ background: "var(--gradient-primary)" }}>
-                      <Sparkles className="h-3.5 w-3.5" />
-                    </span>
-                    <span className="min-w-0 text-[11px] font-bold text-foreground">GPB is reading the scene…</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Composer sits beside the headline on large screens */}
+          <div className="hidden min-w-0 lg:block">
+            <OutcomeComposer />
           </div>
         </div>
       </section>
 
-      {/* AI journey */}
-      <section className="mt-5">
-        <AiJourneyStrip />
-      </section>
+      <HowItWorks />
+      <OutcomeBundles />
+      <DailyLifeModules />
+      <ShowGpbBand />
+      <TrustSection />
 
-      {/* Walking pros runway sitting directly above the category row */}
-      <ProsOnTheMove slim />
+      <BrowseFallback />
 
-      {/* Quick categories */}
-      <section className="mt-3">
+      {/* Secondary browse paths */}
+      <section className="mt-6">
         <CategoryIconRow />
       </section>
-
-      {/* Compact discovery rows */}
       <HomeRows />
 
-      <ShowGpbCallout />
       <EmergencyStrip />
       <ProviderRecruitment />
       <EarlyAccessSection />
@@ -184,6 +132,7 @@ function Landing() {
     </AppShell>
   );
 }
+
 
 
 function EmergencyStrip() {
@@ -228,10 +177,11 @@ function ProviderRecruitment() {
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-center">
         <div className="min-w-0">
           <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">For professionals</div>
-          <h2 className="text-2xl font-black tracking-tight md:text-3xl">Become a Founding Provider</h2>
+          <h2 className="text-2xl font-black tracking-tight md:text-3xl">Get clearer jobs, not vague leads.</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90">
-            {catalog.length} categories, {TOTAL_SERVICES}+ services. Register your interest before launch and
-            you get a clear, standardized job brief instead of a vague enquiry.
+            Customers tell GPB the outcome; you receive a structured job brief with scope and location.
+            {" "}{catalog.length} categories, {TOTAL_SERVICES}+ services — register your interest before launch
+            and set your own radius, availability and pricing.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2.5">
             <Link
@@ -312,7 +262,7 @@ export function Footer() {
         <div className="min-w-0">
           <Logo />
           <p className="mt-3 max-w-xs text-xs leading-relaxed">
-            AI-powered services marketplace connecting customers with trusted local pros.
+            You tell us the outcome. We handle the work — with trusted local professionals.
           </p>
           <div className="mt-4 flex items-center gap-2">
             {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
