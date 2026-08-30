@@ -13,6 +13,7 @@ import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
 import { OutcomeComposer } from "@/components/snapit/OutcomeComposer";
 import {
   HowItWorks, OutcomeBundles, DailyLifeModules, ShowGpbBand, TrustSection, BrowseFallback,
+  OrchestratorBand,
 } from "@/components/snapit/V2Sections";
 
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
@@ -22,14 +23,14 @@ const SITE_URL = "https://getperfectboy.com";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GPB — Whatever you need. Consider it done." },
-      { name: "description", content: "Tell GetPerfectBoy the outcome you want and we'll work out the tasks, then route the job to trusted local professionals. Photo, video or plain text." },
-      { property: "og:title", content: "GPB — Whatever you need. Consider it done." },
+      { title: "GPB — One outcome. One plan. Consider it done." },
+      { name: "description", content: "Tell GetPerfectBoy your day and get one coordinated plan: linked tasks, sequencing, timing and trusted local pros. Photo, video or plain text." },
+      { property: "og:title", content: "GPB — One outcome. One plan. Consider it done." },
       { property: "og:description", content: "You tell us the outcome. We handle the work. GPB turns your request into a clear job brief for trusted local pros." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "GPB — Whatever you need. Consider it done." },
+      { name: "twitter:title", content: "GPB — One outcome. One plan. Consider it done." },
       { name: "twitter:description", content: "You tell us the outcome. We handle the work." },
     ],
     links: [{ rel: "canonical", href: SITE_URL + "/" }],
@@ -68,7 +69,8 @@ function Landing() {
               What do you <span className="text-gradient-hero">need done?</span>
             </h1>
             <p className="mt-3 max-w-[48ch] text-[clamp(0.95rem,1.2vw,1.15rem)] leading-relaxed text-muted-foreground">
-              Tell GPB the outcome. We’ll figure out the work — and route it to trusted local pros.
+              Tell GPB your day — one outcome, one plan. We sequence the tasks, the timing and the trusted
+              local pros behind them.
             </p>
 
             <div className="mt-6 lg:hidden">
@@ -110,6 +112,7 @@ function Landing() {
         </div>
       </section>
 
+      <OrchestratorBand />
       <HowItWorks />
       <OutcomeBundles />
       <DailyLifeModules />
@@ -179,7 +182,8 @@ function ProviderRecruitment() {
           <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">For professionals</div>
           <h2 className="text-2xl font-black tracking-tight md:text-3xl">Get clearer jobs, not vague leads.</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90">
-            Customers tell GPB the outcome; you receive a structured job brief with scope and location.
+            Pros register their capabilities, service area, availability, team size and pricing — then GPB
+            routes only the relevant subtask of a customer's plan to you, with scope and location attached.
             {" "}{catalog.length} categories, {TOTAL_SERVICES}+ services — register your interest before launch
             and set your own radius, availability and pricing.
           </p>
@@ -206,7 +210,7 @@ function ProviderRecruitment() {
         <ul className="space-y-2 text-sm">
           {[
             "Free profile with your service ZIP and radius",
-            "Standardized job scopes, not vague enquiries",
+            "Only the subtasks that match your capabilities",
             "Set your own prices, availability and coverage",
           ].map((l) => (
             <li key={l} className="flex items-start gap-2 rounded-2xl bg-white/10 px-4 py-2.5 backdrop-blur">

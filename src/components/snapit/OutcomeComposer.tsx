@@ -4,16 +4,16 @@ import { Camera, Mic, Sparkles } from "lucide-react";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 
 const EXAMPLES = [
-  "My parents are visiting tomorrow. Get my apartment ready.",
+  "I need dinner, groceries, and to be at DFW by 6 PM.",
+  "My parents arrive tomorrow. Get my apartment ready and pick them up.",
+  "I’m moving Saturday. Coordinate packing, movers, junk removal and cleaning.",
   "My car is making a strange noise. Handle it.",
-  "I'm moving Saturday. Help me get everything done.",
-  "The kitchen sink is leaking under the cabinet.",
   "Guests at 6pm — deep clean the living room and bath.",
 ];
 
 /**
- * Outcome-first hero composer. The request text is routed into the existing
- * /search intent pipeline so nothing new is promised on the backend.
+ * Outcome-first hero composer. Multi-part requests become one coordinated GPB
+ * plan on /plan; the existing /search catalogue stays available as a fallback.
  */
 export function OutcomeComposer() {
   const navigate = useNavigate();
@@ -32,7 +32,7 @@ export function OutcomeComposer() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const q = request.trim();
-    void navigate({ to: "/search", search: { q, loc: loc.trim() } });
+    void navigate({ to: "/plan", search: { q, loc: loc.trim() } });
   };
 
   return (
@@ -42,7 +42,7 @@ export function OutcomeComposer() {
       className="rounded-[26px] border border-border/60 bg-card p-3 shadow-[var(--shadow-elevated)] sm:p-4"
     >
       <label htmlFor="gpb-outcome" className="sr-only">
-        Describe what you need done
+        Describe the outcome or the day you need handled
       </label>
       <div className="relative">
         <textarea
@@ -53,7 +53,7 @@ export function OutcomeComposer() {
           onBlur={() => (paused.current = false)}
           rows={3}
           placeholder={EXAMPLES[i]}
-          className="min-h-[92px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pr-12 text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60"
+          className="min-h-[102px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pr-12 text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60"
         />
         <button
           type="button"
@@ -86,7 +86,7 @@ export function OutcomeComposer() {
           className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.01] sm:w-auto"
           style={{ background: "var(--gradient-primary)" }}
         >
-          <Sparkles className="h-4 w-4" /> Let GPB handle it
+          <Sparkles className="h-4 w-4" /> Build my plan
         </button>
       </div>
 
@@ -99,8 +99,18 @@ export function OutcomeComposer() {
         >
           <Camera className="h-4 w-4 text-primary" /> Show GPB instead
         </Link>
+        <Link
+          to="/plan"
+          search={{ q: "", loc: "" }}
+         
+          data-analytics-id="plan_demo"
+          data-analytics-location="hero_composer"
+          className="text-xs font-bold text-primary hover:underline"
+        >
+          See an example plan
+        </Link>
         <span className="text-[11px] text-muted-foreground">
-          Don’t know the service name? Just say the outcome.
+          Multi-part days welcome — GPB sequences them.
         </span>
       </div>
 

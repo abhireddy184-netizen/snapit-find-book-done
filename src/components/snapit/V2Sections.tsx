@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import {
   ArrowRight, MessageSquareText, ListChecks, HardHat, Home, PackageCheck, Car,
   Truck, HeartHandshake, ShieldAlert, ShieldCheck, FileText, Images, Activity,
-  Camera, Sparkles,
+  Camera, Sparkles, UtensilsCrossed, ShoppingBasket, CarFront, UserRound, Route,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -325,6 +325,71 @@ export function BrowseFallback() {
         >
           Browse services <ArrowRight className="h-4 w-4" />
         </Link>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- 7) Orchestrator: one outcome, many channels ---------------- */
+
+const CHANNELS: { icon: LucideIcon; title: string; body: string; live: boolean }[] = [
+  { icon: HardHat, title: "GPB local pros", body: "Cleaning, handyman, moving, errands, auto and more — live on GPB today.", live: true },
+  { icon: UtensilsCrossed, title: "Food ordering", body: "Meals timed around the rest of your plan.", live: false },
+  { icon: ShoppingBasket, title: "Grocery pickup or delivery", body: "Kept on your route, or switched to delivery when timing gets tight.", live: false },
+  { icon: CarFront, title: "Rides & transport", body: "Departure times worked backwards from your deadline.", live: false },
+  { icon: UserRound, title: "You", body: "The steps only you can do — GPB schedules everything else around them.", live: true },
+];
+
+export function OrchestratorBand() {
+  return (
+    <section id="orchestrator" className="mt-14 scroll-mt-24 overflow-hidden rounded-[28px] border border-border/60 bg-card shadow-sm">
+      <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+        <div className="min-w-0">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-primary">
+            <Route className="h-3.5 w-3.5" /> Tell GPB your day
+          </span>
+          <h2 className="mt-3 text-[clamp(1.5rem,3.4vw,2.25rem)] font-black leading-tight tracking-tight">
+            One outcome. One plan. Consider it done.
+          </h2>
+          <p className="mt-2 max-w-[56ch] text-sm leading-relaxed text-muted-foreground">
+            “I need dinner, groceries, and to be at DFW by 6 PM.” GPB turns a whole part of your day into a
+            single sequenced plan — parent goal, linked subtasks, timing, dependencies and a safety buffer.
+            Don’t manage the apps; tell GPB what needs to happen.
+          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-2.5">
+            <Link
+              to="/plan"
+              search={{ q: "", loc: "" }}
+              data-analytics-id="plan_demo"
+              data-analytics-location="homepage_band"
+              className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              See an example plan <ArrowRight className="h-4 w-4" />
+            </Link>
+            <span className="text-[11px] text-muted-foreground">
+              Prototype planner — nothing is booked or dispatched.
+            </span>
+          </div>
+        </div>
+        <ul className="grid gap-2">
+          {CHANNELS.map((c) => (
+            <li key={c.title} className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background px-4 py-3">
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                <c.icon className="h-4 w-4" />
+              </span>
+              <span className="min-w-0">
+                <span className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-sm font-black tracking-tight">{c.title}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${c.live ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                    {c.live ? "Live on GPB" : "Future integration"}
+                  </span>
+                </span>
+                <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">{c.body}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

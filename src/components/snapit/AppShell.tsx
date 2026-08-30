@@ -52,6 +52,7 @@ function TopBar() {
           <Link to="/emergency" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[color:var(--color-accent)] hover:bg-[color:var(--color-accent)]/10 transition-colors">
             <ShieldAlert className="h-4 w-4" /> Emergency
           </Link>
+          <Link to="/plan" search={{ q: "", loc: "" }} data-analytics-id="plan_demo" data-analytics-location="header" className="rounded-full px-3 py-1.5 font-semibold hover:text-foreground hover:bg-muted transition-colors">GPB Plan</Link>
           <a href="/#how-it-works" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">How it works</a>
           <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Services</Link>
           <Link to="/provider-interest" data-analytics-id="provider_interest_cta" data-analytics-location="header" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">For Pros</Link>
