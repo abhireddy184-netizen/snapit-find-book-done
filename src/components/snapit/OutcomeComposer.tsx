@@ -159,6 +159,10 @@ export function OutcomeComposer() {
       window.clearTimeout(recordTimerRef.current);
       recordTimerRef.current = null;
     }
+    if (partialTimerRef.current !== null) {
+      window.clearInterval(partialTimerRef.current);
+      partialTimerRef.current = null;
+    }
     vadRef.current?.stop();
     vadRef.current = null;
     const m = mediaRef.current;
