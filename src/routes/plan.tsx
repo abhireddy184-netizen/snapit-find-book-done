@@ -10,9 +10,11 @@ import type { LucideIcon } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { buildPlan } from "@/lib/plan.functions";
 import {
-  CHANNEL_META, demoAirportPlan, formatClock, move, parseClock, planEndMinutes, resequence,
-  type ExecutionChannel, type GpbPlan, type PlanTask,
+  CHANNEL_META, demoAirportPlan, formatClock, move, parseClock, planEndMinutes, resequence, uiCopy,
+  type ExecutionChannel, type GpbPlan, type PlanTask, type PlanUiCopy,
 } from "@/lib/plan-model";
+
+type Copy = Required<PlanUiCopy>;
 
 type PlanSearch = { q: string; loc: string; demo?: boolean };
 
@@ -81,11 +83,13 @@ function PlanPage() {
   const [plan, setPlan] = useState<GpbPlan | undefined>(basePlan);
   const [replanApplied, setReplanApplied] = useState(false);
   const [replanDismissed, setReplanDismissed] = useState(false);
+  const [clarifyDismissed, setClarifyDismissed] = useState(false);
 
   useEffect(() => {
     setPlan(basePlan);
     setReplanApplied(false);
     setReplanDismissed(false);
+    setClarifyDismissed(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [basePlan?.outcome, basePlan?.source, query.dataUpdatedAt, isDemo]);
 
@@ -144,6 +148,19 @@ function PlanPage() {
       {plan && (
         <>
           <PlanSummary plan={plan} isDemo={isDemo} />
+
+          {!isDemo && plan.understanding?.clarificationQuestion && !clarifyDismissed && (
+            <ClarifyCard
+              plan={plan}
+              onAnswer={(answer) =>
+                void navigate({
+                  to: "/plan",
+                  search: { q: `${search.q} — ${answer}`, loc: search.loc },
+                })
+              }
+              onDismiss={() => setClarifyDismissed(true)}
+            />
+          )}
 
           {plan.replan && !replanDismissed && (
             <ReplanCard
