@@ -55,6 +55,12 @@ export type PlanUnderstanding = {
   languageName: string;
   /** True when the request mixes languages (code-switching). */
   codeSwitched: boolean;
+  /**
+   * How the request was written: in the language's own script, romanized /
+   * transliterated into Latin letters, or a mix of both. Used so the reply can
+   * mirror the user's style instead of switching scripts on them.
+   */
+  script?: "native" | "latin" | "mixed";
   /** Canonical, meaning-preserving restatement of the request for the planner. */
   normalizedRequest: string;
   /** 0-1 confidence that the intent was understood correctly. */
