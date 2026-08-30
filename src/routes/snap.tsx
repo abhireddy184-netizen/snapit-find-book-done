@@ -241,12 +241,12 @@ function SnapPage() {
       <div className="mx-auto max-w-3xl">
         <div className="pt-2">
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> AI-powered diagnosis
+            <Sparkles className="h-3.5 w-3.5" /> One way to talk to GPB
           </div>
-          <h1 className="mt-3 text-3xl font-black tracking-tight md:text-4xl">Show us what you need</h1>
+          <h1 className="mt-3 text-3xl font-black tracking-tight md:text-4xl">Don’t know what service you need? Show us.</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Take a photo, record a video, upload an image, or simply describe what you need. GPB figures out the service and
-            connects you with the right local professional. A photo is never required.
+            Take a photo, record a video, upload an image, or simply describe the outcome you want. GPB works out
+            what the job actually is and routes it to the right local professional. A photo is never required.
           </p>
         </div>
 

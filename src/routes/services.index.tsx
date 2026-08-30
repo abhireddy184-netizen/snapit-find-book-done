@@ -30,10 +30,10 @@ function AllServicesPage() {
         <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur">
           <MapPin className="h-3.5 w-3.5" /> {market.name} · {market.currency}
         </div>
-        <h1 className="mt-4 text-4xl font-black tracking-tight md:text-5xl">All GPB services</h1>
+        <h1 className="mt-4 text-4xl font-black tracking-tight md:text-5xl">Prefer to browse? Choose a service.</h1>
         <p className="mt-3 max-w-2xl text-sm text-white/80 md:text-base">
           {catalog.length} master categories and {TOTAL_SERVICES} sub-services — from plumbing and mounting to lawn care,
-          mobile auto and at-home beauty. Not sure what to pick? Show us instead.
+          mobile auto and at-home beauty. You never have to pick one: tell GPB the outcome and we’ll work it out.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <label className="flex flex-1 items-center gap-2 rounded-2xl bg-white/12 px-4 py-3 ring-1 ring-white/20 backdrop-blur">
