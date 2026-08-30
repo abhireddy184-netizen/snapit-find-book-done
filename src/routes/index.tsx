@@ -12,9 +12,10 @@ import { CategoryIconRow, HomeRows } from "@/components/snapit/HomeSections";
 import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
 import { OutcomeComposer } from "@/components/snapit/OutcomeComposer";
 import {
-  HowItWorks, OutcomeBundles, DailyLifeModules, ShowGpbBand, TrustSection, BrowseFallback,
-  OrchestratorBand,
+  DailyLifeModules, ShowGpbBand, BrowseFallback,
+  SimpleFlow, ExamplePlanPreview, HowGpbWorksDetails,
 } from "@/components/snapit/V2Sections";
+
 
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
 
