@@ -377,7 +377,7 @@ export function OutcomeComposer() {
           onBlur={() => (paused.current = false)}
           rows={3}
           placeholder={EXAMPLES[i]}
-          className="min-h-[102px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pr-12 text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60"
+          className="min-h-[112px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pr-[3.25rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:pr-14"
         />
         <button
           type="button"
@@ -386,7 +386,8 @@ export function OutcomeComposer() {
           title={micTitle}
           aria-pressed={listening}
           disabled={transcribing}
-          className={`absolute right-2.5 top-2.5 grid h-9 w-9 place-items-center rounded-full border transition-all ${
+          className={`absolute right-2 top-2 grid h-10 w-10 shrink-0 place-items-center rounded-full border transition-all sm:right-2.5 sm:top-2.5 ${
+
             listening
               ? "animate-pulse border-primary bg-primary text-primary-foreground shadow-md"
               : transcribing
