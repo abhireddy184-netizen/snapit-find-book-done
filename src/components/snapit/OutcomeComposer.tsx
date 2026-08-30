@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Camera, Mic, Sparkles } from "lucide-react";
+import { Camera, Mic, Sparkles } from "lucide-react";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 
 const EXAMPLES = [
@@ -115,9 +115,6 @@ export function OutcomeComposer() {
             {ex.length > 42 ? ex.slice(0, 40) + "…" : ex}
           </button>
         ))}
-      </div>
-      <div className="mt-2">
-        <ArrowRight className="hidden" aria-hidden="true" />
       </div>
     </form>
   );
