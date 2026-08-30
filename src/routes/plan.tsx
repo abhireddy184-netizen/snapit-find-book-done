@@ -1,0 +1,638 @@
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import {
+  ArrowRight, ArrowUp, ArrowDown, Clock, Loader2, MapPin, RotateCcw, Sparkles,
+  TriangleAlert, Undo2, HardHat, ShoppingBasket, UtensilsCrossed, CarFront, UserRound, CircleSlash,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { AppShell } from "@/components/snapit/AppShell";
+import { buildPlan } from "@/lib/plan.functions";
+import {
+  CHANNEL_META, demoAirportPlan, formatClock, move, parseClock, planEndMinutes, resequence,
+  type ExecutionChannel, type GpbPlan, type PlanTask,
+} from "@/lib/plan-model";
+
+type PlanSearch = { q: string; loc: string; demo?: boolean };
+
+function asString(v: unknown): string {
+  if (typeof v === "string") return v;
+  if (typeof v === "number" && Number.isInteger(v) && v >= 0 && v < 100000) {
+    return String(v).padStart(5, "0");
+  }
+  return v == null ? "" : String(v);
+}
+
+export const Route = createFileRoute("/plan")({
+  validateSearch: (search: Record<string, unknown>): PlanSearch => ({
+    q: asString(search['q']),
+    loc: asString(search['loc']),
+    ...(search['demo'] ? { demo: true } : {}),
+  }),
+  head: () => ({
+    meta: [
+      { title: "Your GPB plan — one outcome, one coordinated plan" },
+      { name: "description", content: "Tell GPB your day and get one plan: linked tasks, sequencing, timing and honest execution channels. A prototype planner, not a confirmed booking." },
+      { property: "og:title", content: "Your GPB plan — one outcome, one coordinated plan" },
+      { property: "og:description", content: "GPB turns a whole real-world outcome into one timed plan with linked tasks." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Your GPB plan" },
+      { name: "twitter:description", content: "One outcome. One plan. Consider it done." },
+    ],
+  }),
+  component: PlanPage,
+});
+
+const CHANNEL_ICON: Record<ExecutionChannel, LucideIcon> = {
+  "gpb-pro": HardHat,
+  "food-partner": UtensilsCrossed,
+  "grocery-partner": ShoppingBasket,
+  "ride-partner": CarFront,
+  "user-action": UserRound,
+  "not-supported": CircleSlash,
+};
+
+function nowClockString() {
+  const d = new Date();
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
+function PlanPage() {
+  const navigate = useNavigate();
+  const search = Route.useSearch();
+  const runBuildPlan = useServerFn(buildPlan);
+  const isDemo = search.demo || !search.q.trim();
+
+  const query = useQuery({
+    queryKey: ["gpb-plan", search.q, search.loc],
+    enabled: !isDemo,
+    staleTime: 5 * 60_000,
+    retry: false,
+    queryFn: () =>
+      runBuildPlan({
+        data: { request: search.q, location: search.loc, nowClock: nowClockString() },
+      }) as Promise<GpbPlan>,
+  });
+
+  const basePlan: GpbPlan | undefined = isDemo ? demoAirportPlan() : query.data;
+
+  const [plan, setPlan] = useState<GpbPlan | undefined>(basePlan);
+  const [replanApplied, setReplanApplied] = useState(false);
+  const [replanDismissed, setReplanDismissed] = useState(false);
+
+  useEffect(() => {
+    setPlan(basePlan);
+    setReplanApplied(false);
+    setReplanDismissed(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [basePlan?.outcome, basePlan?.source, query.dataUpdatedAt, isDemo]);
+
+  const update = (tasks: PlanTask[]) =>
+    setPlan((p) => (p ? { ...p, tasks: resequence(tasks) } : p));
+
+  const applyReplan = () => {
+    setPlan((p) => {
+      if (!p) return p;
+      const tasks = p.tasks.map((t) =>
+        t.swappable
+          ? {
+              ...t,
+              title: t.title.replace(/pickup|run|stop/i, "delivery").trim() || "Grocery delivery",
+              detail: "Switched to delivery to your door so the route goes straight to the destination.",
+              channel: "grocery-partner" as ExecutionChannel,
+              durationMinutes: 0,
+              parallel: true,
+              locationNote: "Delivered while you travel",
+            }
+          : t,
+      );
+      return { ...p, tasks: resequence(tasks) };
+    });
+    setReplanApplied(true);
+  };
+
+  const resetPlan = () => {
+    setPlan(basePlan);
+    setReplanApplied(false);
+    setReplanDismissed(false);
+  };
+
+  return (
+    <AppShell>
+      <PlanHeader
+        request={search.q}
+        loc={search.loc}
+        isDemo={isDemo}
+        onSubmit={(q, loc) => void navigate({ to: "/plan", search: { q, loc } })}
+      />
+
+      {!isDemo && query.isPending && <PlanSkeleton request={search.q} />}
+      {!isDemo && query.isError && (
+        <div className="mt-6 rounded-[24px] border border-destructive/30 bg-card p-5">
+          <p className="text-sm font-bold text-destructive">We couldn't build that plan just now.</p>
+          <button
+            onClick={() => void query.refetch()}
+            className="mt-3 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-bold hover:bg-muted"
+          >
+            <RotateCcw className="h-4 w-4" /> Try again
+          </button>
+        </div>
+      )}
+
+      {plan && (
+        <>
+          <PlanSummary plan={plan} isDemo={isDemo} />
+
+          {plan.replan && !replanDismissed && (
+            <ReplanCard
+              plan={plan}
+              applied={replanApplied}
+              onApply={applyReplan}
+              onKeep={() => setReplanDismissed(true)}
+            />
+          )}
+
+          <Timeline plan={plan} onChange={update} onReset={resetPlan} />
+          <ChannelLegend plan={plan} />
+          <PlanNotes plan={plan} />
+          <NextSteps />
+        </>
+      )}
+    </AppShell>
+  );
+}
+
+/* ---------------- header / composer ---------------- */
+
+function PlanHeader({
+  request, loc, isDemo, onSubmit,
+}: { request: string; loc: string; isDemo: boolean; onSubmit: (q: string, loc: string) => void }) {
+  const [q, setQ] = useState(request);
+  const [l, setL] = useState(loc);
+  useEffect(() => setQ(request), [request]);
+  useEffect(() => setL(loc), [loc]);
+
+  return (
+    <section className="fade-up">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-primary">
+        <Sparkles className="h-3.5 w-3.5" /> GPB Plan
+      </span>
+      <h1 className="mt-3 text-[clamp(1.6rem,4vw,2.6rem)] font-black leading-tight tracking-tight">
+        {isDemo ? "One outcome. One plan." : "Here's your plan."}
+      </h1>
+      <p className="mt-2 max-w-[62ch] text-sm text-muted-foreground sm:text-base">
+        {isDemo
+          ? "This is an example plan so you can see how GPB sequences a whole day. Describe your own outcome below to build one."
+          : "GPB broke your request into linked tasks with timing and order. Edit, reorder or skip anything — nothing is booked."}
+      </p>
+
+      <form
+        onSubmit={(e) => { e.preventDefault(); if (q.trim()) onSubmit(q.trim(), l.trim()); }}
+        className="mt-5 grid gap-2 rounded-[24px] border border-border/60 bg-card p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start"
+      >
+        <div className="grid min-w-0 gap-2">
+          <label htmlFor="plan-request" className="sr-only">Describe your outcome or day</label>
+          <textarea
+            id="plan-request"
+            rows={2}
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="I need dinner, groceries, and to be at DFW by 6 PM."
+            className="min-h-[62px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3 text-[15px] leading-relaxed outline-none placeholder:text-muted-foreground focus:bg-muted/60"
+          />
+          <label htmlFor="plan-loc" className="sr-only">ZIP or city</label>
+          <input
+            id="plan-loc"
+            value={l}
+            onChange={(e) => setL(e.target.value)}
+            placeholder="ZIP or city"
+            className="w-full rounded-2xl bg-muted/40 px-4 py-2.5 text-sm outline-none placeholder:text-muted-foreground focus:bg-muted/60"
+          />
+        </div>
+        <button
+          type="submit"
+          data-analytics-id="build_plan"
+          className="inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.01]"
+          style={{ background: "var(--gradient-primary)" }}
+        >
+          <Sparkles className="h-4 w-4" /> Build my plan
+        </button>
+      </form>
+    </section>
+  );
+}
+
+function PlanSkeleton({ request }: { request: string }) {
+  return (
+    <div className="mt-6 rounded-[24px] border border-border/60 bg-card p-6">
+      <p className="flex items-center gap-2 text-sm font-bold">
+        <Loader2 className="h-4 w-4 animate-spin text-primary" /> GPB is sequencing your plan…
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">“{request}”</p>
+      <div className="mt-4 space-y-2">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="h-14 animate-pulse rounded-2xl bg-muted/60" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------- summary ---------------- */
+
+function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
+  const end = planEndMinutes(plan);
+  const deadline = plan.deadline ? parseClock(plan.deadline) : null;
+  const slack = deadline == null ? null : deadline - end;
+
+  return (
+    <section className="mt-6 overflow-hidden rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+          Parent goal
+        </span>
+        {isDemo && (
+          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-primary">
+            Example plan
+          </span>
+        )}
+        {plan.source === "fallback" && (
+          <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
+            Draft plan
+          </span>
+        )}
+      </div>
+      <h2 className="mt-2 text-lg font-black leading-snug tracking-tight sm:text-xl">{plan.outcome}</h2>
+      <p className="mt-1.5 max-w-[70ch] text-sm leading-relaxed text-muted-foreground">{plan.summary}</p>
+
+      <dl className="mt-4 grid gap-2 sm:grid-cols-3">
+        <Stat label="Plan starts" value={formatClock(parseClock(plan.startClock))} icon={Clock} />
+        <Stat
+          label={plan.deadline ? "Target" : "Plan ends"}
+          value={formatClock(plan.deadline ? parseClock(plan.deadline) : end)}
+          icon={Clock}
+        />
+        <Stat
+          label={slack == null ? "Steps" : "Buffer"}
+          value={
+            slack == null
+              ? `${plan.tasks.filter((t) => t.status !== "skipped").length} tasks`
+              : slack >= 0
+                ? `${slack} min spare`
+                : `${Math.abs(slack)} min over`
+          }
+          icon={slack != null && slack < 0 ? TriangleAlert : MapPin}
+          tone={slack != null && slack < 0 ? "danger" : undefined}
+        />
+      </dl>
+    </section>
+  );
+}
+
+function Stat({
+  label, value, icon: Icon, tone,
+}: { label: string; value: string; icon: LucideIcon; tone?: "danger" }) {
+  return (
+    <div className={`rounded-2xl border px-4 py-3 ${tone === "danger" ? "border-destructive/40 bg-destructive/5" : "border-border/60 bg-background"}`}>
+      <dt className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        <Icon className={`h-3.5 w-3.5 ${tone === "danger" ? "text-destructive" : "text-primary"}`} /> {label}
+      </dt>
+      <dd className={`mt-0.5 text-base font-black tracking-tight ${tone === "danger" ? "text-destructive" : ""}`}>{value}</dd>
+    </div>
+  );
+}
+
+/* ---------------- re-plan card ---------------- */
+
+function ReplanCard({
+  plan, applied, onApply, onKeep,
+}: { plan: GpbPlan; applied: boolean; onApply: () => void; onKeep: () => void }) {
+  const r = plan.replan!;
+  return (
+    <section
+      aria-live="polite"
+      className="mt-4 rounded-[24px] border border-[color:var(--color-accent)]/40 bg-card p-5 shadow-sm"
+    >
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[color:var(--color-accent)]/12 text-[color:var(--color-accent)]">
+          <TriangleAlert className="h-5 w-5" />
+        </span>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-sm font-black tracking-tight sm:text-base">{r.headline}</h3>
+            <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Prototype signal
+            </span>
+          </div>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{r.body}</p>
+          {applied ? (
+            <p className="mt-3 text-sm font-bold text-primary">
+              Plan updated — the stop now runs as delivery while you travel.
+            </p>
+          ) : (
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                onClick={onApply}
+                data-analytics-id="replan_apply"
+                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-black text-white shadow-md transition-transform hover:scale-[1.02]"
+                style={{ background: "var(--gradient-primary)" }}
+              >
+                {r.applyLabel} <ArrowRight className="h-4 w-4" />
+              </button>
+              <button
+                onClick={onKeep}
+                data-analytics-id="replan_keep"
+                className="inline-flex items-center rounded-full border border-border bg-background px-5 py-2.5 text-sm font-bold hover:bg-muted"
+              >
+                {r.keepLabel}
+              </button>
+            </div>
+          )}
+          <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+            Live traffic and partner execution are prototype signals in this preview, not connected data.
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- timeline ---------------- */
+
+function Timeline({
+  plan, onChange, onReset,
+}: { plan: GpbPlan; onChange: (t: PlanTask[]) => void; onReset: () => void }) {
+  const start = parseClock(plan.startClock);
+
+  return (
+    <section className="mt-6">
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <h2 className="text-[clamp(1.25rem,2.6vw,1.7rem)] font-black tracking-tight">The GPB plan</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            One timeline for the whole outcome — reorder, skip or restore any step.
+          </p>
+        </div>
+        <button
+          onClick={onReset}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-4 py-2 text-xs font-bold hover:bg-muted"
+        >
+          <Undo2 className="h-3.5 w-3.5" /> Reset plan
+        </button>
+      </header>
+
+      <ol className="mt-4 space-y-2.5">
+        {plan.tasks.map((task, i) => (
+          <TaskRow
+            key={task.id}
+            task={task}
+            index={i}
+            clock={formatClock(start + task.startOffsetMinutes)}
+            isLast={i === plan.tasks.length - 1}
+            onMove={(dir) => onChange(move(plan.tasks, i, i + dir))}
+            onToggleSkip={() =>
+              onChange(
+                plan.tasks.map((t) =>
+                  t.id === task.id ? { ...t, status: t.status === "skipped" ? "planned" : "skipped" } : t,
+                ),
+              )
+            }
+            onRename={(title) =>
+              onChange(plan.tasks.map((t) => (t.id === task.id ? { ...t, title } : t)))
+            }
+            onDuration={(minutes) =>
+              onChange(plan.tasks.map((t) => (t.id === task.id ? { ...t, durationMinutes: minutes } : t)))
+            }
+          />
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+function TaskRow({
+  task, index, clock, isLast, onMove, onToggleSkip, onRename, onDuration,
+}: {
+  task: PlanTask; index: number; clock: string; isLast: boolean;
+  onMove: (dir: number) => void; onToggleSkip: () => void;
+  onRename: (title: string) => void; onDuration: (minutes: number) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const meta = CHANNEL_META[task.channel];
+  const Icon = CHANNEL_ICON[task.channel];
+  const skipped = task.status === "skipped";
+
+  return (
+    <li
+      className={`relative overflow-hidden rounded-[24px] border bg-card p-4 shadow-sm transition-all sm:p-5 ${
+        skipped ? "border-dashed border-border/60 opacity-60" : "border-border/60"
+      }`}
+    >
+      <div className="grid gap-3 sm:grid-cols-[5.5rem_auto_minmax(0,1fr)_auto] sm:items-start">
+        <div className="flex items-center gap-2 sm:block">
+          <span className="text-sm font-black tracking-tight text-foreground">{skipped ? "—" : clock}</span>
+          <span className="block text-[11px] font-semibold text-muted-foreground">
+            {task.durationMinutes > 0 ? `${task.durationMinutes} min` : "arrival"}
+          </span>
+        </div>
+
+        <span
+          className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl border border-border/60 bg-background text-primary"
+          aria-hidden="true"
+        >
+          <Icon className="h-5 w-5" />
+        </span>
+
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            {editing ? (
+              <input
+                autoFocus
+                value={task.title}
+                onChange={(e) => onRename(e.target.value)}
+                onBlur={() => setEditing(false)}
+                onKeyDown={(e) => e.key === "Enter" && setEditing(false)}
+                aria-label="Task title"
+                className="min-w-0 flex-1 rounded-xl bg-muted/50 px-3 py-1.5 text-sm font-bold outline-none"
+              />
+            ) : (
+              <h3 className={`text-sm font-black tracking-tight sm:text-base ${skipped ? "line-through" : ""}`}>
+                {task.title}
+              </h3>
+            )}
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                meta.live ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {meta.label}
+              {!meta.live && " · coming"}
+            </span>
+            {task.parallel && index > 0 && (
+              <span className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                In parallel
+              </span>
+            )}
+          </div>
+
+          {task.detail && <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{task.detail}</p>}
+
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-muted-foreground">
+            {task.locationNote && (
+              <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {task.locationNote}</span>
+            )}
+            {task.dependsOn?.length ? <span>After step {index}</span> : null}
+            {task.categorySlug && (
+              <Link
+                to="/services/$category"
+                params={{ category: task.categorySlug }}
+                className="font-bold text-primary hover:underline"
+              >
+                Open GPB service
+              </Link>
+            )}
+          </div>
+
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <button
+              onClick={() => setEditing((v) => !v)}
+              className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-bold hover:bg-muted"
+            >
+              {editing ? "Done" : "Edit"}
+            </button>
+            <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
+              <span className="sr-only sm:not-sr-only">Duration</span>
+              <input
+                type="number"
+                min={0}
+                max={480}
+                step={5}
+                value={task.durationMinutes}
+                onChange={(e) => onDuration(Math.max(0, Math.min(480, Number(e.target.value) || 0)))}
+                aria-label={`Duration in minutes for ${task.title}`}
+                className="w-16 rounded-full border border-border bg-background px-2.5 py-1.5 text-[11px] font-bold outline-none"
+              />
+              min
+            </label>
+            <button
+              onClick={onToggleSkip}
+              className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-bold hover:bg-muted"
+            >
+              {skipped ? "Restore" : "Skip"}
+            </button>
+          </div>
+        </div>
+
+        <div className="flex gap-1.5 sm:flex-col">
+          <button
+            onClick={() => onMove(-1)}
+            disabled={index === 0}
+            aria-label={`Move ${task.title} earlier`}
+            className="grid h-8 w-8 place-items-center rounded-full border border-border bg-background disabled:opacity-30 hover:bg-muted"
+          >
+            <ArrowUp className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => onMove(1)}
+            disabled={isLast}
+            aria-label={`Move ${task.title} later`}
+            className="grid h-8 w-8 place-items-center rounded-full border border-border bg-background disabled:opacity-30 hover:bg-muted"
+          >
+            <ArrowDown className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+    </li>
+  );
+}
+
+/* ---------------- channels + notes ---------------- */
+
+function ChannelLegend({ plan }: { plan: GpbPlan }) {
+  const used = new Set(plan.tasks.map((t) => t.channel));
+  const channels = (Object.keys(CHANNEL_META) as ExecutionChannel[]).filter((c) => c !== "not-supported" || used.has(c));
+  return (
+    <section className="mt-8">
+      <h2 className="text-[clamp(1.15rem,2.4vw,1.5rem)] font-black tracking-tight">
+        One outcome, one plan, many services behind the scenes.
+      </h2>
+      <p className="mt-1 max-w-[64ch] text-sm text-muted-foreground">
+        You don't pick apps. GPB decides which channel each step belongs to — and says plainly which ones are live today.
+      </p>
+      <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+        {channels.map((c) => {
+          const meta = CHANNEL_META[c];
+          const Icon = CHANNEL_ICON[c];
+          return (
+            <div
+              key={c}
+              className={`flex items-start gap-3 rounded-[22px] border p-4 ${
+                used.has(c) ? "border-primary/30 bg-card" : "border-border/60 bg-muted/20"
+              }`}
+            >
+              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-border/60 bg-background text-primary">
+                <Icon className="h-4 w-4" />
+              </span>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <span className="text-sm font-black tracking-tight">{meta.label}</span>
+                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${meta.live ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
+                    {meta.live ? "Live on GPB" : "Future integration"}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{meta.blurb}</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function PlanNotes({ plan }: { plan: GpbPlan }) {
+  return (
+    <section className="mt-6 rounded-[22px] border border-dashed border-border bg-muted/25 p-4 sm:p-5">
+      <h2 className="text-sm font-black tracking-tight">What's real today</h2>
+      <ul className="mt-2 space-y-1.5 text-xs leading-relaxed text-muted-foreground">
+        {plan.notes.map((n) => (
+          <li key={n}>· {n}</li>
+        ))}
+        <li>· GPB local pro tasks connect to the live GPB service catalogue and provider flow.</li>
+      </ul>
+    </section>
+  );
+}
+
+function NextSteps() {
+  return (
+    <section className="mt-6 grid gap-3 sm:grid-cols-2">
+      <Link
+        to="/snap"
+        data-analytics-id="show_gpb_cta"
+        data-analytics-location="plan_page"
+        className="flex items-center justify-between gap-3 rounded-[22px] border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30"
+      >
+        <span>
+          <span className="block text-sm font-black tracking-tight">Easier to show than say it?</span>
+          <span className="mt-1 block text-xs text-muted-foreground">Send GPB a photo or video instead.</span>
+        </span>
+        <ArrowRight className="h-4 w-4 shrink-0 text-primary" />
+      </Link>
+      <a
+        href="/#early-access"
+        data-analytics-id="early_access_cta"
+        data-analytics-location="plan_page"
+        className="flex items-center justify-between gap-3 rounded-[22px] border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30"
+      >
+        <span>
+          <span className="block text-sm font-black tracking-tight">Want GPB to run plans like this?</span>
+          <span className="mt-1 block text-xs text-muted-foreground">Join early access — launching city by city.</span>
+        </span>
+        <ArrowRight className="h-4 w-4 shrink-0 text-primary" />
+      </a>
+    </section>
+  );
+}
