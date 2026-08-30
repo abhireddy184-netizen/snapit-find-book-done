@@ -281,7 +281,8 @@ export function OutcomeComposer() {
         const base = baseTextRef.current;
         setRequest(base ? `${base} ${spoken}` : spoken);
         setVoiceStatus("idle");
-      } catch {
+      } catch (err) {
+        console.error("[gpb voice] transcription failed", err);
         setVoiceStatus("error");
       }
     };
