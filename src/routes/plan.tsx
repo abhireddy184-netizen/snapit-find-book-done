@@ -26,9 +26,9 @@ function asString(v: unknown): string {
 
 export const Route = createFileRoute("/plan")({
   validateSearch: (search: Record<string, unknown>): PlanSearch => ({
+    ...(search['demo'] ? { demo: true } : {}),
     q: asString(search['q']),
     loc: asString(search['loc']),
-    ...(search['demo'] ? { demo: true } : {}),
   }),
   head: () => ({
     meta: [
