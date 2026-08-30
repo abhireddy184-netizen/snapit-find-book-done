@@ -101,7 +101,7 @@ export function OutcomeComposer() {
         </Link>
         <Link
           to="/plan"
-          search={{ demo: true, q: "", loc: "" }}
+         
           data-analytics-id="plan_demo"
           data-analytics-location="hero_composer"
           className="text-xs font-bold text-primary hover:underline"

@@ -359,7 +359,6 @@ export function OrchestratorBand() {
           <div className="mt-5 flex flex-wrap items-center gap-2.5">
             <Link
               to="/plan"
-              search={{ demo: true, q: "", loc: "" }}
               data-analytics-id="plan_demo"
               data-analytics-location="homepage_band"
               className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
