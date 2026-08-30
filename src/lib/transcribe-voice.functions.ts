@@ -48,6 +48,8 @@ export const transcribeVoice = createServerFn({ method: "POST" })
     const form = new FormData();
     form.append("file", file);
     form.append("model", STT_MODEL);
+    form.append("prompt", STT_PROMPT);
+
 
     const res = await fetch(GATEWAY_URL, {
       method: "POST",
