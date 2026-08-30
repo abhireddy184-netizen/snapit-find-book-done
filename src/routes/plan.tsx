@@ -405,7 +405,7 @@ function TaskRow({
   onRename: (title: string) => void; onDuration: (minutes: number) => void;
 }) {
   const [editing, setEditing] = useState(false);
-  const meta = CHANNEL_META[task.channel];
+
   const Icon = CHANNEL_ICON[task.channel];
   const skipped = task.status === "skipped";
 
