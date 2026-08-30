@@ -129,6 +129,11 @@ export function OutcomeComposer() {
   // Guards so manual stop and automatic stop can't stop/transcribe twice.
   const stopRequestedRef = useRef(false);
   const discardRef = useRef(false);
+  // Rolling provisional transcription (MediaRecorder path).
+  const partialTimerRef = useRef<number | null>(null);
+  const partialSeqRef = useRef(0);
+  const partialInFlightRef = useRef(false);
+  const finalizedRef = useRef(false);
   // Text the recognition session started with — finals append onto this.
   const baseTextRef = useRef("");
   const listening = voiceStatus === "listening";
