@@ -396,7 +396,9 @@ export function OutcomeComposer() {
       <label htmlFor="gpb-outcome" className="sr-only">
         Describe the outcome or the day you need handled
       </label>
-      <div className="relative">
+      {/* dir="auto" resolves per content, so RTL scripts (Arabic, Hebrew, Urdu)
+          flip both the text and the logical padding/mic placement below. */}
+      <div dir="auto" className="relative">
         <textarea
           id="gpb-outcome"
           value={request}
@@ -405,7 +407,7 @@ export function OutcomeComposer() {
           onBlur={() => (paused.current = false)}
           rows={3}
           placeholder={EXAMPLES[i]}
-          className="min-h-[112px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pr-[3.25rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:pr-14"
+          className="min-h-[112px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pe-[3.25rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:pe-14"
         />
         <button
           type="button"
@@ -414,7 +416,7 @@ export function OutcomeComposer() {
           title={micTitle}
           aria-pressed={listening}
           disabled={transcribing}
-          className={`absolute right-2 top-2 grid h-10 w-10 shrink-0 place-items-center rounded-full border transition-all sm:right-2.5 sm:top-2.5 ${
+          className={`absolute end-2 top-2 grid h-10 w-10 shrink-0 place-items-center rounded-full border transition-all sm:end-2.5 sm:top-2.5 ${
 
             listening
               ? "animate-pulse border-primary bg-primary text-primary-foreground shadow-md"
@@ -437,7 +439,7 @@ export function OutcomeComposer() {
       </p>
 
       {statusLine && (
-        <p className={`mt-1.5 text-xs font-semibold ${listening || transcribing ? "text-primary" : "text-muted-foreground"}`}>
+        <p dir="auto" className={`mt-1.5 text-xs font-semibold ${listening || transcribing ? "text-primary" : "text-muted-foreground"}`}>
           {statusLine}
         </p>
       )}
