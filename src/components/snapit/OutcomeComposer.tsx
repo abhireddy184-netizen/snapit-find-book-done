@@ -16,8 +16,12 @@ const EXAMPLES = [
 const MAX_RECORD_MS = 60_000;
 // Rolling provisional transcription while the user is still speaking.
 const PARTIAL_CHUNK_MS = 1_000;
-const PARTIAL_INTERVAL_MS = 2_500;
+// Adaptive cadence: quick first feedback, backing off as the clip grows so a
+// long recording doesn't re-upload big audio every couple of seconds.
+const PARTIAL_MIN_MS = 1_800;
+const PARTIAL_MAX_MS = 4_000;
 const MIN_PARTIAL_BYTES = 6_000;
+
 
 type SpeechRecognitionResultLike = {
   isFinal: boolean;
