@@ -618,11 +618,14 @@ function PlanDetails({ plan }: { plan: GpbPlan }) {
   const channels = (Object.keys(CHANNEL_META) as ExecutionChannel[]).filter(
     (c) => used.has(c) && c !== "not-supported",
   );
-  const hasFuture = channels.some((c) => !CHANNEL_META[c].live);
+  const hasFuture = channels.some((ch) => !CHANNEL_META[ch].live);
+  // Channel blurbs and this caveat only exist in English; the localized versions
+  // of the same disclaimers are already in plan.notes.
+  const english = !plan.understanding || plan.understanding.languageCode.toLowerCase().startsWith("en");
 
   return (
     <section className="mt-6">
-      {hasFuture && (
+      {hasFuture && english && (
         <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
           Food, grocery and ride steps are planned partner services and aren't connected yet. Nothing here is
           booked or ordered.
@@ -662,7 +665,9 @@ function PlanDetails({ plan }: { plan: GpbPlan }) {
           {plan.notes.map((n) => (
             <li key={n}>· {n}</li>
           ))}
-          <li>· Home and local tasks link into the GPB service catalogue, where you choose and book a pro.</li>
+          {english && (
+            <li>· Home and local tasks link into the GPB service catalogue, where you choose and book a pro.</li>
+          )}
         </ul>
       </details>
     </section>

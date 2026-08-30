@@ -7,7 +7,7 @@ const STT_MODEL = "openai/gpt-4o-transcribe";
 // No `language` field is sent: the model auto-detects the spoken language and
 // handles accents plus code-switched speech (e.g. Telugu+English, Hindi+English).
 const STT_PROMPT =
-  "Everyday spoken request about errands, chores, home services, food, groceries, rides or appointments. The speaker may mix languages (for example English with Telugu, Hindi, Tamil or Spanish), have a strong accent, use broken grammar or filler words. Transcribe verbatim in the language actually spoken; do not translate, correct or add anything.";
+  "Everyday spoken request about errands, chores, home services, food, groceries, rides, appointments, airports and flights. It often contains city names, airport codes (DFW, DAL, JFK, LAX, BLR, HYD), business or store names, street names, people's names, clock times with AM/PM, dates and quantities — transcribe those exactly as spoken. The speaker may mix languages within one sentence (for example English with Telugu, Hindi, Kannada, Malayalam, Tamil, Bengali, Marathi, Urdu, Spanish, Arabic, French or Tagalog), have a strong accent, use slang, broken grammar, incomplete phrases or filler words. Transcribe verbatim in the language and script actually spoken, keeping code-switched words in their original language; never translate, summarise, correct grammar, or add anything.";
 
 
 function extFor(mimeType: string): string {
