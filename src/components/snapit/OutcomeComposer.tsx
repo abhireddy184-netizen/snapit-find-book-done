@@ -62,9 +62,8 @@ export function OutcomeComposer() {
   const [i, setI] = useState(0);
   const paused = useRef(false);
 
-  // Voice input state
-  const SR = getSpeechRecognition();
-  const voiceSupported = SR !== null;
+  // Voice input state — support is detected after mount to avoid SSR/client mismatch.
+  const [voiceSupported, setVoiceSupported] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>("idle");
   const recRef = useRef<SpeechRecognitionLike | null>(null);
   // Text the recognition session started with — finals append onto this.
@@ -76,6 +75,11 @@ export function OutcomeComposer() {
       if (!paused.current) setI((v) => (v + 1) % EXAMPLES.length);
     }, 3800);
     return () => window.clearInterval(t);
+  }, []);
+
+  // Feature-detect speech recognition on mount (avoids SSR hydration mismatch).
+  useEffect(() => {
+    setVoiceSupported(getSpeechRecognition() !== null);
   }, []);
 
   // Always tear down recognition on unmount.
@@ -104,12 +108,13 @@ export function OutcomeComposer() {
       stopListening();
       return;
     }
-    if (!SR) {
+    const Ctor = getSpeechRecognition();
+    if (!Ctor) {
       setVoiceStatus("unsupported");
       return;
     }
 
-    const rec = new SR();
+    const rec = new Ctor();
     recRef.current = rec;
     baseTextRef.current = request.trim();
     rec.lang = "en-US";
