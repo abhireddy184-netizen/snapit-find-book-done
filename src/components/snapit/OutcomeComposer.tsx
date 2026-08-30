@@ -90,42 +90,17 @@ export function OutcomeComposer() {
         </button>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2 border-t border-border/60 pt-3">
+      <div className="mt-3 border-t border-border/60 pt-3">
         <Link
           to="/snap"
           data-analytics-id="show_gpb_cta"
           data-analytics-location="hero_composer"
-          className="inline-flex items-center gap-2 rounded-full border border-border/70 bg-background px-4 py-2 text-xs font-bold text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+          className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground transition-colors hover:text-primary"
         >
-          <Camera className="h-4 w-4 text-primary" /> Show GPB instead
+          <Camera className="h-4 w-4 text-primary" /> Or show GPB a photo
         </Link>
-        <Link
-          to="/plan"
-          search={{ q: "", loc: "" }}
-         
-          data-analytics-id="plan_demo"
-          data-analytics-location="hero_composer"
-          className="text-xs font-bold text-primary hover:underline"
-        >
-          See an example plan
-        </Link>
-        <span className="text-[11px] text-muted-foreground">
-          Multi-part days welcome — GPB sequences them.
-        </span>
       </div>
 
-      <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
-        {EXAMPLES.slice(0, 3).map((ex) => (
-          <button
-            key={ex}
-            type="button"
-            onClick={() => setRequest(ex)}
-            className="shrink-0 rounded-full border border-border/60 bg-background px-3 py-1.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
-          >
-            {ex.length > 42 ? ex.slice(0, 40) + "…" : ex}
-          </button>
-        ))}
-      </div>
     </form>
   );
 }

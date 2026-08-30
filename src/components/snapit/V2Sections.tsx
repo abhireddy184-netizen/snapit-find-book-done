@@ -394,3 +394,134 @@ export function OrchestratorBand() {
     </section>
   );
 }
+
+/* ---------------- 8) Simple three-step flow (homepage) ---------------- */
+
+const FLOW: { icon: LucideIcon; title: string; body: string }[] = [
+  { icon: MessageSquareText, title: "Tell GPB", body: "Say what you need done — type it, or show it with a photo." },
+  { icon: ListChecks, title: "Get one plan", body: "GPB turns it into a clear plan with the right steps and timing." },
+  { icon: HardHat, title: "Get it done", body: "Trusted local pros handle the work. You stay in one place." },
+];
+
+export function SimpleFlow() {
+  return (
+    <section className="mt-10 sm:mt-14">
+      <ol className="grid gap-3 md:grid-cols-3">
+        {FLOW.map((s, i) => (
+          <li
+            key={s.title}
+            className="rounded-[26px] border border-border/60 bg-card p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <span
+              className="grid h-12 w-12 place-items-center rounded-2xl text-white shadow-md"
+              style={{ background: i === 0 ? "var(--gradient-primary)" : "color-mix(in oklab, var(--secondary) 84%, var(--primary))" }}
+            >
+              <s.icon className="h-5 w-5" />
+            </span>
+            <h2 className="mt-4 text-lg font-black tracking-tight">{s.title}</h2>
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+/* ---------------- 9) One real example (homepage) ---------------- */
+
+const EXAMPLE_STEPS = [
+  { time: "4:15 PM", label: "Dinner", icon: UtensilsCrossed },
+  { time: "4:55 PM", label: "Groceries", icon: ShoppingBasket },
+  { time: "5:40 PM", label: "At DFW", icon: CarFront },
+];
+
+export function ExamplePlanPreview() {
+  return (
+    <section className="mt-10 overflow-hidden rounded-[28px] border border-border/60 bg-card p-6 shadow-sm sm:p-8 lg:mt-14">
+      <div className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-10">
+        <div className="min-w-0">
+          <h2 className="text-[clamp(1.35rem,3vw,2rem)] font-black leading-tight tracking-tight">
+            “I need dinner, groceries, and to be at DFW by 6 PM.”
+          </h2>
+          <p className="mt-3 max-w-[46ch] text-sm leading-relaxed text-muted-foreground sm:text-base">
+            One request. GPB builds one plan with the timing worked out.
+          </p>
+          <Link
+            to="/plan"
+            search={{ q: "", loc: "" }}
+            data-analytics-id="plan_demo"
+            data-analytics-location="homepage_example"
+            className="mt-5 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
+            style={{ background: "var(--gradient-primary)" }}
+          >
+            See the GPB plan <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <ol className="grid gap-2.5">
+          {EXAMPLE_STEPS.map((s) => (
+            <li key={s.label} className="flex items-center gap-3.5 rounded-2xl border border-border/60 bg-background px-4 py-3.5">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                <s.icon className="h-4.5 w-4.5" />
+              </span>
+              <span className="text-sm font-black tracking-tight">{s.label}</span>
+              <span className="ml-auto text-sm font-bold text-muted-foreground">{s.time}</span>
+            </li>
+          ))}
+          <li className="px-1 text-[11px] text-muted-foreground">
+            Example only — nothing is booked or ordered.
+          </li>
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- 10) Expandable detail (homepage) ---------------- */
+
+export function HowGpbWorksDetails() {
+  return (
+    <section id="how-it-works" className="mt-10 scroll-mt-24">
+      <details className="group rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-base font-black tracking-tight">
+          How GPB works
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border/60 text-muted-foreground transition-transform group-open:rotate-90">
+            <ArrowRight className="h-4 w-4" />
+          </span>
+        </summary>
+
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {STEPS.map((s) => (
+            <div key={s.title} className="rounded-2xl border border-border/60 bg-background p-4">
+              <h3 className="text-sm font-black tracking-tight">{s.title}</h3>
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{s.body}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <div className="rounded-2xl border border-border/60 bg-background p-4">
+            <h3 className="text-sm font-black tracking-tight">Who does the work</h3>
+            <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
+              Home, cleaning, moving, errands and auto tasks go through the GPB service catalogue and local
+              professionals. Food, grocery and ride steps are planned partner integrations and are not
+              connected yet — GPB will always say which is which.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border/60 bg-background p-4">
+            <h3 className="text-sm font-black tracking-tight">What you can rely on</h3>
+            <ul className="mt-1.5 space-y-1 text-xs leading-relaxed text-muted-foreground">
+              {TRUST.map((t) => (
+                <li key={t.title}>· {t.title} — {t.body}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
+          GPB is in early access and launching city by city. Plans are suggestions — nothing is booked until you say so.
+        </p>
+      </details>
+    </section>
+  );
+}

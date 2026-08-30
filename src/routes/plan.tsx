@@ -32,14 +32,14 @@ export const Route = createFileRoute("/plan")({
   }),
   head: () => ({
     meta: [
-      { title: "Your GPB plan — one outcome, one coordinated plan" },
-      { name: "description", content: "Tell GPB your day and get one plan: linked tasks, sequencing, timing and honest execution channels. A prototype planner, not a confirmed booking." },
-      { property: "og:title", content: "Your GPB plan — one outcome, one coordinated plan" },
-      { property: "og:description", content: "GPB turns a whole real-world outcome into one timed plan with linked tasks." },
+      { title: "Your GPB Plan — one plan for what you need done" },
+      { name: "description", content: "Tell GPB what you need done and get one clear plan with steps and timing. Nothing is booked until you say so." },
+      { property: "og:title", content: "Your GPB Plan — one plan for what you need done" },
+      { property: "og:description", content: "GPB turns what you need done into one clear, timed plan." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Your GPB plan" },
-      { name: "twitter:description", content: "One outcome. One plan. Consider it done." },
+      { name: "twitter:description", content: "One request. One clear plan." },
     ],
   }),
   component: PlanPage,
@@ -155,8 +155,7 @@ function PlanPage() {
           )}
 
           <Timeline plan={plan} onChange={update} onReset={resetPlan} />
-          <ChannelLegend plan={plan} />
-          <PlanNotes plan={plan} />
+          <PlanDetails plan={plan} />
           <NextSteps />
         </>
       )}
@@ -176,16 +175,13 @@ function PlanHeader({
 
   return (
     <section className="fade-up">
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-primary">
-        <Sparkles className="h-3.5 w-3.5" /> GPB Plan
-      </span>
-      <h1 className="mt-3 text-[clamp(1.6rem,4vw,2.6rem)] font-black leading-tight tracking-tight">
-        {isDemo ? "One outcome. One plan." : "Here's your plan."}
+      <h1 className="text-[clamp(1.6rem,4vw,2.6rem)] font-black leading-tight tracking-tight">
+        Your GPB Plan
       </h1>
-      <p className="mt-2 max-w-[62ch] text-sm text-muted-foreground sm:text-base">
+      <p className="mt-2 max-w-[58ch] text-sm text-muted-foreground sm:text-base">
         {isDemo
-          ? "This is an example plan so you can see how GPB sequences a whole day. Describe your own outcome below to build one."
-          : "GPB broke your request into linked tasks with timing and order. Edit, reorder or skip anything — nothing is booked."}
+          ? "Here's an example plan. Describe what you need below to build your own."
+          : "Here's your plan. Change the order, the timing or any step — nothing is booked."}
       </p>
 
       <form
@@ -250,17 +246,9 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
   return (
     <section className="mt-6 overflow-hidden rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-          Parent goal
-        </span>
         {isDemo && (
           <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-primary">
             Example plan
-          </span>
-        )}
-        {plan.source === "fallback" && (
-          <span className="rounded-full bg-muted px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-muted-foreground">
-            Draft plan
           </span>
         )}
       </div>
@@ -321,12 +309,11 @@ function ReplanCard({
         </span>
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-sm font-black tracking-tight sm:text-base">{r.headline}</h3>
-            <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-              Prototype signal
-            </span>
+            <h3 className="text-sm font-black tracking-tight sm:text-base">A faster option is available.</h3>
           </div>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{r.body}</p>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+            {r.headline}. {r.body}
+          </p>
           {applied ? (
             <p className="mt-3 text-sm font-bold text-primary">
               Plan updated — the stop now runs as delivery while you travel.
@@ -351,7 +338,7 @@ function ReplanCard({
             </div>
           )}
           <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-            Live traffic and partner execution are prototype signals in this preview, not connected data.
+            This traffic example is simulated — live traffic updates aren't connected yet.
           </p>
         </div>
       </div>
@@ -370,10 +357,8 @@ function Timeline({
     <section className="mt-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-[clamp(1.25rem,2.6vw,1.7rem)] font-black tracking-tight">The GPB plan</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            One timeline for the whole outcome — reorder, skip or restore any step.
-          </p>
+          <h2 className="text-[clamp(1.25rem,2.6vw,1.7rem)] font-black tracking-tight">Your steps</h2>
+          <p className="mt-1 text-sm text-muted-foreground">Reorder, skip or restore any step.</p>
         </div>
         <button
           onClick={onReset}
@@ -420,7 +405,7 @@ function TaskRow({
   onRename: (title: string) => void; onDuration: (minutes: number) => void;
 }) {
   const [editing, setEditing] = useState(false);
-  const meta = CHANNEL_META[task.channel];
+
   const Icon = CHANNEL_ICON[task.channel];
   const skipped = task.status === "skipped";
 
@@ -462,19 +447,6 @@ function TaskRow({
                 {task.title}
               </h3>
             )}
-            <span
-              className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                meta.live ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"
-              }`}
-            >
-              {meta.label}
-              {!meta.live && " · coming"}
-            </span>
-            {task.parallel && index > 0 && (
-              <span className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                In parallel
-              </span>
-            )}
           </div>
 
           {task.detail && <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{task.detail}</p>}
@@ -483,14 +455,13 @@ function TaskRow({
             {task.locationNote && (
               <span className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {task.locationNote}</span>
             )}
-            {task.dependsOn?.length ? <span>After step {index}</span> : null}
             {task.categorySlug && (
               <Link
                 to="/services/$category"
                 params={{ category: task.categorySlug }}
                 className="font-bold text-primary hover:underline"
               >
-                Open GPB service
+                Find a pro
               </Link>
             )}
           </div>
@@ -550,58 +521,58 @@ function TaskRow({
 
 /* ---------------- channels + notes ---------------- */
 
-function ChannelLegend({ plan }: { plan: GpbPlan }) {
+function PlanDetails({ plan }: { plan: GpbPlan }) {
   const used = new Set(plan.tasks.map((t) => t.channel));
-  const channels = (Object.keys(CHANNEL_META) as ExecutionChannel[]).filter((c) => c !== "not-supported" || used.has(c));
-  return (
-    <section className="mt-8">
-      <h2 className="text-[clamp(1.15rem,2.4vw,1.5rem)] font-black tracking-tight">
-        One outcome, one plan, many services behind the scenes.
-      </h2>
-      <p className="mt-1 max-w-[64ch] text-sm text-muted-foreground">
-        You don't pick apps. GPB decides which channel each step belongs to — and says plainly which ones are live today.
-      </p>
-      <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-        {channels.map((c) => {
-          const meta = CHANNEL_META[c];
-          const Icon = CHANNEL_ICON[c];
-          return (
-            <div
-              key={c}
-              className={`flex items-start gap-3 rounded-[22px] border p-4 ${
-                used.has(c) ? "border-primary/30 bg-card" : "border-border/60 bg-muted/20"
-              }`}
-            >
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-border/60 bg-background text-primary">
-                <Icon className="h-4 w-4" />
-              </span>
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-sm font-black tracking-tight">{meta.label}</span>
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${meta.live ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                    {meta.live ? (c === "user-action" ? "Your step" : "GPB service flow") : "Future integration"}
-                  </span>
-                </div>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{meta.blurb}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
+  const channels = (Object.keys(CHANNEL_META) as ExecutionChannel[]).filter(
+    (c) => used.has(c) && c !== "not-supported",
   );
-}
+  const hasFuture = channels.some((c) => !CHANNEL_META[c].live);
 
-function PlanNotes({ plan }: { plan: GpbPlan }) {
   return (
-    <section className="mt-6 rounded-[22px] border border-dashed border-border bg-muted/25 p-4 sm:p-5">
-      <h2 className="text-sm font-black tracking-tight">What's real today</h2>
-      <ul className="mt-2 space-y-1.5 text-xs leading-relaxed text-muted-foreground">
-        {plan.notes.map((n) => (
-          <li key={n}>· {n}</li>
-        ))}
-        <li>· GPB-local tasks link into the current service catalogue and provider booking flow — the plan itself does not route or dispatch a pro.</li>
-      </ul>
+    <section className="mt-6">
+      {hasFuture && (
+        <p className="mb-3 text-xs leading-relaxed text-muted-foreground">
+          Food, grocery and ride steps are planned partner services and aren't connected yet. Nothing here is
+          booked or ordered.
+        </p>
+      )}
+
+      <details className="group rounded-[24px] border border-border/60 bg-card p-5 shadow-sm">
+        <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-black tracking-tight">
+          How this will be handled
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border/60 text-muted-foreground transition-transform group-open:rotate-90">
+            <ArrowRight className="h-4 w-4" />
+          </span>
+        </summary>
+
+        <div className="mt-4 grid gap-2 sm:grid-cols-2">
+          {channels.map((c) => {
+            const meta = CHANNEL_META[c];
+            const Icon = CHANNEL_ICON[c];
+            return (
+              <div key={c} className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background p-4">
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <Icon className="h-4 w-4" />
+                </span>
+                <div className="min-w-0">
+                  <div className="text-sm font-black tracking-tight">
+                    {meta.label}
+                    {!meta.live && <span className="ml-2 text-[11px] font-bold text-muted-foreground">Coming soon</span>}
+                  </div>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{meta.blurb}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <ul className="mt-4 space-y-1.5 text-xs leading-relaxed text-muted-foreground">
+          {plan.notes.map((n) => (
+            <li key={n}>· {n}</li>
+          ))}
+          <li>· Home and local tasks link into the GPB service catalogue, where you choose and book a pro.</li>
+        </ul>
+      </details>
     </section>
   );
 }

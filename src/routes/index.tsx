@@ -4,17 +4,17 @@ import { useServerFn } from "@tanstack/react-start";
 import { subscribeToUpdates } from "@/lib/subscribe.functions";
 import {
   ArrowRight, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
-  Facebook, Instagram, Twitter, Youtube, Sparkles,
+  Facebook, Instagram, Twitter, Youtube,
 } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { Logo, Wordmark } from "@/components/snapit/Logo";
-import { CategoryIconRow, HomeRows } from "@/components/snapit/HomeSections";
 import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
 import { OutcomeComposer } from "@/components/snapit/OutcomeComposer";
 import {
-  HowItWorks, OutcomeBundles, DailyLifeModules, ShowGpbBand, TrustSection, BrowseFallback,
-  OrchestratorBand,
+  DailyLifeModules, ShowGpbBand, BrowseFallback,
+  SimpleFlow, ExamplePlanPreview, HowGpbWorksDetails,
 } from "@/components/snapit/V2Sections";
+
 
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
 
@@ -23,15 +23,15 @@ const SITE_URL = "https://getperfectboy.com";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GPB — One outcome. One plan. Consider it done." },
-      { name: "description", content: "Tell GetPerfectBoy your day and get one coordinated plan: linked tasks, sequencing, timing and trusted local pros. Photo, video or plain text." },
-      { property: "og:title", content: "GPB — One outcome. One plan. Consider it done." },
-      { property: "og:description", content: "You tell us the outcome. We handle the work. GPB turns your request into a clear job brief for trusted local pros." },
+      { title: "GetPerfectBoy — Tell GPB what you need done" },
+      { name: "description", content: "Tell GPB what needs to happen. We build the plan and coordinate the right local help — home, errands, auto, moving, family help and emergencies." },
+      { property: "og:title", content: "GetPerfectBoy — Tell GPB what you need done" },
+      { property: "og:description", content: "Tell GPB what needs to happen. We build the plan and coordinate the right help." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "GPB — One outcome. One plan. Consider it done." },
-      { name: "twitter:description", content: "You tell us the outcome. We handle the work." },
+      { name: "twitter:title", content: "GetPerfectBoy — Tell GPB what you need done" },
+      { name: "twitter:description", content: "Tell GPB what needs to happen. We build the plan and coordinate the right help." },
     ],
     links: [{ rel: "canonical", href: SITE_URL + "/" }],
   }),
@@ -68,41 +68,34 @@ function Landing() {
             <h1 className="mt-5 max-w-[15ch] text-[clamp(2.2rem,5.6vw,4.2rem)] font-black leading-[1.03] tracking-tight text-foreground">
               What do you <span className="text-gradient-hero">need done?</span>
             </h1>
-            <p className="mt-3 max-w-[48ch] text-[clamp(0.95rem,1.2vw,1.15rem)] leading-relaxed text-muted-foreground">
-              Tell GPB your day — one outcome, one plan. We sequence the tasks, the timing and the trusted
-              local pros behind them.
+            <p className="mt-3 max-w-[44ch] text-[clamp(0.95rem,1.2vw,1.15rem)] leading-relaxed text-muted-foreground">
+              Tell GPB what needs to happen. We’ll build the plan and coordinate the right help.
             </p>
 
             <div className="mt-6 lg:hidden">
               <OutcomeComposer />
             </div>
 
-            <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-muted-foreground">
               <a
                 href="#early-access"
                 id="hero-early-access-cta"
                 data-analytics-id="early_access_cta"
                 data-analytics-location="hero"
-                className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
-                style={{ background: "var(--gradient-primary)" }}
+                className="text-primary hover:underline"
               >
-                Get Early Access <ArrowRight className="h-4 w-4" />
+                Get early access
               </a>
               <Link
                 to="/provider-interest"
                 id="hero-provider-interest-cta"
                 data-analytics-id="provider_interest_cta"
                 data-analytics-location="hero"
-                className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary/40 bg-card px-6 py-3.5 text-sm font-black text-primary transition-colors hover:bg-primary/5"
+                className="hover:text-foreground hover:underline"
               >
-                Join GPB as a Pro
+                Join GPB as a pro
               </Link>
             </div>
-
-            <p className="mt-4 inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-              <Sparkles className="h-3.5 w-3.5 text-primary" />
-              Early access · launching city by city
-            </p>
           </div>
 
           {/* Composer sits beside the headline on large screens */}
@@ -112,20 +105,13 @@ function Landing() {
         </div>
       </section>
 
-      <OrchestratorBand />
-      <HowItWorks />
-      <OutcomeBundles />
+      <SimpleFlow />
+      <ExamplePlanPreview />
       <DailyLifeModules />
-      <ShowGpbBand />
-      <TrustSection />
-
       <BrowseFallback />
+      <ShowGpbBand />
+      <HowGpbWorksDetails />
 
-      {/* Secondary browse paths */}
-      <section className="mt-6">
-        <CategoryIconRow />
-      </section>
-      <HomeRows />
 
       <EmergencyStrip />
       <ProviderRecruitment />
