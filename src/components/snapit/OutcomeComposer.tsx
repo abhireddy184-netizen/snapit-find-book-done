@@ -135,11 +135,14 @@ export function OutcomeComposer() {
   const transcribing = voiceStatus === "transcribing";
 
   useEffect(() => {
+    // Examples rotate only while the composer is idle — never during voice input.
+    if (voiceStatus === "listening" || voiceStatus === "transcribing") return;
     const t = window.setInterval(() => {
       if (!paused.current) setI((v) => (v + 1) % EXAMPLES.length);
     }, 3800);
     return () => window.clearInterval(t);
-  }, []);
+  }, [voiceStatus]);
+
 
   // Feature-detect voice input on mount (avoids SSR hydration mismatch).
   useEffect(() => {
