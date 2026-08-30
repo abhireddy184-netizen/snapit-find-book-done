@@ -73,12 +73,15 @@ export function normalizeUnderstanding(raw: string, request: string): PlanUnders
     rawScript === "latin" || rawScript === "mixed" || rawScript === "native"
       ? (rawScript as "latin" | "mixed" | "native")
       : undefined;
+  // Low confidence must never silently become a confident mistranslation: fall
+  // back to the user's verbatim words as the canonical intent.
+  const normalized = str("normalizedRequest");
   return {
     languageCode: str("languageCode").slice(0, 12) || "en",
     languageName: str("languageName").slice(0, 40) || "English",
     codeSwitched: Boolean(p['codeSwitched']),
     ...(script ? { script } : {}),
-    normalizedRequest: str("normalizedRequest") || request,
+    normalizedRequest: (confidence < 0.35 ? `${request}${normalized ? ` (uncertain reading: ${normalized})` : ""}` : normalized) || request,
     confidence,
     // Only surface a question when it is tied to a genuinely critical ambiguity.
     ...(ambiguity && question ? { criticalAmbiguity: ambiguity, clarificationQuestion: question } : {}),
