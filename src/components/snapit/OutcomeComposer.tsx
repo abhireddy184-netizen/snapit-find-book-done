@@ -14,6 +14,10 @@ const EXAMPLES = [
 ];
 
 const MAX_RECORD_MS = 60_000;
+// Rolling provisional transcription while the user is still speaking.
+const PARTIAL_CHUNK_MS = 1_000;
+const PARTIAL_INTERVAL_MS = 2_500;
+const MIN_PARTIAL_BYTES = 6_000;
 
 type SpeechRecognitionResultLike = {
   isFinal: boolean;
