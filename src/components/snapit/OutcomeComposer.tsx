@@ -2,6 +2,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Camera, Mic, Sparkles } from "lucide-react";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
+import { transcribeVoice } from "@/lib/transcribe-voice.functions";
 
 const EXAMPLES = [
   "I need dinner, groceries, and to be at DFW by 6 PM.",
@@ -10,6 +11,8 @@ const EXAMPLES = [
   "My car is making a strange noise. Handle it.",
   "Guests at 6pm — deep clean the living room and bath.",
 ];
+
+const MAX_RECORD_MS = 60_000;
 
 type SpeechRecognitionResultLike = {
   isFinal: boolean;
@@ -42,9 +45,47 @@ function getSpeechRecognition(): SpeechRecognitionCtor | null {
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
 
-type VoiceStatus = "idle" | "listening" | "denied" | "no-speech" | "unsupported" | "error";
+function canRecordAudio(): boolean {
+  return (
+    typeof navigator !== "undefined" &&
+    typeof navigator.mediaDevices?.getUserMedia === "function" &&
+    typeof MediaRecorder !== "undefined"
+  );
+}
 
-const VOICE_MESSAGES: Record<Exclude<VoiceStatus, "idle" | "listening">, string> = {
+function pickMimeType(): string {
+  if (typeof MediaRecorder === "undefined" || typeof MediaRecorder.isTypeSupported !== "function") {
+    return "";
+  }
+  // iOS Safari records audio/mp4; Chrome/Firefox record webm/ogg.
+  for (const t of ["audio/mp4", "audio/webm;codecs=opus", "audio/webm", "audio/ogg;codecs=opus"]) {
+    if (MediaRecorder.isTypeSupported(t)) return t;
+  }
+  return "";
+}
+
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("read failed"));
+    reader.onload = () => {
+      const url = String(reader.result ?? "");
+      resolve(url.slice(url.indexOf(",") + 1));
+    };
+    reader.readAsDataURL(blob);
+  });
+}
+
+type VoiceStatus =
+  | "idle"
+  | "listening"
+  | "transcribing"
+  | "denied"
+  | "no-speech"
+  | "unsupported"
+  | "error";
+
+const VOICE_MESSAGES: Record<Exclude<VoiceStatus, "idle" | "listening" | "transcribing">, string> = {
   denied: "Microphone access was blocked. Allow it in your browser settings to use voice input.",
   "no-speech": "I didn’t catch that — tap the mic and try again.",
   unsupported: "Voice input isn’t supported in this browser — type your request instead.",
@@ -54,6 +95,10 @@ const VOICE_MESSAGES: Record<Exclude<VoiceStatus, "idle" | "listening">, string>
 /**
  * Outcome-first hero composer. Multi-part requests become one coordinated GPB
  * plan on /plan; the existing /search catalogue stays available as a fallback.
+ *
+ * Voice input: Web Speech API where available (Chrome/Edge/Android); on iPhone
+ * Safari and other browsers without it, a short MediaRecorder clip is sent to a
+ * server function that transcribes it via the Lovable AI gateway.
  */
 export function OutcomeComposer() {
   const navigate = useNavigate();
@@ -62,13 +107,16 @@ export function OutcomeComposer() {
   const [i, setI] = useState(0);
   const paused = useRef(false);
 
-  // Voice input state — support is detected after mount to avoid SSR/client mismatch.
+  // Voice input state — capabilities are detected after mount to avoid SSR/client mismatch.
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState<VoiceStatus>("idle");
   const recRef = useRef<SpeechRecognitionLike | null>(null);
+  const mediaRef = useRef<{ recorder: MediaRecorder; stream: MediaStream } | null>(null);
+  const recordTimerRef = useRef<number | null>(null);
   // Text the recognition session started with — finals append onto this.
   const baseTextRef = useRef("");
   const listening = voiceStatus === "listening";
+  const transcribing = voiceStatus === "transcribing";
 
   useEffect(() => {
     const t = window.setInterval(() => {
@@ -77,16 +125,35 @@ export function OutcomeComposer() {
     return () => window.clearInterval(t);
   }, []);
 
-  // Feature-detect speech recognition on mount (avoids SSR hydration mismatch).
+  // Feature-detect voice input on mount (avoids SSR hydration mismatch).
   useEffect(() => {
-    setVoiceSupported(getSpeechRecognition() !== null);
+    setVoiceSupported(getSpeechRecognition() !== null || canRecordAudio());
   }, []);
 
-  // Always tear down recognition on unmount.
+  const stopRecordingResources = () => {
+    if (recordTimerRef.current !== null) {
+      window.clearTimeout(recordTimerRef.current);
+      recordTimerRef.current = null;
+    }
+    const m = mediaRef.current;
+    mediaRef.current = null;
+    m?.stream.getTracks().forEach((t) => t.stop());
+  };
+
+  // Always tear down recognition/recording on unmount.
   useEffect(() => {
     return () => {
       recRef.current?.abort();
       recRef.current = null;
+      const m = mediaRef.current;
+      if (m && m.recorder.state !== "inactive") {
+        try {
+          m.recorder.stop();
+        } catch {
+          /* ignore */
+        }
+      }
+      stopRecordingResources();
     };
   }, []);
 
@@ -103,17 +170,9 @@ export function OutcomeComposer() {
     setVoiceStatus((s) => (s === "listening" ? "idle" : s));
   };
 
-  const toggleVoice = () => {
-    if (listening) {
-      stopListening();
-      return;
-    }
-    const Ctor = getSpeechRecognition();
-    if (!Ctor) {
-      setVoiceStatus("unsupported");
-      return;
-    }
+  /* ---------- Web Speech API path ---------- */
 
+  const startSpeechRecognition = (Ctor: SpeechRecognitionCtor) => {
     const rec = new Ctor();
     recRef.current = rec;
     baseTextRef.current = request.trim();
@@ -162,9 +221,108 @@ export function OutcomeComposer() {
     }
   };
 
+  /* ---------- MediaRecorder + server transcription path (iPhone Safari) ---------- */
+
+  const stopRecordingAndTranscribe = () => {
+    const m = mediaRef.current;
+    if (!m) return;
+    try {
+      if (m.recorder.state !== "inactive") m.recorder.stop();
+    } catch {
+      setVoiceStatus("error");
+      stopRecordingResources();
+    }
+  };
+
+  const startRecording = async () => {
+    baseTextRef.current = request.trim();
+    let stream: MediaStream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      const name = (err as { name?: string } | null)?.name ?? "";
+      setVoiceStatus(name === "NotAllowedError" || name === "SecurityError" ? "denied" : "error");
+      return;
+    }
+
+    const mimeType = pickMimeType();
+    let recorder: MediaRecorder;
+    try {
+      recorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+    } catch {
+      stream.getTracks().forEach((t) => t.stop());
+      setVoiceStatus("error");
+      return;
+    }
+
+    const chunks: Blob[] = [];
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunks.push(e.data);
+    };
+
+    recorder.onstop = async () => {
+      const blob = new Blob(chunks, { type: recorder.mimeType || mimeType || "audio/mp4" });
+      stopRecordingResources();
+      if (blob.size < 200) {
+        setVoiceStatus("no-speech");
+        return;
+      }
+      setVoiceStatus("transcribing");
+      try {
+        const audioDataBase64 = await blobToBase64(blob);
+        const res = await transcribeVoice({
+          data: { audioDataBase64, mimeType: blob.type || "audio/mp4" },
+        });
+        const spoken = res.text.trim();
+        if (!spoken) {
+          setVoiceStatus("no-speech");
+          return;
+        }
+        const base = baseTextRef.current;
+        setRequest(base ? `${base} ${spoken}` : spoken);
+        setVoiceStatus("idle");
+      } catch (err) {
+        console.error("[gpb voice] transcription failed", err);
+        setVoiceStatus("error");
+      }
+    };
+
+    mediaRef.current = { recorder, stream };
+    try {
+      recorder.start();
+      setVoiceStatus("listening");
+      recordTimerRef.current = window.setTimeout(stopRecordingAndTranscribe, MAX_RECORD_MS);
+    } catch {
+      stopRecordingResources();
+      setVoiceStatus("error");
+    }
+  };
+
+  /* ---------- shared toggle ---------- */
+
+  const toggleVoice = () => {
+    if (transcribing) return;
+    if (listening) {
+      if (recRef.current) stopListening();
+      else stopRecordingAndTranscribe();
+      return;
+    }
+    const Ctor = getSpeechRecognition();
+    if (Ctor) {
+      startSpeechRecognition(Ctor);
+    } else if (canRecordAudio()) {
+      void startRecording();
+    } else {
+      setVoiceStatus("unsupported");
+    }
+  };
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (listening) stopListening();
+    if (listening) {
+      if (recRef.current) stopListening();
+      else stopRecordingAndTranscribe();
+    }
     const q = request.trim();
     void navigate({ to: "/plan", search: { q, loc: loc.trim() } });
   };
@@ -173,7 +331,17 @@ export function OutcomeComposer() {
     ? "Voice input isn’t supported in this browser — type instead"
     : listening
       ? "Stop voice input"
-      : "Use voice input";
+      : transcribing
+        ? "Transcribing your voice…"
+        : "Use voice input";
+
+  const statusLine = listening
+    ? "Listening… tap the mic again when you’re done."
+    : transcribing
+      ? "Transcribing your voice…"
+      : voiceStatus in VOICE_MESSAGES
+        ? VOICE_MESSAGES[voiceStatus as keyof typeof VOICE_MESSAGES]
+        : null;
 
   return (
     <form
@@ -201,12 +369,15 @@ export function OutcomeComposer() {
           aria-label={micTitle}
           title={micTitle}
           aria-pressed={listening}
+          disabled={transcribing}
           className={`absolute right-2.5 top-2.5 grid h-9 w-9 place-items-center rounded-full border transition-all ${
             listening
               ? "animate-pulse border-primary bg-primary text-primary-foreground shadow-md"
-              : voiceSupported
-                ? "border-border/70 bg-background text-muted-foreground hover:text-primary"
-                : "cursor-not-allowed border-border/70 bg-background text-muted-foreground opacity-50"
+              : transcribing
+                ? "cursor-wait border-primary/50 bg-primary/10 text-primary"
+                : voiceSupported
+                  ? "border-border/70 bg-background text-muted-foreground hover:text-primary"
+                  : "cursor-not-allowed border-border/70 bg-background text-muted-foreground opacity-50"
           }`}
         >
           <Mic className="h-4 w-4" />
@@ -217,12 +388,12 @@ export function OutcomeComposer() {
         Example request: {EXAMPLES[i]}
       </p>
       <p aria-live="polite" role="status" className="sr-only">
-        {listening ? "Listening… speak your request, then tap the mic again to stop." : ""}
+        {statusLine ?? ""}
       </p>
 
-      {(listening || voiceStatus in VOICE_MESSAGES) && (
-        <p className={`mt-1.5 text-xs font-semibold ${listening ? "text-primary" : "text-muted-foreground"}`}>
-          {listening ? "Listening… tap the mic again when you’re done." : VOICE_MESSAGES[voiceStatus as keyof typeof VOICE_MESSAGES]}
+      {statusLine && (
+        <p className={`mt-1.5 text-xs font-semibold ${listening || transcribing ? "text-primary" : "text-muted-foreground"}`}>
+          {statusLine}
         </p>
       )}
 
