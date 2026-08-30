@@ -392,7 +392,16 @@ export function normalizePlan(
   const deadline =
     typeof parsed['deadline'] === "string" && /^\d{1,2}:\d{2}$/.test(parsed['deadline'] as string)
       ? toClockString(parseClock(parsed['deadline'] as string))
-      : extractDeadline(request);
+      : // English regex is a last-resort fallback only; the canonical intent above
+        // is what carries non-English deadlines.
+        extractDeadline(understanding?.normalizedRequest ?? request);
+
+  const rawCopy = (parsed['uiCopy'] ?? {}) as Record<string, unknown>;
+  const copy: PlanUiCopy = {};
+  for (const [k, v] of Object.entries(rawCopy)) {
+    if (typeof v === "string" && v.trim()) (copy as Record<string, string>)[k] = v.trim().slice(0, 60);
+  }
+  const str = (k: string) => (typeof parsed[k] === "string" ? (parsed[k] as string).trim() : "");
 
   return finalizePlan(
     {
@@ -412,7 +421,14 @@ export function normalizePlan(
         ? (parsed['notes'] as unknown[]).filter((n): n is string => typeof n === "string").slice(0, 3)
         : [],
       source: "ai",
+      originalRequest: request,
+      ...(understanding ? { understanding } : {}),
+      ...(Object.keys(copy).length ? { uiCopy: copy } : {}),
+      ...(str("bookingDisclaimer") ? { bookingDisclaimer: str("bookingDisclaimer") } : {}),
+      ...(str("partnerDisclaimer") ? { partnerDisclaimer: str("partnerDisclaimer") } : {}),
     },
+    nowClock,
+
     nowClock,
   );
 }
