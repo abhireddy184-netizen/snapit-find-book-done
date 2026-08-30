@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Camera, Mic, Sparkles } from "lucide-react";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { transcribeVoice } from "@/lib/transcribe-voice.functions";
+import { startVoiceActivityMonitor, type VoiceActivityMonitor } from "@/lib/voice-activity";
 
 const EXAMPLES = [
   "I need dinner, groceries, and to be at DFW by 6 PM.",
@@ -113,6 +114,11 @@ export function OutcomeComposer() {
   const recRef = useRef<SpeechRecognitionLike | null>(null);
   const mediaRef = useRef<{ recorder: MediaRecorder; stream: MediaStream } | null>(null);
   const recordTimerRef = useRef<number | null>(null);
+  // Local silence detection for the current clip (never runs outside a session).
+  const vadRef = useRef<VoiceActivityMonitor | null>(null);
+  // Guards so manual stop and automatic stop can't stop/transcribe twice.
+  const stopRequestedRef = useRef(false);
+  const discardRef = useRef(false);
   // Text the recognition session started with — finals append onto this.
   const baseTextRef = useRef("");
   const listening = voiceStatus === "listening";
@@ -135,6 +141,8 @@ export function OutcomeComposer() {
       window.clearTimeout(recordTimerRef.current);
       recordTimerRef.current = null;
     }
+    vadRef.current?.stop();
+    vadRef.current = null;
     const m = mediaRef.current;
     mediaRef.current = null;
     m?.stream.getTracks().forEach((t) => t.stop());
@@ -225,11 +233,21 @@ export function OutcomeComposer() {
 
   /* ---------- MediaRecorder + server transcription path (iPhone Safari) ---------- */
 
-  const stopRecordingAndTranscribe = () => {
+  /**
+   * Ends the clip exactly once. `discard` is used by the no-speech timeout so we
+   * never send an empty clip to the transcriber.
+   */
+  const stopRecordingAndTranscribe = (discard = false) => {
     const m = mediaRef.current;
-    if (!m) return;
+    if (!m || stopRequestedRef.current) return;
+    stopRequestedRef.current = true;
+    discardRef.current = discard;
+    // Stop the analyser immediately; the recorder's onstop does the rest.
+    vadRef.current?.stop();
+    vadRef.current = null;
     try {
       if (m.recorder.state !== "inactive") m.recorder.stop();
+      else stopRecordingResources();
     } catch {
       setVoiceStatus("error");
       stopRecordingResources();
@@ -238,6 +256,8 @@ export function OutcomeComposer() {
 
   const startRecording = async () => {
     baseTextRef.current = request.trim();
+    stopRequestedRef.current = false;
+    discardRef.current = false;
     let stream: MediaStream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -272,8 +292,9 @@ export function OutcomeComposer() {
 
     recorder.onstop = async () => {
       const blob = new Blob(chunks, { type: recorder.mimeType || mimeType || "audio/mp4" });
+      const discarded = discardRef.current;
       stopRecordingResources();
-      if (blob.size < 200) {
+      if (discarded || blob.size < 200) {
         setVoiceStatus("no-speech");
         return;
       }
@@ -301,7 +322,14 @@ export function OutcomeComposer() {
     try {
       recorder.start();
       setVoiceStatus("listening");
-      recordTimerRef.current = window.setTimeout(stopRecordingAndTranscribe, MAX_RECORD_MS);
+      // Hard maximum, unchanged.
+      recordTimerRef.current = window.setTimeout(() => stopRecordingAndTranscribe(), MAX_RECORD_MS);
+      // Local level detection: stop on end-of-speech, or if nothing is ever said.
+      // If it can't initialise, recording still works with manual second-tap stop.
+      vadRef.current = startVoiceActivityMonitor(stream, {
+        onSpeechEnd: () => stopRecordingAndTranscribe(),
+        onNoSpeech: () => stopRecordingAndTranscribe(true),
+      });
     } catch {
       stopRecordingResources();
       setVoiceStatus("error");
@@ -345,13 +373,13 @@ export function OutcomeComposer() {
   const micTitle = !voiceSupported
     ? "Voice input isn’t supported in this browser — type instead"
     : listening
-      ? "Stop voice input"
+      ? "Stop voice input now"
       : transcribing
         ? "Transcribing your voice…"
         : "Use voice input — speak any language";
 
   const statusLine = listening
-    ? "Listening… speak in any language, then tap the mic again."
+    ? "Listening… speak in any language — it stops on its own when you finish."
     : transcribing
       ? "Transcribing your voice…"
       : voiceStatus in VOICE_MESSAGES
