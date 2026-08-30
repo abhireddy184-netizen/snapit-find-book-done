@@ -4,11 +4,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { subscribeToUpdates } from "@/lib/subscribe.functions";
 import {
   ArrowRight, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
-  Facebook, Instagram, Twitter, Youtube, Sparkles,
+  Facebook, Instagram, Twitter, Youtube,
 } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { Logo, Wordmark } from "@/components/snapit/Logo";
-import { CategoryIconRow, HomeRows } from "@/components/snapit/HomeSections";
 import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
 import { OutcomeComposer } from "@/components/snapit/OutcomeComposer";
 import {
@@ -24,15 +23,15 @@ const SITE_URL = "https://getperfectboy.com";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GPB — One outcome. One plan. Consider it done." },
-      { name: "description", content: "Tell GetPerfectBoy your day and get one coordinated plan: linked tasks, sequencing, timing and trusted local pros. Photo, video or plain text." },
-      { property: "og:title", content: "GPB — One outcome. One plan. Consider it done." },
-      { property: "og:description", content: "You tell us the outcome. We handle the work. GPB turns your request into a clear job brief for trusted local pros." },
+      { title: "GetPerfectBoy — Tell GPB what you need done" },
+      { name: "description", content: "Tell GPB what needs to happen. We build the plan and coordinate the right local help — home, errands, auto, moving, family help and emergencies." },
+      { property: "og:title", content: "GetPerfectBoy — Tell GPB what you need done" },
+      { property: "og:description", content: "Tell GPB what needs to happen. We build the plan and coordinate the right help." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "GPB — One outcome. One plan. Consider it done." },
-      { name: "twitter:description", content: "You tell us the outcome. We handle the work." },
+      { name: "twitter:title", content: "GetPerfectBoy — Tell GPB what you need done" },
+      { name: "twitter:description", content: "Tell GPB what needs to happen. We build the plan and coordinate the right help." },
     ],
     links: [{ rel: "canonical", href: SITE_URL + "/" }],
   }),
