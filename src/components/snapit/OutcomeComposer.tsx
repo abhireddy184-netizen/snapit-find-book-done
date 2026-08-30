@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, Mic, Sparkles } from "lucide-react";
+import { Camera, Loader2, Mic, Sparkles, Square } from "lucide-react";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { transcribeVoice } from "@/lib/transcribe-voice.functions";
 import { startVoiceActivityMonitor, type VoiceActivityMonitor } from "@/lib/voice-activity";
