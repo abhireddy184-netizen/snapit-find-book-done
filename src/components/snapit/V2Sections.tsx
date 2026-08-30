@@ -71,7 +71,7 @@ type Bundle = {
   title: string;
   request: string;
   tasks: string[];
-  to: string;
+  category: string;
   note?: string;
 };
 
@@ -80,32 +80,32 @@ const BUNDLES: Bundle[] = [
     title: "Guests coming tomorrow",
     request: "“My parents are visiting tomorrow. Get my apartment ready.”",
     tasks: ["Deep clean", "Bathroom refresh", "Bed & room setup"],
-    to: "/services/cleaning",
+    category: "cleaning",
   },
   {
     title: "Moving day",
     request: "“I’m moving Saturday. Help me get everything done.”",
     tasks: ["Packing help", "Movers", "Junk removal", "Move-out clean"],
-    to: "/services/moving",
+    category: "moving",
   },
   {
     title: "Car problem",
     request: "“My car is making a strange noise. Handle it.”",
     tasks: ["Describe or show the issue", "Route to mobile auto help"],
-    to: "/services/auto-mobile",
+    category: "auto-mobile",
   },
   {
     title: "Vacation prep",
     request: "“We’re away for ten days. Keep the house fine.”",
     tasks: ["Home check", "Plant & yard care", "Household tasks"],
-    to: "/services/lawn-outdoor",
+    category: "lawn-outdoor",
   },
   {
     title: "Help my parents",
     request: "“My parents need a hand around the house this week.”",
     tasks: ["Errands", "Household help", "Check-in visit"],
     note: "Practical household support only — not medical or nursing care.",
-    to: "/services/errands",
+    category: "errands",
   },
 ];
 
@@ -152,7 +152,8 @@ export function OutcomeBundles() {
             {b.note && <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">{b.note}</p>}
             <div className="mt-auto pt-4">
               <Link
-                to={b.to}
+                to="/services/$category"
+                params={{ category: b.category }}
                 className="inline-flex items-center gap-1.5 text-xs font-black text-primary hover:underline"
               >
                 Start this request <ArrowRight className="h-3.5 w-3.5" />
@@ -171,17 +172,18 @@ type ModuleCard = {
   icon: LucideIcon;
   title: string;
   body: string;
-  to: string;
+  category?: string;
+  href?: string;
   tone: string;
 };
 
 const MODULES: ModuleCard[] = [
-  { icon: Home, title: "Home", body: "Repairs, cleaning, installs and upkeep.", to: "/services/handyman", tone: "var(--primary)" },
-  { icon: PackageCheck, title: "Errands & returns", body: "Pickups, drop-offs and the small stuff.", to: "/services/errands", tone: "var(--secondary)" },
-  { icon: Car, title: "Auto help", body: "Mobile detailing, diagnosis and routing.", to: "/services/auto-mobile", tone: "var(--sky-ink)" },
-  { icon: Truck, title: "Moving & travel prep", body: "Packing, movers, junk and move-out cleans.", to: "/services/moving", tone: "var(--coral-ink)" },
-  { icon: HeartHandshake, title: "Family assistance", body: "Household help and errands for loved ones.", to: "/services/errands", tone: "var(--lavender)" },
-  { icon: ShieldAlert, title: "Emergency help", body: "Burst pipe, no power, no heat, lockout.", to: "/emergency", tone: "var(--destructive)" },
+  { icon: Home, title: "Home", body: "Repairs, cleaning, installs and upkeep.", category: "handyman", tone: "var(--primary)" },
+  { icon: PackageCheck, title: "Errands & returns", body: "Pickups, drop-offs and the small stuff.", category: "errands", tone: "var(--secondary)" },
+  { icon: Car, title: "Auto help", body: "Mobile detailing, diagnosis and routing.", category: "auto-mobile", tone: "var(--sky-ink)" },
+  { icon: Truck, title: "Moving & travel prep", body: "Packing, movers, junk and move-out cleans.", category: "moving", tone: "var(--coral-ink)" },
+  { icon: HeartHandshake, title: "Family assistance", body: "Household help and errands for loved ones.", category: "errands", tone: "var(--lavender)" },
+  { icon: ShieldAlert, title: "Emergency help", body: "Burst pipe, no power, no heat, lockout.", href: "/emergency", tone: "var(--destructive)" },
 ];
 
 export function DailyLifeModules() {
@@ -200,7 +202,9 @@ export function DailyLifeModules() {
         {MODULES.map((m) => (
           <Link
             key={m.title}
-            to={m.to}
+            {...(m.category
+              ? { to: "/services/$category" as const, params: { category: m.category } }
+              : { to: "/emergency" as const })}
             className="group flex items-start gap-3.5 rounded-[24px] border border-border/60 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md sm:p-5"
           >
             <span
