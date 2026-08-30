@@ -378,6 +378,38 @@ function SnapPage() {
               <div className="absolute top-3 left-3 rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
                 {mediaKind === "video" ? "Video frame" : mediaKind === "photo" ? "Photo" : "Uploaded"}
               </div>
+              <button
+                type="button"
+                onClick={reset}
+                aria-label="Remove this image"
+                className="absolute top-2 right-2 grid h-11 w-11 place-items-center rounded-full bg-black/60 text-white backdrop-blur transition-colors hover:bg-black/80"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            {/* Single image by design — Replace swaps the one image you're diagnosing. */}
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              <button
+                type="button"
+                onClick={() => cameraRef.current?.click()}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-card px-3 text-sm font-bold hover:bg-muted"
+              >
+                <Camera className="h-4 w-4" /> Retake
+              </button>
+              <button
+                type="button"
+                onClick={() => uploadRef.current?.click()}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-card px-3 text-sm font-bold hover:bg-muted"
+              >
+                <Upload className="h-4 w-4" /> Replace
+              </button>
+              <button
+                type="button"
+                onClick={reset}
+                className="col-span-2 inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-card px-3 text-sm font-bold text-muted-foreground hover:bg-muted sm:col-span-1"
+              >
+                <X className="h-4 w-4" /> Remove image
+              </button>
             </div>
             <label className="block">
               <span className="text-xs font-semibold text-muted-foreground">Add a note (optional)</span>
@@ -393,16 +425,11 @@ function SnapPage() {
               <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>
             )}
             <div className="flex gap-2">
-              <button
-                onClick={reset}
-                className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-3 text-sm font-semibold hover:bg-muted"
-              >
-                <RotateCcw className="h-4 w-4" /> Retake
-              </button>
-              <GradientButton onClick={runAnalysis} disabled={loading} className="flex-1 justify-center">
+              <GradientButton onClick={runAnalysis} disabled={loading} className="min-h-12 flex-1 justify-center">
                 <Sparkles className="h-4 w-4" /> Diagnose with AI
               </GradientButton>
             </div>
+
           </div>
         )}
 
