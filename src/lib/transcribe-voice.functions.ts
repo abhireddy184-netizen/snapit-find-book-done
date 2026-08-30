@@ -1,23 +1,29 @@
 import { createServerFn } from "@tanstack/react-start";
-import { streamText } from "ai";
 import { z } from "zod";
-import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 
-// ~8 MB of base64 ≈ 6 MB of audio ≈ well over a minute of speech.
 const MAX_AUDIO_B64 = 8 * 1024 * 1024;
+const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/audio/transcriptions";
+const STT_MODEL = "openai/gpt-4o-mini-transcribe";
+
+function extFor(mimeType: string): string {
+  if (mimeType.includes("mp4") || mimeType.includes("m4a")) return "m4a";
+  if (mimeType.includes("webm")) return "webm";
+  if (mimeType.includes("ogg")) return "ogg";
+  if (mimeType.includes("wav")) return "wav";
+  if (mimeType.includes("mpeg") || mimeType.includes("mp3")) return "mp3";
+  return "webm";
+}
 
 /**
- * Server-side voice transcription for browsers without the Web Speech API
- * (notably iPhone Safari). The client records a short clip via MediaRecorder
- * and sends it here; a Gemini model (audio-capable via the Lovable AI gateway)
- * returns the transcript.
+ * Transcribes a short voice note (base64 audio) with the Lovable AI gateway's
+ * speech-to-text model. Used by the outcome composer on browsers without the
+ * Web Speech API (notably iPhone Safari).
  */
 export const transcribeVoice = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z
       .object({
         audioDataBase64: z.string().min(100).max(MAX_AUDIO_B64),
-        // Recorder MIME types may carry codec params, e.g. "audio/webm;codecs=opus".
         mimeType: z
           .string()
           .regex(/^audio\/[a-z0-9.+-]+(?:\s*;.*)?$/i)
@@ -28,48 +34,25 @@ export const transcribeVoice = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const key = process.env["LOVABLE_API_KEY"];
     if (!key) throw new Error("Missing LOVABLE_API_KEY");
-    const gateway = createLovableAiGatewayProvider(key);
 
-    // Stream server-side so long generations survive platform request timeouts.
-    const result = streamText({
-      model: gateway("google/gemini-3.7-flash"),
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: "Transcribe the attached voice recording verbatim. The speaker is describing a task, errand, or day plan they want help with. Return ONLY the spoken words as plain text — no quotes, no commentary, no timestamps. If there is no intelligible speech, return an empty string.",
-            },
-            { type: "file", data: data.audioDataBase64, mediaType: data.mimeType },
-          ],
-        },
-      ],
+    const bytes = Buffer.from(data.audioDataBase64, "base64");
+    if (bytes.byteLength === 0) throw new Error("Empty audio payload");
+    const baseMime = data.mimeType.split(";")[0]!.trim();
+    const file = new File([new Uint8Array(bytes)], `voice.${extFor(baseMime)}`, { type: baseMime });
+
+    const form = new FormData();
+    form.append("file", file);
+    form.append("model", STT_MODEL);
+
+    const res = await fetch(GATEWAY_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${key}` },
+      body: form,
     });
-
-    let text = "";
-    try {
-      for await (const part of result.fullStream) {
-        if (part.type === "text-delta") {
-          text += part.text;
-        } else if (part.type === "error") {
-          throw (part.error as Error) ?? new Error("stream error");
-        }
-      }
-    } catch (err) {
-      // Surface the underlying provider/gateway detail for debugging.
-      const seen: string[] = [];
-      let cur: unknown = err;
-      for (let depth = 0; cur && depth < 4; depth++) {
-        const c = cur as { name?: string; message?: string; statusCode?: number; responseBody?: unknown; cause?: unknown };
-        seen.push(
-          `${c.name ?? "Error"}: ${c.message ?? String(cur)}${c.statusCode ? ` [${c.statusCode}]` : ""}${
-            typeof c.responseBody === "string" ? ` body=${c.responseBody.slice(0, 300)}` : ""
-          }`,
-        );
-        cur = c.cause;
-      }
-      throw new Error(`Transcription failed :: ${seen.join(" <- ")}`);
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      throw new Error(`Transcription failed: ${res.status} ${body.slice(0, 300)}`);
     }
-    return { text: text.trim() };
+    const json = (await res.json()) as { text?: string };
+    return { text: (json.text ?? "").trim() };
   });
