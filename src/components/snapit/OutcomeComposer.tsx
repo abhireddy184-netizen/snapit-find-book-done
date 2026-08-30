@@ -173,7 +173,7 @@ export function OutcomeComposer() {
       recordTimerRef.current = null;
     }
     if (partialTimerRef.current !== null) {
-      window.clearInterval(partialTimerRef.current);
+      window.clearTimeout(partialTimerRef.current);
       partialTimerRef.current = null;
     }
     vadRef.current?.stop();
@@ -281,7 +281,7 @@ export function OutcomeComposer() {
     // Any provisional transcription still in flight is now stale.
     partialSeqRef.current += 1;
     if (partialTimerRef.current !== null) {
-      window.clearInterval(partialTimerRef.current);
+      window.clearTimeout(partialTimerRef.current);
       partialTimerRef.current = null;
     }
     vadRef.current?.stop();
