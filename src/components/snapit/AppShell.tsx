@@ -225,11 +225,6 @@ function BottomNav() {
       </div>
     </nav>
   );
-
-        })}
-      </div>
-    </nav>
-  );
 }
 
 export function GradientButton({
