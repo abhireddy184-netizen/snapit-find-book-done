@@ -46,20 +46,18 @@ function TopBar() {
           <Logo />
         </div>
         <nav className="hidden items-center justify-center gap-1 text-sm font-medium text-muted-foreground lg:flex xl:gap-2 [&>a]:whitespace-nowrap">
-          <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-primary hover:bg-primary/5 transition-colors">
+          {/* One emphasis per row: Sign up is the only filled CTA. Secondary
+              destinations (How it works, For Pros, Early Access) live in the
+              footer so the header stays calm. */}
+          <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">
             <Camera className="h-4 w-4" /> Show GetPros
           </Link>
+          <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Services</Link>
           <Link to="/emergency" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-destructive hover:bg-destructive/10 transition-colors">
             <ShieldAlert className="h-4 w-4" /> Emergency
           </Link>
-
-          
-          <Link to="/" hash="how-it-works" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">How it works</Link>
-          <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Services</Link>
-          <Link to="/provider-interest" data-analytics-id="provider_interest_cta" data-analytics-location="header" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">For Pros</Link>
-          <Link to="/" hash="early-access" data-analytics-id="early_access_cta" data-analytics-location="header" className="rounded-full px-3 py-1.5 font-semibold text-primary hover:bg-primary/5 transition-colors">Early Access</Link>
-
         </nav>
+
         <div className="flex shrink-0 items-center gap-1.5 justify-self-end sm:gap-2">
           <ThemeToggle />
           <AuthNav />
