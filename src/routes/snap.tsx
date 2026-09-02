@@ -32,8 +32,8 @@ import {
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
 import { getCategoryBySlug } from "@/lib/catalog";
-import { detectServiceIntentInText } from "@/lib/search-intent";
-import { createFastPathAnalysis } from "@/lib/snap-fast-path";
+import { detectServiceIntentInText, matchServiceIntent, rankServices } from "@/lib/search-intent";
+import { createFastPathAnalysis, createLocalOptionsAnalysis } from "@/lib/snap-fast-path";
 import { fetchBookableProviders, type ProviderMatch } from "@/lib/providers";
 import { extractZip, isZipCode, lookupZip } from "@/lib/us-zip";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
@@ -51,7 +51,7 @@ import {
 /** Hard ceiling for a single AI diagnosis request before we bail out. */
 // Text-only requests are fast (no visual pipeline); media needs more room.
 const ANALYSIS_TIMEOUT_MS = 34_000;
-const TEXT_ANALYSIS_TIMEOUT_MS = 12_500;
+const TEXT_ANALYSIS_TIMEOUT_MS = 6_000;
 
 type SnapSearch = { q?: string; loc?: string };
 
@@ -160,7 +160,15 @@ function SnapPage() {
       }
     } catch (e) {
       if (runRef.current !== token) return;
-      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+      // Text-only recovery: never leave the customer stuck — fall back to the
+      // best local catalogue matches instead of a dead end.
+      const local = frames.length ? null : createLocalOptionsAnalysis(noteText, rankServices(noteText, 4));
+      if (local) {
+        setPhase("matching");
+        setAnalysis(local);
+      } else {
+        setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+      }
     } finally {
       if (runRef.current === token) {
         setLoading(false);
@@ -240,7 +248,7 @@ function SnapPage() {
     setTextOnly(true);
     // A confident text-only catalog hit is resolved entirely in the browser.
     // It never enters the image pipeline or waits on the AI gateway.
-    const deterministicHit = detectServiceIntentInText(typed);
+    const deterministicHit = detectServiceIntentInText(typed) ?? matchServiceIntent(typed);
     setFastPath(Boolean(deterministicHit));
     setFrames([]);
     setNote(described);
@@ -587,7 +595,7 @@ function ScanningOverlay({
   useEffect(() => {
     setSlow(false);
     // Only flag a genuine backend delay, never a staged animation.
-    const slowTimer = setTimeout(() => setSlow(true), 8000);
+    const slowTimer = setTimeout(() => setSlow(true), 4000);
     return () => clearTimeout(slowTimer);
   }, [phase]);
 
