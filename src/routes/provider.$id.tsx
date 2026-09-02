@@ -1,5 +1,4 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
 import { Star, ShieldCheck, MapPin, Clock, Calendar as CalendarIcon } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { getProvider, type Provider } from "@/lib/snapit-data";
@@ -38,7 +37,7 @@ export const Route = createFileRoute("/provider/$id")({
 
 function ProviderPage() {
   const { provider: p } = Route.useLoaderData() as { provider: Provider };
-  const [selectedDay, setSelectedDay] = useState(0);
+  const selectedDay = 0;
   const days = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
@@ -63,9 +62,14 @@ function ProviderPage() {
                 <span className="mt-1 inline-flex rounded-full bg-muted px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">Demo profile</span>
               </div>
             </div>
-            <Link to="/book" search={{ provider: p.id }} className="shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-card" style={{ background: "var(--gradient-primary)" }}>
-              Book Now
+            <Link
+              to="/search"
+              search={{ q: p.category ?? "", loc: "", pros: 1 }}
+              className="shrink-0 rounded-full border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+            >
+              Find bookable pros
             </Link>
+
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
@@ -96,36 +100,39 @@ function ProviderPage() {
         </div>
       </Section>
 
-      <Section title="Availability">
+      <Section title="Availability (example)">
         <div className="surface-card p-5">
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <p className="text-xs text-muted-foreground">
+            This is an example profile. The days and times below are illustrative and are not live availability.
+          </p>
+          <div className="mt-3 flex gap-2 overflow-x-auto pb-2" aria-hidden="true">
             {days.map((d, i) => (
-              <button
+              <div
                 key={i}
-                onClick={() => setSelectedDay(i)}
-                className={`flex shrink-0 flex-col items-center rounded-xl border px-4 py-2 text-xs font-semibold ${selectedDay === i ? "border-primary bg-primary text-white" : "border-border bg-background text-foreground"}`}
+                className={`flex shrink-0 flex-col items-center rounded-xl border px-4 py-2 text-xs font-semibold ${selectedDay === i ? "border-primary text-primary" : "border-border bg-background text-muted-foreground"}`}
               >
                 <span>{d.toLocaleDateString("en", { weekday: "short" })}</span>
                 <span className="text-base">{d.getDate()}</span>
-              </button>
+              </div>
             ))}
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5">
+          <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5" aria-hidden="true">
             {slots.map((s) => (
-              <button key={s} className="rounded-full border border-border bg-background px-3 py-2 text-xs font-semibold hover:border-primary hover:text-primary">
+              <div key={s} className="rounded-full border border-dashed border-border bg-muted/40 px-3 py-2 text-center text-xs font-semibold text-muted-foreground">
                 {s}
-              </button>
+              </div>
             ))}
           </div>
           <div className="mt-4">
-            <Link to="/book" search={{ provider: p.id }}>
+            <Link to="/search" search={{ q: p.category ?? "", loc: "", pros: 1 }}>
               <GradientButton className="w-full">
-                <CalendarIcon className="h-4 w-4" /> Book this pro
+                <CalendarIcon className="h-4 w-4" /> Find bookable pros
               </GradientButton>
             </Link>
           </div>
         </div>
       </Section>
+
 
       <Section title={`Reviews (${p.reviews})`}>
         <div className="space-y-3">

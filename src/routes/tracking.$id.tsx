@@ -7,10 +7,10 @@ import { providers } from "@/lib/snapit-data";
 export const Route = createFileRoute("/tracking/$id")({
   head: ({ params }) => ({
     meta: [
-      { title: `Tracking ${params.id} — GetPros` },
-      { name: "description", content: "Track your GetPros pro in real time — see their ETA, route and arrival status." },
-      { property: "og:title", content: "Live pro tracking — GetPros" },
-      { property: "og:description", content: "Real-time ETA and route updates for your booked pro." },
+      { title: `Tracking preview ${params.id} — GetPros` },
+      { name: "description", content: "Preview of the GetPros job tracking screen using example data." },
+      { property: "og:title", content: "Job tracking preview — GetPros" },
+      { property: "og:description", content: "Example tracking screen — not live provider data." },
     ],
   }),
   loader: ({ params }) => {
@@ -67,11 +67,12 @@ function TrackingPage() {
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Live tracking</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tracking preview · example data</div>
             <h1 className="text-2xl font-black md:text-3xl">Your pro is on the way</h1>
+            <p className="mt-1 text-xs text-muted-foreground">Simulated example — not a live provider location or verified arrival time.</p>
           </div>
           <div className="rounded-full bg-primary/10 px-4 py-2 text-center">
-            <div className="text-xs font-semibold uppercase text-primary">ETA</div>
+            <div className="text-xs font-semibold uppercase text-primary">Example ETA</div>
             <div className="text-lg font-black text-primary">{eta} min</div>
           </div>
         </div>
@@ -141,7 +142,7 @@ function TrackingPage() {
           <div className="surface-card p-3">
             <Clock className="mx-auto h-4 w-4 text-primary" />
             <div className="mt-1 font-bold">{eta} min</div>
-            <div className="text-muted-foreground">Arrival</div>
+            <div className="text-muted-foreground">Example arrival</div>
           </div>
           <div className="surface-card p-3">
             <Navigation className="mx-auto h-4 w-4 text-primary" />
