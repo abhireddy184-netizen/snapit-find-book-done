@@ -26,6 +26,7 @@ export type Database = {
           duration_minutes: number
           end_at: string | null
           id: string
+          idempotency_key: string | null
           job_id: string | null
           occupied_end_at: string | null
           overran_window: boolean
@@ -36,6 +37,7 @@ export type Database = {
           service: string
           service_address: string
           service_timezone: string | null
+          service_zip: string | null
           start_at: string | null
           started_at: string | null
           status: Database["public"]["Enums"]["booking_status"]
@@ -52,6 +54,7 @@ export type Database = {
           duration_minutes?: number
           end_at?: string | null
           id?: string
+          idempotency_key?: string | null
           job_id?: string | null
           occupied_end_at?: string | null
           overran_window?: boolean
@@ -62,6 +65,7 @@ export type Database = {
           service: string
           service_address: string
           service_timezone?: string | null
+          service_zip?: string | null
           start_at?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
@@ -78,6 +82,7 @@ export type Database = {
           duration_minutes?: number
           end_at?: string | null
           id?: string
+          idempotency_key?: string | null
           job_id?: string | null
           occupied_end_at?: string | null
           overran_window?: boolean
@@ -88,6 +93,7 @@ export type Database = {
           service?: string
           service_address?: string
           service_timezone?: string | null
+          service_zip?: string | null
           start_at?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
@@ -623,11 +629,27 @@ export type Database = {
         }
         Relationships: []
       }
+      us_zip3_zones: {
+        Row: {
+          time_zone: string
+          zip3: string
+        }
+        Insert: {
+          time_zone: string
+          zip3: string
+        }
+        Update: {
+          time_zone?: string
+          zip3?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      extract_service_zip: { Args: { _address: string }; Returns: string }
       get_my_provider_profile: {
         Args: never
         Returns: {
@@ -668,6 +690,7 @@ export type Database = {
         Args: { _hours: Json }
         Returns: undefined
       }
+      service_zone_for_zip: { Args: { _zip: string }; Returns: string }
     }
     Enums: {
       app_role: "customer" | "provider"
