@@ -909,9 +909,13 @@ function AnalysisView({
         {matched.length > 0 && (
           <Stat
             icon={Clock}
-            label="Fastest ETA"
-            value={`~${recommended?.eta ?? 10} min`}
-            hint={`${matched.length} pros in this trade`}
+            label="Pros available"
+            value={String(matched.length)}
+            hint={
+              recommended?.distanceMiles != null
+                ? `Closest is ${Math.round(recommended.distanceMiles)} mi away`
+                : "Verified and accepting work"
+            }
           />
         )}
       </div>
