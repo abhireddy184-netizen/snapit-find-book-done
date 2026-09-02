@@ -511,14 +511,16 @@ export function OutcomeComposer() {
   };
 
   /** Single exit point for both manual submit and the silent countdown. */
-  const goToPlan = (text: string) => {
+  const goToService = (text: string) => {
     const q = text.trim();
     if (!q || submittedRef.current) return;
     submittedRef.current = true;
     cancelAutoSubmit();
     setEmptyError(false);
-    void navigate({ to: "/plan", search: { q, loc: loc.trim() } });
+    // Photo, voice and text all converge on the same service understanding flow.
+    void navigate({ to: "/snap", search: { q, loc: loc.trim() } });
   };
+
 
   // Countdown reaching zero builds the plan — never a booking, order or message.
   useEffect(() => {
