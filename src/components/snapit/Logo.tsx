@@ -78,7 +78,7 @@ export function Logo({ compact = false, onColor = false }: { compact?: boolean; 
         /* Below 360px the monogram alone carries the brand so the header
            never overflows next to Log in / Sign up. */
         <span className="hidden min-w-0 leading-none min-[360px]:block">
-          <span className="block truncate">
+          <span className="block">
             {/* ".ai" only where there is room, so narrow phones show a clean
                 "GetPros" instead of a clipped wordmark. */}
             <Wordmark size={17} short onColor={onColor} className="sm:hidden" />
