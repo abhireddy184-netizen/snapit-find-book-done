@@ -77,9 +77,12 @@ export function Logo({ compact = false, onColor = false }: { compact?: boolean; 
         /* Below 360px the wordmark tile alone carries the brand so the header
            never overflows next to Log in / Sign up. */
         <span className="hidden min-w-0 leading-none min-[360px]:block">
-          <span className={`block truncate text-[14px] font-black tracking-tight sm:text-base ${onColor ? "text-white" : "text-foreground"}`}>
-            GetPerfectBoy.com
+          <span className={`block truncate text-[13.5px] font-black tracking-tight sm:text-base ${onColor ? "text-white" : "text-foreground"}`}>
+            {/* ".com" only where there is room, so narrow phones show the full
+                name instead of a clipped "GetPerfectBo…". */}
+            GetPerfectBoy<span className="hidden min-[430px]:inline">.com</span>
           </span>
+
           <span className={`mt-1 hidden truncate text-[10px] font-medium sm:block ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
             Whatever you need. Consider it done.
           </span>
