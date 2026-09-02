@@ -330,8 +330,14 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
   const c = uiCopy(plan);
   const locale = planLocale(plan);
   const end = planEndMinutes(plan);
-  const deadline = plan.deadline ? parseClock(plan.deadline) : null;
+  // Deadline is measured from the plan's own start day, so a target on a later
+  // date is never reported as hundreds of minutes "over".
+  const deadline = planDeadlineMinutes(plan);
   const slack = deadline == null ? null : deadline - end;
+  const startDateLabel = formatPlanDate(plan.startDate, locale);
+  const deadlineDateLabel = formatPlanDate(plan.deadlineDate ?? plan.startDate, locale);
+  // Only worth showing the day on the target when it differs from the start day.
+  const showDeadlineDate = Boolean(plan.deadlineDate && plan.deadlineDate !== plan.startDate);
 
   return (
     <section className="mt-6 overflow-hidden rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
@@ -347,15 +353,30 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
             <span dir="auto" className="truncate">{plan.understanding.languageName}</span>
           </span>
         )}
+        {startDateLabel && (
+          <span className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-border/60 bg-background px-2.5 py-1 text-[10px] font-bold text-muted-foreground">
+            <CalendarDays className="h-3 w-3 shrink-0 text-primary" />
+            <span dir="auto" className="truncate">
+              {startDateLabel}
+              {plan.timeZone ? ` · ${plan.timeZone}` : ""}
+            </span>
+          </span>
+        )}
       </div>
       <h2 dir="auto" className="mt-2 text-lg font-black leading-snug tracking-tight sm:text-xl">{plan.outcome}</h2>
       <p dir="auto" className="mt-1.5 max-w-[70ch] text-sm leading-relaxed text-muted-foreground">{plan.summary}</p>
 
       <dl className="mt-4 grid gap-2 sm:grid-cols-3">
-        <Stat label={c.planStartsLabel} value={formatClock(parseClock(plan.startClock), locale)} icon={Clock} />
+        <Stat
+          label={c.planStartsLabel}
+          value={formatClock(parseClock(plan.startClock), locale)}
+          sub={startDateLabel}
+          icon={Clock}
+        />
         <Stat
           label={plan.deadline ? c.targetLabel : c.planEndsLabel}
           value={formatClock(plan.deadline ? parseClock(plan.deadline) : end, locale)}
+          sub={showDeadlineDate ? deadlineDateLabel : null}
           icon={Clock}
         />
         <Stat
@@ -364,8 +385,8 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
             slack == null
               ? `${plan.tasks.filter((t) => t.status !== "skipped").length} ${c.tasksWord}`
               : slack >= 0
-                ? `${slack} ${c.spareSuffix}`
-                : `${Math.abs(slack)} ${c.overSuffix}`
+                ? `${slack} ${c.minutesShort} ${c.spareSuffix}`
+                : `${Math.abs(slack)} ${c.minutesShort} ${c.overSuffix}`
           }
           icon={slack != null && slack < 0 ? TriangleAlert : MapPin}
           tone={slack != null && slack < 0 ? "danger" : undefined}
@@ -373,6 +394,7 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
       </dl>
     </section>
   );
+
 }
 
 function Stat({
