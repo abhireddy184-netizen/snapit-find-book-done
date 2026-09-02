@@ -995,8 +995,11 @@ function AnalysisView({
       <div id="pros-list" className="scroll-mt-20">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-black">Service pros nearby</h2>
-            <p className="text-xs text-muted-foreground">Demo data — sample profiles shown while real pros are onboarded.</p>
+            <h2 className="text-lg font-black">What a pro list will look like</h2>
+            <p className="text-xs text-muted-foreground">
+              Sample profiles only — no real {String.raw`${""}`}GPB pros cover this trade in your area yet, so none of these can be
+              booked, messaged or sent a quote request.
+            </p>
           </div>
           <button
             onClick={() => {
