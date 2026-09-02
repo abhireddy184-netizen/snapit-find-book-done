@@ -18,17 +18,17 @@ export function AiJourneyStrip() {
       {STEPS.map((s, i) => (
         <li
           key={s.label}
-          className="flex min-w-[70%] snap-start items-center gap-2.5 rounded-2xl border border-border/60 bg-card px-3 py-2.5 shadow-sm min-[430px]:min-w-[58%] md:min-w-0"
+          className="flex min-w-[70%] snap-start items-center gap-2.5 surface-card px-3 py-2.5 min-[430px]:min-w-[58%] md:min-w-0"
         >
           <span
             className="grid h-8 w-8 shrink-0 place-items-center rounded-xl text-white"
-            style={{ background: i === 0 ? "var(--gradient-primary)" : "color-mix(in oklab, var(--secondary) 82%, var(--primary))" }}
+            style={{ background: i === 0 ? "var(--primary)" : "color-mix(in oklab, var(--secondary) 82%, var(--primary))" }}
           >
             <s.icon className="h-4 w-4" />
           </span>
           <span className="min-w-0">
-            <span className="block text-[13px] font-black leading-tight text-foreground">{s.label}</span>
-            <span className="block text-[11px] leading-tight text-muted-foreground">{s.hint}</span>
+            <span className="block text-xs font-black leading-tight text-foreground">{s.label}</span>
+            <span className="block text-xs leading-tight text-muted-foreground">{s.hint}</span>
           </span>
         </li>
       ))}
@@ -59,19 +59,19 @@ export function CategoryIconRow() {
           className="group flex w-[74px] shrink-0 flex-col items-center gap-1.5 sm:w-auto"
         >
           <span
-            className="grid h-14 w-14 place-items-center rounded-2xl border border-border/60 bg-card shadow-sm transition-all group-hover:-translate-y-0.5 group-hover:shadow-md"
+            className="grid h-14 w-14 place-items-center surface-card transition-all group-hover:-translate-y-0.5 group-hover:shadow-card"
             style={{ color: c.tint }}
           >
             <c.icon className="h-6 w-6" />
           </span>
-          <span className="w-full truncate text-center text-[11px] font-semibold text-foreground">{c.label}</span>
+          <span className="w-full truncate text-center text-xs font-semibold text-foreground">{c.label}</span>
         </Link>
       ))}
       <Link to="/services" className="group flex w-[74px] shrink-0 flex-col items-center gap-1.5 sm:w-auto">
         <span className="grid h-14 w-14 place-items-center rounded-2xl border border-dashed border-border bg-muted/40 text-muted-foreground transition-all group-hover:-translate-y-0.5">
           <Grid3x3 className="h-6 w-6" />
         </span>
-        <span className="w-full truncate text-center text-[11px] font-semibold text-foreground">More</span>
+        <span className="w-full truncate text-center text-xs font-semibold text-foreground">More</span>
       </Link>
     </div>
   );
@@ -124,7 +124,7 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
               key={`${categorySlug}/${service.slug}`}
               to="/services/$category/$service"
               params={{ category: categorySlug, service: service.slug }}
-              className="group w-[154px] shrink-0 snap-start overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md min-[430px]:w-[168px] md:w-auto"
+              className="group w-[154px] shrink-0 snap-start overflow-hidden surface-card transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-card min-[430px]:w-[168px] md:w-auto"
             >
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
                 {img ? (
@@ -133,7 +133,7 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
                     alt={service.name}
                     loading="lazy"
                     decoding="async"
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                   />
                 ) : (
                   <span
@@ -145,8 +145,8 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
                 )}
               </div>
                <div className="flex min-h-14 flex-col justify-center p-3">
-                 <div className="line-clamp-2 text-[13px] font-bold leading-tight text-foreground">{service.name}</div>
-                 <div className="mt-1 truncate text-[10px] font-semibold text-muted-foreground">
+                 <div className="line-clamp-2 text-xs font-bold leading-tight text-foreground">{service.name}</div>
+                 <div className="mt-1 truncate text-xs font-semibold text-muted-foreground">
                    {getCategoryBySlug(categorySlug)?.name}
                  </div>
               </div>

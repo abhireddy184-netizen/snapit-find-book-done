@@ -131,7 +131,7 @@ export function ProviderWorkSettings({ userId }: { userId: string | undefined })
 
   return (
     <div className="space-y-5">
-      <section className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+      <section className="surface-card p-5 sm:p-6">
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-black">Weekly hours</h2>
@@ -312,7 +312,7 @@ function TimeOffSection({
   }
 
   return (
-    <section className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+    <section className="surface-card p-5 sm:p-6">
       <h2 className="text-lg font-black">Time off</h2>
       <p className="mt-1 text-sm text-muted-foreground">
         Blocked time never shows as available to customers. Existing accepted jobs are not cancelled — reach out to the

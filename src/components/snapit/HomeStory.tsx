@@ -33,7 +33,7 @@ export function JourneyRail({ onColor = false, stacked = false }: { onColor?: bo
             className={
               "relative flex items-start gap-3 overflow-hidden rounded-2xl border p-3.5 transition-all duration-500 " +
               (on
-                ? "-translate-y-0.5 border-transparent shadow-lg"
+                ? "-translate-y-0.5 border-transparent shadow-elevated"
                 : onColor
                   ? "border-white/15 bg-white/5"
                   : "border-border/60 bg-card/70")
@@ -41,14 +41,14 @@ export function JourneyRail({ onColor = false, stacked = false }: { onColor?: bo
             style={on ? { background: "color-mix(in oklab, " + s.tint + " 12%, var(--card))", borderColor: "color-mix(in oklab, " + s.tint + " 40%, transparent)" } : undefined}
           >
             <span
-              className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white shadow-md transition-transform duration-500"
+              className="relative grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white shadow-card transition-transform duration-500"
               style={{ background: s.tint, transform: on ? "scale(1.06)" : "scale(1)" }}
             >
               {on && <span className="ping-ring absolute inset-0 rounded-xl" style={{ background: s.tint, opacity: 0.35 }} />}
               <s.icon className="relative h-4.5 w-4.5" style={{ width: 18, height: 18 }} />
             </span>
             <span className="min-w-0">
-              <span className="block text-[10px] font-black uppercase tracking-[0.14em] text-muted-foreground">Step {i + 1}</span>
+              <span className="block text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">Step {i + 1}</span>
               <span className="block text-sm font-black leading-tight text-foreground">{s.label}</span>
               <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">{s.detail}</span>
             </span>
@@ -76,7 +76,7 @@ export function InputModes() {
         <Link
           key={m.label}
           to="/snap"
-          className="group inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/80 px-3.5 py-2 text-xs font-bold text-foreground shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+          className="group inline-flex items-center gap-2 rounded-full border border-border/70 bg-card/80 px-3.5 py-2 text-xs font-bold text-foreground shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-card"
         >
           <m.icon className="h-3.5 w-3.5 text-primary transition-transform group-hover:scale-110" />
           {m.label}
@@ -132,7 +132,7 @@ export function RoomStory() {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-8 xl:gap-10">
       {/* Canvas */}
-      <div className="relative overflow-hidden rounded-[26px] border border-border/60 bg-card shadow-[var(--shadow-elevated)]">
+      <div className="relative overflow-hidden surface-card shadow-[var(--shadow-elevated)]">
         <div className="relative aspect-[4/3] w-full overflow-hidden">
           {/* Room illustration, drawn in CSS */}
           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, color-mix(in oklab, var(--primary) 7%, var(--card)) 0%, color-mix(in oklab, var(--secondary) 8%, var(--card)) 68%, color-mix(in oklab, var(--foreground) 8%, var(--card)) 68.5%, color-mix(in oklab, var(--foreground) 12%, var(--card)) 100%)" }} />
@@ -142,7 +142,7 @@ export function RoomStory() {
           {/* wall panel */}
           <div className="absolute left-[18%] top-[16%] h-[26%] w-[26%] rounded-xl border border-dashed border-border/70 bg-[color-mix(in_oklab,var(--foreground)_4%,transparent)]" />
           {/* sofa */}
-          <div className="absolute bottom-[10%] left-[12%] h-[16%] w-[28%] rounded-2xl bg-[color-mix(in_oklab,var(--coral)_35%,var(--card))] shadow-md" />
+          <div className="absolute bottom-[10%] left-[12%] h-[16%] w-[28%] rounded-2xl bg-[color-mix(in_oklab,var(--coral)_35%,var(--card))] shadow-card" />
           <div className="absolute bottom-[20%] left-[13%] h-[8%] w-[26%] rounded-t-2xl bg-[color-mix(in_oklab,var(--coral)_50%,var(--card))]" />
           {/* rug */}
           <div className="absolute bottom-[6%] left-[42%] h-[10%] w-[34%] rounded-[50%] bg-[color-mix(in_oklab,var(--lavender)_28%,var(--card))]" />
@@ -171,7 +171,7 @@ export function RoomStory() {
                 <span className="relative grid place-items-center">
                   {on && <span className="ping-ring absolute h-7 w-7 rounded-full" style={{ background: s.tint }} />}
                   <span
-                    className="relative grid place-items-center rounded-full text-white shadow-lg ring-2 ring-white/80 transition-all duration-300"
+                    className="relative grid place-items-center rounded-full text-white shadow-elevated ring-2 ring-white/80 transition-all duration-300"
                     style={{ background: s.tint, height: on ? 34 : 26, width: on ? 34 : 26 }}
                   >
                     <s.icon style={{ height: on ? 16 : 13, width: on ? 16 : 13 }} />
@@ -188,10 +188,10 @@ export function RoomStory() {
                 <active.icon className="h-4 w-4" />
               </span>
               <span className="min-w-0">
-                <span className="block text-[10px] font-black uppercase tracking-[0.14em] text-muted-foreground">Detected · {active.name}</span>
+                <span className="block text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">Detected · {active.name}</span>
                 <span className="block truncate text-sm font-black text-foreground">{active.service}</span>
               </span>
-              <span className="ml-auto hidden shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-black text-primary sm:inline-flex">
+              <span className="ml-auto hidden shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-black text-primary sm:inline-flex">
                 <Sparkles className="h-3 w-3" /> GetPros AI
               </span>
             </div>
@@ -215,7 +215,7 @@ export function RoomStory() {
                   onClick={() => pick(s.id)}
                   className={
                     "flex w-full items-center gap-3 rounded-2xl border px-3.5 py-2.5 text-left transition-all duration-300 " +
-                    (on ? "border-transparent shadow-md" : "border-border/60 bg-card hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-sm")
+                    (on ? "border-transparent shadow-card" : "border-border/60 bg-card hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-sm")
                   }
                   style={on ? { background: "color-mix(in oklab, " + s.tint + " 12%, var(--card))", borderColor: "color-mix(in oklab, " + s.tint + " 38%, transparent)" } : undefined}
                 >
@@ -234,7 +234,7 @@ export function RoomStory() {
         <Link
           to="/services/$category"
           params={{ category: active.category }}
-          className="mt-4 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-lg transition-transform hover:scale-[1.02]"
+          className="mt-4 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-elevated transition-transform hover:scale-[1.01]"
           style={{ background: "var(--gradient-primary)" }}
         >
           Explore {active.service} <ArrowRight className="h-4 w-4" />
@@ -266,13 +266,13 @@ export function ProVerticals() {
           key={v.slug}
           to="/services/$category"
           params={{ category: v.slug }}
-          className="group relative overflow-hidden rounded-3xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl"
+          className="group relative overflow-hidden surface-card p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-elevated"
         >
           <span
             className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-15 blur-2xl transition-opacity group-hover:opacity-35"
             style={{ background: v.tint }}
           />
-          <span className="relative grid h-11 w-11 place-items-center rounded-2xl text-white shadow-md transition-transform group-hover:scale-110" style={{ background: v.tint }}>
+          <span className="relative grid h-11 w-11 place-items-center rounded-2xl text-white shadow-card transition-transform group-hover:scale-110" style={{ background: v.tint }}>
             <v.icon className="h-5 w-5" />
           </span>
           <span className="relative mt-3 block text-sm font-black text-foreground">{v.name}</span>
@@ -289,7 +289,7 @@ export function SectionConnector({ label }: { label?: string }) {
     <div className="relative flex flex-col items-center py-8" aria-hidden="true">
       <span className="hairline-connector h-16 w-px" />
       {label && (
-        <span className="mt-3 rounded-full border border-border/60 bg-card/80 px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-muted-foreground backdrop-blur">
+        <span className="mt-3 rounded-full border border-border/60 bg-card/80 px-3.5 py-1.5 text-xs font-black uppercase tracking-[0.16em] text-muted-foreground backdrop-blur">
           {label}
         </span>
       )}
@@ -305,7 +305,7 @@ export function SectionBridge({ label }: { label: string }) {
   return (
     <div className="flex items-center justify-center gap-3" aria-hidden="true">
       <span className="h-px w-12 sm:w-20 bg-gradient-to-r from-transparent via-primary/40 to-primary/10 animate-pulse" />
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/90 px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-muted-foreground backdrop-blur shadow-sm">
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/90 px-3 py-1 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground backdrop-blur shadow-sm">
         <span className="h-1.5 w-1.5 rounded-full bg-primary/70 animate-pulse" />
         {label}
       </span>

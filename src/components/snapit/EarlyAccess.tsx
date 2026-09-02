@@ -10,10 +10,10 @@ import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 /** Show GetPros callout — concise, mobile-first. */
 export function ShowGpbCallout() {
   return (
-    <section className="mt-10 overflow-hidden rounded-[24px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+    <section className="mt-10 overflow-hidden surface-card p-5 sm:p-6">
       <div className="grid gap-4 md:grid-cols-[1.3fr_auto] md:items-center">
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-black text-primary">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-black text-primary">
             <Sparkles className="h-3.5 w-3.5" /> Not sure what you need?
           </span>
           <h2 className="mt-2 text-xl font-black tracking-tight sm:text-2xl">Show GetPros the problem.</h2>
@@ -27,7 +27,7 @@ export function ShowGpbCallout() {
           id="show-gpb-cta-section"
           data-analytics-id="show_gpb_cta"
           data-analytics-location="homepage_callout"
-          className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
+          className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-elevated transition-transform hover:scale-[1.01]"
           style={{ background: "var(--gradient-primary)" }}
         >
           <Camera className="h-5 w-5" /> Show GetPros
@@ -87,10 +87,10 @@ export function EarlyAccessSection() {
 
   return (
     <section id="early-access" className="mt-12 scroll-mt-24">
-      <div className="overflow-hidden rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-8">
+      <div className="overflow-hidden surface-card p-5 sm:p-8">
         <div className="grid gap-7 lg:grid-cols-[1fr_1fr] lg:items-start">
           <div className="min-w-0">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/15 px-3 py-1 text-[11px] font-black text-secondary">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/15 px-3 py-1 text-xs font-black text-secondary">
               <MapPin className="h-3.5 w-3.5" /> Launching city by city
             </span>
             <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">GetPros is launching city by city</h2>
@@ -115,8 +115,8 @@ export function EarlyAccessSection() {
           {done ? (
             <div className="rounded-3xl border border-border/60 bg-background p-6 text-center">
               <div
-                className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white shadow-lg"
-                style={{ background: "var(--gradient-primary)" }}
+                className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white shadow-elevated"
+                style={{ background: "var(--primary)" }}
               >
                 <CheckCircle2 className="h-7 w-7" />
               </div>
@@ -126,7 +126,7 @@ export function EarlyAccessSection() {
               </p>
               <Link
                 to="/snap"
-                className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-md"
+                className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-card"
                 style={{ background: "var(--gradient-primary)" }}
               >
                 <Camera className="h-4 w-4" /> Show GetPros a job now
@@ -190,7 +190,7 @@ export function EarlyAccessSection() {
                   {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Joining…</> : <>Join Early Access <ArrowRight className="h-4 w-4" /></>}
                 </GradientButton>
               </div>
-              <p className="mt-3 text-center text-[11px] leading-relaxed text-muted-foreground">
+              <p className="mt-3 text-center text-xs leading-relaxed text-muted-foreground">
                 Free to join — this isn’t a paid membership and doesn’t create an account. We’ll only use
                 your details to contact you about GetPros availability near you, and you can ask us to remove
                 you at any time.

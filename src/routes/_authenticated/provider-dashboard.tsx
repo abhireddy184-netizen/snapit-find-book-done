@@ -95,8 +95,8 @@ function useProviderBookings(userId: string | undefined) {
 
 function EmptyJobs({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-3xl border border-border/60 bg-card p-10 text-center shadow-sm">
-      <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--gradient-primary)" }}>
+    <div className="surface-card p-10 text-center">
+      <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--primary)" }}>
         <Inbox className="h-6 w-6" />
       </div>
       <h2 className="mt-4 text-lg font-black">{title}</h2>
@@ -138,7 +138,7 @@ function Requests({ userId }: { userId: string | undefined }) {
         <p className="rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-medium text-destructive">{actionError}</p>
       )}
       {bookings.map((b) => (
-        <div key={b.id} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
+        <div key={b.id} className="surface-card p-4">
           <JobRow booking={b} />
           <div className="mt-3 flex gap-2">
             <button
@@ -174,7 +174,7 @@ function JobRow({ booking }: { booking: Booking }) {
             {formatBookingDate(booking.scheduled_date)} · {booking.scheduled_time}
           </div>
         </div>
-        <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[10px] font-semibold capitalize">{booking.status.replace("_", " ")}</span>
+        <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold capitalize">{booking.status.replace("_", " ")}</span>
       </div>
       {booking.details && <p className="mt-3 line-clamp-2 text-xs text-muted-foreground">{booking.details}</p>}
       <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
@@ -212,7 +212,7 @@ function Schedule({ userId }: { userId: string | undefined }) {
         <p className="rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-medium text-destructive">{actionError}</p>
       )}
       {upcoming.map((b) => (
-        <div key={b.id} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
+        <div key={b.id} className="surface-card p-4">
           <JobRow booking={b} />
           <div className="mt-3 flex flex-wrap gap-2">
             {b.status === "confirmed" ? (
@@ -236,7 +236,7 @@ function Schedule({ userId }: { userId: string | undefined }) {
             )}
           </div>
           {b.status === "in_progress" && (
-            <p className="mt-2 text-[11px] text-muted-foreground">
+            <p className="mt-2 text-xs text-muted-foreground">
               In progress. If the job runs past 8:00 PM you can still complete it truthfully — the overrun is recorded.
             </p>
           )}
@@ -367,7 +367,7 @@ function BusinessProfile() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
-      <form onSubmit={save} className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm">
+      <form onSubmit={save} className="surface-card p-6">
         <div className="flex items-center gap-3">
           <GpbMark />
           <div>
@@ -500,7 +500,7 @@ function VerificationCard({
   const StateIcon = state.icon;
 
   return (
-    <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
+    <div className="surface-card p-5">
       <div className="flex items-center gap-3">
         <GpbMark />
         <div>
@@ -517,10 +517,10 @@ function VerificationCard({
       <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-muted">
         <div
           className="h-full rounded-full transition-all"
-          style={{ width: `${pct}%`, background: "var(--gradient-primary)" }}
+          style={{ width: `${pct}%`, background: "var(--primary)" }}
         />
       </div>
-      <p className="mt-1.5 text-[11px] font-semibold text-muted-foreground">{completed} of {steps.length} steps complete</p>
+      <p className="mt-1.5 text-xs font-semibold text-muted-foreground">{completed} of {steps.length} steps complete</p>
 
       <ul className="mt-4 space-y-2">
         {steps.map((s) => (
@@ -544,7 +544,7 @@ function VerificationCard({
               ? "Your details are with the GetPros team. No badge is shown to customers until the review completes."
               : "Your profile is complete. Manual GetPros review isn’t open yet — we’ll contact you when it starts, and no badge is shown to customers until then."}
       </p>
-      <p className="mt-1 text-[11px] text-muted-foreground">Status: <span className="capitalize">{status.replace(/_/g, " ")}</span></p>
+      <p className="mt-1 text-xs text-muted-foreground">Status: <span className="capitalize">{status.replace(/_/g, " ")}</span></p>
     </div>
   );
 }

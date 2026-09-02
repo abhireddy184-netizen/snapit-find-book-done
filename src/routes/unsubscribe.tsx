@@ -48,7 +48,7 @@ function UnsubscribePage() {
 
   return (
     <AppShell>
-      <section className="mx-auto mt-10 max-w-lg rounded-[26px] border border-border/60 bg-card p-6 text-center shadow-sm sm:p-8">
+      <section className="mx-auto mt-10 max-w-lg surface-card p-6 text-center sm:p-8">
         <h1 className="text-2xl font-black tracking-tight text-foreground">{copy.title}</h1>
         <p aria-live="polite" className="mt-3 text-sm text-muted-foreground">{copy.body}</p>
         <Link

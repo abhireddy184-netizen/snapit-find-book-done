@@ -45,7 +45,7 @@ function EmergencyPage() {
           </div>
           <a
             href="tel:+18005550199"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-6 py-4 text-base font-bold text-white shadow-lg hover:bg-red-700"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-6 py-4 text-base font-bold text-white shadow-elevated hover:bg-red-700"
           >
             <PhoneCall className="h-5 w-5" /> Call dispatcher
           </a>
@@ -59,14 +59,14 @@ function EmergencyPage() {
             <Link
               key={t.slug}
               to="/snap"
-              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-red-300 hover:shadow-lg"
+              className="group flex items-center gap-3 surface-card p-4 transition-all hover:-translate-y-0.5 hover:border-red-300 hover:shadow-elevated"
             >
-              <div className={`grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${t.color} text-white shadow-md`}>
+              <div className={`grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${t.color} text-white shadow-card`}>
                 <t.icon className="h-5 w-5" />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-bold">{t.label}</div>
-                <div className="mt-0.5 inline-flex items-center gap-1 text-[11px] text-muted-foreground">
+                <div className="mt-0.5 inline-flex items-center gap-1 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3" /> ~{t.eta} min avg arrival
                 </div>
               </div>
@@ -80,7 +80,7 @@ function EmergencyPage() {
         <h2 className="text-lg font-black">On-call now near you</h2>
         <div className="mt-4 space-y-3">
           {emergencyPros.map((p) => (
-            <div key={p.id} className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm sm:flex-row sm:items-center">
+            <div key={p.id} className="flex flex-col gap-3 surface-card p-4 sm:flex-row sm:items-center">
               <div className="flex items-center gap-3">
                 <Avatar initials={p.initials} gradient={p.gradient} />
                 <div>

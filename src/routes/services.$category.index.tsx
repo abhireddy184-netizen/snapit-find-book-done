@@ -30,7 +30,7 @@ export const Route = createFileRoute("/services/$category/")({
   },
   notFoundComponent: () => (
     <AppShell>
-      <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
+      <div className="mx-auto max-w-md surface-card p-6 text-center">
         <h1 className="text-xl font-black">We don't have that category</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           The link may be out of date. Browse all 32 GetPros categories to find the service you need.
@@ -57,13 +57,13 @@ function CategoryPage() {
         <span className="font-semibold text-foreground">{category.name}</span>
       </nav>
 
-      <section className={`mt-4 overflow-hidden rounded-[28px] bg-gradient-to-br ${category.gradient} px-6 py-10 text-white md:px-12 md:py-14`}>
+      <section className={`mt-4 overflow-hidden rounded-2xl bg-gradient-to-br ${category.gradient} px-6 py-10 text-white md:px-12 md:py-14`}>
         <div className="grid h-14 w-14 place-items-center rounded-2xl bg-white/20 backdrop-blur">
           <Icon className="h-7 w-7" />
         </div>
         <h1 className="mt-5 text-4xl font-black tracking-tight md:text-5xl">{category.name}</h1>
         <p className="mt-2 max-w-2xl text-sm text-white/90 md:text-base">{category.tagline}</p>
-        <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-semibold">
+        <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold">
           <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur">{category.services.length} services</span>
           <span className="rounded-full bg-white/20 px-3 py-1 backdrop-blur">Available in {market.name}</span>
           {licenseRequired && (
@@ -74,7 +74,7 @@ function CategoryPage() {
         </div>
         <Link
           to="/snap"
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-plum shadow-lg transition-transform hover:scale-[1.02]"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-plum shadow-elevated transition-transform hover:scale-[1.01]"
         >
           <Camera className="h-4 w-4" /> Show us the problem
         </Link>
@@ -84,7 +84,7 @@ function CategoryPage() {
       <ServicePicker category={category} />
 
       {(licenseRequired || slug === "beauty-at-home") && (
-        <p className="mt-4 rounded-2xl border border-border/60 bg-card px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+        <p className="mt-4 surface-card px-4 py-3 text-xs leading-relaxed text-muted-foreground">
           {slug === "beauty-at-home"
             ? "At-home beauty availability varies by state/local rules and provider licensing."
             : "Local licensing or qualification requirements may apply depending on the job and location. GetPros should match regulated work only to appropriately qualified providers where required by local law."}
@@ -132,7 +132,7 @@ function ServicePicker({ category }: { category: MasterCategory }) {
             key={sv.slug}
             to="/services/$category/$service"
             params={{ category: category.slug, service: sv.slug }}
-            className="card-lift group flex h-full items-center gap-3 overflow-hidden rounded-2xl border border-border/60 bg-card p-2.5 shadow-sm hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-md sm:flex-col sm:items-stretch sm:gap-0 sm:rounded-3xl sm:p-0"
+            className="card-lift group flex h-full items-center gap-3 overflow-hidden surface-card p-2.5 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-card sm:flex-col sm:items-stretch sm:gap-0 sm:rounded-3xl sm:p-0"
           >
             {serviceScene(category.slug, sv.slug) && (
               <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-xl bg-muted sm:h-auto sm:w-full sm:rounded-none sm:aspect-[16/9]">
@@ -143,7 +143,7 @@ function ServicePicker({ category }: { category: MasterCategory }) {
                   decoding="async"
                   width={768}
                   height={512}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                 />
               </div>
             )}
@@ -151,7 +151,7 @@ function ServicePicker({ category }: { category: MasterCategory }) {
             <div className="flex items-start justify-between gap-2">
               <h3 className="text-sm font-black sm:text-base">{sv.name}</h3>
               {sv.featured && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-secondary/15 px-2 py-0.5 text-[10px] font-bold text-secondary">
+                <span className="inline-flex items-center gap-1 rounded-full bg-secondary/15 px-2 py-0.5 text-xs font-bold text-secondary">
                   <Sparkles className="h-3 w-3" /> Popular
                 </span>
               )}

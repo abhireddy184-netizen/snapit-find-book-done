@@ -20,7 +20,7 @@ export const Route = createFileRoute("/tracking/$id")({
   },
   notFoundComponent: () => (
     <AppShell>
-      <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
+      <div className="mx-auto max-w-md surface-card p-6 text-center">
         <h1 className="text-xl font-black">Nothing to track on this link</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           This tracking link has expired or the job isn't live yet. Open the job from your bookings to see its status.
@@ -71,14 +71,14 @@ function TrackingPage() {
             <h1 className="text-2xl font-black md:text-3xl">Your pro is on the way</h1>
           </div>
           <div className="rounded-full bg-primary/10 px-4 py-2 text-center">
-            <div className="text-[10px] font-semibold uppercase text-primary">ETA</div>
+            <div className="text-xs font-semibold uppercase text-primary">ETA</div>
             <div className="text-lg font-black text-primary">{eta} min</div>
           </div>
         </div>
 
         <MapPreview progress={progress} providerInitials={provider.initials} gradient={provider.gradient} />
 
-        <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
+        <div className="surface-card p-4">
           <div className="flex items-center gap-3">
             <Avatar initials={provider.initials} gradient={provider.gradient} size={56} />
             <div className="min-w-0 flex-1">
@@ -96,14 +96,14 @@ function TrackingPage() {
               <a href="tel:+15550100199" className="grid h-11 w-11 place-items-center rounded-full border border-border hover:bg-muted">
                 <PhoneCall className="h-4 w-4" />
               </a>
-              <button className="grid h-11 w-11 place-items-center rounded-full text-white shadow-sm" style={{ background: "var(--gradient-primary)" }}>
+              <button className="grid h-11 w-11 place-items-center rounded-full text-white shadow-sm" style={{ background: "var(--primary)" }}>
                 <MessageCircle className="h-4 w-4" />
               </button>
             </div>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
+        <div className="surface-card p-5">
           <div className="text-sm font-bold">Trip progress</div>
           <ol className="mt-4 space-y-3">
             {stages.map((s, i) => {
@@ -112,8 +112,8 @@ function TrackingPage() {
               return (
                 <li key={s.key} className="flex items-center gap-3">
                   <span
-                    className={`grid h-7 w-7 place-items-center rounded-full text-[10px] font-bold ${done ? "text-white" : "bg-muted text-muted-foreground"}`}
-                    style={done ? { background: "var(--gradient-primary)" } : undefined}
+                    className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${done ? "text-white" : "bg-muted text-muted-foreground"}`}
+                    style={done ? { background: "var(--primary)" } : undefined}
                   >
                     {done ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
                   </span>
@@ -121,7 +121,7 @@ function TrackingPage() {
                     {s.label}
                   </span>
                   {current && (
-                    <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                    <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-bold text-primary">
                       <span className="relative flex h-2 w-2"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-70" /><span className="relative inline-flex h-2 w-2 rounded-full bg-primary" /></span>
                       Now
                     </span>
@@ -133,17 +133,17 @@ function TrackingPage() {
         </div>
 
         <div className="grid grid-cols-3 gap-2 text-center text-xs">
-          <div className="rounded-2xl border border-border/60 bg-card p-3">
+          <div className="surface-card p-3">
             <MapPin className="mx-auto h-4 w-4 text-primary" />
             <div className="mt-1 font-bold">{provider.distance} mi</div>
             <div className="text-muted-foreground">Distance</div>
           </div>
-          <div className="rounded-2xl border border-border/60 bg-card p-3">
+          <div className="surface-card p-3">
             <Clock className="mx-auto h-4 w-4 text-primary" />
             <div className="mt-1 font-bold">{eta} min</div>
             <div className="text-muted-foreground">Arrival</div>
           </div>
-          <div className="rounded-2xl border border-border/60 bg-card p-3">
+          <div className="surface-card p-3">
             <Navigation className="mx-auto h-4 w-4 text-primary" />
             <div className="mt-1 font-bold">{Math.round(progress * 100)}%</div>
             <div className="text-muted-foreground">Route</div>
@@ -161,7 +161,7 @@ function TrackingPage() {
 
 function MapPreview({ progress, providerInitials, gradient }: { progress: number; providerInitials: string; gradient: string }) {
   return (
-    <div className="relative h-64 overflow-hidden rounded-3xl border border-border/60 shadow-lg md:h-80">
+    <div className="relative h-64 overflow-hidden rounded-3xl border border-border/60 shadow-elevated md:h-80">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,61,141,0.14),transparent_40%),radial-gradient(circle_at_80%_60%,rgba(255,216,61,0.20),transparent_45%)] bg-muted" />
       {/* Grid lines to suggest map */}
       <svg className="absolute inset-0 h-full w-full opacity-40" xmlns="http://www.w3.org/2000/svg">
@@ -190,11 +190,11 @@ function MapPreview({ progress, providerInitials, gradient }: { progress: number
         />
       </svg>
       {/* Destination pin */}
-      <div className="absolute right-6 top-4 flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-[11px] font-bold text-foreground shadow-md">
+      <div className="absolute right-6 top-4 flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-foreground shadow-card">
         <MapPin className="h-3.5 w-3.5 text-red-500" /> Your address
       </div>
       {/* Origin */}
-      <div className="absolute bottom-4 left-4 flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-[11px] font-bold text-foreground shadow-md">
+      <div className="absolute bottom-4 left-4 flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-xs font-bold text-foreground shadow-card">
         <span className="h-2 w-2 rounded-full bg-mint" /> Pro origin
       </div>
       {/* Moving avatar */}
@@ -207,7 +207,7 @@ function MapPreview({ progress, providerInitials, gradient }: { progress: number
       >
         <div className="relative">
           <span className="absolute inset-0 -m-2 animate-ping rounded-full bg-primary/40" />
-          <div className={`relative grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br ${gradient} text-sm font-bold text-white shadow-xl ring-4 ring-white`}>
+          <div className={`relative grid h-11 w-11 place-items-center rounded-full bg-gradient-to-br ${gradient} text-sm font-bold text-white shadow-elevated ring-4 ring-white`}>
             {providerInitials}
           </div>
         </div>

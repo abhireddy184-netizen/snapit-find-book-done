@@ -174,7 +174,7 @@ function PlanPage() {
 
       {!isDemo && query.isPending && <PlanSkeleton request={search.q} />}
       {!isDemo && query.isError && (
-        <div className="mt-6 rounded-[24px] border border-destructive/30 bg-card p-5">
+        <div className="mt-6 rounded-2xl border border-destructive/30 bg-card p-5">
           <p dir="auto" className="text-sm font-bold text-destructive">{c.errorTitle}</p>
           <button
             onClick={() => void query.refetch()}
@@ -240,7 +240,7 @@ function PlanHeader({
       <h1 dir="auto" className="text-[clamp(1.6rem,4vw,2.6rem)] font-black leading-tight tracking-tight">
         {c.pageTitle}
       </h1>
-      <p dir="auto" className="mt-2 max-w-[58ch] text-[16px] leading-relaxed text-muted-foreground sm:text-[18px]">
+      <p dir="auto" className="mt-2 max-w-[58ch] text-base leading-relaxed text-muted-foreground sm:text-lg">
         {isDemo
           ? "Here's an example plan. Describe what you need below to build your own."
           : c.pageIntro}
@@ -248,7 +248,7 @@ function PlanHeader({
 
       <form
         onSubmit={(e) => { e.preventDefault(); if (q.trim()) onSubmit(q.trim(), l.trim()); }}
-        className="mt-5 grid gap-2 rounded-[24px] border border-border/60 bg-card p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start"
+        className="mt-5 grid gap-2 surface-card p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start"
       >
         <div className="grid min-w-0 gap-2">
           <label htmlFor="plan-request" className="sr-only">{c.requestPlaceholder}</label>
@@ -259,7 +259,7 @@ function PlanHeader({
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={c.requestPlaceholder}
-            className="min-h-[92px] w-full resize-y rounded-2xl bg-muted/40 px-4 py-3 text-[17px] leading-relaxed outline-none placeholder:text-muted-foreground focus:bg-muted/60"
+            className="min-h-[92px] w-full resize-y rounded-2xl bg-muted/40 px-4 py-3 text-base leading-relaxed outline-none placeholder:text-muted-foreground focus:bg-muted/60"
           />
           <label htmlFor="plan-loc" className="sr-only">{c.locationPlaceholder}</label>
           <input
@@ -268,13 +268,13 @@ function PlanHeader({
             value={l}
             onChange={(e) => setL(e.target.value)}
             placeholder={c.locationPlaceholder}
-            className="w-full rounded-2xl bg-muted/40 px-4 py-2.5 text-[16px] outline-none placeholder:text-muted-foreground focus:bg-muted/60"
+            className="w-full rounded-2xl bg-muted/40 px-4 py-2.5 text-base outline-none placeholder:text-muted-foreground focus:bg-muted/60"
           />
         </div>
         <button
           type="submit"
           data-analytics-id="build_plan"
-          className="inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.01]"
+          className="inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-black text-white shadow-elevated transition-transform hover:scale-[1.01]"
           style={{ background: "var(--gradient-primary)" }}
         >
           <Sparkles className="h-4 w-4" /> {c.buildLabel}
@@ -286,7 +286,7 @@ function PlanHeader({
 
 function PlanSkeleton({ request }: { request: string }) {
   return (
-    <div className="mt-6 rounded-[24px] border border-border/60 bg-card p-6">
+    <div className="mt-6 surface-card p-6">
       <p className="flex items-center gap-2 text-sm font-bold">
         <Loader2 className="h-4 w-4 animate-spin text-primary" /> GetPros is sequencing your plan…
       </p>
@@ -317,21 +317,21 @@ function ConversationCard({
   return (
     <section aria-live="polite" className="mt-6 space-y-3">
       {request.trim() && (
-        <div className="rounded-[22px] border border-border/60 bg-muted/40 p-4 sm:p-5">
-          <p className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">You said</p>
+        <div className="rounded-2xl border border-border/60 bg-muted/40 p-4 sm:p-5">
+          <p className="text-xs font-black uppercase tracking-wider text-muted-foreground">You said</p>
           <p dir="auto" className="mt-1 reply-text break-words">{request.trim()}</p>
         </div>
       )}
-      <div className="rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+      <div className="surface-card p-5 sm:p-6">
         <div className="flex items-start gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
             <MessageCircle className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-black uppercase tracking-wider text-primary">GetPros</p>
+            <p className="text-xs font-black uppercase tracking-wider text-primary">GetPros</p>
             <p dir="auto" className="mt-1 reply-text font-bold break-words">{reply}</p>
             {invitation && (
-              <p dir="auto" className="mt-2 text-[15px] leading-relaxed text-muted-foreground break-words sm:text-base">{invitation}</p>
+              <p dir="auto" className="mt-2 text-sm leading-relaxed text-muted-foreground break-words sm:text-base">{invitation}</p>
             )}
           </div>
         </div>
@@ -359,21 +359,21 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
   const endDateLabel = end >= 1440 ? formatPlanDate(addDays(plan.startDate, Math.floor(end / 1440)), locale) : null;
 
   return (
-    <section className="mt-6 overflow-hidden rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+    <section className="mt-6 overflow-hidden surface-card p-5 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
         {isDemo && (
-          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-primary">
+          <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-black uppercase tracking-wider text-primary">
             Example plan
           </span>
         )}
         {plan.understanding && !plan.understanding.languageCode.toLowerCase().startsWith("en") && (
-          <span className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-border/60 bg-background px-2.5 py-1 text-[10px] font-bold text-muted-foreground">
+          <span className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-border/60 bg-background px-2.5 py-1 text-xs font-bold text-muted-foreground">
             <Languages className="h-3 w-3 shrink-0 text-primary" />
             <span dir="auto" className="truncate">{plan.understanding.languageName}</span>
           </span>
         )}
         {startDateLabel && (
-          <span className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-border/60 bg-background px-2.5 py-1 text-[10px] font-bold text-muted-foreground">
+          <span className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-border/60 bg-background px-2.5 py-1 text-xs font-bold text-muted-foreground">
             <CalendarDays className="h-3 w-3 shrink-0 text-primary" />
             <span dir="auto" className="truncate">
               {startDateLabel}
@@ -383,7 +383,7 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
         )}
       </div>
       <h2 dir="auto" className="mt-2 text-lg font-black leading-snug tracking-tight sm:text-xl">{plan.outcome}</h2>
-      <p dir="auto" className="mt-1.5 max-w-[70ch] text-[16px] leading-relaxed text-muted-foreground sm:text-[17px]">{plan.summary}</p>
+      <p dir="auto" className="mt-1.5 max-w-[70ch] text-base leading-relaxed text-muted-foreground sm:text-base">{plan.summary}</p>
 
       <dl className="mt-4 grid gap-2 sm:grid-cols-3">
         <Stat
@@ -424,11 +424,11 @@ function Stat({
 }: { label: string; value: string; icon: LucideIcon; tone?: "danger"; sub?: string | null }) {
   return (
     <div className={`rounded-2xl border px-4 py-3 ${tone === "danger" ? "border-destructive/40 bg-destructive/5" : "border-border/60 bg-background"}`}>
-      <dt dir="auto" className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+      <dt dir="auto" className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
         <Icon className={`h-3.5 w-3.5 ${tone === "danger" ? "text-destructive" : "text-primary"}`} /> {label}
       </dt>
       <dd dir="auto" className={`mt-0.5 text-base font-black tracking-tight ${tone === "danger" ? "text-destructive" : ""}`}>{value}</dd>
-      {sub && <dd dir="auto" className="mt-0.5 text-[11px] font-semibold text-muted-foreground">{sub}</dd>}
+      {sub && <dd dir="auto" className="mt-0.5 text-xs font-semibold text-muted-foreground">{sub}</dd>}
     </div>
   );
 }
@@ -452,7 +452,7 @@ function ClarifyCard({
   return (
     <section
       aria-live="polite"
-      className="mt-4 overflow-hidden rounded-[24px] border border-primary/30 bg-card p-5 shadow-sm"
+      className="mt-4 overflow-hidden rounded-2xl border border-primary/30 bg-card p-5 shadow-sm"
     >
       <div className="flex items-start gap-3">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
@@ -460,7 +460,7 @@ function ClarifyCard({
         </span>
         <div className="min-w-0 flex-1">
           <h3 dir="auto" className="text-sm font-black tracking-tight sm:text-base">{c.clarifyTitle}</h3>
-          <p dir="auto" className="mt-1 text-[17px] leading-relaxed break-words hyphens-auto text-foreground">{question}</p>
+          <p dir="auto" className="mt-1 text-base leading-relaxed break-words hyphens-auto text-foreground">{question}</p>
           <p dir="auto" className="mt-1 text-xs leading-relaxed text-muted-foreground">{c.clarifyHint}</p>
 
           <form
@@ -474,13 +474,13 @@ function ClarifyCard({
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder={c.clarifyPlaceholder}
-              className="w-full min-w-0 rounded-2xl bg-muted/40 px-4 py-3 text-[16px] outline-none placeholder:text-muted-foreground focus:bg-muted/60"
+              className="w-full min-w-0 rounded-2xl bg-muted/40 px-4 py-3 text-base outline-none placeholder:text-muted-foreground focus:bg-muted/60"
             />
             <div className="flex flex-wrap gap-2">
               <button
                 type="submit"
                 data-analytics-id="clarify_submit"
-                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-black text-white shadow-md transition-transform hover:scale-[1.01] sm:flex-none"
+                className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-5 py-2.5 text-sm font-black text-white shadow-card transition-transform hover:scale-[1.01] sm:flex-none"
                 style={{ background: "var(--gradient-primary)" }}
               >
                 {c.clarifySubmit} <ArrowRight className="h-4 w-4" />
@@ -509,7 +509,7 @@ function ReplanCard({
   return (
     <section
       aria-live="polite"
-      className="mt-4 rounded-[24px] border border-[color:var(--color-accent)]/40 bg-card p-5 shadow-sm"
+      className="mt-4 rounded-2xl border border-[color:var(--color-accent)]/40 bg-card p-5 shadow-sm"
     >
       <div className="flex items-start gap-3">
         <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-[color:var(--color-accent)]/12 text-[color:var(--color-accent)]">
@@ -531,7 +531,7 @@ function ReplanCard({
               <button
                 onClick={onApply}
                 data-analytics-id="replan_apply"
-                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-black text-white shadow-md transition-transform hover:scale-[1.02]"
+                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-black text-white shadow-card transition-transform hover:scale-[1.01]"
                 style={{ background: "var(--gradient-primary)" }}
               >
                 {r.applyLabel} <ArrowRight className="h-4 w-4" />
@@ -545,7 +545,7 @@ function ReplanCard({
               </button>
             </div>
           )}
-          <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+          <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
             This traffic example is simulated — live traffic updates aren't connected yet.
           </p>
         </div>
@@ -568,7 +568,7 @@ function Timeline({
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 dir="auto" className="text-[clamp(1.25rem,2.6vw,1.7rem)] font-black tracking-tight">{c.stepsHeading}</h2>
-          <p dir="auto" className="mt-1 text-[15px] text-muted-foreground sm:text-base">{c.stepsHint}</p>
+          <p dir="auto" className="mt-1 text-sm text-muted-foreground sm:text-base">{c.stepsHint}</p>
         </div>
         <button
           onClick={onReset}
@@ -623,7 +623,7 @@ function TaskRow({
 
   return (
     <li
-      className={`relative overflow-hidden rounded-[24px] border bg-card p-4 shadow-sm transition-all sm:p-5 ${
+      className={`relative overflow-hidden rounded-2xl border bg-card p-4 shadow-sm transition-all sm:p-5 ${
         skipped ? "border-dashed border-border/60 opacity-60" : "border-border/60"
       }`}
     >
@@ -633,10 +633,10 @@ function TaskRow({
             {skipped ? "—" : clock}
             {/* Past midnight the bare clock is ambiguous, so mark the next day. */}
             {!skipped && dayShift > 0 && (
-              <span className="ml-1 align-top text-[10px] font-bold text-muted-foreground">+{dayShift}d</span>
+              <span className="ml-1 align-top text-xs font-bold text-muted-foreground">+{dayShift}d</span>
             )}
           </span>
-          <span className="block text-[11px] font-semibold text-muted-foreground">
+          <span className="block text-xs font-semibold text-muted-foreground">
             {task.durationMinutes > 0 ? `${task.durationMinutes} ${c.minutesShort}` : ""}
           </span>
         </div>
@@ -662,15 +662,15 @@ function TaskRow({
                 className="min-w-0 flex-1 rounded-xl bg-muted/50 px-3 py-1.5 text-sm font-bold outline-none"
               />
             ) : (
-              <h3 dir="auto" className={`text-[17px] font-black sm:text-[18px] ${skipped ? "line-through" : ""}`}>
+              <h3 dir="auto" className={`text-base font-black sm:text-lg ${skipped ? "line-through" : ""}`}>
                 {task.title}
               </h3>
             )}
           </div>
 
-          {task.detail && <p dir="auto" className="mt-1 text-[16px] leading-relaxed text-muted-foreground">{task.detail}</p>}
+          {task.detail && <p dir="auto" className="mt-1 text-base leading-relaxed text-muted-foreground">{task.detail}</p>}
 
-          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-muted-foreground">
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted-foreground">
             {task.locationNote && (
               <span dir="auto" className="inline-flex items-center gap-1"><MapPin className="h-3 w-3" /> {task.locationNote}</span>
             )}
@@ -690,7 +690,7 @@ function TaskRow({
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               onClick={() => setEditing((v) => !v)}
-              className="rounded-full border border-border bg-background px-3 py-1.5 text-[12px] font-bold hover:bg-muted"
+              className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-bold hover:bg-muted"
             >
               {editing ? c.doneLabel : c.editLabel}
             </button>
@@ -698,7 +698,7 @@ function TaskRow({
 
           {editing && (
             <div className="mt-2 flex flex-wrap items-center gap-2 rounded-2xl border border-border/60 bg-muted/30 p-2.5">
-              <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
+              <label className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
                 <span>{c.durationLabel}</span>
                 <input
                   type="number"
@@ -708,13 +708,13 @@ function TaskRow({
                   value={task.durationMinutes}
                   onChange={(e) => onDuration(Math.max(0, Math.min(480, Number(e.target.value) || 0)))}
                   aria-label={`Duration in minutes for ${task.title}`}
-                  className="w-16 rounded-full border border-border bg-background px-2.5 py-1.5 text-[11px] font-bold outline-none"
+                  className="w-16 rounded-full border border-border bg-background px-2.5 py-1.5 text-xs font-bold outline-none"
                 />
                 {c.minutesShort}
               </label>
               <button
                 onClick={onToggleSkip}
-                className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-bold hover:bg-muted"
+                className="rounded-full border border-border bg-background px-3 py-1.5 text-xs font-bold hover:bg-muted"
               >
                 {skipped ? c.restoreLabel : c.skipLabel}
               </button>
@@ -765,7 +765,7 @@ function PlanDetails({ plan }: { plan: GpbPlan }) {
         </p>
       )}
 
-      <details className="group rounded-[24px] border border-border/60 bg-card p-5 shadow-sm">
+      <details className="group surface-card p-5">
         <summary dir="auto" className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-black tracking-tight">
           {c.detailsHeading}
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border/60 text-muted-foreground transition-transform group-open:rotate-90">
@@ -788,7 +788,7 @@ function PlanDetails({ plan }: { plan: GpbPlan }) {
                 <div className="min-w-0">
                   <div className="text-sm font-black tracking-tight">
                     {meta.label}
-                    {!meta.live && <span className="ml-2 text-[11px] font-bold text-muted-foreground">Coming soon</span>}
+                    {!meta.live && <span className="ml-2 text-xs font-bold text-muted-foreground">Coming soon</span>}
                   </div>
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{meta.blurb}</p>
                 </div>
@@ -817,7 +817,7 @@ function NextSteps({ c }: { c: Copy }) {
         to="/snap"
         data-analytics-id="show_gpb_cta"
         data-analytics-location="plan_page"
-        className="flex items-center justify-between gap-3 rounded-[22px] border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30"
+        className="flex items-center justify-between gap-3 surface-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30"
       >
         <span>
           <span dir="auto" className="block text-sm font-black tracking-tight">{c.snapCtaTitle}</span>
@@ -829,7 +829,7 @@ function NextSteps({ c }: { c: Copy }) {
         href="/#early-access"
         data-analytics-id="early_access_cta"
         data-analytics-location="plan_page"
-        className="flex items-center justify-between gap-3 rounded-[22px] border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30"
+        className="flex items-center justify-between gap-3 surface-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30"
       >
         <span>
           <span dir="auto" className="block text-sm font-black tracking-tight">{c.earlyCtaTitle}</span>

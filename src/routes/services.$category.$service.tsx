@@ -31,7 +31,7 @@ export const Route = createFileRoute("/services/$category/$service")({
   },
   notFoundComponent: () => (
     <AppShell>
-      <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
+      <div className="mx-auto max-w-md surface-card p-6 text-center">
         <h1 className="text-xl font-black">We don't offer that service yet</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           This link doesn't match a GetPros service. Browse the full catalogue, or show us the problem and we'll work out
@@ -74,7 +74,7 @@ function ServicePage() {
       <section className="mt-4 grid gap-6 md:grid-cols-[1.4fr_1fr]">
         <div>
           {serviceScene(category.slug, service.slug) && (
-            <div className="relative mb-5 aspect-[16/9] w-full overflow-hidden rounded-[28px] shadow-lg">
+            <div className="relative mb-5 aspect-[16/9] w-full overflow-hidden rounded-2xl shadow-elevated">
               <img
                 src={serviceScene(category.slug, service.slug)}
                 alt={`${service.name} being carried out by a professional`}
@@ -92,7 +92,7 @@ function ServicePage() {
           <h1 className="mt-4 text-4xl font-black tracking-tight md:text-5xl">{service.name}</h1>
           <p className="mt-3 text-base text-muted-foreground">{service.blurb}</p>
 
-          <div className="mt-6 rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
+          <div className="mt-6 surface-card p-5">
             <h2 className="text-sm font-black uppercase tracking-wider text-muted-foreground">What's typically included</h2>
             <ul className="mt-3 space-y-2 text-sm">
               {[
@@ -109,7 +109,7 @@ function ServicePage() {
             </ul>
           </div>
 
-          <div className="mt-4 rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
+          <div className="mt-4 surface-card p-5">
             <h2 className="text-sm font-black uppercase tracking-wider text-muted-foreground">Common questions</h2>
             <div className="mt-3 space-y-4 text-sm">
               <Faq q={`How much does ${service.name.toLowerCase()} cost?`} a={`Most ${market.name} jobs land between ${formatPrice(service.priceLow, service.priceHigh)}${service.unit ? ` ${service.unit}` : ""}. Your pro confirms the final price after seeing the job — GetPros never invents a price without enough information.`} />
@@ -126,7 +126,7 @@ function ServicePage() {
         </div>
 
         <aside className="space-y-4">
-          <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
+          <div className="surface-card p-5">
             <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Typical price guidance</div>
             <div className="mt-1 text-3xl font-black text-primary">{formatPrice(service.priceLow, service.priceHigh)}</div>
             <div className="text-xs text-muted-foreground">{service.unit ?? "typical job total"} · {market.currency}</div>
@@ -154,10 +154,10 @@ function ServicePage() {
             </Link>
           </div>
 
-          <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
+          <div className="surface-card p-5">
             <div className="flex items-center justify-between">
               <div className="text-sm font-black">Providers</div>
-              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Sample profiles</span>
+              <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">Sample profiles</span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
               Example listings shown while GetPros onboards verified pros in your area.
@@ -187,7 +187,7 @@ function ServicePage() {
               key={sv.slug}
               to="/services/$category/$service"
               params={{ category: category.slug, service: sv.slug }}
-              className="card-lift rounded-2xl border border-border/60 bg-card p-4 text-sm font-semibold hover:-translate-y-0.5 hover:shadow-lg"
+              className="card-lift surface-card p-4 text-sm font-semibold hover:-translate-y-0.5 hover:shadow-elevated"
             >
               {sv.name}
               <div className="mt-1 text-xs font-normal text-muted-foreground">{formatPrice(sv.priceLow, sv.priceHigh)}</div>

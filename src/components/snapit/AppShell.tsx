@@ -46,20 +46,18 @@ function TopBar() {
           <Logo />
         </div>
         <nav className="hidden items-center justify-center gap-1 text-sm font-medium text-muted-foreground lg:flex xl:gap-2 [&>a]:whitespace-nowrap">
-          <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-primary hover:bg-primary/5 transition-colors">
+          {/* One emphasis per row: Sign up is the only filled CTA. Secondary
+              destinations (How it works, For Pros, Early Access) live in the
+              footer so the header stays calm. */}
+          <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">
             <Camera className="h-4 w-4" /> Show GetPros
           </Link>
+          <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Services</Link>
           <Link to="/emergency" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-destructive hover:bg-destructive/10 transition-colors">
             <ShieldAlert className="h-4 w-4" /> Emergency
           </Link>
-
-          
-          <Link to="/" hash="how-it-works" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">How it works</Link>
-          <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Services</Link>
-          <Link to="/provider-interest" data-analytics-id="provider_interest_cta" data-analytics-location="header" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">For Pros</Link>
-          <Link to="/" hash="early-access" data-analytics-id="early_access_cta" data-analytics-location="header" className="rounded-full px-3 py-1.5 font-semibold text-primary hover:bg-primary/5 transition-colors">Early Access</Link>
-
         </nav>
+
         <div className="flex shrink-0 items-center gap-1.5 justify-self-end sm:gap-2">
           <ThemeToggle />
           <AuthNav />
@@ -88,7 +86,7 @@ function AuthNav() {
           to={dashboardTo}
           className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted"
         >
-          <span className="grid h-7 w-7 place-items-center rounded-full text-[11px] font-bold text-white" style={{ background: "var(--gradient-primary)" }}>
+          <span className="grid h-7 w-7 place-items-center rounded-full text-xs font-bold text-white" style={{ background: "var(--primary)" }}>
             {initials}
           </span>
           <span className="hidden md:inline">
@@ -121,7 +119,7 @@ function AuthNav() {
       <Link
         to="/register"
         search={{ redirect: undefined, role: undefined }}
-        className="inline-flex shrink-0 items-center rounded-full px-3.5 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] hover:shadow-lg sm:px-4"
+        className="inline-flex shrink-0 items-center rounded-full px-3.5 py-2 text-sm font-semibold text-white shadow-card transition-all hover:scale-[1.01] hover:shadow-elevated sm:px-4"
         style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px color-mix(in oklab, var(--primary) 55%, transparent)" }}
       >
         Sign up
@@ -198,12 +196,12 @@ function BottomNav() {
                 aria-label="Show GetPros — camera diagnosis"
               >
                 <span
-                  className="grid h-14 w-14 place-items-center rounded-full text-white shadow-xl ring-4 ring-card transition-transform hover:scale-105"
-                  style={{ background: "var(--gradient-primary)", boxShadow: "0 16px 40px -12px color-mix(in oklab, var(--primary) 60%, transparent)" }}
+                  className="grid h-14 w-14 place-items-center rounded-full text-white shadow-elevated ring-4 ring-card transition-transform hover:scale-[1.02]"
+                  style={{ background: "var(--primary)", boxShadow: "0 16px 40px -12px color-mix(in oklab, var(--primary) 60%, transparent)" }}
                 >
                   <Icon className="h-6 w-6" />
                 </span>
-                <span className="text-[10px] font-bold text-primary">{it.label}</span>
+                <span className="text-xs font-bold text-primary">{it.label}</span>
               </Link>
             );
           }
@@ -214,7 +212,7 @@ function BottomNav() {
               {...(search ? { search } : {})}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex min-h-11 flex-1 flex-col items-center justify-center gap-1 rounded-full px-2 py-1.5 text-[10px] font-medium transition-colors",
+                "flex min-h-11 flex-1 flex-col items-center justify-center gap-1 rounded-full px-2 py-1.5 text-xs font-medium transition-colors",
                 active ? "text-primary" : "text-muted-foreground"
               )}
             >
@@ -261,7 +259,7 @@ export function GradientButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100",
+        "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-sm font-semibold text-white shadow-elevated transition-all hover:scale-[1.01] hover:shadow-elevated active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100",
         className
       )}
       style={{ background: bg, boxShadow: glow }}
@@ -277,7 +275,7 @@ export function GradientButton({
 export function Avatar({ initials, gradient, size = 48 }: { initials: string; gradient: string; size?: number }) {
   return (
     <div
-      className={cn("grid shrink-0 place-items-center rounded-full bg-gradient-to-br text-white font-bold shadow-md ring-2 ring-white", gradient)}
+      className={cn("grid shrink-0 place-items-center rounded-full bg-gradient-to-br text-white font-bold shadow-card ring-2 ring-white", gradient)}
       style={{ width: size, height: size, fontSize: size * 0.36 }}
     >
       {initials}

@@ -26,8 +26,8 @@ function AllServicesPage() {
 
   return (
     <AppShell>
-      <section className="mt-4 overflow-hidden rounded-[28px] px-6 py-10 md:px-12 md:py-14 plum-panel">
-        <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-[11px] font-bold uppercase tracking-wider backdrop-blur">
+      <section className="mt-4 overflow-hidden rounded-2xl px-6 py-10 md:px-12 md:py-14 plum-panel">
+        <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider backdrop-blur">
           <MapPin className="h-3.5 w-3.5" /> {market.name} · {market.currency}
         </div>
         <h1 className="mt-4 text-4xl font-black tracking-tight md:text-5xl">Prefer to browse? Choose a service.</h1>
@@ -47,7 +47,7 @@ function AllServicesPage() {
           </label>
           <Link
             to="/snap"
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-plum shadow-lg transition-transform hover:scale-[1.02]"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-plum shadow-elevated transition-transform hover:scale-[1.01]"
           >
             <Sparkles className="h-4 w-4" /> Show us what you need
           </Link>
@@ -81,7 +81,7 @@ function AllServicesPage() {
             <div key={cat.slug} id={cat.slug} className="scroll-mt-24">
               <div className="flex items-start gap-4">
                 {categoryScene(cat.slug) ? (
-                  <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-2xl shadow-md">
+                  <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-2xl shadow-card">
                     <img
                       src={categoryScene(cat.slug)}
                       alt={`${cat.name} professional at work`}
@@ -97,7 +97,7 @@ function AllServicesPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${cat.gradient} text-white shadow-md`}>
+                  <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${cat.gradient} text-white shadow-card`}>
                     <Icon className="h-6 w-6" />
                   </div>
                 )}
@@ -105,7 +105,7 @@ function AllServicesPage() {
                   <div className="flex flex-wrap items-center gap-2">
                     <h2 className="text-xl font-black">{cat.name}</h2>
                     {licenseRequired && (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                         <ShieldCheck className="h-3 w-3" /> License/qualification checks where required
                       </span>
                     )}
@@ -148,9 +148,9 @@ function ServiceRow({
     <Link
       to="/services/$category/$service"
       params={{ category: categorySlug, service: slug }}
-      className="card-lift group flex h-full flex-col rounded-3xl border border-border/60 bg-card p-4 shadow-sm hover:-translate-y-1 hover:border-secondary/40 hover:shadow-xl"
+      className="card-lift group flex h-full flex-col surface-card p-4 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-elevated"
     >
-      <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{categoryName}</div>
+      <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{categoryName}</div>
       <div className="mt-1 text-sm font-black">{name}</div>
       <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{blurb}</p>
       <div className="mt-3 flex items-center justify-between text-xs">

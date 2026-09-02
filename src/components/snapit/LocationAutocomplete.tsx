@@ -183,7 +183,7 @@ export function LocationAutocomplete({
         <ul
           id={listId}
           role="listbox"
-          className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 max-h-72 overflow-auto rounded-2xl border border-border/70 bg-card p-1.5 shadow-xl"
+          className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 max-h-72 overflow-auto rounded-2xl border border-border/70 bg-card p-1.5 shadow-elevated"
         >
           {items.map((p, i) => (
             <li key={p.zip} role="option" aria-selected={i === active}>

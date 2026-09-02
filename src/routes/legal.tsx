@@ -108,7 +108,7 @@ function LegalPage() {
 
 function Section({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="mt-8 scroll-mt-24 rounded-3xl border border-border/60 bg-card p-5 md:p-7">
+    <section id={id} className="mt-8 scroll-mt-24 surface-card p-5 md:p-7">
       <h2 className="text-xl font-black">{title}</h2>
       <div className="mt-3 space-y-3 text-sm leading-relaxed text-muted-foreground">{children}</div>
     </section>

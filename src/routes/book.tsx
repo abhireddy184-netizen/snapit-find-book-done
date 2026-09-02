@@ -356,8 +356,8 @@ function BookPage() {
   if (confirmed) {
     return (
       <AppShell hideBottomNav>
-        <div className="mx-auto mt-16 max-w-md rounded-3xl border border-border/60 bg-card p-8 text-center shadow-lg">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full text-white shadow-lg" style={{ background: "var(--gradient-primary)" }}>
+        <div className="mx-auto mt-16 max-w-md surface-card p-8 text-center shadow-elevated">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full text-white shadow-elevated" style={{ background: "var(--primary)" }}>
             <Check className="h-8 w-8" strokeWidth={3} />
           </div>
           <h1 className="mt-4 text-2xl font-black">Request sent</h1>
@@ -373,7 +373,7 @@ function BookPage() {
   if (providerState !== "ready" || !provider) {
     return (
       <AppShell hideBottomNav>
-        <div className="mx-auto mt-12 max-w-md rounded-3xl border border-border/60 bg-card p-7 text-center shadow-sm">
+        <div className="mx-auto mt-12 max-w-md surface-card p-7 text-center">
           {providerState === "loading" ? (
             <>
               <Loader2 className="mx-auto h-6 w-6 animate-spin text-primary" />
@@ -413,11 +413,11 @@ function BookPage() {
             <span>{steps[step]}</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-muted">
-            <div className="h-full transition-all" style={{ width: `${((step + 1) / steps.length) * 100}%`, background: "var(--gradient-primary)" }} />
+            <div className="h-full transition-all" style={{ width: `${((step + 1) / steps.length) * 100}%`, background: "var(--primary)" }} />
           </div>
         </div>
 
-        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
+        <div className="mb-4 flex items-center gap-3 surface-card p-4">
           <Avatar initials={provider.business_name.slice(0, 2).toUpperCase()} gradient={category?.gradient ?? "from-[#2C5CA8] to-[#1F3A73]"} />
           <div className="min-w-0">
             <div className="truncate text-sm font-black">{provider.business_name}</div>
@@ -427,13 +427,13 @@ function BookPage() {
             </div>
           </div>
           {provider.verification_status === "verified" && (
-            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-mint-ink">
+            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-1 text-xs font-bold uppercase tracking-wider text-mint-ink">
               <ShieldCheck className="h-3 w-3" /> Verified
             </span>
           )}
         </div>
 
-        <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
+        <div className="surface-card p-6">
           {step === 0 && (
             <StepWrap
               title="What do you need?"

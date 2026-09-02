@@ -4,7 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { subscribeToUpdates } from "@/lib/subscribe.functions";
 import {
   ArrowRight, Camera, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
-  Facebook, Instagram, Twitter, Youtube,
 } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
@@ -42,48 +41,41 @@ export const Route = createFileRoute("/")({
 function Landing() {
   return (
     <AppShell>
-      {/* Hero — outcome-first composer */}
+      {/* Hero — outcome-first composer. One clean surface: no gradient orbs,
+          no mesh. The composer is the single action on phones. */}
       <section
-        className="gpb-bleed fade-up relative -mt-4 overflow-hidden border-b border-border/50 py-9 sm:py-12 lg:py-16 xl:py-20 md:-mt-6"
+        className="gpb-bleed fade-up relative -mt-4 overflow-hidden border-b border-border/50 py-10 sm:py-14 lg:py-20 xl:py-24 md:-mt-6"
         style={{ backgroundColor: "color-mix(in oklab, var(--card) 92%, var(--background))" }}
       >
-        <div
-          className="pointer-events-none absolute -right-24 -top-28 h-[26rem] w-[26rem] rounded-full opacity-20 blur-3xl"
-          style={{ background: "var(--gradient-primary)" }}
-          aria-hidden="true"
-        />
-        <div
-          className="pointer-events-none absolute -bottom-40 -left-32 h-[24rem] w-[24rem] rounded-full opacity-[0.13] blur-3xl"
-          style={{ background: "var(--gradient-secondary)" }}
-          aria-hidden="true"
-        />
         <div className="gpb-shell relative grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-14 xl:gap-20">
           <div className="min-w-0">
             {/* Branding lives in the header only — repeating the wordmark here
                 pushed the headline below the fold on phones. */}
-            <h1 className="max-w-[15ch] text-[clamp(2rem,5.6vw,4.2rem)] font-black leading-[1.05] tracking-tight text-foreground">
+            <h1 className="max-w-[15ch] text-[clamp(2.125rem,5.4vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.03em] text-foreground">
               What service do you <span className="text-gradient-hero">need?</span>
             </h1>
-            <p className="mt-2.5 max-w-[44ch] text-[clamp(0.9rem,1.2vw,1.15rem)] leading-relaxed text-muted-foreground">
+            <p className="mt-3.5 max-w-[44ch] text-[clamp(1.0625rem,1.2vw,1.2rem)] leading-relaxed text-muted-foreground">
               Show GetPros a photo, speak it in any language, or type it. We work out the service you need and
               find a local pro.
             </p>
 
-            {/* Photo-first: the camera is the headline action, on every size. */}
+            {/* Desktop keeps a photo-first button because the composer sits in
+                the second column; on phones the composer already carries it. */}
             <Link
               to="/snap"
               id="hero-show-gpb-cta"
               data-analytics-id="show_gpb_cta"
               data-analytics-location="hero_primary"
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-black text-white shadow-lg transition-transform hover:scale-[1.01] sm:w-auto"
+              className="mt-6 hidden items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-bold text-white shadow-elevated transition-transform duration-200 hover:scale-[1.01] lg:inline-flex"
               style={{ background: "var(--gradient-primary)" }}
             >
               <Camera className="h-5 w-5" /> Show GetPros a photo
             </Link>
 
-            <div className="mt-4 lg:hidden">
+            <div className="mt-5 lg:hidden">
               <OutcomeComposer />
             </div>
+
 
 
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-muted-foreground">
@@ -143,14 +135,14 @@ function EmergencyStrip() {
     { label: "Lockout", icon: Lock },
   ];
   return (
-    <section className="mt-10 overflow-hidden rounded-[24px] border border-destructive/25 bg-card p-4 sm:p-5">
+    <section className="mt-10 overflow-hidden rounded-2xl border border-destructive/25 bg-card p-4 sm:p-5">
       <div className="grid gap-4 md:grid-cols-[1fr_1.1fr] md:items-center">
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive px-2.5 py-1 text-[11px] font-black text-destructive-foreground">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive px-2.5 py-1 text-xs font-black text-destructive-foreground">
             <ShieldAlert className="h-3.5 w-3.5" /> 24/7 Emergency
           </span>
           <h2 className="mt-2 text-lg font-black tracking-tight sm:text-xl">When it can't wait, flag it first.</h2>
-          <Link to="/emergency" className="mt-3 inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-2.5 text-sm font-bold text-destructive-foreground transition-transform hover:scale-[1.02]">
+          <Link to="/emergency" className="mt-3 inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-2.5 text-sm font-bold text-destructive-foreground transition-transform hover:scale-[1.01]">
             Get emergency help <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -173,10 +165,10 @@ function EmergencyStrip() {
 
 function ProviderRecruitment() {
   return (
-    <section className="mt-10 overflow-hidden rounded-[26px] px-5 py-8 text-white sm:px-8 md:py-10" style={{ background: "var(--gradient-primary)" }}>
+    <section className="mt-10 overflow-hidden rounded-2xl px-5 py-8 text-white sm:px-8 md:py-10" style={{ background: "var(--gradient-primary)" }}>
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-center">
         <div className="min-w-0">
-          <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">For professionals</div>
+          <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-bold backdrop-blur">For professionals</div>
           <h2 className="text-2xl font-black tracking-tight md:text-3xl">Get clearer jobs, not vague leads.</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90">
             Pros set their service category, service area/radius, availability and starting price — customer
@@ -189,7 +181,7 @@ function ProviderRecruitment() {
               id="provider-recruitment-cta"
               data-analytics-id="provider_interest_cta"
               data-analytics-location="homepage_provider_section"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-lg transition-transform hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-elevated transition-transform hover:scale-[1.01]"
             >
               Register Your Interest <ArrowRight className="h-4 w-4" />
             </Link>
@@ -260,18 +252,12 @@ export function Footer() {
     <footer className="mt-14 border-t border-border/60 pt-10 pb-6 text-sm text-muted-foreground">
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
         <div className="min-w-0">
-          <Logo />
+          <Logo showTagline />
           <p className="mt-3 max-w-xs text-xs leading-relaxed">
             Show, say or type the service you need. We connect you with trusted local pros.
           </p>
-          <div className="mt-4 flex items-center gap-2">
-            {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
-              <a key={i} href="#" aria-label="Social" className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary">
-                <Icon className="h-4 w-4" />
-              </a>
-            ))}
-          </div>
         </div>
+
         <div>
           <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">Get started</div>
           <ul className="space-y-2">
@@ -301,10 +287,19 @@ export function Footer() {
             <li><Link to="/services" className="hover:text-foreground">All services</Link></li>
           </ul>
         </div>
-        <FooterCol title="Support" links={["Help center", "Contact", "Trust & safety", "Cancellation"]} />
+        <div>
+          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">Company</div>
+          <ul className="space-y-2">
+            <li><a href="/#how-it-works" className="hover:text-foreground">How it works</a></li>
+            <li><Link to="/emergency" className="hover:text-foreground">Emergency services</Link></li>
+            <li><Link to="/legal" hash="terms" className="hover:text-foreground">Trust &amp; safety</Link></li>
+            <li><Link to="/legal" hash="privacy" className="hover:text-foreground">Privacy</Link></li>
+          </ul>
+        </div>
+
         <div className="min-w-0">
           <div className="mb-2 text-xs font-bold uppercase tracking-wider text-foreground">Newsletter</div>
-          <p className="mb-3 text-[11px] leading-relaxed">
+          <p className="mb-3 text-xs leading-relaxed">
             General GetPros news and new services — this is not the early access list.{" "}
             <a href="/#early-access" className="font-semibold text-primary hover:underline">Join early access</a> to
             be notified when pros go live near you. Unsubscribe anytime.
@@ -340,7 +335,7 @@ export function Footer() {
             id="gpb-newsletter-status"
             role="status"
             aria-live="polite"
-            className={`mt-2 min-h-[1rem] text-[11px] font-semibold ${state === "error" ? "text-destructive" : "text-foreground"}`}
+            className={`mt-2 min-h-[1rem] text-xs font-semibold ${state === "error" ? "text-destructive" : "text-foreground"}`}
           >
             {message}
           </p>
@@ -360,11 +355,3 @@ export function Footer() {
   );
 }
 
-function FooterCol({ title, links }: { title: string; links: string[] }) {
-  return (
-    <div>
-      <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">{title}</div>
-      <ul className="space-y-2">{links.map((l) => <li key={l}>{l}</li>)}</ul>
-    </div>
-  );
-}
