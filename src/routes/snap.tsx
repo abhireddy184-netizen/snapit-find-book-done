@@ -1202,33 +1202,26 @@ function ClarifyPanel({
   );
 }
 
+/**
+ * A real GPB professional. Everything shown here comes from the pro's own
+ * public profile — we never invent ratings, ETAs or distances.
+ */
 function ProCard({
-  pro,
+  match,
   recommended = false,
-  quoteMode,
-  selected,
-  onToggle,
   onBook,
-  onMessage,
-  onCall,
 }: {
-  pro: MatchedProvider;
+  match: ProviderMatch;
   recommended?: boolean;
-  quoteMode: boolean;
-  selected: boolean;
-  onToggle: () => void;
   onBook: () => void;
-  onMessage: () => void;
-  onCall: () => void;
 }) {
-  const clickable = quoteMode;
+  const p = match.provider;
+  const name = p.business_name?.trim() || "GPB professional";
+  const initials = name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("") || "GP";
   return (
     <div
-      onClick={clickable ? onToggle : undefined}
       className={`relative overflow-hidden rounded-3xl border bg-card p-4 shadow-sm transition-all ${
         recommended ? "border-primary/30 shadow-lg md:p-5" : "border-border/60 hover:shadow-md"
-      } ${clickable ? "cursor-pointer hover:-translate-y-0.5" : ""} ${
-        selected ? "ring-2 ring-primary/60" : ""
       }`}
     >
       {recommended && (
@@ -1236,161 +1229,55 @@ function ProCard({
       )}
       {recommended && (
         <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
-          <CheckCircle2 className="h-3 w-3" /> Recommended for you
-        </div>
-      )}
-      {quoteMode && (
-        <div
-          className={`absolute right-3 top-3 grid h-6 w-6 place-items-center rounded-full border-2 transition-all ${
-            selected ? "border-primary bg-primary text-white" : "border-border bg-background"
-          }`}
-        >
-          {selected && <Check className="h-3.5 w-3.5" strokeWidth={4} />}
+          <CheckCircle2 className="h-3 w-3" /> Closest available pro
         </div>
       )}
 
       <div className="flex items-center gap-3">
-        <Avatar initials={pro.initials} gradient={pro.gradient} size={recommended ? 60 : 48} />
+        <Avatar initials={initials} gradient="var(--gradient-primary)" size={recommended ? 60 : 48} />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-1.5">
-            <div className="truncate text-sm font-black">{pro.name}</div>
-            {pro.verified && (
-              <span className="inline-flex items-center gap-0.5 rounded-full bg-mint/25 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-mint-ink">
-                <ShieldCheck className="h-2.5 w-2.5" /> Verified
+          <div className="flex flex-wrap items-center gap-1.5">
+            <div className="truncate text-sm font-black">{name}</div>
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-mint/25 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-mint-ink">
+              <ShieldCheck className="h-2.5 w-2.5" /> Verified
+            </span>
+          </div>
+          {p.service_category && (
+            <div className="truncate text-[11px] text-muted-foreground">{p.service_category}</div>
+          )}
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-muted-foreground">
+            {match.distanceMiles != null && (
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="h-3 w-3" /> {Math.round(match.distanceMiles)} mi away
               </span>
             )}
-          </div>
-          <div className="truncate text-[11px] text-muted-foreground">{pro.business}</div>
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px]">
-            <span className="inline-flex items-center gap-1 font-semibold">
-              <Star className="h-3 w-3 fill-amber-400 text-amber-400" /> {pro.rating}
-              <span className="ml-1 font-normal text-muted-foreground">· {pro.reviews}</span>
-            </span>
-            <span className="inline-flex items-center gap-1 text-muted-foreground">
-              <MapPin className="h-3 w-3" /> {pro.distance} mi
-            </span>
-            <span className="inline-flex items-center gap-1 text-muted-foreground">
-              <Award className="h-3 w-3" /> {pro.yearsExperience}y
+            <span className="inline-flex items-center gap-1">
+              <Clock className="h-3 w-3" /> {p.default_duration_minutes} min typical visit
             </span>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-1">
-          <div className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-bold text-primary">
-            <Clock className="h-3 w-3" /> {pro.eta} min
-          </div>
+        {p.starting_price != null && (
           <div className="text-[11px] font-bold text-foreground">
-            from <span className="text-primary">${pro.startingPrice}</span>
+            from <span className="text-primary">${Number(p.starting_price)}</span>
           </div>
-        </div>
+        )}
       </div>
 
-      {/*
-        These are illustrative profiles, not GPB accounts. Booking, messaging
-        or calling them would go nowhere, so we say so instead of pretending.
-      */}
-      <div className="mt-4 rounded-2xl bg-muted/60 px-3 py-2 text-[11px] font-medium text-muted-foreground">
-        Sample profile — not a real GPB pro yet, so it can't be booked or contacted.
-      </div>
-    </div>
-  );
-}
+      {p.bio && <p className="mt-3 line-clamp-2 text-xs text-muted-foreground">{p.bio}</p>}
 
-function Sheet({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm sm:items-center">
-      <div
-        onClick={onClose}
-        className="absolute inset-0 animate-fade-in"
-        aria-hidden="true"
-      />
-      <div
-        role="dialog"
-        className="relative w-full max-w-md rounded-t-3xl border border-border/60 bg-background p-5 shadow-2xl animate-scale-in sm:rounded-3xl"
-      >
-        <button
-          onClick={onClose}
-          className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
-          aria-label="Close"
+      <div className="mt-4 flex flex-wrap gap-2">
+        <GradientButton onClick={onBook} className="flex-1 justify-center py-2.5 text-sm">
+          <CalendarClock className="h-4 w-4" /> Request this pro
+        </GradientButton>
+        <Link
+          to="/provider/$id"
+          params={{ id: p.user_id }}
+          className="inline-flex items-center justify-center rounded-full border border-border bg-background px-4 py-2.5 text-sm font-semibold hover:bg-muted"
         >
-          <X className="h-4 w-4" />
-        </button>
-        {children}
+          View profile
+        </Link>
       </div>
     </div>
-  );
-}
-
-function MessageProSheet({ pro, problem, onClose }: { pro: MatchedProvider; problem: string; onClose: () => void }) {
-  const [text, setText] = useState(`Hi ${pro.name.split(" ")[0]}, I just used GPB AI. Here's what it flagged: "${problem}". Are you available to help?`);
-  const [sent, setSent] = useState(false);
-  return (
-    <Sheet onClose={onClose}>
-      <div className="flex items-center gap-3">
-        <Avatar initials={pro.initials} gradient={pro.gradient} size={48} />
-        <div>
-          <div className="text-sm font-black">Message {pro.name.split(" ")[0]}</div>
-          <div className="text-[11px] text-muted-foreground">Typically replies in a few minutes</div>
-        </div>
-      </div>
-      {sent ? (
-        <div className="mt-6 flex flex-col items-center justify-center gap-2 py-4">
-          <div className="grid h-14 w-14 place-items-center rounded-full bg-primary/10 text-primary">
-            <Check className="h-7 w-7" strokeWidth={3} />
-          </div>
-          <div className="text-sm font-bold">Message sent</div>
-          <div className="text-xs text-muted-foreground">You'll get a notification when {pro.name.split(" ")[0]} replies.</div>
-        </div>
-      ) : (
-        <>
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={5}
-            className="mt-4 w-full resize-none rounded-2xl border border-border/60 bg-card p-3 text-sm outline-none focus:border-primary"
-          />
-          <GradientButton
-            onClick={() => setSent(true)}
-            disabled={!text.trim()}
-            className="mt-3 w-full justify-center py-2.5 text-sm"
-          >
-            <Send className="h-4 w-4" /> Send message
-          </GradientButton>
-        </>
-      )}
-    </Sheet>
-  );
-}
-
-function CallProSheet({ pro, onClose }: { pro: MatchedProvider; onClose: () => void }) {
-  return (
-    <Sheet onClose={onClose}>
-      <div className="flex flex-col items-center py-3 text-center">
-        <div className="relative">
-          <Avatar initials={pro.initials} gradient={pro.gradient} size={88} />
-          <span className="absolute inset-0 -z-10 animate-ping rounded-full bg-primary/20" />
-        </div>
-        <div className="mt-4 text-lg font-black">{pro.name}</div>
-        <div className="text-xs text-muted-foreground">{pro.business}</div>
-        <div className="mt-1 inline-flex items-center gap-1 text-xs text-muted-foreground">
-          <Phone className="h-3 w-3" /> {pro.phone}
-        </div>
-        <div className="mt-6 flex w-full gap-2">
-          <button
-            onClick={onClose}
-            className="flex-1 rounded-full border border-border py-3 text-sm font-semibold hover:bg-muted"
-          >
-            Cancel
-          </button>
-          <a
-            href={`tel:${pro.phone.replace(/[^+\d]/g, "")}`}
-            className="flex-1 inline-flex items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white shadow"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            <Phone className="h-4 w-4" /> Call now
-          </a>
-        </div>
-      </div>
-    </Sheet>
   );
 }
 
