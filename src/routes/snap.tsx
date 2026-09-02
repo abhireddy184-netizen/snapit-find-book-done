@@ -1265,31 +1265,13 @@ function ProCard({
         </div>
       </div>
 
-      {!quoteMode && (
-        <div className="mt-4 grid grid-cols-[1fr_auto_auto] gap-2">
-          <button
-            onClick={onBook}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-xs font-bold text-white shadow-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            Book Now <ArrowRight className="h-3.5 w-3.5" />
-          </button>
-          <button
-            onClick={onMessage}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted"
-            aria-label="Message pro"
-          >
-            <MessageCircle className="h-4 w-4" />
-          </button>
-          <button
-            onClick={onCall}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted"
-            aria-label="Call pro"
-          >
-            <Phone className="h-4 w-4" />
-          </button>
-        </div>
-      )}
+      {/*
+        These are illustrative profiles, not GPB accounts. Booking, messaging
+        or calling them would go nowhere, so we say so instead of pretending.
+      */}
+      <div className="mt-4 rounded-2xl bg-muted/60 px-3 py-2 text-[11px] font-medium text-muted-foreground">
+        Sample profile — not a real GPB pro yet, so it can't be booked or contacted.
+      </div>
     </div>
   );
 }
