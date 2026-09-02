@@ -410,7 +410,15 @@ export function finalizePlan(plan: GpbPlan, nowClock: string, nowDate?: string):
     );
   }
 
-  return withReplan({ ...plan, tasks, startClock, notes: [...notes] });
+  return withReplan({
+    ...plan,
+    tasks,
+    startClock,
+    ...(startDate ? { startDate } : {}),
+    ...(plan.deadline && deadlineDate ? { deadlineDate } : {}),
+    notes: [...notes],
+  });
+
 }
 
 
