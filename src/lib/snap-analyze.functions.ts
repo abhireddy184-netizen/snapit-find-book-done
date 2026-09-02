@@ -4,6 +4,7 @@ import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { SYSTEM_PROMPT, buildUserPrompt, normalizeAnalysis } from "./snap-analyze.server";
 import { detectServiceIntentInText } from "./search-intent";
+import { createFastPathAnalysis } from "./snap-fast-path";
 
 
 export type { SnapAnalysis, ServiceOption, IssueSource, ResponseKind } from "./snap-analyze.server";
@@ -44,19 +45,7 @@ export const analyzeSnap = createServerFn({ method: "POST" })
     // resolve it locally and return in milliseconds.
     const fastHit = !hasMedia && note ? detectServiceIntentInText(ctx.latestMessage || note) : null;
     if (fastHit && note) {
-      const local = JSON.stringify({
-        responseKind: "diagnosis",
-        issueSource: "customer-described",
-        headline: `${fastHit.service.name} — that's what this sounds like.`,
-        categorySlug: fastHit.category.slug,
-        serviceSlug: fastHit.service.slug,
-        confidence: 0.82,
-        problem: note,
-        hasPriceEstimate: false,
-        urgency: "medium",
-        urgencyReason: "Based on what you described.",
-      });
-      return normalizeAnalysis(local, true, false, note, { ...ctx, forceResolve: true });
+      return createFastPathAnalysis(note, fastHit);
     }
 
 
@@ -66,7 +55,7 @@ export const analyzeSnap = createServerFn({ method: "POST" })
     for (const image of images) content.push({ type: "image", image });
 
     // Hard server-side budget so a slow upstream can never hang the UI.
-    const budgetMs = hasMedia ? 28_000 : 15_000;
+    const budgetMs = hasMedia ? 28_000 : 12_000;
     try {
       const { text } = await generateText({
         // Fast multimodal chat model: no reasoning round-trips, so simple
