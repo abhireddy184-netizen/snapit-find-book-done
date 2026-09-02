@@ -587,7 +587,10 @@ export function OutcomeComposer() {
           onChange={(e) => {
             setRequest(e.target.value);
             if (emptyError) setEmptyError(false);
+            // Editing means the person is still composing — stand down.
+            if (autoSecs !== null) cancelAutoSubmit();
           }}
+
           onFocus={() => (paused.current = true)}
           onBlur={() => (paused.current = false)}
           rows={3}
