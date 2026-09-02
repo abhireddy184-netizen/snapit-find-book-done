@@ -160,7 +160,15 @@ function SnapPage() {
       }
     } catch (e) {
       if (runRef.current !== token) return;
-      setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+      // Text-only recovery: never leave the customer stuck — fall back to the
+      // best local catalogue matches instead of a dead end.
+      const local = frames.length ? null : createLocalOptionsAnalysis(noteText, rankServices(noteText, 4));
+      if (local) {
+        setPhase("matching");
+        setAnalysis(local);
+      } else {
+        setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+      }
     } finally {
       if (runRef.current === token) {
         setLoading(false);
