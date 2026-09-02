@@ -185,7 +185,9 @@ function PlanPage() {
         </div>
       )}
 
-      {conversation && <ConversationCard reply={conversation.reply} invitation={conversation.invitation} />}
+      {conversation && (
+        <ConversationCard request={search.q} reply={conversation.reply} invitation={conversation.invitation} />
+      )}
 
       {plan && (
 
@@ -238,7 +240,7 @@ function PlanHeader({
       <h1 dir="auto" className="text-[clamp(1.6rem,4vw,2.6rem)] font-black leading-tight tracking-tight">
         {c.pageTitle}
       </h1>
-      <p dir="auto" className="mt-2 max-w-[58ch] text-sm text-muted-foreground sm:text-base">
+      <p dir="auto" className="mt-2 max-w-[58ch] text-[16px] leading-relaxed text-muted-foreground sm:text-[18px]">
         {isDemo
           ? "Here's an example plan. Describe what you need below to build your own."
           : c.pageIntro}
@@ -253,11 +255,11 @@ function PlanHeader({
           <textarea
             id="plan-request"
             dir="auto"
-            rows={2}
+            rows={3}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={c.requestPlaceholder}
-            className="min-h-[62px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3 text-[15px] leading-relaxed outline-none placeholder:text-muted-foreground focus:bg-muted/60"
+            className="min-h-[92px] w-full resize-y rounded-2xl bg-muted/40 px-4 py-3 text-[17px] leading-relaxed outline-none placeholder:text-muted-foreground focus:bg-muted/60"
           />
           <label htmlFor="plan-loc" className="sr-only">{c.locationPlaceholder}</label>
           <input
@@ -266,7 +268,7 @@ function PlanHeader({
             value={l}
             onChange={(e) => setL(e.target.value)}
             placeholder={c.locationPlaceholder}
-            className="w-full rounded-2xl bg-muted/40 px-4 py-2.5 text-sm outline-none placeholder:text-muted-foreground focus:bg-muted/60"
+            className="w-full rounded-2xl bg-muted/40 px-4 py-2.5 text-[16px] outline-none placeholder:text-muted-foreground focus:bg-muted/60"
           />
         </div>
         <button
@@ -304,19 +306,34 @@ function PlanSkeleton({ request }: { request: string }) {
  * Shown when the message carried no task at all — a greeting, a joke, a test or
  * a general question. GPB answers briefly in the person's own language and
  * invites them to say what they need, instead of inventing a plan.
+ *
+ * The person's own words and GPB's reply are shown as two clearly separate
+ * blocks: GPB's banter is never presented as something the user asked for, and
+ * it never becomes the request text in the composer above.
  */
-function ConversationCard({ reply, invitation }: { reply: string; invitation?: string | undefined }) {
+function ConversationCard({
+  request, reply, invitation,
+}: { request: string; reply: string; invitation?: string | undefined }) {
   return (
-    <section aria-live="polite" className="mt-6 rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
-      <div className="flex items-start gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
-          <MessageCircle className="h-5 w-5" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p dir="auto" className="text-base font-bold leading-relaxed break-words">{reply}</p>
-          {invitation && (
-            <p dir="auto" className="mt-2 text-sm leading-relaxed text-muted-foreground break-words">{invitation}</p>
-          )}
+    <section aria-live="polite" className="mt-6 space-y-3">
+      {request.trim() && (
+        <div className="rounded-[22px] border border-border/60 bg-muted/40 p-4 sm:p-5">
+          <p className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">You said</p>
+          <p dir="auto" className="mt-1 text-[17px] leading-relaxed break-words">{request.trim()}</p>
+        </div>
+      )}
+      <div className="rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+        <div className="flex items-start gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+            <MessageCircle className="h-5 w-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-black uppercase tracking-wider text-primary">GPB</p>
+            <p dir="auto" className="mt-1 text-[17px] font-bold leading-relaxed break-words sm:text-[18px]">{reply}</p>
+            {invitation && (
+              <p dir="auto" className="mt-2 text-[15px] leading-relaxed text-muted-foreground break-words sm:text-base">{invitation}</p>
+            )}
+          </div>
         </div>
       </div>
     </section>
@@ -364,7 +381,7 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
         )}
       </div>
       <h2 dir="auto" className="mt-2 text-lg font-black leading-snug tracking-tight sm:text-xl">{plan.outcome}</h2>
-      <p dir="auto" className="mt-1.5 max-w-[70ch] text-sm leading-relaxed text-muted-foreground">{plan.summary}</p>
+      <p dir="auto" className="mt-1.5 max-w-[70ch] text-[16px] leading-relaxed text-muted-foreground sm:text-[17px]">{plan.summary}</p>
 
       <dl className="mt-4 grid gap-2 sm:grid-cols-3">
         <Stat
@@ -438,7 +455,7 @@ function ClarifyCard({
         </span>
         <div className="min-w-0 flex-1">
           <h3 dir="auto" className="text-sm font-black tracking-tight sm:text-base">{c.clarifyTitle}</h3>
-          <p dir="auto" className="mt-1 text-sm leading-relaxed break-words hyphens-auto text-foreground">{question}</p>
+          <p dir="auto" className="mt-1 text-[17px] leading-relaxed break-words hyphens-auto text-foreground">{question}</p>
           <p dir="auto" className="mt-1 text-xs leading-relaxed text-muted-foreground">{c.clarifyHint}</p>
 
           <form
@@ -452,7 +469,7 @@ function ClarifyCard({
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               placeholder={c.clarifyPlaceholder}
-              className="w-full min-w-0 rounded-2xl bg-muted/40 px-4 py-3 text-sm outline-none placeholder:text-muted-foreground focus:bg-muted/60"
+              className="w-full min-w-0 rounded-2xl bg-muted/40 px-4 py-3 text-[16px] outline-none placeholder:text-muted-foreground focus:bg-muted/60"
             />
             <div className="flex flex-wrap gap-2">
               <button
@@ -546,7 +563,7 @@ function Timeline({
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 dir="auto" className="text-[clamp(1.25rem,2.6vw,1.7rem)] font-black tracking-tight">{c.stepsHeading}</h2>
-          <p dir="auto" className="mt-1 text-sm text-muted-foreground">{c.stepsHint}</p>
+          <p dir="auto" className="mt-1 text-[15px] text-muted-foreground sm:text-base">{c.stepsHint}</p>
         </div>
         <button
           onClick={onReset}
@@ -633,13 +650,13 @@ function TaskRow({
                 className="min-w-0 flex-1 rounded-xl bg-muted/50 px-3 py-1.5 text-sm font-bold outline-none"
               />
             ) : (
-              <h3 dir="auto" className={`text-sm font-black tracking-tight sm:text-base ${skipped ? "line-through" : ""}`}>
+              <h3 dir="auto" className={`text-[17px] font-black tracking-tight sm:text-[18px] ${skipped ? "line-through" : ""}`}>
                 {task.title}
               </h3>
             )}
           </div>
 
-          {task.detail && <p dir="auto" className="mt-1 text-sm leading-relaxed text-muted-foreground">{task.detail}</p>}
+          {task.detail && <p dir="auto" className="mt-1 text-[16px] leading-relaxed text-muted-foreground">{task.detail}</p>}
 
           <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-muted-foreground">
             {task.locationNote && (
