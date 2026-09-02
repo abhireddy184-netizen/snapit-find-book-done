@@ -588,6 +588,8 @@ export function OutcomeComposer() {
       <div dir={isRtlText(request) ? "rtl" : "ltr"} className="relative">
         <textarea
           id="gpb-outcome"
+          ref={textareaRef}
+
           dir="auto"
           value={request}
           onChange={(e) => {
