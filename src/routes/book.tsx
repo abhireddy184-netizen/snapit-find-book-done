@@ -226,6 +226,21 @@ function BookPage() {
   const activeDay = days.find((d) => d.iso === dateIso) ?? null;
   const scheduleReady = Boolean(timeZone && dateIso && slotMinute != null);
 
+  // One stable key per distinct request. Retrying the same confirmation reuses
+  // it (so the database rejects the duplicate); changing the pro, the slot or
+  // the address makes it a genuinely different request.
+  const keySeed = `${provider?.user_id ?? ""}|${jobId ?? ""}|${dateIso ?? ""}|${slotMinute ?? ""}|${address.trim()}`;
+  const keyRef = useRef<{ seed: string; key: string } | null>(null);
+  if (keyRef.current?.seed !== keySeed) {
+    keyRef.current = {
+      seed: keySeed,
+      key: typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    };
+  }
+  const requestKey = keyRef.current.key;
+
   const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
 
