@@ -486,7 +486,14 @@ function SnapPage() {
         )}
 
         {analysis && (image || textOnly) && (
-          <AnalysisView analysis={analysis} image={image} onReset={reset} onAnswer={(t) => void runFollowUp(t)} />
+          <AnalysisView
+            analysis={analysis}
+            image={image}
+            onReset={reset}
+            onAnswer={(t) => void runFollowUp(t)}
+            onResolve={() => void resolveNow()}
+          />
+
         )}
       </div>
     </AppShell>
