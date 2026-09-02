@@ -213,6 +213,8 @@ export const catalog: MasterCategory[] = [
       s("dishwasher-service", "Dishwasher Repair & Install", "Leaks, poor cleaning or a new install.", 130, 600, { cues: ["dishwasher"] }),
       s("oven-range-repair", "Oven & Range Repair", "Uneven heat, igniters, elements and controls.", 140, 700, { cues: ["oven", "stove", "range"] }),
       s("microwave-service", "Microwave Repair & Install", "Over-range replacement and repairs.", 120, 480 ),
+      s("tv-repair", "TV & Screen Repair", "No power, no picture, sound, ports or cracked panel — diagnosed and repaired.", 120, 550, { featured: true, cues: ["tv", "television", "screen", "no picture"] }),
+      s("tv-setup", "TV Setup & Troubleshooting", "Inputs, sound bars, streaming boxes and signal problems sorted.", 90, 280, { cues: ["tv setup", "hdmi", "signal"] }),
       s("appliance-installation", "Appliance Installation", "Delivery-day hookup for any major appliance.", 90, 350, { featured: true }),
       s("appliance-diagnosis", "Appliance Diagnosis Visit", "One visit, clear answer on repair vs replace.", 79, 160 ),
     ],
