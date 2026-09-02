@@ -154,15 +154,21 @@ function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const keyboardOpen = useKeyboardOpen();
   const { user } = useAuth();
-  const items = [
-    { key: "home", to: "/" as const, label: "Home", icon: Home },
-    { key: "search", to: "/search" as const, label: "Search", icon: Search },
-    { key: "snap", to: "/snap" as const, label: "Show GPB", icon: Camera, highlight: true },
-    { key: "bookings", to: "/dashboard" as const, label: "Bookings", icon: CalendarDays },
+  const items: Array<{
+    key: string;
+    to: "/" | "/search" | "/snap" | "/dashboard" | "/login";
+    label: string;
+    icon: typeof Home;
+    highlight?: boolean;
+  }> = [
+    { key: "home", to: "/", label: "Home", icon: Home },
+    { key: "search", to: "/search", label: "Search", icon: Search },
+    { key: "snap", to: "/snap", label: "Show GPB", icon: Camera, highlight: true },
+    { key: "bookings", to: "/dashboard", label: "Bookings", icon: CalendarDays },
     // Signed-out visitors get a real entry point instead of a silent redirect.
     user
-      ? { key: "profile", to: "/dashboard" as const, label: "Profile", icon: User }
-      : { key: "profile", to: "/login" as const, label: "Log in", icon: User },
+      ? { key: "profile", to: "/dashboard", label: "Profile", icon: User }
+      : { key: "profile", to: "/login", label: "Log in", icon: User },
   ];
   return (
     <nav
@@ -173,20 +179,25 @@ function BottomNav() {
       )}
     >
       <div className="glass-strong mx-auto flex items-stretch justify-around rounded-full px-2 py-2 shadow-[0_20px_60px_-20px_color-mix(in oklab, var(--plum) 22%, transparent)]">
-        {items.map((it, i) => {
+        {items.map((it) => {
           const active = it.key === "home" ? pathname === "/" : pathname.startsWith(it.to);
-
           const Icon = it.icon;
+          const search =
+            it.to === "/search"
+              ? { q: "", loc: "" }
+              : it.to === "/login"
+                ? { redirect: undefined }
+                : undefined;
           if (it.highlight) {
             return (
               <Link
-                key={i}
+                key={it.key}
                 to={it.to}
                 className="-mt-7 flex flex-col items-center gap-1"
                 aria-label="Show GPB — camera diagnosis"
               >
                 <span
-                  className="grid h-14 w-14 place-items-center rounded-full text-white shadow-xl ring-4 ring-white transition-transform hover:scale-105"
+                  className="grid h-14 w-14 place-items-center rounded-full text-white shadow-xl ring-4 ring-card transition-transform hover:scale-105"
                   style={{ background: "var(--gradient-primary)", boxShadow: "0 16px 40px -12px color-mix(in oklab, var(--primary) 60%, transparent)" }}
                 >
                   <Icon className="h-6 w-6" />
@@ -197,11 +208,12 @@ function BottomNav() {
           }
           return (
             <Link
-              key={i}
+              key={it.key}
               to={it.to}
-              {...(it.to === "/search" ? { search: { q: "", loc: "" } } : {})}
+              {...(search ? { search } : {})}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "flex flex-1 flex-col items-center gap-1 rounded-full px-2 py-1.5 text-[10px] font-medium transition-colors",
+                "flex min-h-11 flex-1 flex-col items-center justify-center gap-1 rounded-full px-2 py-1.5 text-[10px] font-medium transition-colors",
                 active ? "text-primary" : "text-muted-foreground"
               )}
             >
@@ -209,6 +221,11 @@ function BottomNav() {
               <span className="truncate">{it.label}</span>
             </Link>
           );
+        })}
+      </div>
+    </nav>
+  );
+
         })}
       </div>
     </nav>
