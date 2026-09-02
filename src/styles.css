@@ -53,6 +53,13 @@
   --color-lavender: var(--lavender);
   --color-lemon: var(--lemon);
   --color-ivory: var(--ivory);
+  --color-mauve: var(--mauve);
+  --color-mauve-ink: var(--mauve-ink);
+  --color-steel: var(--steel);
+  --color-steel-ink: var(--steel-ink);
+  --color-trust: var(--trust);
+  --color-trust-ink: var(--trust-ink);
+  --color-trust-foreground: var(--trust-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
