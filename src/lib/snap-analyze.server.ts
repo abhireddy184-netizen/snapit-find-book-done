@@ -270,8 +270,9 @@ export function normalizeAnalysis(
           : responseKind === "options"
             ? "A few GPB services could fit — which one sounds right?"
             : cat?.name ?? "Let's narrow this down"),
-    category: (aiCategory ? parsed.category?.trim() : inferredService?.label) || cat?.name || "",
+    category: (inferredService?.label || (aiCategory ? parsed.category?.trim() : "")) || cat?.name || "",
     categorySlug,
+    serviceSlug: inferredService?.serviceSlug,
 
     confidence: Math.min(1, Math.max(0, Number(parsed.confidence ?? 0.5))),
     problem: parsed.problem?.trim() ||
