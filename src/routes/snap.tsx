@@ -27,6 +27,7 @@ import {
   X,
   History as HistoryIcon,
   ClipboardList,
+  CalendarClock,
 } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
