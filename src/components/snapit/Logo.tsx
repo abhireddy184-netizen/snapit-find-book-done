@@ -70,7 +70,16 @@ export function BrandMark({
   );
 }
 
-export function Logo({ compact = false, onColor = false }: { compact?: boolean; onColor?: boolean }) {
+export function Logo({
+  compact = false,
+  onColor = false,
+  /** The tagline belongs in the footer; the header lockup stays a single line. */
+  showTagline = false,
+}: {
+  compact?: boolean;
+  onColor?: boolean;
+  showTagline?: boolean;
+}) {
   return (
     <Link to="/" className="flex min-w-0 items-center gap-2.5" aria-label="GetPros.ai home">
       <BrandMark size={36} onColor={onColor} className="h-9 w-9 sm:h-10 sm:w-10" />
@@ -79,15 +88,16 @@ export function Logo({ compact = false, onColor = false }: { compact?: boolean; 
            never overflows next to Log in / Sign up. */
         <span className="hidden min-w-0 leading-none min-[360px]:block">
           <span className="block">
-            {/* ".ai" only where there is room, so narrow phones show a clean
-                "GetPros" instead of a clipped wordmark. */}
-            <Wordmark size="clamp(1rem, 4.4vw, 1.2rem)" onColor={onColor} className="inline-block" />
+            <Wordmark size="clamp(1.05rem, 4.4vw, 1.3rem)" onColor={onColor} className="inline-block" />
           </span>
-          <span className={`mt-1 hidden truncate text-xs font-medium sm:block ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
-            Whatever you need. Consider it done.
-          </span>
+          {showTagline && (
+            <span className={`mt-1.5 hidden truncate text-xs font-medium sm:block ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
+              Whatever you need. Consider it done.
+            </span>
+          )}
         </span>
       )}
     </Link>
   );
 }
+
