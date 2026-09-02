@@ -1,14 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Check, Camera, ChevronLeft, ChevronRight, MapPin, Loader2 } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, MapPin, Loader2, ShieldCheck, AlertTriangle } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { providers, getProvider } from "@/lib/snapit-data";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BOOKING_DRAFT_KEY } from "@/lib/bookings";
+import { catalog, getCategoryBySlug, type MasterCategory } from "@/lib/catalog";
+import { fetchProviderByUserId, isBookable, type PublicProvider } from "@/lib/providers";
+import { fetchAvailability, fetchBusy } from "@/lib/schedule";
+import type { WeeklyHours } from "@/lib/service-hours";
 import {
-  DEFAULT_DURATION_MINUTES,
-  DEFAULT_TRAVEL_BUFFER_MINUTES,
   addDaysIso,
   formatSlot,
   resolveServiceLocation,
@@ -25,10 +26,10 @@ type BookingDraft = {
   date: string;
   time: string;
   providerId?: string;
+  categorySlug?: string;
+  jobId?: string;
 };
 
-/** Total minutes we must fit inside the 8:00 AM–8:00 PM local service window. */
-const TOTAL_MINUTES = DEFAULT_DURATION_MINUTES + DEFAULT_TRAVEL_BUFFER_MINUTES;
 /** Customers can't book a pro for right now — give everyone lead time. */
 const LEAD_TIME_MINUTES = 120;
 
@@ -40,14 +41,14 @@ function dayLabel(isoDate: string, today: string): string {
   });
 }
 
-type BookSearch = { provider?: string; job?: string; service?: string; pro?: string };
+type BookSearch = { provider?: string; job?: string; service?: string; category?: string };
 
 export const Route = createFileRoute("/book")({
   validateSearch: (search: Record<string, unknown>): BookSearch => ({
     provider: typeof search['provider'] === "string" ? (search['provider'] as string) : undefined,
     job: typeof search['job'] === "string" ? (search['job'] as string) : undefined,
     service: typeof search['service'] === "string" ? (search['service'] as string) : undefined,
-    pro: typeof search['pro'] === "string" ? (search['pro'] as string) : undefined,
+    category: typeof search['category'] === "string" ? (search['category'] as string) : undefined,
   }),
   head: () => ({
     meta: [
@@ -60,28 +61,81 @@ export const Route = createFileRoute("/book")({
   component: BookPage,
 });
 
-const steps = ["Service", "Details", "Photos", "Address", "Schedule", "Review"];
+const steps = ["Service", "Details", "Address", "Schedule", "Review"];
+
+/** Match a provider's stored category label to a catalog category. */
+function categoryFor(provider: PublicProvider | null, slug?: string): MasterCategory | null {
+  if (slug) {
+    const hit = getCategoryBySlug(slug);
+    if (hit) return hit;
+  }
+  const raw = provider?.service_category?.toLowerCase().trim();
+  if (!raw) return null;
+  return (
+    catalog.find((c) => c.slug === raw || c.providerCategory === raw || c.name.toLowerCase() === raw) ?? null
+  );
+}
 
 function BookPage() {
   const navigate = useNavigate();
-  const { provider: providerParam, job: jobId, service: serviceParam, pro: proParam } = Route.useSearch();
+  const { provider: providerParam, job: jobId, service: serviceParam, category: categoryParam } = Route.useSearch();
   const { user, loading: authLoading } = useAuth();
+
   const [step, setStep] = useState(0);
-  const [service, setService] = useState(serviceParam || "Leak repair");
+  const [provider, setProvider] = useState<PublicProvider | null>(null);
+  const [providerState, setProviderState] = useState<"loading" | "ready" | "missing">(
+    providerParam ? "loading" : "missing",
+  );
+  const [hours, setHours] = useState<WeeklyHours[] | null>(null);
+  const [busy, setBusy] = useState<{ startAt: string; endAt: string }[]>([]);
+  const [scheduleLoading, setScheduleLoading] = useState(false);
+
+  const [service, setService] = useState(serviceParam || "");
   const [details, setDetails] = useState("");
-  const [photos, setPhotos] = useState<string[]>([]);
   const [address, setAddress] = useState("");
   const [location, setLocation] = useState<ServiceLocation | null>(null);
+  const [locationChecked, setLocationChecked] = useState(false);
   const [dateIso, setDateIso] = useState<string | null>(null);
   const [slotMinute, setSlotMinute] = useState<number | null>(null);
+  const [slotWasReset, setSlotWasReset] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [draftCategory, setDraftCategory] = useState<string | undefined>(undefined);
 
-  const pro = (providerParam ? getProvider(providerParam) : undefined) ?? providers[0];
-  const proName = proParam || pro.name;
+  // Load the real pro this booking will be assigned to. There is no fallback:
+  // a booking must name an actual GPB professional's account.
+  useEffect(() => {
+    if (!providerParam) { setProviderState("missing"); return; }
+    let cancelled = false;
+    setProviderState("loading");
+    void fetchProviderByUserId(providerParam)
+      .then((p) => {
+        if (cancelled) return;
+        if (p && isBookable(p)) { setProvider(p); setProviderState("ready"); }
+        else { setProvider(null); setProviderState("missing"); }
+      })
+      .catch(() => { if (!cancelled) setProviderState("missing"); });
+    return () => { cancelled = true; };
+  }, [providerParam]);
 
-  // Restore a draft saved when a guest was sent to sign in.
+  // The pro's own weekly hours and busy ranges drive the calendar.
+  useEffect(() => {
+    if (!provider) { setHours(null); setBusy([]); return; }
+    let cancelled = false;
+    setScheduleLoading(true);
+    void Promise.all([fetchAvailability(provider.user_id), fetchBusy(provider.user_id)])
+      .then(([h, b]) => { if (!cancelled) { setHours(h); setBusy(b); } })
+      .catch(() => { if (!cancelled) { setHours([]); setBusy([]); } })
+      .finally(() => { if (!cancelled) setScheduleLoading(false); });
+    return () => { cancelled = true; };
+  }, [provider]);
+
+  const category = categoryFor(provider, categoryParam ?? draftCategory);
+  const serviceOptions = category?.services.map((s) => s.name) ?? [];
+
+  // Restore a draft saved when a guest was sent to sign in. We keep the pro,
+  // the service and the job, and re-validate the slot below.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const raw = window.localStorage.getItem(BOOKING_DRAFT_KEY);
@@ -92,12 +146,27 @@ function BookPage() {
       if (draft.service) setService(draft.service);
       if (draft.details) setDetails(draft.details);
       if (draft.address) setAddress(draft.address);
+      if (draft.categorySlug) setDraftCategory(draft.categorySlug);
       if (draft.date) setDateIso(draft.date);
       if (draft.time) setSlotMinute(Number(draft.time) || null);
+      if (draft.providerId && draft.providerId !== providerParam) {
+        void navigate({
+          to: "/book",
+          search: {
+            provider: draft.providerId,
+            ...(draft.jobId ? { job: draft.jobId } : {}),
+            ...(draft.service ? { service: draft.service } : {}),
+            ...(draft.categorySlug ? { category: draft.categorySlug } : {}),
+          },
+          replace: true,
+        });
+      }
       setStep(steps.length - 1);
     } catch {
       /* ignore malformed draft */
     }
+    // Runs once on mount; the redirect above carries the pro through.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // The service address decides the timezone — never the customer's device.
@@ -105,35 +174,49 @@ function BookPage() {
   useEffect(() => {
     let cancelled = false;
     const value = address.trim();
+    setLocationChecked(false);
     if (!value) { setLocation(null); return; }
     void resolveServiceLocation(value).then((loc) => {
-      if (!cancelled) setLocation(loc);
+      if (!cancelled) { setLocation(loc); setLocationChecked(true); }
     });
     return () => { cancelled = true; };
   }, [address]);
 
+  const durationMinutes = provider?.default_duration_minutes ?? 60;
+  const bufferMinutes = provider?.travel_buffer_minutes ?? 0;
   const timeZone = location?.timeZone ?? null;
   const notBefore = useMemo(() => new Date(Date.now() + LEAD_TIME_MINUTES * 60_000), []);
   const today = timeZone ? todayInZone(timeZone, notBefore) : null;
 
   const days = useMemo(() => {
-    if (!timeZone || !today) return [] as { iso: string; label: string; slots: number[] }[];
-    return Array.from({ length: 7 }, (_, i) => {
+    if (!timeZone || !today || !provider || hours == null) {
+      return [] as { iso: string; label: string; slots: number[] }[];
+    }
+    return Array.from({ length: 14 }, (_, i) => {
       const iso = addDaysIso(today, i);
       return {
         iso,
         label: dayLabel(iso, today),
-        slots: slotsForDate(iso, { totalMinutes: TOTAL_MINUTES, timeZone, notBefore }),
+        slots: slotsForDate(iso, { durationMinutes, bufferMinutes, timeZone, hours, busy, notBefore }),
       };
     }).filter((d) => d.slots.length > 0);
-  }, [timeZone, today, notBefore]);
+  }, [timeZone, today, provider, hours, busy, durationMinutes, bufferMinutes, notBefore]);
 
-  // Keep the selection valid whenever the address (and so the calendar) changes.
+  // Keep the selection valid, and tell the customer when their saved slot went
+  // away instead of silently moving them to another day.
   useEffect(() => {
-    if (days.length === 0) { setDateIso(null); setSlotMinute(null); return; }
-    const current = days.find((d) => d.iso === dateIso) ?? days[0]!;
-    if (current.iso !== dateIso) setDateIso(current.iso);
-    if (slotMinute == null || !current.slots.includes(slotMinute)) setSlotMinute(current.slots[0]!);
+    if (days.length === 0) return;
+    const current = days.find((d) => d.iso === dateIso);
+    if (!current) {
+      if (dateIso || slotMinute != null) setSlotWasReset(true);
+      setDateIso(null);
+      setSlotMinute(null);
+      return;
+    }
+    if (slotMinute != null && !current.slots.includes(slotMinute)) {
+      setSlotWasReset(true);
+      setSlotMinute(null);
+    }
   }, [days, dateIso, slotMinute]);
 
   const activeDay = days.find((d) => d.iso === dateIso) ?? null;
@@ -144,26 +227,27 @@ function BookPage() {
 
   const submit = async () => {
     setError(null);
-    if (!address.trim()) {
-      setError("Please add a service address before confirming.");
-      setStep(3);
-      return;
-    }
+    if (!provider) { setError("Pick a professional before confirming."); return; }
+    if (!service.trim()) { setError("Choose the service you need."); setStep(0); return; }
+    if (!address.trim()) { setError("Please add a service address before confirming."); setStep(2); return; }
     if (!location) {
-      setError("Add a US ZIP code to your address so we can schedule in your local time.");
-      setStep(3);
+      setError("Add a US ZIP code we serve to your address so we can schedule in the right local time.");
+      setStep(2);
       return;
     }
     if (!dateIso || slotMinute == null) {
       setError("Pick a date and start time for your job.");
-      setStep(4);
+      setStep(3);
       return;
     }
 
     if (!user) {
       if (typeof window !== "undefined") {
         const draft: BookingDraft = {
-          service, details, address, date: dateIso, time: String(slotMinute), providerId: pro.id,
+          service, details, address, date: dateIso, time: String(slotMinute),
+          providerId: provider.user_id,
+          ...(category ? { categorySlug: category.slug } : {}),
+          ...(jobId ? { jobId } : {}),
         };
         window.localStorage.setItem(BOOKING_DRAFT_KEY, JSON.stringify(draft));
       }
@@ -173,15 +257,16 @@ function BookPage() {
 
     // Store the exact instant alongside the local wall time, so the job means
     // the same moment to the customer and the pro wherever each of them is.
+    // The database recomputes end_at / occupied_end_at and re-checks the
+    // window, the pro's hours, time off and overlaps — this is convenience.
     const startAt = zonedTimeToUtc(dateIso, slotMinute, location.timeZone);
-    const endAt = new Date(startAt.getTime() + DEFAULT_DURATION_MINUTES * 60_000);
     const timeLabel = formatSlot(slotMinute);
 
     setSubmitting(true);
     const { error: insertError } = await supabase.from("bookings").insert({
       customer_id: user.id,
-      provider_id: null,
-      provider_name_snapshot: proName,
+      provider_id: provider.user_id,
+      provider_name_snapshot: provider.business_name,
       job_id: jobId ?? null,
       service,
       details: details || null,
@@ -189,14 +274,26 @@ function BookPage() {
       scheduled_date: dateIso,
       scheduled_time: timeLabel,
       start_at: startAt.toISOString(),
-      end_at: endAt.toISOString(),
+      duration_minutes: durationMinutes,
+      buffer_minutes: bufferMinutes,
       service_timezone: location.timeZone,
       status: "pending",
     });
-    setSubmitting(false);
 
     if (insertError) {
-      setError("We couldn't save your request. Please try again.");
+      setSubmitting(false);
+      // Someone else may have taken the slot while this form was open.
+      const taken = /overlap|exclusion|conflict/i.test(insertError.message);
+      setError(
+        taken
+          ? "That time was just taken. Pick another slot and we'll try again."
+          : insertError.message || "We couldn't save your request. Please try again.",
+      );
+      if (taken) {
+        setSlotMinute(null);
+        setBusy(await fetchBusy(provider.user_id).catch(() => busy));
+        setStep(3);
+      }
       return;
     }
 
@@ -212,7 +309,7 @@ function BookPage() {
         .eq("id", jobId);
     }
 
-
+    setSubmitting(false);
     setConfirmed(true);
     setTimeout(() => {
       if (jobId) void navigate({ to: "/job/$id", params: { id: jobId } });
@@ -227,14 +324,48 @@ function BookPage() {
           <div className="mx-auto grid h-16 w-16 place-items-center rounded-full text-white shadow-lg" style={{ background: "var(--gradient-primary)" }}>
             <Check className="h-8 w-8" strokeWidth={3} />
           </div>
-          <h1 className="mt-4 text-2xl font-black">Request sent!</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Your pro will confirm shortly. We'll notify you as soon as they do.</p>
+          <h1 className="mt-4 text-2xl font-black">Request sent</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            {provider?.business_name ?? "Your pro"} now has your request. It stays <strong>pending</strong> until they
+            accept it — you'll see the status change in your dashboard.
+          </p>
         </div>
       </AppShell>
     );
   }
 
-  const photoGrads = ["from-[#FF3D8D] to-[#FF7A45]", "from-[#FFD83D] to-[#FF9E2C]", "from-[#4ED6A0] to-[#6EC8FF]"];
+  if (providerState !== "ready" || !provider) {
+    return (
+      <AppShell hideBottomNav>
+        <div className="mx-auto mt-12 max-w-md rounded-3xl border border-border/60 bg-card p-7 text-center shadow-sm">
+          {providerState === "loading" ? (
+            <>
+              <Loader2 className="mx-auto h-6 w-6 animate-spin text-primary" />
+              <p className="mt-3 text-sm text-muted-foreground">Checking this professional's availability…</p>
+            </>
+          ) : (
+            <>
+              <div className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-muted">
+                <AlertTriangle className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <h1 className="mt-3 text-xl font-black">Choose a professional first</h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                GPB only books real, verified pros who are currently accepting work. We won't create a request that
+                nobody receives.
+              </p>
+              <Link
+                to="/search"
+                className="mt-4 inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white"
+                style={{ background: "var(--gradient-primary)" }}
+              >
+                Find a pro <ChevronRight className="h-4 w-4" />
+              </Link>
+            </>
+          )}
+        </div>
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell hideBottomNav>
@@ -249,21 +380,49 @@ function BookPage() {
           </div>
         </div>
 
+        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
+          <Avatar initials={provider.business_name.slice(0, 2).toUpperCase()} gradient={category?.gradient ?? "from-[#E2704B] to-[#C0468F]"} />
+          <div className="min-w-0">
+            <div className="truncate text-sm font-black">{provider.business_name}</div>
+            <div className="truncate text-xs text-muted-foreground">
+              {provider.service_category ?? "GPB pro"}
+              {provider.service_zip ? ` · serves ${provider.service_zip}` : ""}
+            </div>
+          </div>
+          {provider.verification_status === "verified" && (
+            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-mint-ink">
+              <ShieldCheck className="h-3 w-3" /> Verified
+            </span>
+          )}
+        </div>
+
         <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
           {step === 0 && (
-            <StepWrap title="What do you need?" subtitle="Pick the service that best matches your job.">
-              <div className="grid gap-2">
-                {["Leak repair", "Drain unclog", "Water heater", "Toilet install", "Other"].map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => setService(opt)}
-                    className={`flex items-center justify-between rounded-xl border p-4 text-left text-sm font-medium ${service === opt ? "border-primary bg-primary/5 text-primary" : "border-border bg-background"}`}
-                  >
-                    {opt}
-                    {service === opt && <Check className="h-4 w-4" />}
-                  </button>
-                ))}
-              </div>
+            <StepWrap
+              title="What do you need?"
+              subtitle={category ? `Services ${provider.business_name} offers under ${category.name}.` : "Tell us what the job is."}
+            >
+              {serviceOptions.length > 0 ? (
+                <div className="grid gap-2">
+                  {serviceOptions.map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => setService(opt)}
+                      className={`flex items-center justify-between rounded-xl border p-4 text-left text-sm font-medium ${service === opt ? "border-primary bg-primary/5 text-primary" : "border-border bg-background"}`}
+                    >
+                      {opt}
+                      {service === opt && <Check className="h-4 w-4" />}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <input
+                  value={service}
+                  onChange={(e) => setService(e.target.value)}
+                  placeholder="e.g. Kitchen sink leak repair"
+                  className="w-full rounded-xl border border-border bg-background p-4 text-sm outline-none focus:border-primary"
+                />
+              )}
             </StepWrap>
           )}
 
@@ -276,47 +435,42 @@ function BookPage() {
                 placeholder="e.g. Kitchen sink is leaking under the cabinet..."
                 className="w-full rounded-xl border border-border bg-background p-4 text-sm outline-none focus:border-primary"
               />
+              <p className="mt-3 text-xs text-muted-foreground">
+                Photo attachments aren't available on booking requests yet — describe the job here, or start from
+                <Link to="/snap" className="ml-1 font-semibold text-primary">Snap a problem</Link> to send pictures with an
+                AI diagnosis.
+              </p>
             </StepWrap>
           )}
 
           {step === 2 && (
-            <StepWrap title="Add photos" subtitle="Snap a few photos so the pro can prep the right tools.">
-              <div className="grid grid-cols-3 gap-3">
-                {photos.map((g, i) => (
-                  <div key={i} className={`aspect-square rounded-xl bg-gradient-to-br ${g}`} />
-                ))}
-                <button
-                  onClick={() => setPhotos((p) => [...p, photoGrads[p.length % photoGrads.length]])}
-                  className="grid aspect-square place-items-center rounded-xl border-2 border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary"
-                >
-                  <div className="flex flex-col items-center gap-1 text-xs font-semibold">
-                    <Camera className="h-5 w-5" />
-                    Add
-                  </div>
-                </button>
-              </div>
-              <p className="mt-3 text-xs text-muted-foreground">Photos are optional but recommended.</p>
-            </StepWrap>
-          )}
-
-          {step === 3 && (
             <StepWrap title="Service address" subtitle="Where should the pro meet you?">
               <label className="flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-3">
                 <MapPin className="h-4 w-4 shrink-0 text-primary" />
                 <input
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="123 Main St, Springfield"
+                  placeholder="123 Main St, Springfield 75034"
                   className="min-w-0 flex-1 bg-transparent text-sm outline-none"
                 />
               </label>
+              {locationChecked && !location && (
+                <p className="mt-2 text-xs font-medium text-destructive">
+                  We couldn't place that address in a US area we schedule for. Add a valid US ZIP code.
+                </p>
+              )}
+              {location && (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Scheduling in {location.city}, {location.state} local time ({location.timeZone}).
+                </p>
+              )}
               <div className="mt-3 rounded-xl bg-muted/50 p-3 text-xs text-muted-foreground">
                 Your exact address is only shared with the pro after they confirm.
               </div>
             </StepWrap>
           )}
 
-          {step === 4 && (
+          {step === 3 && (
             <StepWrap
               title="Pick date & time"
               subtitle={
@@ -325,16 +479,25 @@ function BookPage() {
                   : "Add a US ZIP code to your address and we'll show real local availability."
               }
             >
+              {slotWasReset && (
+                <div className="mb-3 rounded-2xl border border-amber-300/60 bg-amber-50 p-3 text-xs font-medium text-amber-900">
+                  Your earlier time is no longer open. Please choose a new one — we haven't changed your date for you.
+                </div>
+              )}
               {!location ? (
                 <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
                   We schedule in the service address's own timezone, so we need a US ZIP code first.
-                  <button onClick={() => setStep(3)} className="ml-1 font-bold text-primary underline">
+                  <button onClick={() => setStep(2)} className="ml-1 font-bold text-primary underline">
                     Add your address
                   </button>
                 </div>
+              ) : scheduleLoading ? (
+                <div className="flex items-center gap-2 rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Loading {provider.business_name}'s real openings…
+                </div>
               ) : days.length === 0 ? (
                 <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
-                  No openings in the next 7 days for a job this length. Try a different address or contact support.
+                  {provider.business_name} has no openings in the next 14 days for a job this length. Try another pro.
                 </div>
               ) : (
                 <>
@@ -342,47 +505,44 @@ function BookPage() {
                     {days.map((d) => (
                       <button
                         key={d.iso}
-                        onClick={() => { setDateIso(d.iso); setSlotMinute(d.slots[0]!); }}
+                        onClick={() => { setDateIso(d.iso); setSlotMinute(null); }}
                         className={`shrink-0 snap-start rounded-xl border px-4 py-2 text-sm font-semibold ${dateIso === d.iso ? "border-primary bg-primary text-white" : "border-border bg-background"}`}
                       >
                         {d.label}
                       </button>
                     ))}
                   </div>
-                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                    {(activeDay?.slots ?? []).map((m) => (
-                      <button
-                        key={m}
-                        onClick={() => setSlotMinute(m)}
-                        className={`rounded-full border px-3 py-2 text-xs font-semibold ${slotMinute === m ? "border-primary bg-primary/10 text-primary" : "border-border"}`}
-                      >
-                        {formatSlot(m)}
-                      </button>
-                    ))}
-                  </div>
+                  {activeDay ? (
+                    <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                      {activeDay.slots.map((m) => (
+                        <button
+                          key={m}
+                          onClick={() => { setSlotMinute(m); setSlotWasReset(false); }}
+                          className={`rounded-full border px-3 py-2 text-xs font-semibold ${slotMinute === m ? "border-primary bg-primary/10 text-primary" : "border-border"}`}
+                        >
+                          {formatSlot(m)}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">Pick a day to see open times.</p>
+                  )}
                   <p className="mt-3 text-xs text-muted-foreground">
-                    We hold about {DEFAULT_DURATION_MINUTES} minutes for the job plus {DEFAULT_TRAVEL_BUFFER_MINUTES} minutes
-                    of travel, and the earliest slot is {LEAD_TIME_MINUTES / 60} hours from now.
+                    {provider.business_name} holds {durationMinutes} minutes for this job
+                    {bufferMinutes > 0 ? ` plus ${bufferMinutes} minutes of travel` : ""}, and the earliest slot is
+                    {" "}{LEAD_TIME_MINUTES / 60} hours from now.
                   </p>
                 </>
               )}
             </StepWrap>
           )}
 
-
-          {step === 5 && (
+          {step === 4 && (
             <StepWrap title="Review your request" subtitle="Confirm the details below to send it to your pro.">
-              <div className="flex items-center gap-3 rounded-xl bg-muted/40 p-3">
-                <Avatar initials={pro.initials} gradient={pro.gradient} />
-                <div className="min-w-0">
-                  <div className="truncate text-sm font-bold">{pro.name}</div>
-                  <div className="truncate text-xs text-muted-foreground">{pro.business}</div>
-                </div>
-              </div>
-              <dl className="mt-4 space-y-2 text-sm">
-                <Row label="Service" value={service} />
+              <dl className="space-y-2 text-sm">
+                <Row label="Pro" value={provider.business_name} />
+                <Row label="Service" value={service || "—"} />
                 <Row label="Details" value={details || "—"} />
-                <Row label="Photos" value={`${photos.length} attached`} />
                 <Row label="Address" value={address || "—"} />
                 <Row
                   label="Date & time"
@@ -392,9 +552,12 @@ function BookPage() {
                       : "Not set"
                   }
                 />
-
-                <Row label="Estimated start" value={`$${pro.startingPrice}`} />
+                <Row label="Held" value={`${durationMinutes} min job${bufferMinutes > 0 ? ` + ${bufferMinutes} min travel` : ""}`} />
               </dl>
+              <p className="mt-4 text-xs text-muted-foreground">
+                Sending this creates a <strong>pending</strong> request. It becomes a confirmed job only when
+                {" "}{provider.business_name} accepts it.
+              </p>
             </StepWrap>
           )}
 
@@ -407,10 +570,12 @@ function BookPage() {
               <ChevronLeft className="h-4 w-4" /> Back
             </button>
             {step < steps.length - 1 ? (
-              <GradientButton onClick={next} disabled={step === 4 && !scheduleReady}>
+              <GradientButton
+                onClick={next}
+                disabled={(step === 0 && !service.trim()) || (step === 3 && !scheduleReady)}
+              >
                 Continue <ChevronRight className="h-4 w-4" />
               </GradientButton>
-
             ) : (
               <GradientButton onClick={() => void submit()} disabled={submitting || authLoading}>
                 {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</> : <>Confirm request <Check className="h-4 w-4" /></>}
