@@ -997,58 +997,12 @@ function AnalysisView({
           <div>
             <h2 className="text-lg font-black">What a pro list will look like</h2>
             <p className="text-xs text-muted-foreground">
-              Sample profiles only — no real {String.raw`${""}`}GPB pros cover this trade in your area yet, so none of these can be
+              Sample profiles only — no real GPB pros cover this trade in your area yet, so none of these can be
               booked, messaged or sent a quote request.
             </p>
           </div>
-          <button
-            onClick={() => {
-              setQuoteMode((v) => !v);
-              setSelected([]);
-            }}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${
-              quoteMode ? "border-primary bg-primary/10 text-primary" : "border-border text-foreground hover:bg-muted"
-            }`}
-          >
-            {quoteMode ? (
-              <>
-                <X className="h-3.5 w-3.5" /> Cancel
-              </>
-            ) : (
-              <>
-                <Send className="h-3.5 w-3.5" /> Request quotes
-              </>
-            )}
-          </button>
         </div>
 
-        {quoteMode && (
-          <div className="mb-3 flex items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3 text-xs animate-fade-in">
-            <div className="flex items-center gap-2 font-semibold text-primary">
-              <Sparkles className="h-4 w-4" /> Select up to 5 pros to request quotes
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="rounded-full bg-primary/10 px-2 py-1 font-bold text-primary">
-                {selected.length}/5
-              </span>
-              <GradientButton
-                onClick={sendQuoteRequests}
-                disabled={selected.length === 0 || sent}
-                className="px-4 py-2 text-xs"
-              >
-                {sent ? (
-                  <>
-                    <Check className="h-3.5 w-3.5" /> Sent!
-                  </>
-                ) : (
-                  <>
-                    <Send className="h-3.5 w-3.5" /> Send ({selected.length})
-                  </>
-                )}
-              </GradientButton>
-            </div>
-          </div>
-        )}
 
         <div className="grid gap-3">
           {recommended && (
