@@ -282,12 +282,21 @@ function BookPage() {
       buffer_minutes: bufferMinutes,
       service_timezone: location.timeZone,
       status: "pending",
+      // A retry of the same request can never become a second booking.
+      idempotency_key: requestKey,
     });
 
-    if (insertError) {
+    // 23505 on the idempotency index means this exact request already landed —
+    // a double tap or a retried network call, not a new booking.
+    const alreadySent =
+      insertError != null &&
+      ((insertError as { code?: string }).code === "23505" ||
+        /idempotency/i.test(insertError.message));
+
+    if (insertError && !alreadySent) {
       setSubmitting(false);
       // Someone else may have taken the slot while this form was open.
-      const taken = /overlap|exclusion|conflict/i.test(insertError.message);
+      const taken = /overlap|exclusion|conflict|just taken/i.test(insertError.message);
       setError(
         taken
           ? "That time was just taken. Pick another slot and we'll try again."
@@ -302,15 +311,23 @@ function BookPage() {
     }
 
     if (jobId) {
-      await supabase
+      // The booking is only PENDING until the pro accepts, so the job stays in
+      // "quotes requested" — it flips to booked from the pro's acceptance, not
+      // from sending the request. A failure here is surfaced, never swallowed.
+      const { error: jobError } = await supabase
         .from("service_requests")
         .update({
-          status: "booked",
           service_address: address.trim(),
           preferred_date: dateIso,
           preferred_time: timeLabel,
         })
         .eq("id", jobId);
+      if (jobError) {
+        setSubmitting(false);
+        setError(
+          "Your request was sent, but we couldn't update the job record. Open the job to check its details.",
+        );
+      }
     }
 
     setSubmitting(false);
