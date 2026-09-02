@@ -64,6 +64,20 @@ function nowClockString() {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
+/** Today's local calendar date, so future-dated requests schedule correctly. */
+function nowDateString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function localTimeZone(): string | undefined {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function PlanPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
@@ -77,11 +91,24 @@ function PlanPage() {
     retry: false,
     queryFn: () =>
       runBuildPlan({
-        data: { request: search.q, location: search.loc, nowClock: nowClockString() },
-      }) as Promise<GpbPlan>,
+        data: {
+          request: search.q,
+          location: search.loc,
+          nowClock: nowClockString(),
+          nowDate: nowDateString(),
+          ...(localTimeZone() ? { timeZone: localTimeZone() as string } : {}),
+        },
+      }) as Promise<PlanResult>,
   });
 
-  const basePlan: GpbPlan | undefined = isDemo ? demoAirportPlan() : query.data;
+  const result = query.data;
+  const conversation = !isDemo && result?.kind === "conversation" ? result : undefined;
+  const basePlan: GpbPlan | undefined = isDemo
+    ? demoAirportPlan()
+    : result?.kind === "plan"
+      ? result.plan
+      : undefined;
+
 
   const [plan, setPlan] = useState<GpbPlan | undefined>(basePlan);
   const [replanApplied, setReplanApplied] = useState(false);
