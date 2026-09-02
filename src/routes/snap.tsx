@@ -32,8 +32,8 @@ import {
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
 import { getCategoryBySlug } from "@/lib/catalog";
-import { detectServiceIntentInText } from "@/lib/search-intent";
-import { createFastPathAnalysis } from "@/lib/snap-fast-path";
+import { detectServiceIntentInText, matchServiceIntent, rankServices } from "@/lib/search-intent";
+import { createFastPathAnalysis, createLocalOptionsAnalysis } from "@/lib/snap-fast-path";
 import { fetchBookableProviders, type ProviderMatch } from "@/lib/providers";
 import { extractZip, isZipCode, lookupZip } from "@/lib/us-zip";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
