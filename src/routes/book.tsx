@@ -6,6 +6,17 @@ import { providers, getProvider } from "@/lib/snapit-data";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BOOKING_DRAFT_KEY } from "@/lib/bookings";
+import {
+  DEFAULT_DURATION_MINUTES,
+  DEFAULT_TRAVEL_BUFFER_MINUTES,
+  addDaysIso,
+  formatSlot,
+  resolveServiceLocation,
+  slotsForDate,
+  todayInZone,
+  zonedTimeToUtc,
+  type ServiceLocation,
+} from "@/lib/service-hours";
 
 type BookingDraft = {
   service: string;
@@ -16,24 +27,17 @@ type BookingDraft = {
   providerId?: string;
 };
 
-const dayOptions = ["Today", "Tomorrow", "Wed", "Thu", "Fri", "Sat"];
+/** Total minutes we must fit inside the 8:00 AM–8:00 PM local service window. */
+const TOTAL_MINUTES = DEFAULT_DURATION_MINUTES + DEFAULT_TRAVEL_BUFFER_MINUTES;
+/** Customers can't book a pro for right now — give everyone lead time. */
+const LEAD_TIME_MINUTES = 120;
 
-function resolveDate(label: string): string {
-  const d = new Date();
-  const index = dayOptions.indexOf(label);
-  if (index <= 1) {
-    d.setDate(d.getDate() + index);
-  } else {
-    const targets = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-    const target = targets.indexOf(label.toLowerCase().slice(0, 3));
-    if (target >= 0) {
-      let diff = (target - d.getDay() + 7) % 7;
-      if (diff === 0) diff = 7;
-      d.setDate(d.getDate() + diff);
-    }
-  }
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+function dayLabel(isoDate: string, timeZone: string, today: string): string {
+  if (isoDate === today) return "Today";
+  if (isoDate === addDaysIso(today, 1)) return "Tomorrow";
+  return new Date(`${isoDate}T12:00:00Z`).toLocaleDateString("en-US", {
+    weekday: "short", month: "short", day: "numeric", timeZone: "UTC",
+  });
 }
 
 type BookSearch = { provider?: string; job?: string; service?: string; pro?: string };
