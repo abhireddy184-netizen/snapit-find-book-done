@@ -586,6 +586,7 @@ function Timeline({
             task={task}
             index={i}
             clock={formatClock(start + task.startOffsetMinutes, locale)}
+            dayShift={Math.floor((start + task.startOffsetMinutes) / 1440)}
             isLast={i === plan.tasks.length - 1}
             onMove={(dir) => onChange(move(plan.tasks, i, i + dir))}
             onToggleSkip={() =>
@@ -609,9 +610,9 @@ function Timeline({
 }
 
 function TaskRow({
-  c, task, index, clock, isLast, onMove, onToggleSkip, onRename, onDuration,
+  c, task, index, clock, dayShift, isLast, onMove, onToggleSkip, onRename, onDuration,
 }: {
-  c: Copy; task: PlanTask; index: number; clock: string; isLast: boolean;
+  c: Copy; task: PlanTask; index: number; clock: string; dayShift: number; isLast: boolean;
   onMove: (dir: number) => void; onToggleSkip: () => void;
   onRename: (title: string) => void; onDuration: (minutes: number) => void;
 }) {
@@ -628,7 +629,13 @@ function TaskRow({
     >
       <div className="grid gap-3 sm:grid-cols-[5.5rem_auto_minmax(0,1fr)] sm:items-start">
         <div className="flex items-center gap-2 sm:block">
-          <span className="text-sm font-black tracking-tight text-foreground">{skipped ? "—" : clock}</span>
+          <span className="text-sm font-black tracking-tight text-foreground">
+            {skipped ? "—" : clock}
+            {/* Past midnight the bare clock is ambiguous, so mark the next day. */}
+            {!skipped && dayShift > 0 && (
+              <span className="ml-1 align-top text-[10px] font-bold text-muted-foreground">+{dayShift}d</span>
+            )}
+          </span>
           <span className="block text-[11px] font-semibold text-muted-foreground">
             {task.durationMinutes > 0 ? `${task.durationMinutes} ${c.minutesShort}` : ""}
           </span>
