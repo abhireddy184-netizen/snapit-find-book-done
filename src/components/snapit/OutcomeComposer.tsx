@@ -395,8 +395,12 @@ export function OutcomeComposer() {
           return;
         }
         const base = baseTextRef.current;
-        setRequest(base ? `${base} ${spoken}` : spoken);
+        const finalText = base ? `${base} ${spoken}` : spoken;
+        setRequest(finalText);
         setVoiceStatus("idle");
+        // Authoritative transcript is in — start the silent countdown.
+        armAutoSubmit(finalText);
+
       } catch (err) {
         console.error("[gpb voice] transcription failed", err);
         setVoiceStatus("error");
