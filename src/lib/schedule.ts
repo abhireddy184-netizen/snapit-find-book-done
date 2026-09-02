@@ -82,19 +82,24 @@ export function toTimeOffRanges(rows: TimeOffRow[]): TimeOff[] {
   return rows.map((r) => ({ startsAt: r.starts_at, endsAt: r.ends_at }));
 }
 
-/** Booked time for a provider that new slots must avoid. */
-export async function fetchBusy(providerId: string): Promise<{ startAt: string; endAt: string }[]> {
-  const { data, error } = await supabase
-    .from("bookings")
-    .select("start_at,end_at,status")
-    .eq("provider_id", providerId)
-    .in("status", ["pending", "confirmed", "in_progress"])
-    .not("start_at", "is", null)
-    .gte("start_at", new Date().toISOString());
+/**
+ * Time a provider is unavailable, as anonymous [start,end) intervals.
+ * This RPC deliberately exposes no customer, address, reason or job detail —
+ * it merges bookings (job + travel buffer) and time off into bare ranges, so
+ * a customer picking a slot never reads another customer's data.
+ */
+export async function fetchBusy(
+  providerId: string,
+  from: Date = new Date(),
+  to: Date = new Date(Date.now() + 45 * 86_400_000),
+): Promise<{ startAt: string; endAt: string }[]> {
+  const { data, error } = await supabase.rpc("provider_busy_intervals", {
+    _provider_id: providerId,
+    _from: from.toISOString(),
+    _to: to.toISOString(),
+  });
   if (error) throw error;
-  return (data ?? [])
-    .filter((b): b is { start_at: string; end_at: string; status: BookingStatus } => Boolean(b.start_at && b.end_at))
-    .map((b) => ({ startAt: b.start_at, endAt: b.end_at }));
+  return (data ?? []).map((r) => ({ startAt: r.starts_at, endAt: r.ends_at }));
 }
 
 /* --------------------------------------------------------- job transitions */
