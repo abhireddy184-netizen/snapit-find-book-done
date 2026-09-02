@@ -56,7 +56,7 @@ function TopBar() {
           <Link to="/" hash="how-it-works" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">How it works</Link>
           <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Services</Link>
           <Link to="/provider-interest" data-analytics-id="provider_interest_cta" data-analytics-location="header" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">For Pros</Link>
-          <a href="/#early-access" data-analytics-id="early_access_cta" data-analytics-location="header" className="rounded-full px-3 py-1.5 font-semibold text-primary hover:bg-primary/5 transition-colors">Early Access</a>
+          <Link to="/" hash="early-access" data-analytics-id="early_access_cta" data-analytics-location="header" className="rounded-full px-3 py-1.5 font-semibold text-primary hover:bg-primary/5 transition-colors">Early Access</Link>
 
         </nav>
         <div className="flex shrink-0 items-center gap-1.5 justify-self-end sm:gap-2">
