@@ -154,6 +154,8 @@ function SnapPage() {
     setDescribeMode(false);
     setMediaKind(kind);
     setNote("");
+    setAskedQuestions([]);
+    setTurnCount(0);
     // Show the working state immediately — no dead period after capture.
     setLoading(true);
     setPhase("preparing");
