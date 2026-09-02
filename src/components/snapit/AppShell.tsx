@@ -192,6 +192,15 @@ function BottomNav() {
               <Link
                 key={it.key}
                 to={it.to}
+                onClick={(e) => {
+                  // Already on the Show GP screen with a photo/result open:
+                  // clear that state and reopen the camera in place instead
+                  // of a no-op navigation to the current route.
+                  if (pathname === "/snap") {
+                    e.preventDefault();
+                    window.dispatchEvent(new Event("getpros:recapture"));
+                  }
+                }}
                 className="-mt-7 flex flex-col items-center gap-1.5"
                 aria-label="Show GP — camera diagnosis"
               >

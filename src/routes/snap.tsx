@@ -124,6 +124,17 @@ function SnapPage() {
     // Invalidate any in-flight run when the page unmounts.
     runRef.current += 1;
   }, []);
+  // Tapping the center Show GP camera while this page is open: wipe the old
+  // photo/result and immediately reopen the camera so the new shot replaces it.
+  useEffect(() => {
+    const recapture = () => {
+      reset();
+      requestAnimationFrame(() => cameraRef.current?.click());
+    };
+    window.addEventListener("getpros:recapture", recapture);
+    return () => window.removeEventListener("getpros:recapture", recapture);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // Release the temporary preview blob URL whenever it's replaced or cleared.
   useEffect(() => {
     if (!pendingPreview) return;
