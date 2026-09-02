@@ -8,12 +8,13 @@ import { StableTranscript } from "@/lib/stable-transcript";
 
 
 const EXAMPLES = [
-  "I need dinner, groceries, and to be at DFW by 6 PM.",
-  "My parents arrive tomorrow. Get my apartment ready and pick them up.",
-  "I’m moving Saturday. Coordinate packing, movers, junk removal and cleaning.",
-  "My car is making a strange noise. Handle it.",
-  "Guests at 6pm — deep clean the living room and bath.",
+  "My kitchen sink is leaking under the cabinet.",
+  "I need a deep clean of a 2-bedroom apartment on Saturday.",
+  "Moving next weekend — need movers and packing help.",
+  "My TV won’t turn on. Can someone look at it?",
+  "Need someone to pick up a parcel and drop it at the post office.",
 ];
+
 
 const MAX_RECORD_MS = 60_000;
 // Rolling provisional transcription while the user is still speaking.
@@ -123,8 +124,9 @@ const VOICE_MESSAGES: Record<Exclude<VoiceStatus, "idle" | "listening" | "transc
 };
 
 /**
- * Outcome-first hero composer. Multi-part requests become one coordinated GPB
- * plan on /plan; the existing /search catalogue stays available as a fallback.
+ * Service-request hero composer. Photo, voice and typed requests all converge on
+ * request into the service understanding flow on /snap; the /services catalogue
+ * stays available as a browse fallback.
  *
  * Voice input: Web Speech API where available (Chrome/Edge/Android); on iPhone
  * Safari and other browsers without it, a short MediaRecorder clip is sent to a
@@ -135,7 +137,7 @@ export function OutcomeComposer() {
   const [request, setRequest] = useState("");
   const [loc, setLoc] = useState("");
   const [i, setI] = useState(0);
-  /** Set when someone submits an empty request — /plan would silently show the demo. */
+  /** Set when someone submits an empty request — nothing to understand yet. */
   const [emptyError, setEmptyError] = useState(false);
   const paused = useRef(false);
 
@@ -510,21 +512,23 @@ export function OutcomeComposer() {
   };
 
   /** Single exit point for both manual submit and the silent countdown. */
-  const goToPlan = (text: string) => {
+  const goToService = (text: string) => {
     const q = text.trim();
     if (!q || submittedRef.current) return;
     submittedRef.current = true;
     cancelAutoSubmit();
     setEmptyError(false);
-    void navigate({ to: "/plan", search: { q, loc: loc.trim() } });
+    // Photo, voice and text all converge on the same service understanding flow.
+    void navigate({ to: "/snap", search: { q, loc: loc.trim() } });
   };
 
-  // Countdown reaching zero builds the plan — never a booking, order or message.
+
+  // Countdown reaching zero finds the service — never a booking, order or message.
   useEffect(() => {
     if (autoSecs === null) return;
     if (autoSecs > 0) return;
     cancelAutoSubmit();
-    goToPlan(request);
+    goToService(request);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSecs]);
 
@@ -535,15 +539,14 @@ export function OutcomeComposer() {
       else stopRecordingAndTranscribe();
     }
     const q = request.trim();
-    // An empty request lands on /plan's demo plan, which reads like a real
-    // answer to a request that was never made. Ask for the words instead.
+    // Nothing to work with — ask for the words instead of sending an empty request.
     if (!q) {
       cancelAutoSubmit();
       setEmptyError(true);
       document.getElementById("gpb-outcome")?.focus();
       return;
     }
-    goToPlan(q);
+    goToService(q);
   };
 
 
@@ -574,7 +577,7 @@ export function OutcomeComposer() {
       className="rounded-[26px] border border-border/60 bg-card p-3 shadow-[var(--shadow-elevated)] sm:p-4"
     >
       <label htmlFor="gpb-outcome" className="sr-only">
-        Describe the outcome or the day you need handled
+        Describe the service you need
       </label>
       {/* Direction follows what the person actually typed: any RTL script
           (Arabic, Hebrew, Urdu, Persian, …) flips the text and the logical
@@ -654,7 +657,7 @@ export function OutcomeComposer() {
       )}
       {emptyError && (
         <p id="gpb-outcome-error" role="alert" className="mt-1.5 text-xs font-semibold text-destructive">
-          Tell GPB what you need first — type it or tap the mic.
+          Tell GPB what service you need — type it or tap the mic.
         </p>
       )}
 
@@ -665,7 +668,7 @@ export function OutcomeComposer() {
           className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-primary/30 bg-primary/5 px-3 py-2.5"
         >
           <p className="min-w-0 flex-1 text-xs font-bold text-primary">
-            Building your plan in {autoSecs}s — say more or edit to keep going.
+            Finding your service in {autoSecs}s — say more or edit to keep going.
           </p>
           <button
             type="button"
@@ -676,10 +679,10 @@ export function OutcomeComposer() {
           </button>
           <button
             type="button"
-            onClick={() => goToPlan(request)}
+            onClick={() => goToService(request)}
             className="min-h-[40px] shrink-0 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground"
           >
-            Build now
+            Find now
           </button>
         </div>
       )}
@@ -703,7 +706,7 @@ export function OutcomeComposer() {
           className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.01] sm:w-auto"
           style={{ background: "var(--gradient-primary)" }}
         >
-          <Sparkles className="h-4 w-4" /> Build my plan
+          <Sparkles className="h-4 w-4" /> Find a pro
         </button>
       </div>
 
@@ -714,7 +717,7 @@ export function OutcomeComposer() {
           data-analytics-location="hero_composer"
           className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground transition-colors hover:text-primary"
         >
-          <Camera className="h-4 w-4 text-primary" /> Or show GPB a photo
+          <Camera className="h-4 w-4 text-primary" /> Or show GPB a photo instead
         </Link>
       </div>
 

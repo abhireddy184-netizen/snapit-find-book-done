@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import {
   ArrowRight, MessageSquareText, ListChecks, HardHat, Home, PackageCheck, Car,
   Truck, HeartHandshake, ShieldAlert, ShieldCheck, FileText, Images, Activity,
-  Camera, Sparkles, UtensilsCrossed, ShoppingBasket, CarFront, UserRound, Route,
+  Camera, Sparkles,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -191,10 +191,10 @@ export function DailyLifeModules() {
     <section className="mt-14">
       <header className="max-w-2xl">
         <h2 className="text-[clamp(1.5rem,3.4vw,2.25rem)] font-black leading-tight tracking-tight">
-          Whatever the day throws at you.
+          Services people ask GPB for.
         </h2>
         <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-          Six ways people put GPB to work — each one starts with a request, not a category list.
+          Six of the most requested areas — each one starts with your request, not a category list.
         </p>
       </header>
 
@@ -330,77 +330,13 @@ export function BrowseFallback() {
   );
 }
 
-/* ---------------- 7) Orchestrator: one outcome, many channels ---------------- */
-
-const CHANNELS: { icon: LucideIcon; title: string; body: string; live: boolean }[] = [
-  { icon: HardHat, title: "GPB local pros", body: "Cleaning, handyman, moving, errands, auto and more — through the current GPB service flow.", live: true },
-  { icon: UtensilsCrossed, title: "Food ordering", body: "Meals timed around the rest of your plan.", live: false },
-  { icon: ShoppingBasket, title: "Grocery pickup or delivery", body: "Kept on your route, or switched to delivery when timing gets tight.", live: false },
-  { icon: CarFront, title: "Rides & transport", body: "Departure times worked backwards from your deadline.", live: false },
-  { icon: UserRound, title: "You", body: "The steps only you can do — GPB schedules everything else around them.", live: true },
-];
-
-export function OrchestratorBand() {
-  return (
-    <section id="orchestrator" className="mt-14 scroll-mt-24 overflow-hidden rounded-[28px] border border-border/60 bg-card shadow-sm">
-      <div className="grid gap-6 p-5 sm:p-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-        <div className="min-w-0">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-primary">
-            <Route className="h-3.5 w-3.5" /> Tell GPB your day
-          </span>
-          <h2 className="mt-3 text-[clamp(1.5rem,3.4vw,2.25rem)] font-black leading-tight tracking-tight">
-            One outcome. One plan. Consider it done.
-          </h2>
-          <p className="mt-2 max-w-[56ch] text-sm leading-relaxed text-muted-foreground">
-            “I need dinner, groceries, and to be at DFW by 6 PM.” GPB turns a whole part of your day into a
-            single sequenced plan — parent goal, linked subtasks, timing, dependencies and a safety buffer.
-            Don’t manage the apps; tell GPB what needs to happen.
-          </p>
-          <div className="mt-5 flex flex-wrap items-center gap-2.5">
-            <Link
-              to="/plan"
-              search={{ q: "", loc: "" }}
-              data-analytics-id="plan_demo"
-              data-analytics-location="homepage_band"
-              className="inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
-              style={{ background: "var(--gradient-primary)" }}
-            >
-              See an example plan <ArrowRight className="h-4 w-4" />
-            </Link>
-            <span className="text-[11px] text-muted-foreground">
-              Prototype planner — nothing is booked or dispatched.
-            </span>
-          </div>
-        </div>
-        <ul className="grid gap-2">
-          {CHANNELS.map((c) => (
-            <li key={c.title} className="flex items-start gap-3 rounded-2xl border border-border/60 bg-background px-4 py-3">
-              <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
-                <c.icon className="h-4 w-4" />
-              </span>
-              <span className="min-w-0">
-                <span className="flex flex-wrap items-center gap-1.5">
-                  <span className="text-sm font-black tracking-tight">{c.title}</span>
-                  <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${c.live ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-                    {c.live ? "GPB service flow" : "Future integration"}
-                  </span>
-                </span>
-                <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">{c.body}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-/* ---------------- 8) Simple three-step flow (homepage) ---------------- */
+/* Sections 7-8 (day-plan orchestrator band) are deferred with the general
+   day planner — the services-only experience does not link to /plan. */
 
 const FLOW: { icon: LucideIcon; title: string; body: string }[] = [
-  { icon: MessageSquareText, title: "Tell GPB", body: "Say what you need done — type it, or show it with a photo." },
-  { icon: ListChecks, title: "Get one plan", body: "GPB turns it into a clear plan with the right steps and timing." },
-  { icon: HardHat, title: "Get it done", body: "Trusted local pros handle the work. You stay in one place." },
+  { icon: Camera, title: "Show or tell GPB", body: "Photo, voice in any language, or plain text — whatever is easiest." },
+  { icon: ListChecks, title: "See what's needed", body: "GPB turns it into a short, clear service request you can edit." },
+  { icon: HardHat, title: "Get a local pro", body: "We match a real, available pro near you — or tell you honestly if there isn't one yet." },
 ];
 
 export function SimpleFlow() {
@@ -423,56 +359,6 @@ export function SimpleFlow() {
           </li>
         ))}
       </ol>
-    </section>
-  );
-}
-
-/* ---------------- 9) One real example (homepage) ---------------- */
-
-const EXAMPLE_STEPS = [
-  { time: "4:15 PM", label: "Dinner", icon: UtensilsCrossed },
-  { time: "4:55 PM", label: "Groceries", icon: ShoppingBasket },
-  { time: "5:40 PM", label: "At DFW", icon: CarFront },
-];
-
-export function ExamplePlanPreview() {
-  return (
-    <section className="mt-10 overflow-hidden rounded-[28px] border border-border/60 bg-card p-6 shadow-sm sm:p-8 lg:mt-14">
-      <div className="grid gap-6 lg:grid-cols-[1fr_1fr] lg:items-center lg:gap-10">
-        <div className="min-w-0">
-          <h2 className="text-[clamp(1.35rem,3vw,2rem)] font-black leading-tight tracking-tight">
-            “I need dinner, groceries, and to be at DFW by 6 PM.”
-          </h2>
-          <p className="mt-3 max-w-[46ch] text-sm leading-relaxed text-muted-foreground sm:text-base">
-            One request. GPB builds one plan with the timing worked out.
-          </p>
-          <Link
-            to="/plan"
-            search={{ q: "", loc: "" }}
-            data-analytics-id="plan_demo"
-            data-analytics-location="homepage_example"
-            className="mt-5 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            See the GPB plan <ArrowRight className="h-4 w-4" />
-          </Link>
-        </div>
-
-        <ol className="grid gap-2.5">
-          {EXAMPLE_STEPS.map((s) => (
-            <li key={s.label} className="flex items-center gap-3.5 rounded-2xl border border-border/60 bg-background px-4 py-3.5">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
-                <s.icon className="h-4.5 w-4.5" />
-              </span>
-              <span className="text-sm font-black tracking-tight">{s.label}</span>
-              <span className="ml-auto text-sm font-bold text-muted-foreground">{s.time}</span>
-            </li>
-          ))}
-          <li className="px-1 text-[11px] text-muted-foreground">
-            Example only — nothing is booked or ordered.
-          </li>
-        </ol>
-      </div>
     </section>
   );
 }
@@ -503,9 +389,9 @@ export function HowGpbWorksDetails() {
           <div className="rounded-2xl border border-border/60 bg-background p-4">
             <h3 className="text-sm font-black tracking-tight">Who does the work</h3>
             <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-              Home, cleaning, moving, errands and auto tasks go through the GPB service catalogue and local
-              professionals. Food, grocery and ride steps are planned partner integrations and are not
-              connected yet — GPB will always say which is which.
+              Home, cleaning, repairs, moving, errands and auto requests go through the GPB service
+              catalogue and local professionals. GPB only shows pros that are real, verified and available
+              in your area — otherwise it says so plainly.
             </p>
           </div>
           <div className="rounded-2xl border border-border/60 bg-background p-4">
@@ -519,7 +405,7 @@ export function HowGpbWorksDetails() {
         </div>
 
         <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
-          GPB is in early access and launching city by city. Plans are suggestions — nothing is booked until you say so.
+          GPB is in early access and launching city by city. Nothing is booked until you say so.
         </p>
       </details>
     </section>

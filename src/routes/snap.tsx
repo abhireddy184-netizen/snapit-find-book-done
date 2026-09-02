@@ -47,7 +47,15 @@ import {
 /** Hard ceiling for a single AI diagnosis request before we bail out. */
 const ANALYSIS_TIMEOUT_MS = 40_000;
 
+type SnapSearch = { q?: string; loc?: string };
+
 export const Route = createFileRoute("/snap")({
+  validateSearch: (search: Record<string, unknown>): SnapSearch => {
+    const q = typeof search["q"] === "string" ? search["q"] : "";
+    const loc = search["loc"] == null ? "" : String(search["loc"]);
+    return { ...(q ? { q } : {}), ...(loc ? { loc } : {}) };
+  },
+
   head: () => ({
     meta: [
       { title: "Show us the problem — AI diagnosis in seconds | GPB" },
@@ -59,6 +67,7 @@ export const Route = createFileRoute("/snap")({
   component: SnapPage,
 });
 
+
 const urgencyStyles: Record<string, { chip: string; label: string; icon: typeof ShieldAlert }> = {
   emergency: { chip: "bg-red-100 text-red-700 border-red-200", label: "Emergency", icon: ShieldAlert },
   high: { chip: "bg-orange-100 text-orange-700 border-orange-200", label: "High priority", icon: Zap },
@@ -67,13 +76,21 @@ const urgencyStyles: Record<string, { chip: string; label: string; icon: typeof 
 };
 
 function SnapPage() {
+  // A spoken/typed service request handed over from the home composer (or an
+  // old /plan link) arrives as ?q= — same flow, no separate planning step.
+  const search = Route.useSearch();
+  const incomingRequest = (search.q ?? "").trim();
+  const incomingLoc = (search.loc ?? "").trim();
+  const autoRanRef = useRef(false);
+
   const [image, setImage] = useState<string | null>(null);
   const [frames, setFrames] = useState<string[]>([]);
   const [mediaKind, setMediaKind] = useState<"photo" | "video" | "upload" | null>(null);
   const [note, setNote] = useState("");
-  const [describeMode, setDescribeMode] = useState(false);
-  const [describeText, setDescribeText] = useState("");
+  const [describeMode, setDescribeMode] = useState(incomingRequest.length > 0);
+  const [describeText, setDescribeText] = useState(incomingRequest);
   const [textOnly, setTextOnly] = useState(false);
+
   const [analysis, setAnalysis] = useState<SnapAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -195,10 +212,12 @@ function SnapPage() {
     await runDiagnosisFresh(frames, note, token, { latestMessage: note });
   };
 
-  /** Text-only path — no photo required (essential on desktop). */
-  const runTextAnalysis = async () => {
-    const described = describeText.trim();
-    if (described.length < 4 || busyRef.current) return;
+  /** Text/voice path — no photo required (essential on desktop). */
+  const runTextAnalysis = async (override?: string) => {
+    const typed = (override ?? describeText).trim();
+    if (typed.length < 4 || busyRef.current) return;
+    // The service location travels with the request so GPB can match locally.
+    const described = incomingLoc ? `${typed}\n(Service location: ${incomingLoc})` : typed;
     busyRef.current = true;
     const token = ++runRef.current;
     setError(null);
@@ -213,6 +232,19 @@ function SnapPage() {
     setLoading(true);
     await runDiagnosis([], described, token, { latestMessage: described, asked: [], turns: 0 });
   };
+
+  /**
+   * A request handed over from the home composer runs immediately — the person
+   * already said what they need; asking them to press "go" again is friction.
+   */
+  useEffect(() => {
+    if (!incomingRequest || autoRanRef.current) return;
+    if (incomingRequest.length < 4) return;
+    autoRanRef.current = true;
+    void runTextAnalysis(incomingRequest);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [incomingRequest]);
+
 
   /** Abandon any in-flight work and go back to a usable screen. */
   const cancelAnalysis = () => {
