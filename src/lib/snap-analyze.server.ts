@@ -68,6 +68,13 @@ HARD RULES
 - Cosmetic/grooming intent on hair, nails, skin, beard etc. routes to the beauty-at-home category.
 - issueSource must be: "detected" (clearly visible), "possible" (likely but unconfirmed), "customer-described" (based on their words), or "insufficient".
 
+PROGRESSION RULES (never trap the customer in a question loop)
+- The customer's LATEST message always overrides any earlier guess of yours and any inference from the photo. If they say "TV repair", the service is a repair — not mounting, not installation, not setup — even if the photo shows a wall-mounted TV. Repair, installation/mounting, setup/troubleshooting and cleaning are DIFFERENT services: pick the one their words name.
+- Never repeat, rephrase or re-ask a question that has already been asked, and never re-ask something they already answered. Carry every earlier answer forward.
+- Ask at most 1-2 short clarifying questions in total across the whole conversation. Once the service is identifiable, STOP asking and resolve: responseKind "diagnosis" with the matching categorySlug/serviceSlug so GPB can find a professional. Details a pro can collect on site (exact model, symptom specifics, brand) are NOT worth another question — leave them to the pro.
+- Do NOT push DIY troubleshooting, self-diagnosis checklists (power/picture/sound/remote/inputs), cable-swapping tips or generic safety lists. GPB connects people with pros. Only give a safety note for a genuine urgent hazard (gas, live electricity, water on power, fire, structural collapse).
+- When the service is known but a fair price range is not, still use responseKind "diagnosis" with hasPriceEstimate false and costs 0 — the customer must still reach a professional.
+
 CATEGORY + SERVICE SLUGS (categorySlug must be one of the category slugs; serviceSlug when used must belong to that category):
 ${catalogSummary()}
 
@@ -76,17 +83,59 @@ Return ONLY valid minified JSON, no markdown, matching:
 
 Keep every string short and plain-language. Prices are USD typical ranges.`;
 
-export function buildUserPrompt(note: string | undefined, hasMedia: boolean, frameCount = 1) {
+export type AnalysisContext = {
+  /** Questions GPB has already put to this customer in this conversation. */
+  askedQuestions?: string[];
+  /** How many clarification answers the customer has already given. */
+  turnCount?: number;
+  /** Customer pressed "Find a professional" / "Not sure" — resolve with what we have. */
+  forceResolve?: boolean;
+  /** The newest thing the customer typed; it outranks every earlier guess. */
+  latestMessage?: string;
+};
+
+function conversationBlock(ctx?: AnalysisContext) {
+  if (!ctx) return "";
+  const parts: string[] = [];
+  if (ctx.latestMessage?.trim()) {
+    parts.push(
+      `The customer's LATEST message is: "${ctx.latestMessage.trim()}". It overrides every earlier assumption, including anything inferred from the photo.`,
+    );
+  }
+  if (ctx.askedQuestions?.length) {
+    parts.push(
+      `You have ALREADY asked: ${ctx.askedQuestions.map((q) => `"${q}"`).join("; ")}. Do not ask these again or reword them.`,
+    );
+  }
+  if (ctx.forceResolve) {
+    parts.push(
+      `The customer asked to move on and find a professional. Ask NOTHING further: return responseKind "diagnosis" (or "options" only if genuinely two different trades) with the best-fit categorySlug/serviceSlug and leave remaining details for the pro.`,
+    );
+  } else if ((ctx.turnCount ?? 0) >= 2) {
+    parts.push(
+      `This is clarification turn ${ctx.turnCount}. No more questions are allowed — resolve to the best-fit service now.`,
+    );
+  }
+  return parts.length ? `\n${parts.join(" ")}` : "";
+}
+
+export function buildUserPrompt(
+  note: string | undefined,
+  hasMedia: boolean,
+  frameCount = 1,
+  ctx?: AnalysisContext,
+) {
   const described = note?.trim();
+  const convo = conversationBlock(ctx);
   if (!hasMedia) {
-    return `The customer sent NO photo — only this description: "${described}". Work out the service from their words alone. Respond with JSON only.`;
+    return `The customer sent NO photo — only this description: "${described}". Work out the service from their words alone.${convo} Respond with JSON only.`;
   }
   const multi = frameCount > 1
     ? ` The ${frameCount} images are frames sampled across one short video of the same scene — read them together, not as separate problems.`
     : "";
   return described
-    ? `Customer description (HIGHEST PRIORITY — treat this as the real problem even if the image shows something else): "${described}". Their words define the subject. Use the image only as supporting context.${multi} Respond with JSON only.`
-    : `The customer sent ${frameCount > 1 ? `${frameCount} frames from one short video` : "an image"} with no description. First decide the intended visual subject from salience, then only report a problem if one is genuinely visible on THAT subject. Ignore incidental marks on surrounding surfaces.${multi} Respond with JSON only.`;
+    ? `Customer description (HIGHEST PRIORITY — treat this as the real problem even if the image shows something else): "${described}". Their words define the subject. Use the image only as supporting context.${multi}${convo} Respond with JSON only.`
+    : `The customer sent ${frameCount > 1 ? `${frameCount} frames from one short video` : "an image"} with no description. First decide the intended visual subject from salience, then only report a problem if one is genuinely visible on THAT subject. Ignore incidental marks on surrounding surfaces.${multi}${convo} Respond with JSON only.`;
 }
 
 const CATEGORY_SLUGS = new Set(catalog.map((c) => c.slug));
