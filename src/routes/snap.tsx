@@ -51,7 +51,7 @@ import {
 /** Hard ceiling for a single AI diagnosis request before we bail out. */
 // Text-only requests are fast (no visual pipeline); media needs more room.
 const ANALYSIS_TIMEOUT_MS = 34_000;
-const TEXT_ANALYSIS_TIMEOUT_MS = 12_500;
+const TEXT_ANALYSIS_TIMEOUT_MS = 6_000;
 
 type SnapSearch = { q?: string; loc?: string };
 
