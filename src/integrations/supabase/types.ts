@@ -16,47 +16,74 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          cancelled_at: string | null
+          completed_at: string | null
           created_at: string
           customer_id: string
+          decline_reason: string | null
           details: string | null
+          duration_minutes: number
+          end_at: string | null
           id: string
           job_id: string | null
+          overran_window: boolean
           provider_id: string | null
           provider_name_snapshot: string | null
           scheduled_date: string
           scheduled_time: string
           service: string
           service_address: string
+          service_timezone: string | null
+          start_at: string | null
+          started_at: string | null
           status: Database["public"]["Enums"]["booking_status"]
           updated_at: string
         }
         Insert: {
+          cancelled_at?: string | null
+          completed_at?: string | null
           created_at?: string
           customer_id: string
+          decline_reason?: string | null
           details?: string | null
+          duration_minutes?: number
+          end_at?: string | null
           id?: string
           job_id?: string | null
+          overran_window?: boolean
           provider_id?: string | null
           provider_name_snapshot?: string | null
           scheduled_date: string
           scheduled_time: string
           service: string
           service_address: string
+          service_timezone?: string | null
+          start_at?: string | null
+          started_at?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           updated_at?: string
         }
         Update: {
+          cancelled_at?: string | null
+          completed_at?: string | null
           created_at?: string
           customer_id?: string
+          decline_reason?: string | null
           details?: string | null
+          duration_minutes?: number
+          end_at?: string | null
           id?: string
           job_id?: string | null
+          overran_window?: boolean
           provider_id?: string | null
           provider_name_snapshot?: string | null
           scheduled_date?: string
           scheduled_time?: string
           service?: string
           service_address?: string
+          service_timezone?: string | null
+          start_at?: string | null
+          started_at?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
           updated_at?: string
         }
@@ -198,6 +225,36 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_availability: {
+        Row: {
+          created_at: string
+          end_minute: number
+          id: string
+          provider_id: string
+          start_minute: number
+          updated_at: string
+          weekday: number
+        }
+        Insert: {
+          created_at?: string
+          end_minute: number
+          id?: string
+          provider_id: string
+          start_minute: number
+          updated_at?: string
+          weekday: number
+        }
+        Update: {
+          created_at?: string
+          end_minute?: number
+          id?: string
+          provider_id?: string
+          start_minute?: number
+          updated_at?: string
+          weekday?: number
+        }
+        Relationships: []
+      }
       provider_interest: {
         Row: {
           business_name: string | null
@@ -248,10 +305,12 @@ export type Database = {
       }
       provider_profiles: {
         Row: {
+          accepting_bookings: boolean
           availability: string | null
           bio: string | null
           business_name: string
           created_at: string
+          default_duration_minutes: number
           id: string
           interest_claimed_at: string | null
           phone: string | null
@@ -260,15 +319,18 @@ export type Database = {
           service_radius_miles: number | null
           service_zip: string | null
           starting_price: number | null
+          travel_buffer_minutes: number
           updated_at: string
           user_id: string
           verification_status: Database["public"]["Enums"]["verification_status"]
         }
         Insert: {
+          accepting_bookings?: boolean
           availability?: string | null
           bio?: string | null
           business_name?: string
           created_at?: string
+          default_duration_minutes?: number
           id?: string
           interest_claimed_at?: string | null
           phone?: string | null
@@ -277,15 +339,18 @@ export type Database = {
           service_radius_miles?: number | null
           service_zip?: string | null
           starting_price?: number | null
+          travel_buffer_minutes?: number
           updated_at?: string
           user_id: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
         }
         Update: {
+          accepting_bookings?: boolean
           availability?: string | null
           bio?: string | null
           business_name?: string
           created_at?: string
+          default_duration_minutes?: number
           id?: string
           interest_claimed_at?: string | null
           phone?: string | null
@@ -294,6 +359,7 @@ export type Database = {
           service_radius_miles?: number | null
           service_zip?: string | null
           starting_price?: number | null
+          travel_buffer_minutes?: number
           updated_at?: string
           user_id?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
@@ -386,6 +452,36 @@ export type Database = {
           is_primary?: boolean
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      provider_time_off: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          provider_id: string
+          reason: string
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          provider_id: string
+          reason?: string
+          starts_at: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          provider_id?: string
+          reason?: string
+          starts_at?: string
+          updated_at?: string
         }
         Relationships: []
       }
