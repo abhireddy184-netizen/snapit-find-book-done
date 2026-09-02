@@ -86,7 +86,7 @@ function ProviderInterestPage() {
     return (
       <AppShell>
         <div className="mx-auto max-w-lg py-16 text-center">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full text-white shadow-lg" style={{ background: "var(--gradient-primary)" }}>
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full text-white shadow-elevated" style={{ background: "var(--gradient-primary)" }}>
             <CheckCircle2 className="h-8 w-8" />
           </div>
           <h1 className="mt-6 text-3xl font-black">You’re on the list</h1>
@@ -107,7 +107,7 @@ function ProviderInterestPage() {
             <Link
               to="/register"
               search={{ redirect: undefined, role: "provider" }}
-              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-md"
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-card"
               style={{ background: "var(--gradient-primary)" }}
             >
               Create a pro account <ArrowRight className="h-4 w-4" />
@@ -214,7 +214,7 @@ function ProviderInterestPage() {
               {busy ? <><Loader2 className="h-4 w-4 animate-spin" /> Submitting…</> : <>Register your interest <ArrowRight className="h-4 w-4" /></>}
             </GradientButton>
           </div>
-          <p className="mt-3 text-center text-[11px] text-muted-foreground">
+          <p className="mt-3 text-center text-xs text-muted-foreground">
             Registering interest does not create an account, approval or verification.
           </p>
         </form>

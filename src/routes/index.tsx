@@ -75,7 +75,7 @@ function Landing() {
               id="hero-show-gpb-cta"
               data-analytics-id="show_gpb_cta"
               data-analytics-location="hero_primary"
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-black text-white shadow-lg transition-transform hover:scale-[1.01] sm:w-auto"
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-black text-white shadow-elevated transition-transform hover:scale-[1.01] sm:w-auto"
               style={{ background: "var(--gradient-primary)" }}
             >
               <Camera className="h-5 w-5" /> Show GetPros a photo
@@ -143,10 +143,10 @@ function EmergencyStrip() {
     { label: "Lockout", icon: Lock },
   ];
   return (
-    <section className="mt-10 overflow-hidden rounded-[24px] border border-destructive/25 bg-card p-4 sm:p-5">
+    <section className="mt-10 overflow-hidden rounded-2xl border border-destructive/25 bg-card p-4 sm:p-5">
       <div className="grid gap-4 md:grid-cols-[1fr_1.1fr] md:items-center">
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive px-2.5 py-1 text-[11px] font-black text-destructive-foreground">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive px-2.5 py-1 text-xs font-black text-destructive-foreground">
             <ShieldAlert className="h-3.5 w-3.5" /> 24/7 Emergency
           </span>
           <h2 className="mt-2 text-lg font-black tracking-tight sm:text-xl">When it can't wait, flag it first.</h2>
@@ -173,10 +173,10 @@ function EmergencyStrip() {
 
 function ProviderRecruitment() {
   return (
-    <section className="mt-10 overflow-hidden rounded-[26px] px-5 py-8 text-white sm:px-8 md:py-10" style={{ background: "var(--gradient-primary)" }}>
+    <section className="mt-10 overflow-hidden rounded-2xl px-5 py-8 text-white sm:px-8 md:py-10" style={{ background: "var(--gradient-primary)" }}>
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-center">
         <div className="min-w-0">
-          <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">For professionals</div>
+          <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-bold backdrop-blur">For professionals</div>
           <h2 className="text-2xl font-black tracking-tight md:text-3xl">Get clearer jobs, not vague leads.</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90">
             Pros set their service category, service area/radius, availability and starting price — customer
@@ -189,7 +189,7 @@ function ProviderRecruitment() {
               id="provider-recruitment-cta"
               data-analytics-id="provider_interest_cta"
               data-analytics-location="homepage_provider_section"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-lg transition-transform hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-elevated transition-transform hover:scale-[1.02]"
             >
               Register Your Interest <ArrowRight className="h-4 w-4" />
             </Link>
@@ -304,7 +304,7 @@ export function Footer() {
         <FooterCol title="Support" links={["Help center", "Contact", "Trust & safety", "Cancellation"]} />
         <div className="min-w-0">
           <div className="mb-2 text-xs font-bold uppercase tracking-wider text-foreground">Newsletter</div>
-          <p className="mb-3 text-[11px] leading-relaxed">
+          <p className="mb-3 text-xs leading-relaxed">
             General GetPros news and new services — this is not the early access list.{" "}
             <a href="/#early-access" className="font-semibold text-primary hover:underline">Join early access</a> to
             be notified when pros go live near you. Unsubscribe anytime.
@@ -340,7 +340,7 @@ export function Footer() {
             id="gpb-newsletter-status"
             role="status"
             aria-live="polite"
-            className={`mt-2 min-h-[1rem] text-[11px] font-semibold ${state === "error" ? "text-destructive" : "text-foreground"}`}
+            className={`mt-2 min-h-[1rem] text-xs font-semibold ${state === "error" ? "text-destructive" : "text-foreground"}`}
           >
             {message}
           </p>

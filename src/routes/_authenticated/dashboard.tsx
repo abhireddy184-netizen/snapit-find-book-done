@@ -144,15 +144,15 @@ function JobCard({ job }: { job: Job }) {
     <Link
       to="/job/$id"
       params={{ id: job.id }}
-      className="block rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+      className="block rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-elevated"
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold text-primary">{job.category_label}</span>
-        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${JOB_STATUS_STYLE[job.status]}`}>{jobStatusLabel(job.status)}</span>
-        <span className="ml-auto text-[10px] text-muted-foreground">{new Date(job.created_at).toLocaleDateString()}</span>
+        <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">{job.category_label}</span>
+        <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${JOB_STATUS_STYLE[job.status]}`}>{jobStatusLabel(job.status)}</span>
+        <span className="ml-auto text-xs text-muted-foreground">{new Date(job.created_at).toLocaleDateString()}</span>
       </div>
       <p className="mt-2 line-clamp-2 text-sm font-medium">{job.problem_statement}</p>
-      <div className="mt-2 flex items-center gap-3 text-[11px] text-muted-foreground">
+      <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
         <span className="font-semibold text-foreground/80">
           {money(job.expected_price_low, job.currency)}–{money(job.expected_price_high, job.currency)}
         </span>
@@ -239,7 +239,7 @@ function BookingCard({ booking }: { booking: Booking }) {
             {name} · {formatBookingDate(booking.scheduled_date)} · {booking.scheduled_time}
           </div>
         </div>
-        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold capitalize ${statusStyle[booking.status] ?? "bg-muted"}`}>
+        <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-semibold capitalize ${statusStyle[booking.status] ?? "bg-muted"}`}>
           {booking.status.replace("_", " ")}
         </span>
       </div>
@@ -258,7 +258,7 @@ function Saved() {
       <DemoNote>Sample pros shown for demo browsing — saved lists become real once providers join GetPros.</DemoNote>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {providers.slice(0, 4).map((p) => (
-          <Link key={p.id} to="/provider/$id" params={{ id: p.id }} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm hover:shadow-md">
+          <Link key={p.id} to="/provider/$id" params={{ id: p.id }} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm hover:shadow-card">
             <div className="flex items-center gap-3">
               <Avatar initials={p.initials} gradient={p.gradient} />
               <div className="min-w-0">
@@ -291,7 +291,7 @@ function Messages() {
             <div className="min-w-0 flex-1">
               <div className="flex items-center justify-between gap-2">
                 <div className="truncate text-sm font-bold">{p.name}</div>
-                <div className="shrink-0 text-[10px] text-muted-foreground">{["Now", "2m", "1h", "Yesterday"][i]}</div>
+                <div className="shrink-0 text-xs text-muted-foreground">{["Now", "2m", "1h", "Yesterday"][i]}</div>
               </div>
               <div className="truncate text-xs text-muted-foreground">{["I'm on my way!", "Sounds good, see you at 11.", "Thanks for booking.", "Job complete — please rate!"][i]}</div>
             </div>

@@ -27,8 +27,8 @@ function CategoriesPage() {
         {catalog.map((cat) => {
           const Icon = cat.icon;
           return (
-            <div key={cat.slug} className="group rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg">
-              <div className={`grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${cat.gradient} text-white shadow-md`}>
+            <div key={cat.slug} className="group rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-elevated">
+              <div className={`grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${cat.gradient} text-white shadow-card`}>
                 <Icon className="h-6 w-6" />
               </div>
               <h3 className="mt-4 text-lg font-bold">{cat.name}</h3>

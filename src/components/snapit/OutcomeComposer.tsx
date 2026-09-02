@@ -574,7 +574,7 @@ export function OutcomeComposer() {
     <form
       onSubmit={submit}
       data-analytics-id="outcome_composer"
-      className="rounded-[26px] border border-border/60 bg-card p-3 shadow-[var(--shadow-elevated)] sm:p-4"
+      className="rounded-2xl border border-border/60 bg-card p-3 shadow-[var(--shadow-elevated)] sm:p-4"
     >
       <label htmlFor="gpb-outcome" className="sr-only">
         Describe the service you need
@@ -602,7 +602,7 @@ export function OutcomeComposer() {
           /* While the mic is active the rotating examples stop competing with
              what the person is actually saying. */
           placeholder={voiceActive ? "" : EXAMPLES[i]}
-          className={`min-h-[96px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3 pe-[3.5rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:py-3.5 sm:pe-16 ${
+          className={`min-h-[96px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3 pe-[3.5rem] text-sm leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:py-3.5 sm:pe-16 ${
             voiceActive ? "bg-primary/5 ring-2 ring-primary/60" : emptyError ? "ring-2 ring-destructive/70" : ""
           }`}
         />
@@ -610,7 +610,7 @@ export function OutcomeComposer() {
         {voiceActive && !request && (
           <span
             aria-hidden
-            className="pointer-events-none absolute inset-x-4 top-3.5 text-[15px] leading-relaxed text-primary/70"
+            className="pointer-events-none absolute inset-x-4 top-3.5 text-sm leading-relaxed text-primary/70"
           >
             {listening ? "Listening… speak now" : "Transcribing…"}
           </span>
@@ -625,7 +625,7 @@ export function OutcomeComposer() {
           className={`absolute end-2 top-2 grid h-12 w-12 shrink-0 place-items-center rounded-full border transition-all sm:end-2.5 sm:top-2.5 ${
 
             listening
-              ? "animate-pulse border-primary bg-primary text-primary-foreground shadow-md"
+              ? "animate-pulse border-primary bg-primary text-primary-foreground shadow-card"
               : transcribing
                 ? "cursor-wait border-primary/50 bg-primary/10 text-primary"
                 : voiceSupported
@@ -703,7 +703,7 @@ export function OutcomeComposer() {
         <button
           type="submit"
           data-analytics-id="outcome_submit"
-          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.01] sm:w-auto"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-black text-white shadow-elevated transition-transform hover:scale-[1.01] sm:w-auto"
           style={{ background: "var(--gradient-primary)" }}
         >
           <Sparkles className="h-4 w-4" /> Find a pro

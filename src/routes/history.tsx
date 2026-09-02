@@ -57,7 +57,7 @@ function HistoryPage() {
 
         {ready && entries.length === 0 && (
           <div className="mt-10 flex flex-col items-center justify-center rounded-3xl border border-dashed border-border/60 bg-card/60 p-10 text-center">
-            <div className="grid h-16 w-16 place-items-center rounded-2xl text-white shadow-lg" style={{ background: "var(--gradient-primary)" }}>
+            <div className="grid h-16 w-16 place-items-center rounded-2xl text-white shadow-elevated" style={{ background: "var(--gradient-primary)" }}>
               <Camera className="h-7 w-7" />
             </div>
             <h2 className="mt-4 text-lg font-bold">No diagnoses yet</h2>
@@ -66,7 +66,7 @@ function HistoryPage() {
             </p>
             <Link
               to="/snap"
-              className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-md"
+              className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-card"
               style={{ background: "var(--gradient-primary)" }}
             >
               <Camera className="h-4 w-4" /> Snap a problem
@@ -81,20 +81,20 @@ function HistoryPage() {
               return (
                 <div
                   key={entry.id}
-                  className="group flex gap-3 overflow-hidden rounded-3xl border border-border/60 bg-card p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                  className="group flex gap-3 overflow-hidden rounded-3xl border border-border/60 bg-card p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-elevated"
                 >
                   <img src={entry.thumbnail} alt="Diagnosis" className="h-28 w-28 shrink-0 rounded-2xl object-cover" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       {cat && (
-                        <span className={`inline-flex items-center gap-1 rounded-full bg-gradient-to-br ${cat.color} px-2 py-0.5 text-[10px] font-semibold text-white`}>
+                        <span className={`inline-flex items-center gap-1 rounded-full bg-gradient-to-br ${cat.color} px-2 py-0.5 text-xs font-semibold text-white`}>
                           <cat.icon className="h-3 w-3" /> {entry.analysis.category}
                         </span>
                       )}
-                      <span className="text-[11px] font-medium text-muted-foreground">{formatRelative(entry.createdAt)}</span>
+                      <span className="text-xs font-medium text-muted-foreground">{formatRelative(entry.createdAt)}</span>
                     </div>
                     <p className="mt-1.5 line-clamp-2 text-sm font-medium text-foreground">{entry.analysis.problem}</p>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                       <span className="inline-flex items-center gap-1 font-semibold text-foreground/80">
                         <DollarSign className="h-3 w-3" />{" "}
                         {entry.analysis.hasPriceEstimate
@@ -104,7 +104,7 @@ function HistoryPage() {
                       <span className="inline-flex items-center gap-1">
                         <Clock className="h-3 w-3" /> {entry.analysis.estimatedDurationMinutes} min
                       </span>
-                      <span className="rounded-full bg-muted px-1.5 py-0.5 font-semibold uppercase text-[9px] tracking-wider">
+                      <span className="rounded-full bg-muted px-1.5 py-0.5 font-semibold uppercase text-xs tracking-wider">
                         {entry.analysis.urgency}
                       </span>
                     </div>
@@ -112,7 +112,7 @@ function HistoryPage() {
                       <Link
                         to="/search"
                         search={{ q: "", loc: "" }}
-                        className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-[11px] font-semibold text-primary hover:bg-primary/20"
+                        className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/20"
                       >
                         Find pros <ArrowRight className="h-3 w-3" />
                       </Link>

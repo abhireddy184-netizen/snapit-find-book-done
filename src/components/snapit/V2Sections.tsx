@@ -30,7 +30,7 @@ export function HowItWorks() {
   return (
     <section id="how-it-works" className="mt-14 scroll-mt-24">
       <header className="max-w-2xl">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-primary">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-primary">
           How GetPros works
         </span>
         <h2 className="mt-3 text-[clamp(1.5rem,3.4vw,2.25rem)] font-black leading-tight tracking-tight">
@@ -45,13 +45,13 @@ export function HowItWorks() {
         {STEPS.map((s, i) => (
           <li
             key={s.title}
-            className="relative overflow-hidden rounded-[24px] border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            className="relative overflow-hidden rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card"
           >
             <span className="absolute right-4 top-3 text-4xl font-black leading-none text-muted-foreground/15">
               {i + 1}
             </span>
             <span
-              className="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-md"
+              className="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-card"
               style={{ background: i === 0 ? "var(--gradient-primary)" : "color-mix(in oklab, var(--secondary) 84%, var(--primary))" }}
             >
               <s.icon className="h-5 w-5" />
@@ -130,11 +130,11 @@ export function OutcomeBundles() {
         {BUNDLES.map((b) => (
           <article
             key={b.title}
-            className="flex w-[82%] shrink-0 snap-start flex-col rounded-[24px] border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md min-[430px]:w-[74%] md:w-auto"
+            className="flex w-[82%] shrink-0 snap-start flex-col rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-card min-[430px]:w-[74%] md:w-auto"
           >
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-base font-black tracking-tight">{b.title}</h3>
-              <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                 GetPros can coordinate
               </span>
             </div>
@@ -143,13 +143,13 @@ export function OutcomeBundles() {
               {b.tasks.map((t) => (
                 <li
                   key={t}
-                  className="rounded-full border border-border/60 bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground"
+                  className="rounded-full border border-border/60 bg-background px-2.5 py-1 text-xs font-semibold text-muted-foreground"
                 >
                   {t}
                 </li>
               ))}
             </ul>
-            {b.note && <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">{b.note}</p>}
+            {b.note && <p className="mt-3 text-xs leading-relaxed text-muted-foreground">{b.note}</p>}
             <div className="mt-auto pt-4">
               <Link
                 to="/services/$category"
@@ -205,7 +205,7 @@ export function DailyLifeModules() {
             {...(m.category
               ? { to: "/services/$category" as const, params: { category: m.category } }
               : { to: "/emergency" as const })}
-            className="group flex items-start gap-3.5 rounded-[24px] border border-border/60 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md sm:p-5"
+            className="group flex items-start gap-3.5 rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-card sm:p-5"
           >
             <span
               className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-border/60 bg-background"
@@ -229,10 +229,10 @@ export function DailyLifeModules() {
 
 export function ShowGpbBand() {
   return (
-    <section className="mt-14 overflow-hidden rounded-[28px] border border-border/60 bg-card shadow-sm">
+    <section className="mt-14 overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
       <div className="grid gap-5 p-5 sm:p-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <div className="min-w-0">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-black text-primary">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-black text-primary">
             <Sparkles className="h-3.5 w-3.5" /> Another way to ask
           </span>
           <h2 className="mt-3 text-[clamp(1.4rem,3.2vw,2.1rem)] font-black leading-tight tracking-tight">
@@ -246,7 +246,7 @@ export function ShowGpbBand() {
             to="/snap"
             data-analytics-id="show_gpb_cta"
             data-analytics-location="homepage_band"
-            className="mt-5 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
+            className="mt-5 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-elevated transition-transform hover:scale-[1.02]"
             style={{ background: "var(--gradient-primary)" }}
           >
             <Camera className="h-5 w-5" /> Show GetPros
@@ -291,7 +291,7 @@ export function TrustSection() {
       </header>
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {TRUST.map((t) => (
-          <div key={t.title} className="rounded-[24px] border border-border/60 bg-card p-5 shadow-sm">
+          <div key={t.title} className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/10 text-primary">
               <t.icon className="h-5 w-5" />
             </span>
@@ -300,7 +300,7 @@ export function TrustSection() {
           </div>
         ))}
       </div>
-      <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
+      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
         GetPros is in early access and launching city by city — coverage grows as verified professionals join each area.
       </p>
     </section>
@@ -311,7 +311,7 @@ export function TrustSection() {
 
 export function BrowseFallback() {
   return (
-    <section className="mt-12 rounded-[24px] border border-dashed border-border bg-muted/25 p-5 sm:p-6">
+    <section className="mt-12 rounded-2xl border border-dashed border-border bg-muted/25 p-5 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <h2 className="text-base font-black tracking-tight sm:text-lg">Prefer to browse? Choose a service.</h2>
@@ -346,10 +346,10 @@ export function SimpleFlow() {
         {FLOW.map((s, i) => (
           <li
             key={s.title}
-            className="rounded-[26px] border border-border/60 bg-card p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+            className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card"
           >
             <span
-              className="grid h-12 w-12 place-items-center rounded-2xl text-white shadow-md"
+              className="grid h-12 w-12 place-items-center rounded-2xl text-white shadow-card"
               style={{ background: i === 0 ? "var(--gradient-primary)" : "color-mix(in oklab, var(--secondary) 84%, var(--primary))" }}
             >
               <s.icon className="h-5 w-5" />
@@ -368,7 +368,7 @@ export function SimpleFlow() {
 export function HowGpbWorksDetails() {
   return (
     <section id="how-it-works" className="mt-10 scroll-mt-24">
-      <details className="group rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+      <details className="group rounded-2xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-base font-black tracking-tight">
           How GetPros works
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border/60 text-muted-foreground transition-transform group-open:rotate-90">
@@ -404,7 +404,7 @@ export function HowGpbWorksDetails() {
           </div>
         </div>
 
-        <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
+        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
           GetPros is in early access and launching city by city. Nothing is booked until you say so.
         </p>
       </details>

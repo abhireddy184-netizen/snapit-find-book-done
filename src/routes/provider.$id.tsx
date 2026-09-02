@@ -60,10 +60,10 @@ function ProviderPage() {
                   {p.verified && <ShieldCheck className="h-5 w-5 shrink-0 text-primary" />}
                 </div>
                 <div className="truncate text-sm text-muted-foreground">{p.business}</div>
-                <span className="mt-1 inline-flex rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Demo profile</span>
+                <span className="mt-1 inline-flex rounded-full bg-muted px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">Demo profile</span>
               </div>
             </div>
-            <Link to="/book" search={{ provider: p.id }} className="shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-md" style={{ background: "var(--gradient-primary)" }}>
+            <Link to="/book" search={{ provider: p.id }} className="shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-card" style={{ background: "var(--gradient-primary)" }}>
               Book Now
             </Link>
           </div>

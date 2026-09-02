@@ -83,7 +83,7 @@ export function Logo({ compact = false, onColor = false }: { compact?: boolean; 
                 "GetPros" instead of a clipped wordmark. */}
             <Wordmark size="clamp(1rem, 4.4vw, 1.2rem)" onColor={onColor} className="inline-block" />
           </span>
-          <span className={`mt-1 hidden truncate text-[10px] font-medium sm:block ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
+          <span className={`mt-1 hidden truncate text-xs font-medium sm:block ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
             Whatever you need. Consider it done.
           </span>
         </span>

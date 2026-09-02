@@ -222,7 +222,7 @@ export function ProsOnTheMove({ slim = false }: { slim?: boolean } = {}) {
   return (
     <section className={slim ? "mt-4" : "mt-6"} aria-label="GetPros pros on the move">
       <div
-        className="relative overflow-hidden rounded-[22px] border border-border/50 px-4 py-2.5 sm:rounded-[24px] md:px-6 lg:px-8"
+        className="relative overflow-hidden rounded-2xl border border-border/50 px-4 py-2.5 sm:rounded-2xl md:px-6 lg:px-8"
         style={{ backgroundColor: "color-mix(in oklab, var(--card) 86%, var(--background))" }}
       >
         {/* ambient wash */}
@@ -236,11 +236,11 @@ export function ProsOnTheMove({ slim = false }: { slim?: boolean } = {}) {
         />
 
         <div className="relative flex items-center justify-between gap-3">
-          <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.14em] text-muted-foreground">
+          <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.14em] text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             GetPros pros on the move
           </span>
-          <span className="hidden text-[11px] text-muted-foreground sm:inline">Matched in minutes, near you</span>
+          <span className="hidden text-xs text-muted-foreground sm:inline">Matched in minutes, near you</span>
         </div>
 
         {/* stage */}
@@ -263,11 +263,11 @@ export function ProsOnTheMove({ slim = false }: { slim?: boolean } = {}) {
             </svg>
 
             <div className="mb-3 flex flex-col items-start gap-1.5">
-              <span className="rounded-full border border-border/60 bg-card/95 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-foreground shadow-sm backdrop-blur">
+              <span className="rounded-full border border-border/60 bg-card/95 px-2.5 py-1 text-xs font-bold uppercase tracking-[0.12em] text-foreground shadow-sm backdrop-blur">
                 {pro.label}
               </span>
               <span
-                className="walk-bubble max-w-[170px] sm:max-w-[210px] lg:text-xs rounded-2xl rounded-bl-sm border border-primary/25 bg-card/95 px-3 py-1.5 text-[11px] font-medium leading-snug text-foreground shadow-sm backdrop-blur md:max-w-none"
+                className="walk-bubble max-w-[170px] sm:max-w-[210px] lg:text-xs rounded-2xl rounded-bl-sm border border-primary/25 bg-card/95 px-3 py-1.5 text-xs font-medium leading-snug text-foreground shadow-sm backdrop-blur md:max-w-none"
                 style={{ ["--walk-duration" as any]: `${WALK_MS}ms` }}
               >
                 {pro.bubble}

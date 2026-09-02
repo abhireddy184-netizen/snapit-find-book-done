@@ -453,7 +453,7 @@ function SnapPage() {
           <div className="mt-6 space-y-4">
             <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm">
               <img src={image} alt="Captured problem" className="w-full max-h-[420px] object-contain bg-muted/30" />
-              <div className="absolute top-3 left-3 rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
+              <div className="absolute top-3 left-3 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
                 {mediaKind === "video" ? "Video frame" : mediaKind === "photo" ? "Photo" : "Uploaded"}
               </div>
               <button
@@ -579,7 +579,7 @@ function ScanningOverlay({
       <div className="absolute -right-24 bottom-1/4 h-96 w-96 rounded-full bg-secondary/25 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
 
 
-      <div className="relative mx-4 w-full max-w-md rounded-[28px] border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-2xl animate-scale-in">
+      <div className="relative mx-4 w-full max-w-md rounded-2xl border border-white/15 bg-white/10 p-6 shadow-elevated backdrop-blur-2xl animate-scale-in">
         <div className="relative overflow-hidden rounded-2xl border border-white/20">
           {image ? (
             <img src={image} alt="Analyzing" className="h-64 w-full object-cover" />
@@ -595,16 +595,16 @@ function ScanningOverlay({
           <div className="absolute right-2 top-2 h-5 w-5 border-r-2 border-t-2 border-white/70 rounded-tr-md" />
           <div className="absolute left-2 bottom-2 h-5 w-5 border-l-2 border-b-2 border-white/70 rounded-bl-md" />
           <div className="absolute right-2 bottom-2 h-5 w-5 border-r-2 border-b-2 border-white/70 rounded-br-md" />
-          <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-white backdrop-blur">
+          <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
             <ScanLine className="h-3 w-3 animate-pulse" /> AI scanning
           </div>
-          <div className="absolute bottom-3 right-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-black text-primary shadow">
+          <div className="absolute bottom-3 right-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-black text-primary shadow">
             {progress}%
           </div>
         </div>
         <div className="mt-5">
           <div className="text-center">
-            <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white/80">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.2em] text-white/80">
               <Sparkles className="h-3.5 w-3.5" /> GetPros AI
             </div>
             <div className="mt-1 text-lg font-black text-white">
@@ -655,7 +655,7 @@ function ScanningOverlay({
           >
             <X className="h-4 w-4" /> Cancel
           </button>
-          <p className="mt-2 text-center text-[11px] text-white/60">
+          <p className="mt-2 text-center text-xs text-white/60">
             This usually takes a few seconds. You can cancel any time.
           </p>
         </div>
@@ -681,12 +681,12 @@ function CaptureTile({
   return (
     <button
       onClick={onClick}
-      className={`card-lift group flex flex-col items-center justify-center gap-3 rounded-3xl border bg-card p-6 text-center shadow-sm hover:-translate-y-0.5 hover:shadow-lg ${
+      className={`card-lift group flex flex-col items-center justify-center gap-3 rounded-3xl border bg-card p-6 text-center shadow-sm hover:-translate-y-0.5 hover:shadow-elevated ${
         active ? "border-secondary ring-2 ring-secondary/30" : "border-border/60 hover:border-secondary/40"
       }`}
     >
       <div
-        className="grid h-14 w-14 place-items-center rounded-2xl text-white shadow-md"
+        className="grid h-14 w-14 place-items-center rounded-2xl text-white shadow-card"
         style={{ background: "var(--gradient-primary)" }}
       >
         <Icon className="h-6 w-6" />
@@ -725,7 +725,7 @@ function JobScopeCta({ analysis, image }: { analysis: SnapAnalysis; image: strin
 
   return (
     <div className="rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/5 to-card p-5 shadow-sm">
-      <div className="flex flex-wrap items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+      <div className="flex flex-wrap items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
         {["Snap", "Understand", "Scope", "Compare", "Book", "Verify", "Proof"].map((s, i) => (
           <span key={s} className="inline-flex items-center gap-2">
             <span className={i <= 1 ? "text-primary" : ""}>{s}</span>
@@ -870,7 +870,7 @@ function AnalysisView({
                 Focused on: {analysis.visualSubject}
               </span>
             )}
-            <span className="ml-auto inline-flex items-center gap-1 text-[11px] font-semibold text-muted-foreground">
+            <span className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground">
               <HistoryIcon className="h-3 w-3" /> Saved to history
             </span>
           </div>
@@ -936,7 +936,7 @@ function AnalysisView({
               <button
                 key={opt.label}
                 onClick={() => onAnswer?.(`I want help with: ${opt.label}. ${opt.reason ?? ""}`)}
-                className="rounded-2xl border border-border/60 bg-background p-3 text-left transition-all hover:-translate-y-0.5 hover:border-secondary hover:shadow-md"
+                className="rounded-2xl border border-border/60 bg-background p-3 text-left transition-all hover:-translate-y-0.5 hover:border-secondary hover:shadow-card"
               >
                 <div className="text-sm font-bold">{opt.label}</div>
                 {opt.reason && <div className="mt-0.5 text-xs text-muted-foreground">{opt.reason}</div>}
@@ -969,7 +969,7 @@ function AnalysisView({
               <ol className="space-y-2 text-sm">
                 {analysis.possibleCauses!.map((c, i) => (
                   <li key={c} className="flex gap-2.5">
-                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary/10 text-[10px] font-black text-primary">
+                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-black text-primary">
                       {i + 1}
                     </span>
                     <span className="text-foreground/90">{c}</span>
@@ -1000,7 +1000,7 @@ function AnalysisView({
       <>
       {/* Confirmed service summary — editable before we go looking for a pro */}
       <div className="rounded-3xl border border-primary/25 bg-card p-5 shadow-sm">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Service we'll request</div>
+        <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Service we'll request</div>
         <div className="mt-1 text-base font-black">
           {analysis.category || category?.name || "Service"}
         </div>
@@ -1210,14 +1210,14 @@ function ProCard({
   return (
     <div
       className={`relative overflow-hidden rounded-3xl border bg-card p-4 shadow-sm transition-all ${
-        recommended ? "border-primary/30 shadow-lg md:p-5" : "border-border/60 hover:shadow-md"
+        recommended ? "border-primary/30 shadow-elevated md:p-5" : "border-border/60 hover:shadow-card"
       }`}
     >
       {recommended && (
         <div className="absolute inset-x-0 top-0 h-1" style={{ background: "var(--gradient-primary)" }} />
       )}
       {recommended && (
-        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-primary">
           <CheckCircle2 className="h-3 w-3" /> Closest available pro
         </div>
       )}
@@ -1227,14 +1227,14 @@ function ProCard({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
             <div className="truncate text-sm font-black">{name}</div>
-            <span className="inline-flex items-center gap-0.5 rounded-full bg-mint/25 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-mint-ink">
+            <span className="inline-flex items-center gap-0.5 rounded-full bg-mint/25 px-1.5 py-0.5 text-xs font-bold uppercase tracking-wider text-mint-ink">
               <ShieldCheck className="h-2.5 w-2.5" /> Verified
             </span>
           </div>
           {p.service_category && (
-            <div className="truncate text-[11px] text-muted-foreground">{p.service_category}</div>
+            <div className="truncate text-xs text-muted-foreground">{p.service_category}</div>
           )}
-          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-[11px] text-muted-foreground">
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-muted-foreground">
             {match.distanceMiles != null && (
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-3 w-3" /> {Math.round(match.distanceMiles)} mi away
@@ -1246,7 +1246,7 @@ function ProCard({
           </div>
         </div>
         {p.starting_price != null && (
-          <div className="text-[11px] font-bold text-foreground">
+          <div className="text-xs font-bold text-foreground">
             from <span className="text-primary">${Number(p.starting_price)}</span>
           </div>
         )}
@@ -1305,7 +1305,7 @@ function TrustBadges() {
   ];
   return (
     <div className="mt-6 rounded-3xl border border-border/60 bg-gradient-to-br from-primary/5 via-card to-card p-4 backdrop-blur-xl">
-      <div className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+      <div className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
         <Users className="h-3.5 w-3.5 text-primary" /> AI-powered matching
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
@@ -1320,7 +1320,7 @@ function TrustBadges() {
             >
               <Icon className="h-4 w-4" />
             </div>
-            <div className="text-[11px] font-semibold leading-tight">{label}</div>
+            <div className="text-xs font-semibold leading-tight">{label}</div>
           </div>
         ))}
       </div>
@@ -1338,7 +1338,7 @@ function RecentDiagnoses({ entries }: { entries: SnapHistoryEntry[] }) {
         </div>
         <Link
           to="/history"
-          className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-[11px] font-semibold hover:bg-muted"
+          className="inline-flex items-center gap-1 rounded-full border border-border px-3 py-1.5 text-xs font-semibold hover:bg-muted"
         >
           View all <ArrowRight className="h-3 w-3" />
         </Link>
@@ -1351,7 +1351,7 @@ function RecentDiagnoses({ entries }: { entries: SnapHistoryEntry[] }) {
             <Link
               key={entry.id}
               to="/history"
-              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
+              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card"
             >
               <div className="relative shrink-0">
                 {entry.thumbnail ? (
@@ -1369,7 +1369,7 @@ function RecentDiagnoses({ entries }: { entries: SnapHistoryEntry[] }) {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="line-clamp-1 text-sm font-semibold">{entry.analysis.problem}</div>
-                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-muted-foreground">
+                <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
                   <span className="font-semibold text-foreground/80">
                     {entry.analysis.hasPriceEstimate
                       ? `$${entry.analysis.estimatedCostLow}–$${entry.analysis.estimatedCostHigh}`
@@ -1380,7 +1380,7 @@ function RecentDiagnoses({ entries }: { entries: SnapHistoryEntry[] }) {
                 </div>
               </div>
               <span
-                className={`inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${u.chip}`}
+                className={`inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-xs font-bold uppercase tracking-wider ${u.chip}`}
               >
                 {u.label}
               </span>

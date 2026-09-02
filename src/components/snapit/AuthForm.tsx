@@ -177,7 +177,7 @@ export function AuthForm({
             <SocialBtn label="Google" />
             <SocialBtn label="Apple" />
           </div>
-          <p className="mt-2 text-center text-[11px] text-muted-foreground">Social sign-in is coming soon.</p>
+          <p className="mt-2 text-center text-xs text-muted-foreground">Social sign-in is coming soon.</p>
 
           <div className="mt-6 text-center text-sm text-muted-foreground">{footer}</div>
           <div className="mt-4 text-center text-xs text-muted-foreground">
@@ -244,7 +244,7 @@ function SocialBtn({ label }: { label: string }) {
       title="Coming soon"
       className="rounded-xl border border-border bg-background py-2.5 text-sm font-semibold text-muted-foreground opacity-60"
     >
-      {label} <span className="text-[10px] font-normal">· soon</span>
+      {label} <span className="text-xs font-normal">· soon</span>
     </button>
   );
 }

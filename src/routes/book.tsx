@@ -356,8 +356,8 @@ function BookPage() {
   if (confirmed) {
     return (
       <AppShell hideBottomNav>
-        <div className="mx-auto mt-16 max-w-md rounded-3xl border border-border/60 bg-card p-8 text-center shadow-lg">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full text-white shadow-lg" style={{ background: "var(--gradient-primary)" }}>
+        <div className="mx-auto mt-16 max-w-md rounded-3xl border border-border/60 bg-card p-8 text-center shadow-elevated">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full text-white shadow-elevated" style={{ background: "var(--gradient-primary)" }}>
             <Check className="h-8 w-8" strokeWidth={3} />
           </div>
           <h1 className="mt-4 text-2xl font-black">Request sent</h1>
@@ -427,7 +427,7 @@ function BookPage() {
             </div>
           </div>
           {provider.verification_status === "verified" && (
-            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-mint-ink">
+            <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-1 text-xs font-bold uppercase tracking-wider text-mint-ink">
               <ShieldCheck className="h-3 w-3" /> Verified
             </span>
           )}

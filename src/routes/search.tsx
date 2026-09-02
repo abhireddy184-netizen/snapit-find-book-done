@@ -233,7 +233,7 @@ function SearchPage() {
                   We’re onboarding pros across the USA. Show us the job and we’ll notify you as coverage opens in your area.
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <Link to="/snap" className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-white shadow-md" style={{ background: "var(--gradient-primary)" }}>
+                  <Link to="/snap" className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-white shadow-card" style={{ background: "var(--gradient-primary)" }}>
                     Show us the problem <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                   <Link to="/provider-interest" className="inline-flex items-center rounded-full border border-border px-4 py-2 text-xs font-semibold hover:bg-muted">
@@ -257,7 +257,7 @@ function SearchPage() {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-1.5">
                         <div className="truncate text-base font-bold">{p.name}</div>
-                        <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">Demo profile</span>
+                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">Demo profile</span>
                       </div>
                       <div className="truncate text-xs text-muted-foreground">{p.business}</div>
                       <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
@@ -294,7 +294,7 @@ function RealProviderCard({ match }: { match: ProviderMatch }) {
           <div className="flex flex-wrap items-center gap-1.5">
             <div className="truncate text-base font-bold">{provider.business_name || "GetPros professional"}</div>
             {provider.verification_status === "verified" && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-0.5 text-[10px] font-semibold text-mint-ink">
+              <span className="inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-0.5 text-xs font-semibold text-mint-ink">
                 <ShieldCheck className="h-3 w-3" /> Verified
               </span>
             )}

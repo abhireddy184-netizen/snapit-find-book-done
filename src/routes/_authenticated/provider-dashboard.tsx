@@ -174,7 +174,7 @@ function JobRow({ booking }: { booking: Booking }) {
             {formatBookingDate(booking.scheduled_date)} · {booking.scheduled_time}
           </div>
         </div>
-        <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[10px] font-semibold capitalize">{booking.status.replace("_", " ")}</span>
+        <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs font-semibold capitalize">{booking.status.replace("_", " ")}</span>
       </div>
       {booking.details && <p className="mt-3 line-clamp-2 text-xs text-muted-foreground">{booking.details}</p>}
       <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
@@ -236,7 +236,7 @@ function Schedule({ userId }: { userId: string | undefined }) {
             )}
           </div>
           {b.status === "in_progress" && (
-            <p className="mt-2 text-[11px] text-muted-foreground">
+            <p className="mt-2 text-xs text-muted-foreground">
               In progress. If the job runs past 8:00 PM you can still complete it truthfully — the overrun is recorded.
             </p>
           )}
@@ -520,7 +520,7 @@ function VerificationCard({
           style={{ width: `${pct}%`, background: "var(--gradient-primary)" }}
         />
       </div>
-      <p className="mt-1.5 text-[11px] font-semibold text-muted-foreground">{completed} of {steps.length} steps complete</p>
+      <p className="mt-1.5 text-xs font-semibold text-muted-foreground">{completed} of {steps.length} steps complete</p>
 
       <ul className="mt-4 space-y-2">
         {steps.map((s) => (
@@ -544,7 +544,7 @@ function VerificationCard({
               ? "Your details are with the GetPros team. No badge is shown to customers until the review completes."
               : "Your profile is complete. Manual GetPros review isn’t open yet — we’ll contact you when it starts, and no badge is shown to customers until then."}
       </p>
-      <p className="mt-1 text-[11px] text-muted-foreground">Status: <span className="capitalize">{status.replace(/_/g, " ")}</span></p>
+      <p className="mt-1 text-xs text-muted-foreground">Status: <span className="capitalize">{status.replace(/_/g, " ")}</span></p>
     </div>
   );
 }
