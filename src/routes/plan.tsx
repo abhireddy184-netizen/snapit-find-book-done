@@ -319,7 +319,7 @@ function ConversationCard({
       {request.trim() && (
         <div className="rounded-[22px] border border-border/60 bg-muted/40 p-4 sm:p-5">
           <p className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">You said</p>
-          <p dir="auto" className="mt-1 text-[17px] leading-relaxed break-words">{request.trim()}</p>
+          <p dir="auto" className="mt-1 reply-text break-words">{request.trim()}</p>
         </div>
       )}
       <div className="rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
@@ -329,7 +329,7 @@ function ConversationCard({
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-black uppercase tracking-wider text-primary">GPB</p>
-            <p dir="auto" className="mt-1 text-[17px] font-bold leading-relaxed break-words sm:text-[18px]">{reply}</p>
+            <p dir="auto" className="mt-1 reply-text font-bold break-words">{reply}</p>
             {invitation && (
               <p dir="auto" className="mt-2 text-[15px] leading-relaxed text-muted-foreground break-words sm:text-base">{invitation}</p>
             )}
@@ -650,7 +650,7 @@ function TaskRow({
                 className="min-w-0 flex-1 rounded-xl bg-muted/50 px-3 py-1.5 text-sm font-bold outline-none"
               />
             ) : (
-              <h3 dir="auto" className={`text-[17px] font-black tracking-tight sm:text-[18px] ${skipped ? "line-through" : ""}`}>
+              <h3 dir="auto" className={`text-[17px] font-black sm:text-[18px] ${skipped ? "line-through" : ""}`}>
                 {task.title}
               </h3>
             )}
