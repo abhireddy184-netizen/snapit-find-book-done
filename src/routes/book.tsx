@@ -610,7 +610,13 @@ function BookPage() {
             {step < steps.length - 1 ? (
               <GradientButton
                 onClick={next}
-                disabled={(step === 0 && !service.trim()) || (step === 3 && !scheduleReady)}
+                disabled={
+                  (step === 0 && !service.trim()) ||
+                  // Never move on with a half-resolved address: the timezone
+                  // decides every slot shown on the next step.
+                  (step === 2 && (!address.trim() || !location)) ||
+                  (step === 3 && !scheduleReady)
+                }
               >
                 Continue <ChevronRight className="h-4 w-4" />
               </GradientButton>
