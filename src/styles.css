@@ -106,8 +106,9 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   /* Two elevation steps, both navy-tinted. Nothing else. */
-  --shadow-card: var(--shadow-card);
-  --shadow-elevated: var(--shadow-elevated);
+  --shadow-card: var(--elev-card);
+  --shadow-elevated: var(--elev-raised);
+
 
 }
 
