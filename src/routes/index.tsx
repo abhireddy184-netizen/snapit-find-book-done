@@ -62,11 +62,24 @@ function Landing() {
             {/* Branding lives in the header only — repeating the wordmark here
                 pushed the headline below the fold on phones. */}
             <h1 className="max-w-[15ch] text-[clamp(2rem,5.6vw,4.2rem)] font-black leading-[1.05] tracking-tight text-foreground">
-              What do you <span className="text-gradient-hero">need done?</span>
+              What service do you <span className="text-gradient-hero">need?</span>
             </h1>
             <p className="mt-2.5 max-w-[44ch] text-[clamp(0.9rem,1.2vw,1.15rem)] leading-relaxed text-muted-foreground">
-              Tell GPB what needs to happen. We’ll build the plan and coordinate the right help.
+              Show GPB a photo, speak it in any language, or type it. We work out the service you need and
+              find a local pro.
             </p>
+
+            {/* Photo-first: the camera is the headline action, on every size. */}
+            <Link
+              to="/snap"
+              id="hero-show-gpb-cta"
+              data-analytics-id="show_gpb_cta"
+              data-analytics-location="hero_primary"
+              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-black text-white shadow-lg transition-transform hover:scale-[1.01] sm:w-auto"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              <Camera className="h-5 w-5" /> Show GPB a photo
+            </Link>
 
             <div className="mt-4 lg:hidden">
               <OutcomeComposer />
@@ -94,6 +107,7 @@ function Landing() {
               </Link>
             </div>
           </div>
+
 
           {/* Composer sits beside the headline on large screens */}
           <div className="hidden min-w-0 lg:block">
