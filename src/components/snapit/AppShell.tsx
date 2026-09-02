@@ -108,13 +108,19 @@ function AuthNav() {
 
   return (
     <>
-      <Link to="/login" search={{ redirect: undefined }} className="hidden rounded-full px-4 py-2 text-sm font-medium text-foreground hover:bg-muted md:inline-flex">
+      {/* Returning users need a visible way in on phones too — a plain text
+          link keeps the header inside 320px next to the gradient Sign up CTA. */}
+      <Link
+        to="/login"
+        search={{ redirect: undefined }}
+        className="inline-flex shrink-0 items-center rounded-full px-2.5 py-2 text-sm font-semibold text-foreground hover:bg-muted sm:px-4"
+      >
         Log in
       </Link>
       <Link
         to="/register"
         search={{ redirect: undefined, role: undefined }}
-        className="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] hover:shadow-lg"
+        className="inline-flex shrink-0 items-center rounded-full px-3.5 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] hover:shadow-lg sm:px-4"
         style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px color-mix(in oklab, var(--primary) 55%, transparent)" }}
       >
         Sign up
@@ -123,31 +129,75 @@ function AuthNav() {
   );
 }
 
+/**
+ * True while a text field has focus — used to drop the floating bottom nav so
+ * the on-screen keyboard never covers the composer's actions on mobile.
+ */
+function useKeyboardOpen() {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const isField = (el: Element | null) =>
+      !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || (el as HTMLElement).isContentEditable);
+    const onFocus = (e: FocusEvent) => { if (isField(e.target as Element)) setOpen(true); };
+    const onBlur = () => setOpen(false);
+    document.addEventListener("focusin", onFocus);
+    document.addEventListener("focusout", onBlur);
+    return () => {
+      document.removeEventListener("focusin", onFocus);
+      document.removeEventListener("focusout", onBlur);
+    };
+  }, []);
+  return open;
+}
+
 function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const items = [
-    { to: "/", label: "Home", icon: Home },
-    { to: "/search", label: "Search", icon: Search },
-    { to: "/snap", label: "Show GPB", icon: Camera, highlight: true },
-    { to: "/dashboard", label: "Bookings", icon: CalendarDays },
-    { to: "/dashboard", label: "Profile", icon: User },
+  const keyboardOpen = useKeyboardOpen();
+  const { user } = useAuth();
+  const items: Array<{
+    key: string;
+    to: "/" | "/search" | "/snap" | "/dashboard" | "/login";
+    label: string;
+    icon: typeof Home;
+    highlight?: boolean;
+  }> = [
+    { key: "home", to: "/", label: "Home", icon: Home },
+    { key: "search", to: "/search", label: "Search", icon: Search },
+    { key: "snap", to: "/snap", label: "Show GPB", icon: Camera, highlight: true },
+    { key: "bookings", to: "/dashboard", label: "Bookings", icon: CalendarDays },
+    // Signed-out visitors get a real entry point instead of a silent redirect.
+    user
+      ? { key: "profile", to: "/dashboard", label: "Profile", icon: User }
+      : { key: "profile", to: "/login", label: "Log in", icon: User },
   ];
   return (
-    <nav className="fixed inset-x-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md px-4 md:hidden">
+    <nav
+      aria-hidden={keyboardOpen}
+      className={cn(
+        "fixed inset-x-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md px-4 transition-all duration-200 md:hidden",
+        keyboardOpen && "pointer-events-none translate-y-[140%] opacity-0"
+      )}
+    >
       <div className="glass-strong mx-auto flex items-stretch justify-around rounded-full px-2 py-2 shadow-[0_20px_60px_-20px_color-mix(in oklab, var(--plum) 22%, transparent)]">
-        {items.map((it, i) => {
-          const active = pathname === it.to && (i === 0 ? pathname === "/" : true);
+        {items.map((it) => {
+          const active = it.key === "home" ? pathname === "/" : pathname.startsWith(it.to);
           const Icon = it.icon;
+          const search =
+            it.to === "/search"
+              ? { q: "", loc: "" }
+              : it.to === "/login"
+                ? { redirect: undefined }
+                : undefined;
           if (it.highlight) {
             return (
               <Link
-                key={i}
+                key={it.key}
                 to={it.to}
                 className="-mt-7 flex flex-col items-center gap-1"
                 aria-label="Show GPB — camera diagnosis"
               >
                 <span
-                  className="grid h-14 w-14 place-items-center rounded-full text-white shadow-xl ring-4 ring-white transition-transform hover:scale-105"
+                  className="grid h-14 w-14 place-items-center rounded-full text-white shadow-xl ring-4 ring-card transition-transform hover:scale-105"
                   style={{ background: "var(--gradient-primary)", boxShadow: "0 16px 40px -12px color-mix(in oklab, var(--primary) 60%, transparent)" }}
                 >
                   <Icon className="h-6 w-6" />
@@ -158,11 +208,12 @@ function BottomNav() {
           }
           return (
             <Link
-              key={i}
+              key={it.key}
               to={it.to}
-              {...(it.to === "/search" ? { search: { q: "", loc: "" } } : {})}
+              {...(search ? { search } : {})}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "flex flex-1 flex-col items-center gap-1 rounded-full px-2 py-1.5 text-[10px] font-medium transition-colors",
+                "flex min-h-11 flex-1 flex-col items-center justify-center gap-1 rounded-full px-2 py-1.5 text-[10px] font-medium transition-colors",
                 active ? "text-primary" : "text-muted-foreground"
               )}
             >

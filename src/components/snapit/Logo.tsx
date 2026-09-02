@@ -74,7 +74,9 @@ export function Logo({ compact = false, onColor = false }: { compact?: boolean; 
         <Wordmark size={13} gradient={false} className={onColor ? "text-primary" : "text-white"} />
       </span>
       {!compact && (
-        <span className="min-w-0 leading-none">
+        /* Below 360px the wordmark tile alone carries the brand so the header
+           never overflows next to Log in / Sign up. */
+        <span className="hidden min-w-0 leading-none min-[360px]:block">
           <span className={`block truncate text-[14px] font-black tracking-tight sm:text-base ${onColor ? "text-white" : "text-foreground"}`}>
             GetPerfectBoy.com
           </span>

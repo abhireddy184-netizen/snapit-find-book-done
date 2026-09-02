@@ -7,7 +7,7 @@ import {
   Facebook, Instagram, Twitter, Youtube,
 } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
-import { Logo, Wordmark } from "@/components/snapit/Logo";
+import { Logo } from "@/components/snapit/Logo";
 import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
 import { OutcomeComposer } from "@/components/snapit/OutcomeComposer";
 import {
@@ -58,23 +58,19 @@ function Landing() {
         />
         <div className="gpb-shell relative grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-14 xl:gap-20">
           <div className="min-w-0">
-            <div className="flex flex-col items-start">
-              <Wordmark size="clamp(2.2rem, 7.5vw, 3rem)" />
-              <span className="mt-1 text-xs font-bold tracking-tight text-muted-foreground sm:text-sm">
-                GetPerfectBoy.com
-              </span>
-            </div>
-
-            <h1 className="mt-5 max-w-[15ch] text-[clamp(2.2rem,5.6vw,4.2rem)] font-black leading-[1.03] tracking-tight text-foreground">
+            {/* Branding lives in the header only — repeating the wordmark here
+                pushed the headline below the fold on phones. */}
+            <h1 className="max-w-[15ch] text-[clamp(2rem,5.6vw,4.2rem)] font-black leading-[1.05] tracking-tight text-foreground">
               What do you <span className="text-gradient-hero">need done?</span>
             </h1>
-            <p className="mt-3 max-w-[44ch] text-[clamp(0.95rem,1.2vw,1.15rem)] leading-relaxed text-muted-foreground">
+            <p className="mt-2.5 max-w-[44ch] text-[clamp(0.9rem,1.2vw,1.15rem)] leading-relaxed text-muted-foreground">
               Tell GPB what needs to happen. We’ll build the plan and coordinate the right help.
             </p>
 
-            <div className="mt-6 lg:hidden">
+            <div className="mt-4 lg:hidden">
               <OutcomeComposer />
             </div>
+
 
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-muted-foreground">
               <a

@@ -126,7 +126,10 @@ export function OutcomeComposer() {
   const [request, setRequest] = useState("");
   const [loc, setLoc] = useState("");
   const [i, setI] = useState(0);
+  /** Set when someone submits an empty request — /plan would silently show the demo. */
+  const [emptyError, setEmptyError] = useState(false);
   const paused = useRef(false);
+
 
   // Voice input state — capabilities are detected after mount to avoid SSR/client mismatch.
   const [voiceSupported, setVoiceSupported] = useState(false);
@@ -466,8 +469,17 @@ export function OutcomeComposer() {
       else stopRecordingAndTranscribe();
     }
     const q = request.trim();
+    // An empty request lands on /plan's demo plan, which reads like a real
+    // answer to a request that was never made. Ask for the words instead.
+    if (!q) {
+      setEmptyError(true);
+      document.getElementById("gpb-outcome")?.focus();
+      return;
+    }
+    setEmptyError(false);
     void navigate({ to: "/plan", search: { q, loc: loc.trim() } });
   };
+
 
   const micTitle = !voiceSupported
     ? "Voice input isn’t supported in this browser — type instead"
@@ -505,17 +517,23 @@ export function OutcomeComposer() {
           id="gpb-outcome"
           dir="auto"
           value={request}
-          onChange={(e) => setRequest(e.target.value)}
+          onChange={(e) => {
+            setRequest(e.target.value);
+            if (emptyError) setEmptyError(false);
+          }}
           onFocus={() => (paused.current = true)}
           onBlur={() => (paused.current = false)}
           rows={3}
+          aria-invalid={emptyError}
+          aria-describedby={emptyError ? "gpb-outcome-error" : undefined}
           /* While the mic is active the rotating examples stop competing with
              what the person is actually saying. */
           placeholder={voiceActive ? "" : EXAMPLES[i]}
-          className={`min-h-[112px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pe-[3.75rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:pe-16 ${
-            voiceActive ? "bg-primary/5 ring-2 ring-primary/60" : ""
+          className={`min-h-[96px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3 pe-[3.5rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:py-3.5 sm:pe-16 ${
+            voiceActive ? "bg-primary/5 ring-2 ring-primary/60" : emptyError ? "ring-2 ring-destructive/70" : ""
           }`}
         />
+
         {voiceActive && !request && (
           <span
             aria-hidden
@@ -564,12 +582,17 @@ export function OutcomeComposer() {
           {statusLine}
         </p>
       )}
-
+      {emptyError && (
+        <p id="gpb-outcome-error" role="alert" className="mt-1.5 text-xs font-semibold text-destructive">
+          Tell GPB what you need first — type it or tap the mic.
+        </p>
+      )}
 
       <div className="mt-2.5 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
         <div className="min-w-0">
           <LocationAutocomplete
             value={loc}
+
             onChange={setLoc}
             aria-label="ZIP or city"
             placeholder="ZIP or city"
