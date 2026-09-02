@@ -220,32 +220,39 @@ function weekdayForDate(isoDate: string): number {
 /** Bookable start minutes for one local date, honouring every rule. */
 export function slotsForDate(isoDate: string, opts: SlotOptions): number[] {
   const {
-    totalMinutes, timeZone, hours = [], timeOff = [], busy = [],
+    durationMinutes, bufferMinutes = 0, timeZone, hours, timeOff = [], busy = [],
     notBefore = new Date(), stepMinutes = 30,
   } = opts;
 
   const weekday = weekdayForDate(isoDate);
-  const dayHours = hours.filter((h) => h.weekday === weekday);
+
+  // An hours array is authoritative: no row for this weekday means closed.
+  // Only an explicitly absent array falls back to the bare platform window.
+  const source = hours == null
+    ? [{ weekday, startMinute: SERVICE_WINDOW_START_MINUTE, endMinute: SERVICE_WINDOW_END_MINUTE }]
+    : hours.filter((h) => h.weekday === weekday);
 
   // Provider hours may narrow the platform window, never extend it.
-  const ranges = (dayHours.length > 0 ? dayHours : [{ weekday, startMinute: SERVICE_WINDOW_START_MINUTE, endMinute: SERVICE_WINDOW_END_MINUTE }])
+  const ranges = source
     .map((h) => ({
       start: Math.max(h.startMinute, SERVICE_WINDOW_START_MINUTE),
       end: Math.min(h.endMinute, SERVICE_WINDOW_END_MINUTE),
     }))
-    .filter((r) => r.end - r.start >= totalMinutes);
+    .filter((r) => r.end - r.start >= durationMinutes);
 
   const offRanges = timeOff.map((t) => [Date.parse(t.startsAt), Date.parse(t.endsAt)] as const);
   const busyRanges = busy.map((b) => [Date.parse(b.startAt), Date.parse(b.endAt)] as const);
   const out: number[] = [];
 
   for (const range of ranges) {
-    for (let m = range.start; m + totalMinutes <= range.end; m += stepMinutes) {
+    for (let m = range.start; m + durationMinutes <= range.end; m += stepMinutes) {
       const startUtc = zonedTimeToUtc(isoDate, m, timeZone).getTime();
-      const endUtc = startUtc + totalMinutes * 60_000;
+      // The job itself must fit the window; the travel buffer only holds the pro.
+      const endUtc = startUtc + durationMinutes * 60_000;
+      const occupiedEndUtc = endUtc + bufferMinutes * 60_000;
       if (startUtc < notBefore.getTime()) continue;
-      if (offRanges.some(([s, e]) => startUtc < e && endUtc > s)) continue;
-      if (busyRanges.some(([s, e]) => startUtc < e && endUtc > s)) continue;
+      if (offRanges.some(([s, e]) => startUtc < e && occupiedEndUtc > s)) continue;
+      if (busyRanges.some(([s, e]) => startUtc < e && occupiedEndUtc > s)) continue;
       out.push(m);
     }
   }
