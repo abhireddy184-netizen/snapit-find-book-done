@@ -355,6 +355,8 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
   const deadlineDateLabel = formatPlanDate(plan.deadlineDate ?? plan.startDate, locale);
   // Only worth showing the day on the target when it differs from the start day.
   const showDeadlineDate = Boolean(plan.deadlineDate && plan.deadlineDate !== plan.startDate);
+  // The plan can run past midnight (a late outing), so carry the day forward.
+  const endDateLabel = end >= 1440 ? formatPlanDate(addDays(plan.startDate, Math.floor(end / 1440)), locale) : null;
 
   return (
     <section className="mt-6 overflow-hidden rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
