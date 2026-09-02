@@ -160,9 +160,33 @@ export function OutcomeComposer() {
   const stableRef = useRef<StableTranscript | null>(null);
   // Text the recognition session started with — finals append onto this.
   const baseTextRef = useRef("");
+  /** Seconds left before GPB builds the plan on its own; null = not armed. */
+  const [autoSecs, setAutoSecs] = useState<number | null>(null);
+  const autoTimerRef = useRef<number | null>(null);
+  /** Exactly-once guard so auto and manual submit can never both fire. */
+  const submittedRef = useRef(false);
 
   const listening = voiceStatus === "listening";
   const transcribing = voiceStatus === "transcribing";
+
+  const cancelAutoSubmit = () => {
+    if (autoTimerRef.current !== null) {
+      window.clearInterval(autoTimerRef.current);
+      autoTimerRef.current = null;
+    }
+    setAutoSecs(null);
+  };
+
+  /** Armed only from a finalized spoken transcript, never from typing. */
+  const armAutoSubmit = (text: string) => {
+    if (text.trim().length < MIN_AUTO_SUBMIT_CHARS) return;
+    if (autoTimerRef.current !== null) window.clearInterval(autoTimerRef.current);
+    setAutoSecs(AUTO_SUBMIT_SECONDS);
+    autoTimerRef.current = window.setInterval(() => {
+      setAutoSecs((s) => (s === null ? null : s - 1));
+    }, 1000);
+  };
+
 
   useEffect(() => {
     // Examples rotate only while the composer is idle — never during voice input.
