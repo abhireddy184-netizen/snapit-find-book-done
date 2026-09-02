@@ -13,6 +13,10 @@ export const analyzeSnap = createServerFn({ method: "POST" })
         imageDataUrl: z.string().min(10).optional(),
         imageDataUrls: z.array(z.string().min(10)).max(4).optional(),
         note: z.string().optional(),
+        latestMessage: z.string().optional(),
+        askedQuestions: z.array(z.string()).max(12).optional(),
+        turnCount: z.number().int().min(0).max(10).optional(),
+        forceResolve: z.boolean().optional(),
       })
       .refine((v) => Boolean(v.imageDataUrl || v.imageDataUrls?.length || v.note?.trim()), {
         message: "Add a photo, a video or a description so GPB can help.",
@@ -26,9 +30,15 @@ export const analyzeSnap = createServerFn({ method: "POST" })
     const images = data.imageDataUrls?.length ? data.imageDataUrls : data.imageDataUrl ? [data.imageDataUrl] : [];
     const hasMedia = images.length > 0;
     const note = data.note?.trim();
+    const ctx = {
+      latestMessage: data.latestMessage?.trim(),
+      askedQuestions: data.askedQuestions ?? [],
+      turnCount: data.turnCount ?? 0,
+      forceResolve: data.forceResolve ?? false,
+    };
 
     const content: ({ type: "text"; text: string } | { type: "image"; image: string })[] = [
-      { type: "text", text: buildUserPrompt(note, hasMedia, images.length) },
+      { type: "text", text: buildUserPrompt(note, hasMedia, images.length, ctx) },
     ];
     for (const image of images) content.push({ type: "image", image });
 
@@ -38,5 +48,5 @@ export const analyzeSnap = createServerFn({ method: "POST" })
       messages: [{ role: "user", content }],
     });
 
-    return normalizeAnalysis(text, Boolean(note), hasMedia);
+    return normalizeAnalysis(text, Boolean(note), hasMedia, note, ctx);
   });

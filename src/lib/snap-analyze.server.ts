@@ -1,5 +1,5 @@
 import { catalog } from "./catalog";
-import { matchServiceIntent, rankServices } from "./search-intent";
+import { detectServiceIntentInText, matchServiceIntent, rankServices } from "./search-intent";
 
 
 export type IssueSource = "detected" | "possible" | "customer-described" | "insufficient";
@@ -19,6 +19,7 @@ export type SnapAnalysis = {
   visualSubject?: string;
   category: string;
   categorySlug: string;
+  serviceSlug?: string;
   confidence: number;
   problem: string;
   estimatedCostLow: number;
@@ -68,6 +69,13 @@ HARD RULES
 - Cosmetic/grooming intent on hair, nails, skin, beard etc. routes to the beauty-at-home category.
 - issueSource must be: "detected" (clearly visible), "possible" (likely but unconfirmed), "customer-described" (based on their words), or "insufficient".
 
+PROGRESSION RULES (never trap the customer in a question loop)
+- The customer's LATEST message always overrides any earlier guess of yours and any inference from the photo. If they say "TV repair", the service is a repair — not mounting, not installation, not setup — even if the photo shows a wall-mounted TV. Repair, installation/mounting, setup/troubleshooting and cleaning are DIFFERENT services: pick the one their words name.
+- Never repeat, rephrase or re-ask a question that has already been asked, and never re-ask something they already answered. Carry every earlier answer forward.
+- Ask at most 1-2 short clarifying questions in total across the whole conversation. Once the service is identifiable, STOP asking and resolve: responseKind "diagnosis" with the matching categorySlug/serviceSlug so GPB can find a professional. Details a pro can collect on site (exact model, symptom specifics, brand) are NOT worth another question — leave them to the pro.
+- Do NOT push DIY troubleshooting, self-diagnosis checklists (power/picture/sound/remote/inputs), cable-swapping tips or generic safety lists. GPB connects people with pros. Only give a safety note for a genuine urgent hazard (gas, live electricity, water on power, fire, structural collapse).
+- When the service is known but a fair price range is not, still use responseKind "diagnosis" with hasPriceEstimate false and costs 0 — the customer must still reach a professional.
+
 CATEGORY + SERVICE SLUGS (categorySlug must be one of the category slugs; serviceSlug when used must belong to that category):
 ${catalogSummary()}
 
@@ -76,17 +84,59 @@ Return ONLY valid minified JSON, no markdown, matching:
 
 Keep every string short and plain-language. Prices are USD typical ranges.`;
 
-export function buildUserPrompt(note: string | undefined, hasMedia: boolean, frameCount = 1) {
+export type AnalysisContext = {
+  /** Questions GPB has already put to this customer in this conversation. */
+  askedQuestions?: string[];
+  /** How many clarification answers the customer has already given. */
+  turnCount?: number;
+  /** Customer pressed "Find a professional" / "Not sure" — resolve with what we have. */
+  forceResolve?: boolean;
+  /** The newest thing the customer typed; it outranks every earlier guess. */
+  latestMessage?: string;
+};
+
+function conversationBlock(ctx?: AnalysisContext) {
+  if (!ctx) return "";
+  const parts: string[] = [];
+  if (ctx.latestMessage?.trim()) {
+    parts.push(
+      `The customer's LATEST message is: "${ctx.latestMessage.trim()}". It overrides every earlier assumption, including anything inferred from the photo.`,
+    );
+  }
+  if (ctx.askedQuestions?.length) {
+    parts.push(
+      `You have ALREADY asked: ${ctx.askedQuestions.map((q) => `"${q}"`).join("; ")}. Do not ask these again or reword them.`,
+    );
+  }
+  if (ctx.forceResolve) {
+    parts.push(
+      `The customer asked to move on and find a professional. Ask NOTHING further: return responseKind "diagnosis" (or "options" only if genuinely two different trades) with the best-fit categorySlug/serviceSlug and leave remaining details for the pro.`,
+    );
+  } else if ((ctx.turnCount ?? 0) >= 2) {
+    parts.push(
+      `This is clarification turn ${ctx.turnCount}. No more questions are allowed — resolve to the best-fit service now.`,
+    );
+  }
+  return parts.length ? `\n${parts.join(" ")}` : "";
+}
+
+export function buildUserPrompt(
+  note: string | undefined,
+  hasMedia: boolean,
+  frameCount = 1,
+  ctx?: AnalysisContext,
+) {
   const described = note?.trim();
+  const convo = conversationBlock(ctx);
   if (!hasMedia) {
-    return `The customer sent NO photo — only this description: "${described}". Work out the service from their words alone. Respond with JSON only.`;
+    return `The customer sent NO photo — only this description: "${described}". Work out the service from their words alone.${convo} Respond with JSON only.`;
   }
   const multi = frameCount > 1
     ? ` The ${frameCount} images are frames sampled across one short video of the same scene — read them together, not as separate problems.`
     : "";
   return described
-    ? `Customer description (HIGHEST PRIORITY — treat this as the real problem even if the image shows something else): "${described}". Their words define the subject. Use the image only as supporting context.${multi} Respond with JSON only.`
-    : `The customer sent ${frameCount > 1 ? `${frameCount} frames from one short video` : "an image"} with no description. First decide the intended visual subject from salience, then only report a problem if one is genuinely visible on THAT subject. Ignore incidental marks on surrounding surfaces.${multi} Respond with JSON only.`;
+    ? `Customer description (HIGHEST PRIORITY — treat this as the real problem even if the image shows something else): "${described}". Their words define the subject. Use the image only as supporting context.${multi}${convo} Respond with JSON only.`
+    : `The customer sent ${frameCount > 1 ? `${frameCount} frames from one short video` : "an image"} with no description. First decide the intended visual subject from salience, then only report a problem if one is genuinely visible on THAT subject. Ignore incidental marks on surrounding surfaces.${multi}${convo} Respond with JSON only.`;
 }
 
 const CATEGORY_SLUGS = new Set(catalog.map((c) => c.slug));
@@ -100,6 +150,7 @@ export function normalizeAnalysis(
   hadNote: boolean,
   hasMedia = false,
   note?: string,
+  ctx?: AnalysisContext,
 ): SnapAnalysis {
   const match = raw.match(/\{[\s\S]*\}/);
   let parsed: Partial<SnapAnalysis> = {};
@@ -113,12 +164,24 @@ export function normalizeAnalysis(
   const aiCategory =
     parsed.categorySlug && CATEGORY_SLUGS.has(parsed.categorySlug) ? parsed.categorySlug : null;
 
+  const parsedKindRaw: ResponseKind | undefined = parsed.responseKind;
+  // The customer's newest words beat any photo inference — "TV repair" must not
+  // be answered with TV mounting. Safety redirects are never overridden.
+  const latest = ctx?.latestMessage?.trim() ?? "";
+  const explicit = parsedKindRaw === "safety-redirect" || !latest ? null : detectServiceIntentInText(latest);
+
   // Never silently label an unclassified request "Handyman". When the AI gave
   // no valid category, try the customer's own words against the catalog first.
   let inferredService: { categorySlug: string; serviceSlug: string; label: string } | null = null;
   let inferredOptions: ServiceOption[] = [];
-  if (!aiCategory && noteText) {
-    const hit = matchServiceIntent(noteText);
+  if (explicit) {
+    inferredService = {
+      categorySlug: explicit.category.slug,
+      serviceSlug: explicit.service.slug,
+      label: explicit.service.name,
+    };
+  } else if (!aiCategory && noteText) {
+    const hit = detectServiceIntentInText(noteText) ?? matchServiceIntent(noteText);
     if (hit) {
       inferredService = {
         categorySlug: hit.category.slug,
@@ -137,25 +200,64 @@ export function normalizeAnalysis(
     }
   }
 
+  // The customer asked to move on, or we've already spent our clarification
+  // budget: resolve with the best fit instead of asking again.
+  const mustResolve = Boolean(ctx?.forceResolve) || (ctx?.turnCount ?? 0) >= 2;
+  if (mustResolve && !inferredService && !aiCategory) {
+    const fallback = rankServices(latest || noteText, 4);
+    if (fallback[0]) {
+      inferredService = {
+        categorySlug: fallback[0].category.slug,
+        serviceSlug: fallback[0].service.slug,
+        label: fallback[0].service.name,
+      };
+      inferredOptions = fallback.slice(1).map((h) => ({
+        categorySlug: h.category.slug,
+        serviceSlug: h.service.slug,
+        label: h.service.name,
+        reason: h.category.name,
+      }));
+    }
+  }
+
   // Empty slug = deliberately unclassified; the UI hides category chips, pricing
   // and pro matches for discovery states.
-  const categorySlug = aiCategory ?? inferredService?.categorySlug ?? "";
+  const categorySlug = inferredService?.categorySlug ?? aiCategory ?? "";
   const cat = catalog.find((c) => c.slug === categorySlug);
   const unclassified = !categorySlug;
-  const parsedKind: ResponseKind | undefined = parsed.responseKind;
-  const responseKind: ResponseKind = unclassified
+  const parsedKind: ResponseKind | undefined = parsedKindRaw;
+  let responseKind: ResponseKind = unclassified
     ? parsedKind === "no-issue" || parsedKind === "safety-redirect"
       ? parsedKind
       : inferredOptions.length > 1
         ? "options"
         : "needs-info"
     : (parsedKind ?? (Object.keys(parsed).length ? "diagnosis" : "needs-info"));
+  // An explicit service the customer named, or an exhausted question budget,
+  // means we stop clarifying and progress to finding a professional.
+  if (categorySlug && responseKind !== "safety-redirect" && (explicit || mustResolve)) {
+    responseKind = "diagnosis";
+  }
   // Only a confident, single-service diagnosis may carry a price or pro match.
   // options / needs-info / no-issue / safety-redirect are discovery states.
+  const categoryChanged = Boolean(explicit && aiCategory && explicit.category.slug !== aiCategory);
   const hasPriceEstimate =
     responseKind === "diagnosis" &&
     Boolean(parsed.hasPriceEstimate ?? true) &&
-    Number(parsed.estimatedCostLow ?? 0) > 0;
+    Number(parsed.estimatedCostLow ?? 0) > 0 &&
+    !categoryChanged;
+  const suppressQuestions = responseKind === "diagnosis";
+  const alreadyAsked = new Set((ctx?.askedQuestions ?? []).map((q) => q.trim().toLowerCase()));
+  const freshQuestions = (
+    Array.isArray(parsed.clarifyingQuestions) ? parsed.clarifyingQuestions.filter(Boolean) : []
+  )
+    .filter((q) => !alreadyAsked.has(String(q).trim().toLowerCase()))
+    .slice(0, 2);
+  // Nothing new left to ask, but we know the trade: progress instead of stalling.
+  if (categorySlug && responseKind === "needs-info" && freshQuestions.length === 0) {
+    responseKind = "diagnosis";
+  }
+  const questions = suppressQuestions || responseKind === "diagnosis" ? [] : freshQuestions;
 
   return {
     responseKind,
@@ -169,8 +271,9 @@ export function normalizeAnalysis(
           : responseKind === "options"
             ? "A few GPB services could fit — which one sounds right?"
             : cat?.name ?? "Let's narrow this down"),
-    category: (aiCategory ? parsed.category?.trim() : inferredService?.label) || cat?.name || "",
+    category: (inferredService?.label || (aiCategory ? parsed.category?.trim() : "")) || cat?.name || "",
     categorySlug,
+    serviceSlug: inferredService?.serviceSlug,
 
     confidence: Math.min(1, Math.max(0, Number(parsed.confidence ?? 0.5))),
     problem: parsed.problem?.trim() ||
@@ -184,7 +287,7 @@ export function normalizeAnalysis(
     recommendedActions: Array.isArray(parsed.recommendedActions) ? parsed.recommendedActions.filter(Boolean).slice(0, 5) : [],
     possibleCauses: Array.isArray(parsed.possibleCauses) ? parsed.possibleCauses.filter(Boolean).slice(0, 4) : [],
     nextSteps: Array.isArray(parsed.nextSteps) ? parsed.nextSteps.filter(Boolean).slice(0, 4) : [],
-    clarifyingQuestions: Array.isArray(parsed.clarifyingQuestions) ? parsed.clarifyingQuestions.filter(Boolean).slice(0, 3) : [],
+    clarifyingQuestions: questions,
     serviceOptions: Array.isArray(parsed.serviceOptions) && parsed.serviceOptions.length
       ? parsed.serviceOptions
           .filter((o) => o && CATEGORY_SLUGS.has(o.categorySlug))

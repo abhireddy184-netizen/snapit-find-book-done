@@ -86,6 +86,9 @@ function SnapPage() {
   // Monotonic token: only the newest run is allowed to write state.
   const runRef = useRef(0);
   const busyRef = useRef(false);
+  // Conversation memory so GPB never re-asks a question or loses an answer.
+  const [askedQuestions, setAskedQuestions] = useState<string[]>([]);
+  const [turnCount, setTurnCount] = useState(0);
   const [recent, setRecent] = useState<SnapHistoryEntry[]>([]);
   useEffect(() => {
     setRecent(loadHistory().slice(0, 4));
@@ -100,16 +103,32 @@ function SnapPage() {
     return () => URL.revokeObjectURL(pendingPreview);
   }, [pendingPreview]);
 
-  const runDiagnosis = async (frames: string[], noteText: string, token: number) => {
+  const runDiagnosis = async (
+    frames: string[],
+    noteText: string,
+    token: number,
+    opts?: { latestMessage?: string; asked?: string[]; turns?: number; forceResolve?: boolean },
+  ) => {
     setPhase("analyzing");
     try {
+      const payload = {
+        ...(frames.length ? { imageDataUrls: frames } : {}),
+        note: noteText,
+        latestMessage: opts?.latestMessage,
+        askedQuestions: opts?.asked ?? askedQuestions,
+        turnCount: opts?.turns ?? turnCount,
+        forceResolve: opts?.forceResolve ?? false,
+      };
       const result = await withTimeout(
-        analyze({ data: frames.length ? { imageDataUrls: frames, note: noteText } : { note: noteText } }),
+        analyze({ data: payload }),
         ANALYSIS_TIMEOUT_MS,
         "The AI is taking longer than usual. Please retry or send it again.",
       );
       if (runRef.current !== token) return;
       setAnalysis(result);
+      if (result.clarifyingQuestions?.length) {
+        setAskedQuestions((prev) => [...new Set([...prev, ...result.clarifyingQuestions!])].slice(0, 12));
+      }
     } catch (e) {
       if (runRef.current !== token) return;
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
@@ -135,6 +154,8 @@ function SnapPage() {
     setDescribeMode(false);
     setMediaKind(kind);
     setNote("");
+    setAskedQuestions([]);
+    setTurnCount(0);
     // Show the working state immediately — no dead period after capture.
     setLoading(true);
     setPhase("preparing");
@@ -163,13 +184,15 @@ function SnapPage() {
     await runDiagnosis(prepared.frames, "", token);
   };
 
+  const runDiagnosisFresh = runDiagnosis;
+
   const runAnalysis = async () => {
     if (!image || busyRef.current) return;
     busyRef.current = true;
     const token = ++runRef.current;
     setLoading(true);
     setError(null);
-    await runDiagnosis(frames, note, token);
+    await runDiagnosisFresh(frames, note, token, { latestMessage: note });
   };
 
   /** Text-only path — no photo required (essential on desktop). */
@@ -185,8 +208,10 @@ function SnapPage() {
     setTextOnly(true);
     setFrames([]);
     setNote(described);
+    setAskedQuestions([]);
+    setTurnCount(0);
     setLoading(true);
-    await runDiagnosis([], described, token);
+    await runDiagnosis([], described, token, { latestMessage: described, asked: [], turns: 0 });
   };
 
   /** Abandon any in-flight work and go back to a usable screen. */
@@ -203,13 +228,29 @@ function SnapPage() {
     const text = extra.trim();
     if (!text || busyRef.current) return;
     const merged = [note, text].filter(Boolean).join(" ");
+    const turns = turnCount + 1;
     busyRef.current = true;
     const token = ++runRef.current;
     setNote(merged);
+    setTurnCount(turns);
     setAnalysis(null);
     setError(null);
     setLoading(true);
-    await runDiagnosis(frames, merged, token);
+    await runDiagnosis(frames, merged, token, { latestMessage: text, turns });
+  };
+
+  /**
+   * "Find a professional" / "Not sure" — stop clarifying and resolve with what
+   * we already know, leaving the remaining detail to the pro.
+   */
+  const resolveNow = async () => {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    const token = ++runRef.current;
+    setAnalysis(null);
+    setError(null);
+    setLoading(true);
+    await runDiagnosis(frames, note, token, { latestMessage: note, forceResolve: true });
   };
 
   const reset = () => {
@@ -219,6 +260,8 @@ function SnapPage() {
     setFrames([]);
     setMediaKind(null);
     setNote("");
+    setAskedQuestions([]);
+    setTurnCount(0);
     setTextOnly(false);
     setDescribeMode(false);
     setDescribeText("");
@@ -228,6 +271,7 @@ function SnapPage() {
     setPhase("idle");
     setPendingPreview(null);
   };
+
 
   // Clearing the input value lets the user pick the exact same file again.
   const onPick = (kind: "photo" | "video" | "upload") => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -442,7 +486,14 @@ function SnapPage() {
         )}
 
         {analysis && (image || textOnly) && (
-          <AnalysisView analysis={analysis} image={image} onReset={reset} onAnswer={(t) => void runFollowUp(t)} />
+          <AnalysisView
+            analysis={analysis}
+            image={image}
+            onReset={reset}
+            onAnswer={(t) => void runFollowUp(t)}
+            onResolve={() => void resolveNow()}
+          />
+
         )}
       </div>
     </AppShell>
@@ -665,11 +716,13 @@ function AnalysisView({
   image,
   onReset,
   onAnswer,
+  onResolve,
 }: {
   analysis: SnapAnalysis;
   image: string | null;
   onReset: () => void;
   onAnswer?: (text: string) => void;
+  onResolve?: () => void;
 }) {
   const navigate = useNavigate();
   const u = urgencyStyles[analysis.urgency] ?? urgencyStyles.medium;
@@ -677,9 +730,9 @@ function AnalysisView({
   const category = getCategoryBySlug(analysis.categorySlug);
   const pool = providerPoolFor(analysis.categorySlug);
   const showPricing = analysis.hasPriceEstimate;
-  // Discovery states (options / needs-info / no-issue / safety-redirect) must be
-  // narrowed by the customer before we show pricing, ETAs or professionals.
-  const showPros = analysis.responseKind === "diagnosis" && analysis.hasPriceEstimate;
+  // Once the service is known we always progress to professionals — a missing
+  // price estimate must never block the customer from reaching someone.
+  const showPros = analysis.responseKind === "diagnosis" && Boolean(analysis.categorySlug);
   const sourceLabel: Record<string, string> = {
     detected: "Detected issue",
     possible: "Possible issue",
@@ -691,20 +744,13 @@ function AnalysisView({
     duration >= 60 ? `${(duration / 60).toFixed(duration % 60 === 0 ? 0 : 1)} hr` : `${duration} min`;
   const confidencePct = Math.round((analysis.confidence ?? 0.7) * 100);
 
+  // Only pros who actually cover this trade — never top up the list with
+  // unrelated professionals just to fill the screen.
   const matched: MatchedProvider[] = useMemo(() => {
-    const inCat = providers.filter((p) => p.category === pool);
-    const others = providers.filter((p) => p.category !== pool);
-    const merged = [...inCat, ...others];
-    // Sort in-category first by rating desc then distance asc, then top up with adjacent pros
-    const sorted = merged
+    const sorted = providers
+      .filter((p) => p.category === pool)
       .slice()
-      .sort((a, b) => {
-        const catA = a.category === pool ? 0 : 1;
-        const catB = b.category === pool ? 0 : 1;
-        if (catA !== catB) return catA - catB;
-        if (b.rating !== a.rating) return b.rating - a.rating;
-        return a.distance - b.distance;
-      })
+      .sort((a, b) => (b.rating !== a.rating ? b.rating - a.rating : a.distance - b.distance))
       .slice(0, 5);
     return sorted.map((p, i) => ({ ...p, eta: [7, 12, 18, 26, 34][i] ?? 40 }));
   }, [pool]);
@@ -814,17 +860,19 @@ function AnalysisView({
         />
         <Stat icon={Timer} label="Repair time" value={durationLabel} hint="Estimated on-site" />
         <Stat icon={UrgencyIcon} label="Urgency" value={u.label} hint={analysis.urgencyReason} />
-        <Stat
-          icon={Clock}
-          label="Fastest ETA"
-          value={`~${recommended?.eta ?? 10} min`}
-          hint={`${matched.length} pros nearby`}
-        />
+        {matched.length > 0 && (
+          <Stat
+            icon={Clock}
+            label="Fastest ETA"
+            value={`~${recommended?.eta ?? 10} min`}
+            hint={`${matched.length} pros in this trade`}
+          />
+        )}
       </div>
       )}
 
       {(analysis.clarifyingQuestions?.length ?? 0) > 0 && (
-        <ClarifyPanel questions={analysis.clarifyingQuestions!} onAnswer={onAnswer} />
+        <ClarifyPanel questions={analysis.clarifyingQuestions!} onAnswer={onAnswer} onResolve={onResolve} />
       )}
 
       {(analysis.serviceOptions?.length ?? 0) > 0 && (
@@ -898,16 +946,52 @@ function AnalysisView({
 
       {showPros && (
       <>
-      {/* Pros section header + quote toolbar */}
+      {/* Confirmed service summary — editable before we go looking for a pro */}
+      <div className="rounded-3xl border border-primary/25 bg-card p-5 shadow-sm">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Service we'll request</div>
+        <div className="mt-1 text-base font-black">
+          {analysis.category || category?.name || "Service"}
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">{analysis.problem}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {category && (
+            <Link
+              to="/services/$category"
+              params={{ category: category.slug }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-2 text-xs font-semibold hover:bg-muted"
+            >
+              Change service
+            </Link>
+          )}
+          <button
+            onClick={onReset}
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-2 text-xs font-semibold hover:bg-muted"
+          >
+            <RotateCcw className="h-3.5 w-3.5" /> Start over
+          </button>
+        </div>
+      </div>
+
       <JobScopeCta analysis={analysis} image={image} />
 
-      <GradientButton
-        onClick={() => document.getElementById("pros-list")?.scrollIntoView({ behavior: "smooth", block: "start" })}
-        className="w-full justify-center py-4 text-base"
-      >
-        <ShieldCheck className="h-5 w-5" /> Browse service pros
-      </GradientButton>
+      {matched.length > 0 ? (
+        <GradientButton
+          onClick={() => document.getElementById("pros-list")?.scrollIntoView({ behavior: "smooth", block: "start" })}
+          className="w-full justify-center py-4 text-base"
+        >
+          <ShieldCheck className="h-5 w-5" /> Browse service pros
+        </GradientButton>
+      ) : (
+        <div className="rounded-3xl border border-border/60 bg-muted/40 p-5 text-sm">
+          <div className="font-black">No {analysis.category || "matching"} pros on GPB yet in this trade.</div>
+          <p className="mt-1 text-muted-foreground">
+            We won't show you someone from a different trade. Send the request and we'll match you as pros for this service
+            come onboard.
+          </p>
+        </div>
+      )}
 
+      {matched.length > 0 && (
       <div id="pros-list" className="scroll-mt-20">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
@@ -992,6 +1076,8 @@ function AnalysisView({
           </div>
         </div>
       </div>
+      )}
+
 
       </>
       )}
@@ -1041,12 +1127,20 @@ function AnalysisView({
   );
 }
 
-function ClarifyPanel({ questions, onAnswer }: { questions: string[]; onAnswer?: (text: string) => void }) {
+function ClarifyPanel({
+  questions,
+  onAnswer,
+  onResolve,
+}: {
+  questions: string[];
+  onAnswer?: (text: string) => void;
+  onResolve?: () => void;
+}) {
   const [answer, setAnswer] = useState("");
   return (
     <div className="rounded-3xl border border-secondary/30 bg-card p-5 shadow-sm">
       <div className="inline-flex items-center gap-1.5 text-sm font-black">
-        <Sparkles className="h-4 w-4 text-secondary" /> A couple of quick questions
+        <Sparkles className="h-4 w-4 text-secondary" /> One quick thing
       </div>
       <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
         {questions.map((q) => (
@@ -1059,7 +1153,7 @@ function ClarifyPanel({ questions, onAnswer }: { questions: string[]; onAnswer?:
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
         rows={3}
-        placeholder="Answer here and we'll narrow it down…"
+        placeholder="Answer here — or skip and let the pro sort out the details…"
         className="mt-3 w-full resize-none rounded-2xl border border-border/60 bg-background p-3 text-sm outline-none focus:border-secondary"
       />
       <GradientButton
@@ -1069,6 +1163,22 @@ function ClarifyPanel({ questions, onAnswer }: { questions: string[]; onAnswer?:
       >
         <ArrowRight className="h-4 w-4" /> Continue
       </GradientButton>
+      {onResolve && (
+        <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+          <button
+            onClick={onResolve}
+            className="w-full rounded-full border border-primary/40 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary hover:bg-primary/10"
+          >
+            Find a professional
+          </button>
+          <button
+            onClick={onResolve}
+            className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm font-semibold hover:bg-muted"
+          >
+            Not sure — decide with the pro
+          </button>
+        </div>
+      )}
     </div>
   );
 }

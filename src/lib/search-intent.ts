@@ -59,8 +59,25 @@ const ALIASES: Record<string, string> = {
   "massage": "beauty-at-home/massage-therapy",
   "mount tv": "mounting-installation/tv-mounting",
   "tv mount": "mounting-installation/tv-mounting",
+  "tv mounting": "mounting-installation/tv-mounting",
+  "mount my tv": "mounting-installation/tv-mounting",
   "hang tv": "mounting-installation/tv-mounting",
+  "hang my tv": "mounting-installation/tv-mounting",
   "wall mount tv": "mounting-installation/tv-mounting",
+  "tv wall mounting": "mounting-installation/tv-mounting",
+  "tv installation": "mounting-installation/tv-mounting",
+  "tv repair": "appliances/tv-repair",
+  "television repair": "appliances/tv-repair",
+  "repair tv": "appliances/tv-repair",
+  "fix tv": "appliances/tv-repair",
+  "fix my tv": "appliances/tv-repair",
+  "tv not working": "appliances/tv-repair",
+  "tv no picture": "appliances/tv-repair",
+  "tv screen broken": "appliances/tv-repair",
+  "cracked tv screen": "appliances/tv-repair",
+  "tv wont turn on": "appliances/tv-repair",
+  "tv setup": "appliances/tv-setup",
+  "tv troubleshooting": "appliances/tv-setup",
   "fridge repair": "appliances/refrigerator-repair",
   "refrigerator repair": "appliances/refrigerator-repair",
   "couch repair": "furniture/sofa-repair",
@@ -329,4 +346,37 @@ export function recallLocation(): string {
     }
     return value;
   } catch { return ""; }
+}
+
+/**
+ * Scans free-form customer text (a photo note, a clarification answer, a voice
+ * transcript) for an unambiguous service phrase anywhere inside it. Unlike
+ * matchServiceIntent this does not require the whole string to be the service,
+ * so "actually it's a TV repair, the screen is black" resolves. Longest phrase
+ * wins so "tv repair" beats a shorter overlapping alias.
+ */
+export function detectServiceIntentInText(raw: string): ServiceHit | null {
+  const q = normalizeQuery(raw);
+  if (!q) return null;
+  const direct = matchServiceIntent(q);
+  if (direct) return direct;
+
+  const padded = ` ${q} `;
+  const phrases = Object.keys(ALIASES)
+    .filter((phrase) => padded.includes(` ${phrase} `))
+    .sort((a, b) => b.length - a.length);
+  for (const phrase of phrases) {
+    const target = ALIASES[phrase];
+    if (!target) continue;
+    const [cat, svc] = target.split("/");
+    const found = buildIndex().find(
+      (e) => e.hit.category.slug === cat && e.hit.service.slug === svc,
+    );
+    if (found) return found.hit;
+  }
+
+  // Fall back to an exact service-name mention ("Cushion & Foam Replacement").
+  const named = buildIndex().filter((e) => e.nameKey.length > 6 && padded.includes(` ${e.nameKey} `));
+  if (named.length === 1 && named[0]) return named[0].hit;
+  return null;
 }
