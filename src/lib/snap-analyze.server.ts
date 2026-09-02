@@ -239,13 +239,19 @@ export function normalizeAnalysis(
   }
   // Only a confident, single-service diagnosis may carry a price or pro match.
   // options / needs-info / no-issue / safety-redirect are discovery states.
+  const categoryChanged = Boolean(explicit && aiCategory && explicit.category.slug !== aiCategory);
   const hasPriceEstimate =
     responseKind === "diagnosis" &&
     Boolean(parsed.hasPriceEstimate ?? true) &&
     Number(parsed.estimatedCostLow ?? 0) > 0 &&
-    !explicit;
+    !categoryChanged;
   const suppressQuestions = responseKind === "diagnosis";
   const alreadyAsked = new Set((ctx?.askedQuestions ?? []).map((q) => q.trim().toLowerCase()));
+  const freshQuestions = (
+    Array.isArray(parsed.clarifyingQuestions) ? parsed.clarifyingQuestions.filter(Boolean) : []
+  )
+    .filter((q) => !alreadyAsked.has(String(q).trim().toLowerCase()))
+    .slice(0, 2);
 
   return {
     responseKind,
