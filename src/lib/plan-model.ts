@@ -69,7 +69,18 @@ export type PlanUnderstanding = {
   criticalAmbiguity?: string;
   /** One concise question, in the user's language, when confirmation is required. */
   clarificationQuestion?: string;
+  /**
+   * Whether there is a real task to plan. "conversational" covers greetings,
+   * jokes, tests and general questions — GPB answers briefly instead of
+   * fabricating a plan. Language-agnostic: decided by meaning, not keywords.
+   */
+  actionability?: "actionable" | "conversational";
+  /** Short, friendly reply in the user's own language/script when conversational. */
+  conversationalReply?: string;
+  /** Gentle one-line invitation to state a task, in the user's own language. */
+  invitation?: string;
 };
+
 
 /**
  * Language-aware UI copy returned by the planner so the plan page can speak the
@@ -131,8 +142,9 @@ export const DEFAULT_UI_COPY: Required<PlanUiCopy> = {
   stepsLabel: "Steps",
   bufferLabel: "Buffer",
   tasksWord: "tasks",
-  spareSuffix: "min spare",
-  overSuffix: "min over",
+  spareSuffix: "spare",
+  overSuffix: "over",
+
   detailsHeading: "How this will be handled",
   clarifyTitle: "One detail to confirm",
   clarifyHint: "Answer in any language — GPB will rebuild the plan.",
@@ -164,7 +176,14 @@ export type GpbPlan = {
   deadline?: string;
   /** Plan start as "HH:MM" 24h. */
   startClock: string;
+  /** Calendar date the plan starts on, "YYYY-MM-DD", when a date is known. */
+  startDate?: string;
+  /** Calendar date the deadline falls on, "YYYY-MM-DD", when a date is known. */
+  deadlineDate?: string;
+  /** IANA time zone the clock values are expressed in, when known. */
+  timeZone?: string;
   bufferMinutes: number;
+
   tasks: PlanTask[];
   notes: string[];
   replan?: ReplanSuggestion;
@@ -265,6 +284,50 @@ export function toClockString(minutes: number): string {
   const total = ((Math.round(minutes) % 1440) + 1440) % 1440;
   return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
 }
+
+/* ---------------- date helpers ---------------- */
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+export function isIsoDate(value: string | undefined): value is string {
+  return typeof value === "string" && ISO_DATE.test(value);
+}
+
+/** Whole calendar days from `from` to `to` (both "YYYY-MM-DD"); 0 when unknown. */
+export function dayGap(from: string | undefined, to: string | undefined): number {
+  if (!isIsoDate(from) || !isIsoDate(to)) return 0;
+  const a = Date.parse(`${from}T00:00:00Z`);
+  const b = Date.parse(`${to}T00:00:00Z`);
+  if (Number.isNaN(a) || Number.isNaN(b)) return 0;
+  return Math.round((b - a) / 86_400_000);
+}
+
+/**
+ * Deadline expressed in minutes from the plan's own start day, so a target on a
+ * later date is never treated as "already in the past" earlier today.
+ */
+export function planDeadlineMinutes(plan: GpbPlan): number | null {
+  if (!plan.deadline) return null;
+  return parseClock(plan.deadline) + dayGap(plan.startDate, plan.deadlineDate) * 1440;
+}
+
+/** Long, localized date label ("Saturday, 13 September") for a plan date. */
+export function formatPlanDate(date: string | undefined, locale?: string): string | null {
+  if (!isIsoDate(date)) return null;
+  const ms = Date.parse(`${date}T12:00:00Z`);
+  if (Number.isNaN(ms)) return null;
+  try {
+    return new Intl.DateTimeFormat(locale || "en", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    }).format(new Date(ms));
+  } catch {
+    return date;
+  }
+}
+
 
 /** Recompute offsets from ordering + parallel flags, skipping skipped tasks. */
 export function resequence(tasks: PlanTask[]): PlanTask[] {

@@ -23,6 +23,15 @@ const PARTIAL_CHUNK_MS = 1_000;
 const PARTIAL_MIN_MS = 1_800;
 const PARTIAL_MAX_MS = 4_000;
 const MIN_PARTIAL_BYTES = 6_000;
+/**
+ * After a voice request is finalized, GPB builds the plan on its own if the
+ * person stays silent. Armed only after a real spoken transcript, never from
+ * typing, and cancellable from the UI or by editing the text.
+ */
+const AUTO_SUBMIT_SECONDS = 10;
+/** Too short to be a real request — never auto-submit noise. */
+const MIN_AUTO_SUBMIT_CHARS = 4;
+
 
 
 type SpeechRecognitionResultLike = {
@@ -151,9 +160,33 @@ export function OutcomeComposer() {
   const stableRef = useRef<StableTranscript | null>(null);
   // Text the recognition session started with — finals append onto this.
   const baseTextRef = useRef("");
+  /** Seconds left before GPB builds the plan on its own; null = not armed. */
+  const [autoSecs, setAutoSecs] = useState<number | null>(null);
+  const autoTimerRef = useRef<number | null>(null);
+  /** Exactly-once guard so auto and manual submit can never both fire. */
+  const submittedRef = useRef(false);
 
   const listening = voiceStatus === "listening";
   const transcribing = voiceStatus === "transcribing";
+
+  const cancelAutoSubmit = () => {
+    if (autoTimerRef.current !== null) {
+      window.clearInterval(autoTimerRef.current);
+      autoTimerRef.current = null;
+    }
+    setAutoSecs(null);
+  };
+
+  /** Armed only from a finalized spoken transcript, never from typing. */
+  const armAutoSubmit = (text: string) => {
+    if (text.trim().length < MIN_AUTO_SUBMIT_CHARS) return;
+    if (autoTimerRef.current !== null) window.clearInterval(autoTimerRef.current);
+    setAutoSecs(AUTO_SUBMIT_SECONDS);
+    autoTimerRef.current = window.setInterval(() => {
+      setAutoSecs((s) => (s === null ? null : s - 1));
+    }, 1000);
+  };
+
 
   useEffect(() => {
     // Examples rotate only while the composer is idle — never during voice input.
@@ -200,8 +233,10 @@ export function OutcomeComposer() {
         }
       }
       stopRecordingResources();
+      if (autoTimerRef.current !== null) window.clearInterval(autoTimerRef.current);
     };
   }, []);
+
 
   const stopListening = () => {
     const rec = recRef.current;
@@ -231,6 +266,8 @@ export function OutcomeComposer() {
 
     // Accumulated final segments for this session; interim shows live.
     let finals = "";
+    // Latest text this session produced — used to arm the silent countdown.
+    let lastText = "";
 
     rec.onresult = (e) => {
       let interim = "";
@@ -243,6 +280,7 @@ export function OutcomeComposer() {
       const spoken = (finals + interim).trim();
       const base = baseTextRef.current;
       const next = base ? (spoken ? `${base} ${spoken}` : base) : spoken;
+      lastText = next;
       setRequest(next);
     };
 
@@ -258,7 +296,10 @@ export function OutcomeComposer() {
     rec.onend = () => {
       recRef.current = null;
       setVoiceStatus((s) => (s === "listening" ? "idle" : s));
+      // Only when this session actually recognised speech.
+      if (finals.trim()) armAutoSubmit(lastText);
     };
+
 
     try {
       rec.start();
@@ -360,8 +401,12 @@ export function OutcomeComposer() {
           return;
         }
         const base = baseTextRef.current;
-        setRequest(base ? `${base} ${spoken}` : spoken);
+        const finalText = base ? `${base} ${spoken}` : spoken;
+        setRequest(finalText);
         setVoiceStatus("idle");
+        // Authoritative transcript is in — start the silent countdown.
+        armAutoSubmit(finalText);
+
       } catch (err) {
         console.error("[gpb voice] transcription failed", err);
         setVoiceStatus("error");
@@ -442,6 +487,8 @@ export function OutcomeComposer() {
 
   const toggleVoice = () => {
     if (transcribing) return;
+    // Any new mic interaction supersedes a pending auto-submit.
+    cancelAutoSubmit();
     if (listening) {
       if (recRef.current) stopListening();
       else stopRecordingAndTranscribe();
@@ -462,6 +509,25 @@ export function OutcomeComposer() {
 
   };
 
+  /** Single exit point for both manual submit and the silent countdown. */
+  const goToPlan = (text: string) => {
+    const q = text.trim();
+    if (!q || submittedRef.current) return;
+    submittedRef.current = true;
+    cancelAutoSubmit();
+    setEmptyError(false);
+    void navigate({ to: "/plan", search: { q, loc: loc.trim() } });
+  };
+
+  // Countdown reaching zero builds the plan — never a booking, order or message.
+  useEffect(() => {
+    if (autoSecs === null) return;
+    if (autoSecs > 0) return;
+    cancelAutoSubmit();
+    goToPlan(request);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSecs]);
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (listening) {
@@ -472,13 +538,14 @@ export function OutcomeComposer() {
     // An empty request lands on /plan's demo plan, which reads like a real
     // answer to a request that was never made. Ask for the words instead.
     if (!q) {
+      cancelAutoSubmit();
       setEmptyError(true);
       document.getElementById("gpb-outcome")?.focus();
       return;
     }
-    setEmptyError(false);
-    void navigate({ to: "/plan", search: { q, loc: loc.trim() } });
+    goToPlan(q);
   };
+
 
 
   const micTitle = !voiceSupported
@@ -520,7 +587,10 @@ export function OutcomeComposer() {
           onChange={(e) => {
             setRequest(e.target.value);
             if (emptyError) setEmptyError(false);
+            // Editing means the person is still composing — stand down.
+            if (autoSecs !== null) cancelAutoSubmit();
           }}
+
           onFocus={() => (paused.current = true)}
           onBlur={() => (paused.current = false)}
           rows={3}
@@ -587,6 +657,34 @@ export function OutcomeComposer() {
           Tell GPB what you need first — type it or tap the mic.
         </p>
       )}
+
+      {autoSecs !== null && autoSecs > 0 && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-primary/30 bg-primary/5 px-3 py-2.5"
+        >
+          <p className="min-w-0 flex-1 text-xs font-bold text-primary">
+            Building your plan in {autoSecs}s — say more or edit to keep going.
+          </p>
+          <button
+            type="button"
+            onClick={cancelAutoSubmit}
+            className="min-h-[40px] shrink-0 rounded-full border border-border bg-background px-4 text-xs font-bold hover:bg-muted"
+          >
+            Keep editing
+          </button>
+          <button
+            type="button"
+            onClick={() => goToPlan(request)}
+            className="min-h-[40px] shrink-0 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground"
+          >
+            Build now
+          </button>
+        </div>
+      )}
+
+
 
       <div className="mt-2.5 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
         <div className="min-w-0">

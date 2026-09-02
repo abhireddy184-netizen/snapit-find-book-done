@@ -5,15 +5,17 @@ import { useEffect, useState } from "react";
 import {
   ArrowRight, ArrowUp, ArrowDown, Clock, Loader2, MapPin, RotateCcw, Sparkles,
   TriangleAlert, Undo2, HardHat, Languages, HelpCircle, ShoppingBasket, UtensilsCrossed, CarFront, UserRound, CircleSlash,
+  MessageCircle, CalendarDays,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
-import { buildPlan } from "@/lib/plan.functions";
+import { buildPlan, type PlanResult } from "@/lib/plan.functions";
 import {
-  CHANNEL_META, DEFAULT_UI_COPY, demoAirportPlan, formatClock, move, parseClock, planEndMinutes,
-  planLocale, resequence, uiCopy,
+  CHANNEL_META, DEFAULT_UI_COPY, demoAirportPlan, formatClock, formatPlanDate, move, parseClock,
+  planDeadlineMinutes, planEndMinutes, planLocale, resequence, uiCopy,
   type ExecutionChannel, type GpbPlan, type PlanTask, type PlanUiCopy,
 } from "@/lib/plan-model";
+
 
 type Copy = Required<PlanUiCopy>;
 
@@ -62,6 +64,20 @@ function nowClockString() {
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
+/** Today's local calendar date, so future-dated requests schedule correctly. */
+function nowDateString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function localTimeZone(): string | undefined {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function PlanPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
@@ -75,11 +91,29 @@ function PlanPage() {
     retry: false,
     queryFn: () =>
       runBuildPlan({
-        data: { request: search.q, location: search.loc, nowClock: nowClockString() },
-      }) as Promise<GpbPlan>,
+        data: {
+          request: search.q,
+          location: search.loc,
+          nowClock: nowClockString(),
+          nowDate: nowDateString(),
+          ...(localTimeZone() ? { timeZone: localTimeZone() as string } : {}),
+        },
+      }) as Promise<PlanResult>,
   });
 
-  const basePlan: GpbPlan | undefined = isDemo ? demoAirportPlan() : query.data;
+  const result = query.data;
+  const conversation =
+    !isDemo && result?.kind === "conversation"
+      ? (result as Extract<PlanResult, { kind: "conversation" }>)
+      : undefined;
+
+
+  const basePlan: GpbPlan | undefined = isDemo
+    ? demoAirportPlan()
+    : result?.kind === "plan"
+      ? result.plan
+      : undefined;
+
 
   const [plan, setPlan] = useState<GpbPlan | undefined>(basePlan);
   const [replanApplied, setReplanApplied] = useState(false);
@@ -151,7 +185,10 @@ function PlanPage() {
         </div>
       )}
 
+      {conversation && <ConversationCard reply={conversation.reply} invitation={conversation.invitation} />}
+
       {plan && (
+
         <>
           <PlanSummary plan={plan} isDemo={isDemo} />
 
@@ -261,14 +298,46 @@ function PlanSkeleton({ request }: { request: string }) {
   );
 }
 
+/* ---------------- conversational reply ---------------- */
+
+/**
+ * Shown when the message carried no task at all — a greeting, a joke, a test or
+ * a general question. GPB answers briefly in the person's own language and
+ * invites them to say what they need, instead of inventing a plan.
+ */
+function ConversationCard({ reply, invitation }: { reply: string; invitation?: string | undefined }) {
+  return (
+    <section aria-live="polite" className="mt-6 rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+          <MessageCircle className="h-5 w-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p dir="auto" className="text-base font-bold leading-relaxed break-words">{reply}</p>
+          {invitation && (
+            <p dir="auto" className="mt-2 text-sm leading-relaxed text-muted-foreground break-words">{invitation}</p>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
 /* ---------------- summary ---------------- */
 
 function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
   const c = uiCopy(plan);
   const locale = planLocale(plan);
   const end = planEndMinutes(plan);
-  const deadline = plan.deadline ? parseClock(plan.deadline) : null;
+  // Deadline is measured from the plan's own start day, so a target on a later
+  // date is never reported as hundreds of minutes "over".
+  const deadline = planDeadlineMinutes(plan);
   const slack = deadline == null ? null : deadline - end;
+  const startDateLabel = formatPlanDate(plan.startDate, locale);
+  const deadlineDateLabel = formatPlanDate(plan.deadlineDate ?? plan.startDate, locale);
+  // Only worth showing the day on the target when it differs from the start day.
+  const showDeadlineDate = Boolean(plan.deadlineDate && plan.deadlineDate !== plan.startDate);
 
   return (
     <section className="mt-6 overflow-hidden rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
@@ -284,15 +353,30 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
             <span dir="auto" className="truncate">{plan.understanding.languageName}</span>
           </span>
         )}
+        {startDateLabel && (
+          <span className="inline-flex max-w-full items-center gap-1 truncate rounded-full border border-border/60 bg-background px-2.5 py-1 text-[10px] font-bold text-muted-foreground">
+            <CalendarDays className="h-3 w-3 shrink-0 text-primary" />
+            <span dir="auto" className="truncate">
+              {startDateLabel}
+              {plan.timeZone ? ` · ${plan.timeZone}` : ""}
+            </span>
+          </span>
+        )}
       </div>
       <h2 dir="auto" className="mt-2 text-lg font-black leading-snug tracking-tight sm:text-xl">{plan.outcome}</h2>
       <p dir="auto" className="mt-1.5 max-w-[70ch] text-sm leading-relaxed text-muted-foreground">{plan.summary}</p>
 
       <dl className="mt-4 grid gap-2 sm:grid-cols-3">
-        <Stat label={c.planStartsLabel} value={formatClock(parseClock(plan.startClock), locale)} icon={Clock} />
+        <Stat
+          label={c.planStartsLabel}
+          value={formatClock(parseClock(plan.startClock), locale)}
+          sub={startDateLabel}
+          icon={Clock}
+        />
         <Stat
           label={plan.deadline ? c.targetLabel : c.planEndsLabel}
           value={formatClock(plan.deadline ? parseClock(plan.deadline) : end, locale)}
+          sub={showDeadlineDate ? deadlineDateLabel : null}
           icon={Clock}
         />
         <Stat
@@ -301,8 +385,8 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
             slack == null
               ? `${plan.tasks.filter((t) => t.status !== "skipped").length} ${c.tasksWord}`
               : slack >= 0
-                ? `${slack} ${c.spareSuffix}`
-                : `${Math.abs(slack)} ${c.overSuffix}`
+                ? `${slack} ${c.minutesShort} ${c.spareSuffix}`
+                : `${Math.abs(slack)} ${c.minutesShort} ${c.overSuffix}`
           }
           icon={slack != null && slack < 0 ? TriangleAlert : MapPin}
           tone={slack != null && slack < 0 ? "danger" : undefined}
@@ -310,20 +394,23 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
       </dl>
     </section>
   );
+
 }
 
 function Stat({
-  label, value, icon: Icon, tone,
-}: { label: string; value: string; icon: LucideIcon; tone?: "danger" }) {
+  label, value, icon: Icon, tone, sub,
+}: { label: string; value: string; icon: LucideIcon; tone?: "danger"; sub?: string | null }) {
   return (
     <div className={`rounded-2xl border px-4 py-3 ${tone === "danger" ? "border-destructive/40 bg-destructive/5" : "border-border/60 bg-background"}`}>
       <dt dir="auto" className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
         <Icon className={`h-3.5 w-3.5 ${tone === "danger" ? "text-destructive" : "text-primary"}`} /> {label}
       </dt>
       <dd dir="auto" className={`mt-0.5 text-base font-black tracking-tight ${tone === "danger" ? "text-destructive" : ""}`}>{value}</dd>
+      {sub && <dd dir="auto" className="mt-0.5 text-[11px] font-semibold text-muted-foreground">{sub}</dd>}
     </div>
   );
 }
+
 
 /* ---------------- clarification card ---------------- */
 

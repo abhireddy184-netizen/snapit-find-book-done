@@ -1,7 +1,9 @@
 import { catalog } from "./catalog";
 import { matchServiceIntent, rankServices } from "./search-intent";
 import {
+  dayGap,
   formatClock,
+  isIsoDate,
   parseClock,
   resequence,
   toClockString,
@@ -11,6 +13,7 @@ import {
   type PlanUiCopy,
   type PlanUnderstanding,
 } from "./plan-model";
+
 
 const CATEGORY_SLUGS = new Set(catalog.map((c) => c.slug));
 const CHANNELS: ExecutionChannel[] = [
@@ -42,18 +45,33 @@ RULES
 7. "confidence" 0-1: how sure you are of the intent. Grammar problems, romanization, dialect or misspellings alone should NOT lower confidence. Lower it only when the actual meaning is unclear.
 8. Ask for clarification ONLY when a single critical detail would materially change execution and cannot be inferred: an impossible-to-infer AM vs PM, two genuinely plausible airports/cities, pickup vs dropoff, or which person. In that case set "criticalAmbiguity" (short, English, internal) and "clarificationQuestion" (ONE short question written in the USER'S OWN language AND their own script/romanization style). Otherwise leave both as empty strings. Never ask about minor uncertainty; a sensible default is better than a question.
 9. LOW CONFIDENCE (you genuinely cannot tell what was said or which language it is): do NOT translate it into something plausible and do NOT guess a different language. Keep the original wording untouched inside "normalizedRequest", set a low "confidence", and ask ONE short clarification written in the same language/script the user appears to have used (plain English only if even that is unclear).
+10. CASUAL PREAMBLE: people often open with teasing, jokes, greetings, self-talk or thinking-aloud before the real ask ("hey what's up man, anyway — I need 2 kg potatoes"). Ignore the preamble as content, but DO extract the real task that follows or precedes it. Never let a joking or informal tone turn into "no task".
+11. QUANTITIES AND ITEMS: keep every item, quantity, unit and brand exactly as stated ("2 kg potatoes" stays 2 kg potatoes — not "some potatoes", not 2 lb, not "vegetables"). Convert nothing.
+12. ACTIONABILITY. Set "actionability":
+   - "actionable" when there is a real-world task, errand, purchase, delivery, appointment, repair or coordination to do — even a very small one, and even when buried in chatter.
+   - "conversational" when the message is only a greeting, a joke, a test, small talk, an insult, or a general question with no task to carry out.
+   When "conversational": write "conversationalReply" — ONE or TWO short, warm, plain sentences answering or acknowledging what they actually said, in the user's own language AND script/romanization style. Then write "invitation" — one short friendly line inviting them to say what they need done, same language and style. Never mock, scold, lecture, moralise, force jokes back, or ask a pile of questions. When "conversational", still fill languageCode/languageName/script normally and leave clarificationQuestion empty.
+   When "actionable", leave "conversationalReply" and "invitation" as empty strings.
+13. Never invent a travel plan, airport run or demo scenario that the person did not ask for. If they asked only for groceries, the intent is only groceries.
 
 Return ONLY minified JSON, no markdown:
-{"languageCode":string,"languageName":string,"script":"native"|"latin"|"mixed","codeSwitched":boolean,"normalizedRequest":string,"confidence":number,"criticalAmbiguity":string,"clarificationQuestion":string}`;
+{"languageCode":string,"languageName":string,"script":"native"|"latin"|"mixed","codeSwitched":boolean,"actionability":"actionable"|"conversational","normalizedRequest":string,"confidence":number,"criticalAmbiguity":string,"clarificationQuestion":string,"conversationalReply":string,"invitation":string}`;
 
-export function buildUnderstandUserPrompt(request: string, location: string, nowClock: string) {
+export function buildUnderstandUserPrompt(
+  request: string,
+  location: string,
+  nowClock: string,
+  nowDate?: string,
+  timeZone?: string,
+) {
   return [
     `Raw request (verbatim): "${request}"`,
     location ? `Location context: ${location}` : "No location given.",
-    `Current local time is roughly ${formatClock(parseClock(nowClock))}.`,
+    `Current local time is roughly ${formatClock(parseClock(nowClock))}${nowDate ? ` on ${nowDate}` : ""}${timeZone ? ` (${timeZone})` : ""}.`,
     "Return JSON only.",
   ].join("\n");
 }
+
 
 /** Parse the understanding stage; always returns something usable. */
 export function normalizeUnderstanding(raw: string, request: string): PlanUnderstanding {
@@ -76,6 +94,11 @@ export function normalizeUnderstanding(raw: string, request: string): PlanUnders
   // Low confidence must never silently become a confident mistranslation: fall
   // back to the user's verbatim words as the canonical intent.
   const normalized = str("normalizedRequest");
+  const reply = str("conversationalReply").slice(0, 300);
+  const invitation = str("invitation").slice(0, 160);
+  // Only treat it as small talk when the model both said so AND wrote a reply —
+  // otherwise a real request would silently get no plan.
+  const conversational = str("actionability").toLowerCase() === "conversational" && Boolean(reply);
   return {
     languageCode: str("languageCode").slice(0, 12) || "en",
     languageName: str("languageName").slice(0, 40) || "English",
@@ -83,10 +106,14 @@ export function normalizeUnderstanding(raw: string, request: string): PlanUnders
     ...(script ? { script } : {}),
     normalizedRequest: (confidence < 0.35 ? `${request}${normalized ? ` (uncertain reading: ${normalized})` : ""}` : normalized) || request,
     confidence,
+    actionability: conversational ? "conversational" : "actionable",
+    ...(conversational ? { conversationalReply: reply } : {}),
+    ...(conversational && invitation ? { invitation } : {}),
     // Only surface a question when it is tied to a genuinely critical ambiguity.
-    ...(ambiguity && question ? { criticalAmbiguity: ambiguity, clarificationQuestion: question } : {}),
+    ...(!conversational && ambiguity && question ? { criticalAmbiguity: ambiguity, clarificationQuestion: question } : {}),
   };
 }
+
 
 /* ================= stage 2 — planning ================= */
 
@@ -106,10 +133,16 @@ Break the request into 2-8 child tasks. For each task decide:
 - dependsOn: ids of tasks that must finish first (use the ids you assign).
 - locationNote: short route/location hint when relevant ("On route to DFW", "At home").
 
-TIMING
+TIMING AND DATES
 - If the request names a hard deadline (e.g. "by 6 PM", "before 8:30"), set "deadline" as 24h "HH:MM" and work backwards, leaving bufferMinutes (15-25) of safety before it.
 - Set "startClock" as 24h "HH:MM" for when the plan should begin.
+- DATES MATTER. You are given today's date. If the request names a future date or day ("September 13", "Saturday", "tomorrow"), set "startDate" and "deadlineDate" as "YYYY-MM-DD" for the day the work and the deadline actually fall on. NEVER schedule a future-dated plan as if it started at the current clock time today, and never mark a future deadline as already missed.
+- If no date is stated, set "startDate" and "deadlineDate" to today's date (or tomorrow's when the stated time has clearly already passed today).
+- FLIGHTS: a flight departure time is NOT the deadline. The deadline is being at the airport ahead of departure — typically 2 hours before for domestic and 3 hours for international — plus travel time. Say plainly in the task detail which time is departure and which is airport arrival.
+- Do not invent constraints (no invented check-in times, gates, or bookings) and do not add days the customer never mentioned.
+- If the chronology the customer stated is impossible (deadline earlier than the work can start, or a date already in the past), do not silently "fix" it: build the closest honest plan and add one short note in "notes" explaining the conflict.
 - Never promise anything is booked. This is a plan, not a confirmation.
+
 
 HONESTY RULES
 - Never claim a partnership, live tracking, or a confirmed booking.
@@ -124,6 +157,8 @@ LANGUAGE OF THE OUTPUT (critical)
 - Never translate away named places, businesses or people: keep them as the customer said them.
 - Machine values (id, channel, categorySlug, serviceSlug, times, numbers) stay in English/ASCII and must never be translated.
 - "uiCopy" is short interface wording for the plan screen (page title, intro line, input placeholders, buttons, card labels); write EVERY value in the customer's language. If the customer's language is English, return the English wording. Keep each value under ~8 words so it fits small phone screens. "pageIntro" is one short sentence reminding them they can change the order/timing and that nothing is booked. "snapCtaTitle"/"snapCtaBody" invite sending a photo or video instead; "earlyCtaTitle"/"earlyCtaBody" invite joining early access, launching city by city.
+- UNITS: "minutesShort" is the short word for minutes in the customer's language (English "min"). "spareSuffix" and "overSuffix" are ONLY the trailing words "spare" / "over" in their language — they must NOT contain the minutes unit or a number, because the UI renders "<number> <minutesShort> <suffix>". "durationLabel" is the word for duration. Never leave a bare number without its unit.
+
 
 MEANING FIRST
 - Infer intent from meaning, never grammar. Keep every hard constraint (times, AM/PM, deadlines, locations, people, quantities, pickup vs dropoff, order).
@@ -133,7 +168,7 @@ CATALOG (categorySlug: serviceSlugs)
 ${catalogSummary()}
 
 Return ONLY minified JSON, no markdown:
-{"outcome":string,"summary":string,"deadline":string,"startClock":string,"bufferMinutes":number,"tasks":[{"id":string,"title":string,"detail":string,"channel":string,"categorySlug":string,"serviceSlug":string,"durationMinutes":number,"parallel":boolean,"dependsOn":[string],"locationNote":string}],"notes":[string],"bookingDisclaimer":string,"partnerDisclaimer":string,"uiCopy":{"stepsHeading":string,"stepsHint":string,"resetLabel":string,"editLabel":string,"doneLabel":string,"skipLabel":string,"restoreLabel":string,"durationLabel":string,"minutesShort":string,"findProLabel":string,"planStartsLabel":string,"targetLabel":string,"planEndsLabel":string,"stepsLabel":string,"bufferLabel":string,"tasksWord":string,"spareSuffix":string,"overSuffix":string,"detailsHeading":string,"clarifyTitle":string,"clarifyHint":string,"clarifyPlaceholder":string,"clarifySubmit":string,"clarifyDismiss":string,"pageTitle":string,"pageIntro":string,"requestPlaceholder":string,"locationPlaceholder":string,"buildLabel":string,"errorTitle":string,"retryLabel":string,"snapCtaTitle":string,"snapCtaBody":string,"earlyCtaTitle":string,"earlyCtaBody":string}}
+{"outcome":string,"summary":string,"deadline":string,"startClock":string,"startDate":string,"deadlineDate":string,"bufferMinutes":number,"tasks":[{"id":string,"title":string,"detail":string,"channel":string,"categorySlug":string,"serviceSlug":string,"durationMinutes":number,"parallel":boolean,"dependsOn":[string],"locationNote":string}],"notes":[string],"bookingDisclaimer":string,"partnerDisclaimer":string,"uiCopy":{"stepsHeading":string,"stepsHint":string,"resetLabel":string,"editLabel":string,"doneLabel":string,"skipLabel":string,"restoreLabel":string,"durationLabel":string,"minutesShort":string,"findProLabel":string,"planStartsLabel":string,"targetLabel":string,"planEndsLabel":string,"stepsLabel":string,"bufferLabel":string,"tasksWord":string,"spareSuffix":string,"overSuffix":string,"detailsHeading":string,"clarifyTitle":string,"clarifyHint":string,"clarifyPlaceholder":string,"clarifySubmit":string,"clarifyDismiss":string,"pageTitle":string,"pageIntro":string,"requestPlaceholder":string,"locationPlaceholder":string,"buildLabel":string,"errorTitle":string,"retryLabel":string,"snapCtaTitle":string,"snapCtaBody":string,"earlyCtaTitle":string,"earlyCtaBody":string}}
 Keep every string short and plain-language.`;
 
 export function buildPlanUserPrompt(
@@ -141,6 +176,8 @@ export function buildPlanUserPrompt(
   location: string,
   nowClock: string,
   understanding?: PlanUnderstanding,
+  nowDate?: string,
+  timeZone?: string,
 ) {
   return [
     `Customer request (verbatim, in their own words): "${request}"`,
@@ -157,9 +194,10 @@ export function buildPlanUserPrompt(
         }. Write ALL customer-facing text in this language and style.`
       : "",
     location ? `Location context: ${location}` : "No location given.",
-    `Current local time is roughly ${formatClock(parseClock(nowClock))}.`,
+    `Current local time is roughly ${formatClock(parseClock(nowClock))}${nowDate ? `, today's date is ${nowDate}` : ""}${timeZone ? `, customer time zone ${timeZone}` : ""}.`,
     "Return JSON only.",
   ]
+
     .filter(Boolean)
     .join("\n");
 }
@@ -214,7 +252,10 @@ export function buildFallbackPlan(
   location: string,
   nowClock: string,
   understanding?: PlanUnderstanding,
+  nowDate?: string,
+  timeZone?: string,
 ): GpbPlan {
+
   const fragments = splitFragments(request);
   const tasks: PlanTask[] = [];
 
@@ -290,6 +331,8 @@ export function buildFallbackPlan(
       summary: "GPB drafted this plan from your request. Adjust the order, timing or steps — nothing is booked.",
       location,
       startClock: nowClock,
+      ...(nowDate ? { startDate: nowDate } : {}),
+      ...(timeZone ? { timeZone } : {}),
       bufferMinutes: 20,
       tasks,
       notes: [],
@@ -298,7 +341,9 @@ export function buildFallbackPlan(
       ...(understanding ? { understanding } : {}),
     },
     nowClock,
+    nowDate,
   );
+
 }
 
 /* ---------------- shared finishing pass ---------------- */
@@ -327,20 +372,36 @@ function withReplan(plan: GpbPlan): GpbPlan {
   };
 }
 
-/** Order, time and caveat a plan so the UI always gets a coherent object. */
-export function finalizePlan(plan: GpbPlan, nowClock: string): GpbPlan {
+/**
+ * Order, time and caveat a plan so the UI always gets a coherent object.
+ *
+ * Date-aware: a deadline on a later calendar day is measured from the plan's own
+ * start day, so a 8:00 PM target next week is never treated as "already past"
+ * tonight, and the plan is only pinned to the current clock when it starts today.
+ */
+export function finalizePlan(plan: GpbPlan, nowClock: string, nowDate?: string): GpbPlan {
   const tasks = resequence(plan.tasks);
   const total = tasks.reduce(
     (max, t) => Math.max(max, t.startOffsetMinutes + t.durationMinutes),
     0,
   );
 
+  const startDate = isIsoDate(plan.startDate) ? plan.startDate : isIsoDate(nowDate) ? nowDate : undefined;
+  const deadlineDate = isIsoDate(plan.deadlineDate) ? plan.deadlineDate : startDate;
+  const startsToday = !startDate || !isIsoDate(nowDate) || startDate === nowDate;
+
   let startClock = plan.startClock || nowClock;
   if (plan.deadline) {
-    const latestStart = parseClock(plan.deadline) - plan.bufferMinutes - total;
-    const earliest = parseClock(nowClock);
-    startClock = toClockString(Math.max(earliest, Math.min(parseClock(startClock), latestStart)));
+    // Deadline relative to the plan's start day; a later date adds whole days.
+    const deadlineAbs = parseClock(plan.deadline) + dayGap(startDate, deadlineDate) * 1440;
+    const latestStart = deadlineAbs - plan.bufferMinutes - total;
+    // Only "no earlier than now" when the plan actually runs today.
+    const earliest = startsToday ? parseClock(nowClock) : 0;
+    startClock = toClockString(
+      Math.max(0, Math.max(earliest, Math.min(parseClock(startClock), latestStart))),
+    );
   }
+
 
   // Disclaimers come from the planner in the customer's own language; the
   // English strings are a fallback only.
@@ -356,7 +417,15 @@ export function finalizePlan(plan: GpbPlan, nowClock: string): GpbPlan {
     );
   }
 
-  return withReplan({ ...plan, tasks, startClock, notes: [...notes] });
+  return withReplan({
+    ...plan,
+    tasks,
+    startClock,
+    ...(startDate ? { startDate } : {}),
+    ...(plan.deadline && deadlineDate ? { deadlineDate } : {}),
+    notes: [...notes],
+  });
+
 }
 
 
@@ -370,6 +439,8 @@ export function normalizePlan(
   location: string,
   nowClock: string,
   understanding?: PlanUnderstanding,
+  nowDate?: string,
+  timeZone?: string,
 ): GpbPlan {
 
   const match = raw.match(/\{[\s\S]*\}/);
@@ -377,8 +448,9 @@ export function normalizePlan(
   try {
     parsed = JSON.parse(match ? match[0] : raw) as Record<string, unknown>;
   } catch {
-    return buildFallbackPlan(request, location, nowClock, understanding);
+    return buildFallbackPlan(request, location, nowClock, understanding, nowDate, timeZone);
   }
+
 
   const rawTasks = Array.isArray(parsed['tasks']) ? (parsed['tasks'] as RawTask[]) : [];
   const tasks: PlanTask[] = rawTasks
@@ -413,7 +485,7 @@ export function normalizePlan(
       };
     });
 
-  if (!tasks.length) return buildFallbackPlan(request, location, nowClock, understanding);
+  if (!tasks.length) return buildFallbackPlan(request, location, nowClock, understanding, nowDate, timeZone);
 
   const deadline =
     typeof parsed['deadline'] === "string" && /^\d{1,2}:\d{2}$/.test(parsed['deadline'] as string)
@@ -421,6 +493,15 @@ export function normalizePlan(
       : // English regex is a last-resort fallback only; the canonical intent above
         // is what carries non-English deadlines.
         extractDeadline(understanding?.normalizedRequest ?? request);
+
+  const isoDate = (k: string) => {
+    const v = parsed[k];
+    return typeof v === "string" && isIsoDate(v.trim()) ? v.trim() : undefined;
+  };
+  const startDate = isoDate("startDate") ?? nowDate;
+  const deadlineDate = isoDate("deadlineDate") ?? startDate;
+
+
 
   const rawCopy = (parsed['uiCopy'] ?? {}) as Record<string, unknown>;
   const copy: PlanUiCopy = {};
@@ -441,6 +522,9 @@ export function normalizePlan(
         typeof parsed['startClock'] === "string" && /^\d{1,2}:\d{2}$/.test(parsed['startClock'])
           ? toClockString(parseClock(parsed['startClock']))
           : nowClock,
+      ...(startDate ? { startDate } : {}),
+      ...(deadline && deadlineDate ? { deadlineDate } : {}),
+      ...(timeZone ? { timeZone } : {}),
       bufferMinutes: Math.min(45, Math.max(10, Math.round(Number(parsed['bufferMinutes'] ?? 20)))),
       tasks,
       notes: Array.isArray(parsed['notes'])
@@ -454,6 +538,7 @@ export function normalizePlan(
       ...(str("partnerDisclaimer") ? { partnerDisclaimer: str("partnerDisclaimer") } : {}),
     },
     nowClock,
-
+    nowDate,
   );
+
 }
