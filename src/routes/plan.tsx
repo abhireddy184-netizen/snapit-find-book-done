@@ -102,7 +102,9 @@ function PlanPage() {
   });
 
   const result = query.data;
-  const conversation = !isDemo && result?.kind === "conversation" ? result : undefined;
+  const conversation =
+    !isDemo && result && result.kind === "conversation" ? result : undefined;
+
   const basePlan: GpbPlan | undefined = isDemo
     ? demoAirportPlan()
     : result?.kind === "plan"
