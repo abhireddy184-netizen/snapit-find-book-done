@@ -24,14 +24,15 @@ export async function fetchProviderBookings(providerId: string): Promise<Booking
   return data ?? [];
 }
 
-export async function fetchMyProviderProfile(userId: string): Promise<ProviderProfile | null> {
-  const { data, error } = await supabase
-    .from("provider_profiles")
-    .select("*")
-    .eq("user_id", userId)
-    .maybeSingle();
+/**
+ * The signed-in pro's own profile, including private fields such as phone.
+ * `provider_profiles` no longer grants those columns to ordinary roles, so
+ * the owner reads them through a security-definer function instead.
+ */
+export async function fetchMyProviderProfile(_userId: string): Promise<ProviderProfile | null> {
+  const { data, error } = await supabase.rpc("get_my_provider_profile");
   if (error) throw error;
-  return data;
+  return (data?.[0] as ProviderProfile | undefined) ?? null;
 }
 
 export function formatBookingDate(value: string): string {
