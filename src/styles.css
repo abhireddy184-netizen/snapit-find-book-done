@@ -149,9 +149,9 @@
   --sidebar-foreground: oklch(0.262 0.030 300);
   --sidebar-primary: oklch(0.605 0.225 352);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.958 0.009 300);
-  --sidebar-accent-foreground: oklch(0.238 0.058 296);
-  --sidebar-border: oklch(0.918 0.011 300);
+  --sidebar-accent: oklch(0.955 0.008 330);
+  --sidebar-accent-foreground: oklch(0.262 0.030 300);
+  --sidebar-border: oklch(0.906 0.006 330);
   --sidebar-ring: oklch(0.605 0.225 352);
 }
 
@@ -185,6 +185,14 @@
   --lavender: oklch(0.74 0.16 292);
   --lemon: oklch(0.86 0.09 88);
   --ivory: oklch(0.965 0.011 84);
+  /* Dark-mode counterparts: same hues, lifted for contrast on midnight. */
+  --mauve: oklch(0.700 0.048 330);
+  --mauve-ink: oklch(0.820 0.045 330);
+  --steel: oklch(0.660 0.032 222);
+  --steel-ink: oklch(0.805 0.030 222);
+  --trust: oklch(0.680 0.055 156);
+  --trust-ink: oklch(0.815 0.050 156);
+  --trust-foreground: oklch(0.182 0.045 300);
   --destructive: oklch(0.66 0.21 25);
   --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(0.352 0.042 300);
