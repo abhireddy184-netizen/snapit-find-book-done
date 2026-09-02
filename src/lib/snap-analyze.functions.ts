@@ -3,6 +3,8 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { SYSTEM_PROMPT, buildUserPrompt, normalizeAnalysis } from "./snap-analyze.server";
+import { detectServiceIntentInText } from "./search-intent";
+
 
 export type { SnapAnalysis, ServiceOption, IssueSource, ResponseKind } from "./snap-analyze.server";
 
@@ -37,16 +39,53 @@ export const analyzeSnap = createServerFn({ method: "POST" })
       forceResolve: data.forceResolve ?? false,
     };
 
+    // Fast path: a text-only request whose words already name a catalogue
+    // service (e.g. "my sink is broken") never needs the visual pipeline —
+    // resolve it locally and return in milliseconds.
+    const fastHit = !hasMedia && note ? detectServiceIntentInText(ctx.latestMessage || note) : null;
+    if (fastHit && note) {
+      const local = JSON.stringify({
+        responseKind: "diagnosis",
+        issueSource: "customer-described",
+        headline: `${fastHit.service.name} — that's what this sounds like.`,
+        categorySlug: fastHit.category.slug,
+        serviceSlug: fastHit.service.slug,
+        confidence: 0.82,
+        problem: note,
+        hasPriceEstimate: false,
+        urgency: "medium",
+        urgencyReason: "Based on what you described.",
+      });
+      return normalizeAnalysis(local, true, false, note, { ...ctx, forceResolve: true });
+    }
+
+
     const content: ({ type: "text"; text: string } | { type: "image"; image: string })[] = [
       { type: "text", text: buildUserPrompt(note, hasMedia, images.length, ctx) },
     ];
     for (const image of images) content.push({ type: "image", image });
 
-    const { text } = await generateText({
-      model: gateway("openai/gpt-5.5"),
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content }],
-    });
-
-    return normalizeAnalysis(text, Boolean(note), hasMedia, note, ctx);
+    // Hard server-side budget so a slow upstream can never hang the UI.
+    const budgetMs = hasMedia ? 28_000 : 15_000;
+    try {
+      const { text } = await generateText({
+        // Fast multimodal chat model: no reasoning round-trips, so simple
+        // requests come back in a couple of seconds.
+        model: gateway("google/gemini-3.6-flash"),
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content }],
+        abortSignal: AbortSignal.timeout(budgetMs),
+      });
+      return normalizeAnalysis(text, Boolean(note), hasMedia, note, ctx);
+    } catch (err) {
+      // Graceful degradation: if the customer gave us words, resolve from the
+      // catalogue instead of failing — they still reach a professional.
+      if (note) return normalizeAnalysis("", true, hasMedia, note, { ...ctx, forceResolve: true });
+      throw new Error(
+        err instanceof Error && /abort|timeout/i.test(err.message)
+          ? "That took longer than usual. Please try again, or add a short description."
+          : "We couldn't analyse that just now. Please try again.",
+      );
+    }
   });
+

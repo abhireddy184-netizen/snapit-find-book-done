@@ -47,7 +47,9 @@ import {
 } from "lucide-react";
 
 /** Hard ceiling for a single AI diagnosis request before we bail out. */
-const ANALYSIS_TIMEOUT_MS = 40_000;
+// Text-only requests are fast (no visual pipeline); media needs more room.
+const ANALYSIS_TIMEOUT_MS = 34_000;
+const TEXT_ANALYSIS_TIMEOUT_MS = 18_000;
 
 type SnapSearch = { q?: string; loc?: string };
 
@@ -140,7 +142,7 @@ function SnapPage() {
       };
       const result = await withTimeout(
         analyze({ data: payload }),
-        ANALYSIS_TIMEOUT_MS,
+        frames.length ? ANALYSIS_TIMEOUT_MS : TEXT_ANALYSIS_TIMEOUT_MS,
         "The AI is taking longer than usual. Please retry or send it again.",
       );
       if (runRef.current !== token) return;
@@ -553,17 +555,21 @@ function ScanningOverlay({
   ];
   const [stepIndex, setStepIndex] = useState(0);
   const [progress, setProgress] = useState(6);
+  const [slow, setSlow] = useState(false);
   useEffect(() => {
     if (phase === "preparing") return;
     const stepTimer = setInterval(() => {
       setStepIndex((i) => (i < steps.length - 1 ? i + 1 : i));
     }, 1200);
+    // Cap well short of 100 so the bar never appears frozen at 94-99%.
     const progressTimer = setInterval(() => {
-      setProgress((p) => (p < 94 ? p + Math.max(1, Math.round((96 - p) * 0.08)) : p));
+      setProgress((p) => (p < 88 ? p + Math.max(1, Math.round((90 - p) * 0.08)) : p));
     }, 180);
+    const slowTimer = setTimeout(() => setSlow(true), 9000);
     return () => {
       clearInterval(stepTimer);
       clearInterval(progressTimer);
+      clearTimeout(slowTimer);
     };
   }, [steps.length, phase]);
   return (
@@ -656,8 +662,11 @@ function ScanningOverlay({
             <X className="h-4 w-4" /> Cancel
           </button>
           <p className="mt-2 text-center text-xs text-white/60">
-            This usually takes a few seconds. You can cancel any time.
+            {slow
+              ? "This is taking longer than usual — we'll fall back to a best match shortly. You can cancel any time."
+              : "This usually takes a few seconds. You can cancel any time."}
           </p>
+
         </div>
         <style>{`@keyframes scanline{0%{transform:translateY(0)}50%{transform:translateY(216px)}100%{transform:translateY(0)}}`}</style>
       </div>
