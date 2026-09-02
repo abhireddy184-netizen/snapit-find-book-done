@@ -23,6 +23,15 @@ const PARTIAL_CHUNK_MS = 1_000;
 const PARTIAL_MIN_MS = 1_800;
 const PARTIAL_MAX_MS = 4_000;
 const MIN_PARTIAL_BYTES = 6_000;
+/**
+ * After a voice request is finalized, GPB builds the plan on its own if the
+ * person stays silent. Armed only after a real spoken transcript, never from
+ * typing, and cancellable from the UI or by editing the text.
+ */
+const AUTO_SUBMIT_SECONDS = 10;
+/** Too short to be a real request — never auto-submit noise. */
+const MIN_AUTO_SUBMIT_CHARS = 4;
+
 
 
 type SpeechRecognitionResultLike = {
