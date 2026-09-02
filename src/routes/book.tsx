@@ -355,6 +355,7 @@ function BookPage() {
               </p>
               <Link
                 to="/search"
+                search={{ q: "", loc: "", pros: 1 }}
                 className="mt-4 inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white"
                 style={{ background: "var(--gradient-primary)" }}
               >
