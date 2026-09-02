@@ -285,7 +285,7 @@ export function normalizeAnalysis(
     recommendedActions: Array.isArray(parsed.recommendedActions) ? parsed.recommendedActions.filter(Boolean).slice(0, 5) : [],
     possibleCauses: Array.isArray(parsed.possibleCauses) ? parsed.possibleCauses.filter(Boolean).slice(0, 4) : [],
     nextSteps: Array.isArray(parsed.nextSteps) ? parsed.nextSteps.filter(Boolean).slice(0, 4) : [],
-    clarifyingQuestions: Array.isArray(parsed.clarifyingQuestions) ? parsed.clarifyingQuestions.filter(Boolean).slice(0, 3) : [],
+    clarifyingQuestions: questions,
     serviceOptions: Array.isArray(parsed.serviceOptions) && parsed.serviceOptions.length
       ? parsed.serviceOptions
           .filter((o) => o && CATEGORY_SLUGS.has(o.categorySlug))
