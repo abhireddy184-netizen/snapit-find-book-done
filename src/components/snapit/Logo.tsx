@@ -23,7 +23,7 @@ export function Wordmark({
   return (
     <span
       aria-hidden="true"
-      className={`brand-font inline-block whitespace-nowrap font-extrabold leading-none tracking-[-0.03em] ${className}`}
+      className={`brand-font whitespace-nowrap font-extrabold leading-none tracking-[-0.03em] ${className}`}
       style={{ fontSize: size }}
     >
       <span className={onColor ? "text-white" : "text-brand-navy"}>Get</span>
