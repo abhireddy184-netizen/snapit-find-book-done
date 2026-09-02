@@ -1,5 +1,5 @@
 import { catalog } from "./catalog";
-import { matchServiceIntent, rankServices } from "./search-intent";
+import { detectServiceIntentInText, matchServiceIntent, rankServices } from "./search-intent";
 
 
 export type IssueSource = "detected" | "possible" | "customer-described" | "insufficient";
