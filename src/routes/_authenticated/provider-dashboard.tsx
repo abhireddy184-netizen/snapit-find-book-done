@@ -167,7 +167,7 @@ function JobRow({ booking }: { booking: Booking }) {
   return (
     <>
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
-        <Avatar initials={booking.service.slice(0, 2).toUpperCase()} gradient="from-[#FF3D8D] to-[#FF7A45]" />
+        <Avatar initials={booking.service.slice(0, 2).toUpperCase()} gradient="from-[#2C5CA8] to-[#2FA8C0]" />
         <div className="min-w-0">
           <div className="truncate text-sm font-bold">{booking.service}</div>
           <div className="truncate text-xs text-muted-foreground">

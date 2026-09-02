@@ -289,7 +289,7 @@ function RealProviderCard({ match }: { match: ProviderMatch }) {
   return (
     <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
       <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
-        <Avatar initials={initials} gradient="from-[#FF3D8D] to-[#5B6CFF]" size={56} />
+        <Avatar initials={initials} gradient="from-[#2C5CA8] to-[#2FA8C0]" size={56} />
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-1.5">
             <div className="truncate text-base font-bold">{provider.business_name || "GetPros professional"}</div>

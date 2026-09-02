@@ -16,12 +16,12 @@ export const Route = createFileRoute("/emergency")({
 });
 
 const emergencyTypes = [
-  { slug: "plumbing", label: "Burst pipe / flood", icon: Droplet, color: "from-[#6EC8FF] to-[#3AA6F0]", eta: 12 },
+  { slug: "plumbing", label: "Burst pipe / flood", icon: Droplet, color: "from-[#2FA8C0] to-[#3AA6F0]", eta: 12 },
   { slug: "electrical", label: "Power outage / sparks", icon: Zap, color: "from-amber-500 to-orange-500", eta: 18 },
-  { slug: "hvac", label: "No heat / no AC", icon: Wind, color: "from-[#6EC8FF] to-[#B58CFF]", eta: 25 },
+  { slug: "hvac", label: "No heat / no AC", icon: Wind, color: "from-[#2FA8C0] to-[#4C86C6]", eta: 25 },
   { slug: "handyman", label: "Broken lock / door", icon: Lock, color: "from-rose-500 to-red-500", eta: 22 },
   { slug: "appliance-repair", label: "Gas leak / smoke", icon: Flame, color: "from-red-500 to-orange-600", eta: 15 },
-  { slug: "auto-services", label: "Roadside / breakdown", icon: Car, color: "from-[#B58CFF] to-[#8A5CF0]", eta: 20 },
+  { slug: "auto-services", label: "Roadside / breakdown", icon: Car, color: "from-[#4C86C6] to-[#2F4E96]", eta: 20 },
 ];
 
 function EmergencyPage() {
