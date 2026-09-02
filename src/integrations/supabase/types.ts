@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          buffer_minutes: number
           cancelled_at: string | null
           completed_at: string | null
           created_at: string
@@ -26,6 +27,7 @@ export type Database = {
           end_at: string | null
           id: string
           job_id: string | null
+          occupied_end_at: string | null
           overran_window: boolean
           provider_id: string | null
           provider_name_snapshot: string | null
@@ -40,6 +42,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          buffer_minutes?: number
           cancelled_at?: string | null
           completed_at?: string | null
           created_at?: string
@@ -50,6 +53,7 @@ export type Database = {
           end_at?: string | null
           id?: string
           job_id?: string | null
+          occupied_end_at?: string | null
           overran_window?: boolean
           provider_id?: string | null
           provider_name_snapshot?: string | null
@@ -64,6 +68,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          buffer_minutes?: number
           cancelled_at?: string | null
           completed_at?: string | null
           created_at?: string
@@ -74,6 +79,7 @@ export type Database = {
           end_at?: string | null
           id?: string
           job_id?: string | null
+          occupied_end_at?: string | null
           overran_window?: boolean
           provider_id?: string | null
           provider_name_snapshot?: string | null
@@ -622,7 +628,46 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_my_provider_profile: {
+        Args: never
+        Returns: {
+          accepting_bookings: boolean
+          availability: string | null
+          bio: string | null
+          business_name: string
+          created_at: string
+          default_duration_minutes: number
+          id: string
+          interest_claimed_at: string | null
+          phone: string | null
+          service_area: string | null
+          service_category: string | null
+          service_radius_miles: number | null
+          service_zip: string | null
+          starting_price: number | null
+          travel_buffer_minutes: number
+          updated_at: string
+          user_id: string
+          verification_status: Database["public"]["Enums"]["verification_status"]
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "provider_profiles"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      provider_busy_intervals: {
+        Args: { _from: string; _provider_id: string; _to: string }
+        Returns: {
+          ends_at: string
+          starts_at: string
+        }[]
+      }
+      replace_provider_availability: {
+        Args: { _hours: Json }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "customer" | "provider"
