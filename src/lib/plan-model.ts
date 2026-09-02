@@ -175,7 +175,14 @@ export type GpbPlan = {
   deadline?: string;
   /** Plan start as "HH:MM" 24h. */
   startClock: string;
+  /** Calendar date the plan starts on, "YYYY-MM-DD", when a date is known. */
+  startDate?: string;
+  /** Calendar date the deadline falls on, "YYYY-MM-DD", when a date is known. */
+  deadlineDate?: string;
+  /** IANA time zone the clock values are expressed in, when known. */
+  timeZone?: string;
   bufferMinutes: number;
+
   tasks: PlanTask[];
   notes: string[];
   replan?: ReplanSuggestion;
