@@ -149,6 +149,7 @@ export function normalizeAnalysis(
   hadNote: boolean,
   hasMedia = false,
   note?: string,
+  ctx?: AnalysisContext,
 ): SnapAnalysis {
   const match = raw.match(/\{[\s\S]*\}/);
   let parsed: Partial<SnapAnalysis> = {};
@@ -162,12 +163,24 @@ export function normalizeAnalysis(
   const aiCategory =
     parsed.categorySlug && CATEGORY_SLUGS.has(parsed.categorySlug) ? parsed.categorySlug : null;
 
+  const parsedKindRaw: ResponseKind | undefined = parsed.responseKind;
+  // The customer's newest words beat any photo inference — "TV repair" must not
+  // be answered with TV mounting. Safety redirects are never overridden.
+  const latest = ctx?.latestMessage?.trim() ?? "";
+  const explicit = parsedKindRaw === "safety-redirect" || !latest ? null : detectServiceIntentInText(latest);
+
   // Never silently label an unclassified request "Handyman". When the AI gave
   // no valid category, try the customer's own words against the catalog first.
   let inferredService: { categorySlug: string; serviceSlug: string; label: string } | null = null;
   let inferredOptions: ServiceOption[] = [];
-  if (!aiCategory && noteText) {
-    const hit = matchServiceIntent(noteText);
+  if (explicit) {
+    inferredService = {
+      categorySlug: explicit.category.slug,
+      serviceSlug: explicit.service.slug,
+      label: explicit.service.name,
+    };
+  } else if (!aiCategory && noteText) {
+    const hit = detectServiceIntentInText(noteText) ?? matchServiceIntent(noteText);
     if (hit) {
       inferredService = {
         categorySlug: hit.category.slug,
@@ -186,25 +199,53 @@ export function normalizeAnalysis(
     }
   }
 
+  // The customer asked to move on, or we've already spent our clarification
+  // budget: resolve with the best fit instead of asking again.
+  const mustResolve = Boolean(ctx?.forceResolve) || (ctx?.turnCount ?? 0) >= 2;
+  if (mustResolve && !inferredService && !aiCategory) {
+    const fallback = rankServices(latest || noteText, 4);
+    if (fallback[0]) {
+      inferredService = {
+        categorySlug: fallback[0].category.slug,
+        serviceSlug: fallback[0].service.slug,
+        label: fallback[0].service.name,
+      };
+      inferredOptions = fallback.slice(1).map((h) => ({
+        categorySlug: h.category.slug,
+        serviceSlug: h.service.slug,
+        label: h.service.name,
+        reason: h.category.name,
+      }));
+    }
+  }
+
   // Empty slug = deliberately unclassified; the UI hides category chips, pricing
   // and pro matches for discovery states.
-  const categorySlug = aiCategory ?? inferredService?.categorySlug ?? "";
+  const categorySlug = inferredService?.categorySlug ?? aiCategory ?? "";
   const cat = catalog.find((c) => c.slug === categorySlug);
   const unclassified = !categorySlug;
-  const parsedKind: ResponseKind | undefined = parsed.responseKind;
-  const responseKind: ResponseKind = unclassified
+  const parsedKind: ResponseKind | undefined = parsedKindRaw;
+  let responseKind: ResponseKind = unclassified
     ? parsedKind === "no-issue" || parsedKind === "safety-redirect"
       ? parsedKind
       : inferredOptions.length > 1
         ? "options"
         : "needs-info"
     : (parsedKind ?? (Object.keys(parsed).length ? "diagnosis" : "needs-info"));
+  // An explicit service the customer named, or an exhausted question budget,
+  // means we stop clarifying and progress to finding a professional.
+  if (categorySlug && responseKind !== "safety-redirect" && (explicit || mustResolve)) {
+    responseKind = "diagnosis";
+  }
   // Only a confident, single-service diagnosis may carry a price or pro match.
   // options / needs-info / no-issue / safety-redirect are discovery states.
   const hasPriceEstimate =
     responseKind === "diagnosis" &&
     Boolean(parsed.hasPriceEstimate ?? true) &&
-    Number(parsed.estimatedCostLow ?? 0) > 0;
+    Number(parsed.estimatedCostLow ?? 0) > 0 &&
+    !explicit;
+  const suppressQuestions = responseKind === "diagnosis";
+  const alreadyAsked = new Set((ctx?.askedQuestions ?? []).map((q) => q.trim().toLowerCase()));
 
   return {
     responseKind,
