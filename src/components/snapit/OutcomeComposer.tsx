@@ -233,8 +233,10 @@ export function OutcomeComposer() {
         }
       }
       stopRecordingResources();
+      if (autoTimerRef.current !== null) window.clearInterval(autoTimerRef.current);
     };
   }, []);
+
 
   const stopListening = () => {
     const rec = recRef.current;
