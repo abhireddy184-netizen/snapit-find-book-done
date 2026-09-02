@@ -253,18 +253,12 @@ export function Footer() {
     <footer className="mt-14 border-t border-border/60 pt-10 pb-6 text-sm text-muted-foreground">
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
         <div className="min-w-0">
-          <Logo />
+          <Logo showTagline />
           <p className="mt-3 max-w-xs text-xs leading-relaxed">
             Show, say or type the service you need. We connect you with trusted local pros.
           </p>
-          <div className="mt-4 flex items-center gap-2">
-            {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
-              <a key={i} href="#" aria-label="Social" className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card text-muted-foreground transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:text-primary">
-                <Icon className="h-4 w-4" />
-              </a>
-            ))}
-          </div>
         </div>
+
         <div>
           <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">Get started</div>
           <ul className="space-y-2">
