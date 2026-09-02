@@ -86,6 +86,9 @@ function SnapPage() {
   // Monotonic token: only the newest run is allowed to write state.
   const runRef = useRef(0);
   const busyRef = useRef(false);
+  // Conversation memory so GPB never re-asks a question or loses an answer.
+  const [askedQuestions, setAskedQuestions] = useState<string[]>([]);
+  const [turnCount, setTurnCount] = useState(0);
   const [recent, setRecent] = useState<SnapHistoryEntry[]>([]);
   useEffect(() => {
     setRecent(loadHistory().slice(0, 4));
@@ -100,16 +103,32 @@ function SnapPage() {
     return () => URL.revokeObjectURL(pendingPreview);
   }, [pendingPreview]);
 
-  const runDiagnosis = async (frames: string[], noteText: string, token: number) => {
+  const runDiagnosis = async (
+    frames: string[],
+    noteText: string,
+    token: number,
+    opts?: { latestMessage?: string; asked?: string[]; turns?: number; forceResolve?: boolean },
+  ) => {
     setPhase("analyzing");
     try {
+      const payload = {
+        ...(frames.length ? { imageDataUrls: frames } : {}),
+        note: noteText,
+        latestMessage: opts?.latestMessage,
+        askedQuestions: opts?.asked ?? askedQuestions,
+        turnCount: opts?.turns ?? turnCount,
+        forceResolve: opts?.forceResolve ?? false,
+      };
       const result = await withTimeout(
-        analyze({ data: frames.length ? { imageDataUrls: frames, note: noteText } : { note: noteText } }),
+        analyze({ data: payload }),
         ANALYSIS_TIMEOUT_MS,
         "The AI is taking longer than usual. Please retry or send it again.",
       );
       if (runRef.current !== token) return;
       setAnalysis(result);
+      if (result.clarifyingQuestions?.length) {
+        setAskedQuestions((prev) => [...new Set([...prev, ...result.clarifyingQuestions!])].slice(0, 12));
+      }
     } catch (e) {
       if (runRef.current !== token) return;
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
