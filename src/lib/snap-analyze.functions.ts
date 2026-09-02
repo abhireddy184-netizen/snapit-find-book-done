@@ -3,6 +3,8 @@ import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import { SYSTEM_PROMPT, buildUserPrompt, normalizeAnalysis } from "./snap-analyze.server";
+import { detectServiceIntentInText } from "./search-intent";
+
 
 export type { SnapAnalysis, ServiceOption, IssueSource, ResponseKind } from "./snap-analyze.server";
 
