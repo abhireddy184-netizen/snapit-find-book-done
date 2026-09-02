@@ -101,9 +101,14 @@ export async function fetchProviderIdsForCategory(slug: string): Promise<string[
   return (data ?? []).map((r) => r.user_id);
 }
 
-/** A provider can only be booked when they are live and not paused. */
+/**
+ * A provider can only be booked when GPB has actually verified them and they
+ * are accepting work. `pending` verification is NOT bookable — the database
+ * booking rules enforce exactly the same test, so the UI can never offer a pro
+ * the server would reject.
+ */
 export function isBookable(provider: PublicProvider): boolean {
-  return provider.accepting_bookings === true && provider.verification_status !== "unverified";
+  return provider.accepting_bookings === true && provider.verification_status === "verified";
 }
 
 /**
