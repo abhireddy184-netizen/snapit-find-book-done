@@ -108,19 +108,46 @@ function AuthNav() {
 
   return (
     <>
-      <Link to="/login" search={{ redirect: undefined }} className="hidden rounded-full px-4 py-2 text-sm font-medium text-foreground hover:bg-muted md:inline-flex">
+      {/* Returning users need a visible way in on phones too — a plain text
+          link keeps the header inside 320px next to the gradient Sign up CTA. */}
+      <Link
+        to="/login"
+        search={{ redirect: undefined }}
+        className="inline-flex shrink-0 items-center rounded-full px-2.5 py-2 text-sm font-semibold text-foreground hover:bg-muted sm:px-4"
+      >
         Log in
       </Link>
       <Link
         to="/register"
         search={{ redirect: undefined, role: undefined }}
-        className="inline-flex items-center rounded-full px-4 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] hover:shadow-lg"
+        className="inline-flex shrink-0 items-center rounded-full px-3.5 py-2 text-sm font-semibold text-white shadow-md transition-all hover:scale-[1.02] hover:shadow-lg sm:px-4"
         style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px color-mix(in oklab, var(--primary) 55%, transparent)" }}
       >
         Sign up
       </Link>
     </>
   );
+}
+
+/**
+ * True while a text field has focus — used to drop the floating bottom nav so
+ * the on-screen keyboard never covers the composer's actions on mobile.
+ */
+function useKeyboardOpen() {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const isField = (el: Element | null) =>
+      !!el && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || (el as HTMLElement).isContentEditable);
+    const onFocus = (e: FocusEvent) => { if (isField(e.target as Element)) setOpen(true); };
+    const onBlur = () => setOpen(false);
+    document.addEventListener("focusin", onFocus);
+    document.addEventListener("focusout", onBlur);
+    return () => {
+      document.removeEventListener("focusin", onFocus);
+      document.removeEventListener("focusout", onBlur);
+    };
+  }, []);
+  return open;
 }
 
 function BottomNav() {
