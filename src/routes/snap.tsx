@@ -697,7 +697,7 @@ function CaptureTile({
   );
 }
 
-type MatchedProvider = Provider & { eta: number };
+
 
 function JobScopeCta({ analysis, image }: { analysis: SnapAnalysis; image: string | null }) {
   const { user } = useAuth();
