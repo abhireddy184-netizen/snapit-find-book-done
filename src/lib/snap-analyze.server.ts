@@ -19,6 +19,7 @@ export type SnapAnalysis = {
   visualSubject?: string;
   category: string;
   categorySlug: string;
+  serviceSlug?: string;
   confidence: number;
   problem: string;
   estimatedCostLow: number;
