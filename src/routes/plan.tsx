@@ -180,7 +180,10 @@ function PlanPage() {
         </div>
       )}
 
+      {conversation && <ConversationCard reply={conversation.reply} invitation={conversation.invitation} />}
+
       {plan && (
+
         <>
           <PlanSummary plan={plan} isDemo={isDemo} />
 
