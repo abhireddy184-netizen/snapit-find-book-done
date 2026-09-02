@@ -173,6 +173,8 @@ export function buildPlanUserPrompt(
   location: string,
   nowClock: string,
   understanding?: PlanUnderstanding,
+  nowDate?: string,
+  timeZone?: string,
 ) {
   return [
     `Customer request (verbatim, in their own words): "${request}"`,
@@ -189,9 +191,10 @@ export function buildPlanUserPrompt(
         }. Write ALL customer-facing text in this language and style.`
       : "",
     location ? `Location context: ${location}` : "No location given.",
-    `Current local time is roughly ${formatClock(parseClock(nowClock))}.`,
+    `Current local time is roughly ${formatClock(parseClock(nowClock))}${nowDate ? `, today's date is ${nowDate}` : ""}${timeZone ? `, customer time zone ${timeZone}` : ""}.`,
     "Return JSON only.",
   ]
+
     .filter(Boolean)
     .join("\n");
 }
