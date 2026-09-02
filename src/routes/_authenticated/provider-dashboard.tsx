@@ -13,6 +13,8 @@ import { claimProviderInterest } from "@/lib/provider-interest.functions";
 import { catalog } from "@/lib/catalog";
 import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
+import { ProviderWorkSettings } from "@/components/snapit/ProviderWorkSettings";
+import { transitionBooking } from "@/lib/schedule";
 
 
 export const Route = createFileRoute("/_authenticated/provider-dashboard")({
@@ -30,6 +32,7 @@ export const Route = createFileRoute("/_authenticated/provider-dashboard")({
 const tabs = [
   { id: "requests", label: "Requests", icon: Wrench },
   { id: "schedule", label: "Schedule", icon: CalendarDays },
+  { id: "work", label: "Hours & time off", icon: Clock3 },
   { id: "profile", label: "Business profile", icon: User },
 ];
 
@@ -75,6 +78,7 @@ function ProviderDashboard() {
       <div className="mt-6">
         {tab === "requests" && <Requests userId={user?.id} />}
         {tab === "schedule" && <Schedule userId={user?.id} />}
+        {tab === "work" && <ProviderWorkSettings userId={user?.id} />}
         {tab === "profile" && <BusinessProfile />}
       </div>
     </AppShell>
@@ -106,9 +110,16 @@ function Requests({ userId }: { userId: string | undefined }) {
   const queryClient = useQueryClient();
   const [busyId, setBusyId] = useState<string | null>(null);
 
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  // Accept/decline goes through the guarded transition helper: the update only
+  // matches a row that is still pending, so a double tap or a retry can't
+  // accept a job twice or revive a declined one.
   async function setStatus(id: string, status: "confirmed" | "cancelled") {
     setBusyId(id);
-    await supabase.from("bookings").update({ status }).eq("id", id);
+    setActionError(null);
+    const result = await transitionBooking(id, "pending", status);
+    if (!result.ok) setActionError(result.message);
     await queryClient.invalidateQueries({ queryKey: ["bookings", "provider", userId] });
     setBusyId(null);
   }
@@ -123,6 +134,9 @@ function Requests({ userId }: { userId: string | undefined }) {
 
   return (
     <div className="space-y-3">
+      {actionError && (
+        <p className="rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-medium text-destructive">{actionError}</p>
+      )}
       {bookings.map((b) => (
         <div key={b.id} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
           <JobRow booking={b} />
@@ -173,6 +187,19 @@ function JobRow({ booking }: { booking: Booking }) {
 
 function Schedule({ userId }: { userId: string | undefined }) {
   const { data, isLoading, error } = useProviderBookings(userId);
+  const queryClient = useQueryClient();
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  async function move(b: Booking, to: "in_progress" | "completed") {
+    setBusyId(b.id);
+    setActionError(null);
+    const result = await transitionBooking(b.id, b.status, to);
+    if (!result.ok) setActionError(result.message);
+    await queryClient.invalidateQueries({ queryKey: ["bookings", "provider", userId] });
+    setBusyId(null);
+  }
+
   if (isLoading) return <Loading />;
   if (error) return <ErrorBox />;
   const upcoming = (data ?? []).filter((b) => b.status === "confirmed" || b.status === "in_progress");
@@ -181,9 +208,38 @@ function Schedule({ userId }: { userId: string | undefined }) {
   }
   return (
     <div className="space-y-3">
+      {actionError && (
+        <p className="rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-medium text-destructive">{actionError}</p>
+      )}
       {upcoming.map((b) => (
         <div key={b.id} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
           <JobRow booking={b} />
+          <div className="mt-3 flex flex-wrap gap-2">
+            {b.status === "confirmed" ? (
+              <button
+                disabled={busyId === b.id}
+                onClick={() => void move(b, "in_progress")}
+                className="flex-1 rounded-full py-2 text-xs font-bold text-white shadow-sm disabled:opacity-50"
+                style={{ background: "var(--gradient-primary)" }}
+              >
+                Start work
+              </button>
+            ) : (
+              <button
+                disabled={busyId === b.id}
+                onClick={() => void move(b, "completed")}
+                className="flex-1 rounded-full py-2 text-xs font-bold text-white shadow-sm disabled:opacity-50"
+                style={{ background: "var(--gradient-primary)" }}
+              >
+                Complete work
+              </button>
+            )}
+          </div>
+          {b.status === "in_progress" && (
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              In progress. If the job runs past 8:00 PM you can still complete it truthfully — the overrun is recorded.
+            </p>
+          )}
         </div>
       ))}
     </div>
