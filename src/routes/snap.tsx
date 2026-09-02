@@ -212,10 +212,12 @@ function SnapPage() {
     await runDiagnosisFresh(frames, note, token, { latestMessage: note });
   };
 
-  /** Text-only path — no photo required (essential on desktop). */
-  const runTextAnalysis = async () => {
-    const described = describeText.trim();
-    if (described.length < 4 || busyRef.current) return;
+  /** Text/voice path — no photo required (essential on desktop). */
+  const runTextAnalysis = async (override?: string) => {
+    const typed = (override ?? describeText).trim();
+    if (typed.length < 4 || busyRef.current) return;
+    // The service location travels with the request so GPB can match locally.
+    const described = incomingLoc ? `${typed}\n(Service location: ${incomingLoc})` : typed;
     busyRef.current = true;
     const token = ++runRef.current;
     setError(null);
@@ -230,6 +232,19 @@ function SnapPage() {
     setLoading(true);
     await runDiagnosis([], described, token, { latestMessage: described, asked: [], turns: 0 });
   };
+
+  /**
+   * A request handed over from the home composer runs immediately — the person
+   * already said what they need; asking them to press "go" again is friction.
+   */
+  useEffect(() => {
+    if (!incomingRequest || autoRanRef.current) return;
+    if (incomingRequest.length < 4) return;
+    autoRanRef.current = true;
+    void runTextAnalysis(incomingRequest);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [incomingRequest]);
+
 
   /** Abandon any in-flight work and go back to a usable screen. */
   const cancelAnalysis = () => {
