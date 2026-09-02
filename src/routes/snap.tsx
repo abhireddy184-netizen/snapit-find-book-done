@@ -568,6 +568,9 @@ function SnapPage() {
   );
 }
 
+/** Three real stages, driven by the actual work — never by timers. */
+const SCAN_STEPS = ["Understanding your request", "Finding the right service", "Preparing your match"];
+
 function ScanningOverlay({
   image,
   phase,
@@ -575,38 +578,18 @@ function ScanningOverlay({
   onCancel,
 }: {
   image: string | null;
-  phase: "idle" | "preparing" | "analyzing";
+  phase: "idle" | "preparing" | "analyzing" | "matching";
   fast?: boolean;
   onCancel: () => void;
 }) {
-  const steps = fast
-    ? ["Reading your request…", "Matching the right service…", "Finding local pros…"]
-    : [
-        "Understanding what you need…",
-        "Checking the visible details…",
-        "Matching possible services…",
-        "Checking confidence…",
-        "Preparing the next step…",
-      ];
-  const [stepIndex, setStepIndex] = useState(0);
-  const [progress, setProgress] = useState(6);
+  const stepIndex = phase === "preparing" ? 0 : phase === "matching" ? 2 : 1;
   const [slow, setSlow] = useState(false);
   useEffect(() => {
-    if (phase === "preparing") return;
-    const stepTimer = setInterval(() => {
-      setStepIndex((i) => (i < steps.length - 1 ? i + 1 : i));
-    }, fast ? 380 : 1200);
-    // Cap well short of 100 so the bar never appears frozen at 94-99%.
-    const progressTimer = setInterval(() => {
-      setProgress((p) => (p < 88 ? p + Math.max(1, Math.round((90 - p) * (fast ? 0.22 : 0.08))) : p));
-    }, 180);
-    const slowTimer = setTimeout(() => setSlow(true), 9000);
-    return () => {
-      clearInterval(stepTimer);
-      clearInterval(progressTimer);
-      clearTimeout(slowTimer);
-    };
-  }, [steps.length, phase, fast]);
+    setSlow(false);
+    // Only flag a genuine backend delay, never a staged animation.
+    const slowTimer = setTimeout(() => setSlow(true), 8000);
+    return () => clearTimeout(slowTimer);
+  }, [phase]);
 
 
 
