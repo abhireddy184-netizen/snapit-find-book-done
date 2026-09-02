@@ -1,4 +1,4 @@
-/** Single source of truth for the GPB password policy (signup, reset, change). */
+/** Single source of truth for the GetPros password policy (signup, reset, change). */
 
 export type PasswordRule = {
   id: string;

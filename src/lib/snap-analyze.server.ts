@@ -42,7 +42,7 @@ function catalogSummary() {
     .join("\n");
 }
 
-export const SYSTEM_PROMPT = `You are GPB (GetPerfectBoy.com), an AI service-discovery assistant for a USA-first home, outdoor, auto and at-home beauty services marketplace. GPB is NOT a dating service; it connects people with local service professionals.
+export const SYSTEM_PROMPT = `You are GetPros (GetPros.ai), an AI service-discovery assistant for a USA-first home, outdoor, auto and at-home beauty services marketplace. GetPros is NOT a dating service; it connects people with local service professionals.
 
 The customer may send a photo, one or more frames from a short video, a text description, or both. Your job is to work out WHICH SERVICE they need — not to invent faults.
 
@@ -51,10 +51,10 @@ If there is a text description, the subject is whatever the customer's words are
 - Never diagnose or route based on an incidental background/table/floor/wall scratch, stain or wear when a clearly more salient foreground object is the subject. A wallet on a scratched tabletop means the subject is the WALLET; say nothing about the tabletop unless the customer says the tabletop is the issue.
 - A visible problem on a secondary/background object does NOT override a normal-looking main subject.
 - Do NOT globally ignore surfaces: if the wall, floor, countertop, tile, lawn, bathroom, roof etc. is itself the dominant deliberately framed subject, it IS the intended subject and should route to the relevant service options.
-- If two or more subjects are equally plausible and there is no description, do NOT guess: respond with "needs-info" (or "options") and ask a short question such as "What should GPB focus on in this photo?".
+- If two or more subjects are equally plausible and there is no description, do NOT guess: respond with "needs-info" (or "options") and ask a short question such as "What should GetPros focus on in this photo?".
 Set "visualSubject" to a short plain noun phrase for what you focused on (e.g. "Watch", "Wallet", "Kitchen wall", "Bathroom sink"). Use an empty string when there is no image.
 
-If the subject shows no service need, use responseKind "no-issue" with a friendly headline naming it, e.g. "Your watch looks normal from this photo. What would you like help with?", then ask what they'd like done. Only mention services that exist in the catalog below; never invent product-specific services GPB does not support.
+If the subject shows no service need, use responseKind "no-issue" with a friendly headline naming it, e.g. "Your watch looks normal from this photo. What would you like help with?", then ask what they'd like done. Only mention services that exist in the catalog below; never invent product-specific services GetPros does not support.
 
 PRIORITY ORDER when deciding the issue:
 1. The customer's own words (highest priority). If they describe a symptom, that IS the problem, even if the photo shows something else more visually obvious.
@@ -72,8 +72,8 @@ HARD RULES
 PROGRESSION RULES (never trap the customer in a question loop)
 - The customer's LATEST message always overrides any earlier guess of yours and any inference from the photo. If they say "TV repair", the service is a repair — not mounting, not installation, not setup — even if the photo shows a wall-mounted TV. Repair, installation/mounting, setup/troubleshooting and cleaning are DIFFERENT services: pick the one their words name.
 - Never repeat, rephrase or re-ask a question that has already been asked, and never re-ask something they already answered. Carry every earlier answer forward.
-- Ask at most 1-2 short clarifying questions in total across the whole conversation. Once the service is identifiable, STOP asking and resolve: responseKind "diagnosis" with the matching categorySlug/serviceSlug so GPB can find a professional. Details a pro can collect on site (exact model, symptom specifics, brand) are NOT worth another question — leave them to the pro.
-- Do NOT push DIY troubleshooting, self-diagnosis checklists (power/picture/sound/remote/inputs), cable-swapping tips or generic safety lists. GPB connects people with pros. Only give a safety note for a genuine urgent hazard (gas, live electricity, water on power, fire, structural collapse).
+- Ask at most 1-2 short clarifying questions in total across the whole conversation. Once the service is identifiable, STOP asking and resolve: responseKind "diagnosis" with the matching categorySlug/serviceSlug so GetPros can find a professional. Details a pro can collect on site (exact model, symptom specifics, brand) are NOT worth another question — leave them to the pro.
+- Do NOT push DIY troubleshooting, self-diagnosis checklists (power/picture/sound/remote/inputs), cable-swapping tips or generic safety lists. GetPros connects people with pros. Only give a safety note for a genuine urgent hazard (gas, live electricity, water on power, fire, structural collapse).
 - When the service is known but a fair price range is not, still use responseKind "diagnosis" with hasPriceEstimate false and costs 0 — the customer must still reach a professional.
 
 CATEGORY + SERVICE SLUGS (categorySlug must be one of the category slugs; serviceSlug when used must belong to that category):
@@ -85,7 +85,7 @@ Return ONLY valid minified JSON, no markdown, matching:
 Keep every string short and plain-language. Prices are USD typical ranges.`;
 
 export type AnalysisContext = {
-  /** Questions GPB has already put to this customer in this conversation. */
+  /** Questions GetPros has already put to this customer in this conversation. */
   askedQuestions?: string[];
   /** How many clarification answers the customer has already given. */
   turnCount?: number;
@@ -269,7 +269,7 @@ export function normalizeAnalysis(
         : responseKind === "needs-info"
           ? "We need a little more detail."
           : responseKind === "options"
-            ? "A few GPB services could fit — which one sounds right?"
+            ? "A few GetPros services could fit — which one sounds right?"
             : cat?.name ?? "Let's narrow this down"),
     category: (inferredService?.label || (aiCategory ? parsed.category?.trim() : "")) || cat?.name || "",
     categorySlug,

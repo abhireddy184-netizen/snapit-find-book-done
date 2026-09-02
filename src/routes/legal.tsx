@@ -4,14 +4,14 @@ import { AppShell } from "@/components/snapit/AppShell";
 export const Route = createFileRoute("/legal")({
   head: () => ({
     meta: [
-      { title: "Privacy, Terms & Accessibility — GPB" },
+      { title: "Privacy, Terms & Accessibility — GetPros" },
       {
         name: "description",
         content:
-          "How GetPerfectBoy.com handles your data, what our terms of use cover, how we use cookies, and our accessibility commitment.",
+          "How GetPros.ai handles your data, what our terms of use cover, how we use cookies, and our accessibility commitment.",
       },
-      { property: "og:title", content: "Privacy, Terms & Accessibility — GPB" },
-      { property: "og:description", content: "GPB privacy, terms, cookies and accessibility information." },
+      { property: "og:title", content: "Privacy, Terms & Accessibility — GetPros" },
+      { property: "og:description", content: "GetPros privacy, terms, cookies and accessibility information." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -25,7 +25,7 @@ function LegalPage() {
       <div className="mx-auto max-w-3xl">
         <h1 className="text-3xl font-black tracking-tight md:text-4xl">Privacy, terms & accessibility</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          GetPerfectBoy.com is in active build-out. The summaries below describe how the product behaves today. Full legal
+          GetPros.ai is in active build-out. The summaries below describe how the product behaves today. Full legal
           documents are being prepared with counsel — until they are published here, these summaries are what applies.
         </p>
 
@@ -60,7 +60,7 @@ function LegalPage() {
 
         <Section id="terms" title="Terms of use">
           <p>
-            GPB is a marketplace and coordination layer. Work is carried out by independent professionals, not by GPB.
+            GetPros is a marketplace and coordination layer. Work is carried out by independent professionals, not by GetPros.
             Prices shown before a pro inspects the job are AI-generated estimates, not quotes, and the final price is the
             one your pro confirms.
           </p>
@@ -69,7 +69,7 @@ function LegalPage() {
             not bookable and are labelled as such wherever they appear.
           </p>
           <p>
-            You are responsible for the accuracy of the job details and the address you supply. Do not use GPB for
+            You are responsible for the accuracy of the job details and the address you supply. Do not use GetPros for
             emergencies that require 911 or your local emergency number.
           </p>
         </Section>
@@ -85,7 +85,7 @@ function LegalPage() {
 
         <Section id="accessibility" title="Accessibility">
           <p>
-            We build GPB to be usable with a keyboard and with screen readers, at readable text sizes, from small phones
+            We build GetPros to be usable with a keyboard and with screen readers, at readable text sizes, from small phones
             up to desktop. Status messages announce themselves, controls have labels, and colour is never the only way we
             convey meaning.
           </p>
@@ -98,7 +98,7 @@ function LegalPage() {
 
         <div className="mt-10 text-sm">
           <Link to="/" className="font-semibold text-primary">
-            ← Back to GPB
+            ← Back to GetPros
           </Link>
         </div>
       </div>

@@ -1,5 +1,5 @@
 /**
- * GPB V3 orchestration model — a single outcome broken into linked, timed tasks.
+ * GetPros V3 orchestration model — a single outcome broken into linked, timed tasks.
  *
  * Pure, browser-safe helpers only. The AI prompt + normalizer live in
  * plan.server.ts; the server function lives in plan.functions.ts.
@@ -71,7 +71,7 @@ export type PlanUnderstanding = {
   clarificationQuestion?: string;
   /**
    * Whether there is a real task to plan. "conversational" covers greetings,
-   * jokes, tests and general questions — GPB answers briefly instead of
+   * jokes, tests and general questions — GetPros answers briefly instead of
    * fabricating a plan. Language-agnostic: decided by meaning, not keywords.
    */
   actionability?: "actionable" | "conversational";
@@ -147,11 +147,11 @@ export const DEFAULT_UI_COPY: Required<PlanUiCopy> = {
 
   detailsHeading: "How this will be handled",
   clarifyTitle: "One detail to confirm",
-  clarifyHint: "Answer in any language — GPB will rebuild the plan.",
+  clarifyHint: "Answer in any language — GetPros will rebuild the plan.",
   clarifyPlaceholder: "Your answer…",
   clarifySubmit: "Update plan",
   clarifyDismiss: "Keep as is",
-  pageTitle: "Your GPB Plan",
+  pageTitle: "Your GetPros Plan",
   pageIntro: "Here's your plan. Change the order, the timing or any step — nothing is booked.",
   requestPlaceholder: "I need dinner, groceries, and to be at DFW by 6 PM.",
   locationPlaceholder: "ZIP or city",
@@ -159,8 +159,8 @@ export const DEFAULT_UI_COPY: Required<PlanUiCopy> = {
   errorTitle: "We couldn't build that plan just now.",
   retryLabel: "Try again",
   snapCtaTitle: "Easier to show than say it?",
-  snapCtaBody: "Send GPB a photo or video instead.",
-  earlyCtaTitle: "Want GPB to run plans like this?",
+  snapCtaBody: "Send GetPros a photo or video instead.",
+  earlyCtaTitle: "Want GetPros to run plans like this?",
   earlyCtaBody: "Join early access — launching city by city.",
 };
 
@@ -206,16 +206,16 @@ export const CHANNEL_META: Record<
   { label: string; short: string; live: boolean; blurb: string }
 > = {
   "gpb-pro": {
-    label: "GPB local pro",
-    short: "GPB pro",
+    label: "GetPros local pro",
+    short: "GetPros pro",
     live: true,
-    blurb: "Links into the current GPB service catalogue and provider booking flow.",
+    blurb: "Links into the current GetPros service catalogue and provider booking flow.",
   },
   "food-partner": {
     label: "Food partner",
     short: "Food",
     live: false,
-    blurb: "Food ordering is part of GPB's expanding orchestration network — not yet a live integration.",
+    blurb: "Food ordering is part of GetPros's expanding orchestration network — not yet a live integration.",
   },
   "grocery-partner": {
     label: "Grocery partner",
@@ -233,13 +233,13 @@ export const CHANNEL_META: Record<
     label: "You",
     short: "You",
     live: true,
-    blurb: "A step only you can do. GPB times it around everything else.",
+    blurb: "A step only you can do. GetPros times it around everything else.",
   },
   "not-supported": {
     label: "Not yet supported",
     short: "Not yet",
     live: false,
-    blurb: "GPB can't coordinate this one yet — we'll tell you rather than pretend.",
+    blurb: "GetPros can't coordinate this one yet — we'll tell you rather than pretend.",
   },
 };
 
@@ -375,7 +375,7 @@ export function demoAirportPlan(): GpbPlan {
     {
       id: "t-leave",
       title: "Leave home",
-      detail: "GPB sets off time from your grocery stop and traffic estimate.",
+      detail: "GetPros sets off time from your grocery stop and traffic estimate.",
       channel: "user-action",
       startOffsetMinutes: 25,
       durationMinutes: 15,

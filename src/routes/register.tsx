@@ -8,10 +8,10 @@ export const Route = createFileRoute("/register")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign up — GPB" },
-      { name: "description", content: "Create your GPB account as a customer or service provider." },
-      { property: "og:title", content: "Sign up — GPB" },
-      { property: "og:description", content: "Create a GPB account in seconds." },
+      { title: "Sign up — GetPros" },
+      { name: "description", content: "Create your GetPros account as a customer or service provider." },
+      { property: "og:title", content: "Sign up — GetPros" },
+      { property: "og:description", content: "Create a GetPros account in seconds." },
     ],
   }),
   component: RegisterPage,
@@ -22,7 +22,7 @@ function RegisterPage() {
   return (
     <AuthForm
       mode="register"
-      title={role === "provider" ? "Join GPB as a pro" : "Create your account"}
+      title={role === "provider" ? "Join GetPros as a pro" : "Create your account"}
       subtitle={
         role === "provider"
           ? "Set up your business profile and start receiving standardized job briefs."

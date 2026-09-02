@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ *
- * Market model — GPB launches USA-first but is globally extensible.
+ * Market model — GetPros launches USA-first but is globally extensible.
  * Availability can later vary by country -> region -> licensing rules.
  * ------------------------------------------------------------------ */
 

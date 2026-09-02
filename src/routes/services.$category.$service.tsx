@@ -15,13 +15,13 @@ export const Route = createFileRoute("/services/$category/$service")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Service not found — GPB" }, { name: "robots", content: "noindex" }] };
+      return { meta: [{ title: "Service not found — GetPros" }, { name: "robots", content: "noindex" }] };
     }
-    const title = `${loaderData.name} — ${loaderData.category} | GPB`;
+    const title = `${loaderData.name} — ${loaderData.category} | GetPros`;
     return {
       meta: [
         { title },
-        { name: "description", content: `${loaderData.blurb} See typical GPB pricing for ${loaderData.name.toLowerCase()} and get matched with a vetted local professional.` },
+        { name: "description", content: `${loaderData.blurb} See typical GetPros pricing for ${loaderData.name.toLowerCase()} and get matched with a vetted local professional.` },
         { property: "og:title", content: title },
         { property: "og:description", content: loaderData.blurb },
         { property: "og:type", content: "website" },
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/services/$category/$service")({
       <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
         <h1 className="text-xl font-black">We don't offer that service yet</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          This link doesn't match a GPB service. Browse the full catalogue, or show us the problem and we'll work out
+          This link doesn't match a GetPros service. Browse the full catalogue, or show us the problem and we'll work out
           which service you need.
         </p>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -42,7 +42,7 @@ export const Route = createFileRoute("/services/$category/$service")({
             Browse all services
           </Link>
           <Link to="/snap" className="inline-flex rounded-full border border-border px-4 py-2 text-sm font-bold">
-            Show GPB
+            Show GetPros
           </Link>
         </div>
       </div>
@@ -112,13 +112,13 @@ function ServicePage() {
           <div className="mt-4 rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
             <h2 className="text-sm font-black uppercase tracking-wider text-muted-foreground">Common questions</h2>
             <div className="mt-3 space-y-4 text-sm">
-              <Faq q={`How much does ${service.name.toLowerCase()} cost?`} a={`Most ${market.name} jobs land between ${formatPrice(service.priceLow, service.priceHigh)}${service.unit ? ` ${service.unit}` : ""}. Your pro confirms the final price after seeing the job — GPB never invents a price without enough information.`} />
-              <Faq q="How fast can someone come out?" a="Availability depends on your area and how many GPB pros are onboarded there. Urgent issues can be flagged through emergency dispatch." />
+              <Faq q={`How much does ${service.name.toLowerCase()} cost?`} a={`Most ${market.name} jobs land between ${formatPrice(service.priceLow, service.priceHigh)}${service.unit ? ` ${service.unit}` : ""}. Your pro confirms the final price after seeing the job — GetPros never invents a price without enough information.`} />
+              <Faq q="How fast can someone come out?" a="Availability depends on your area and how many GetPros pros are onboarded there. Urgent issues can be flagged through emergency dispatch." />
               <Faq q="Do I need a photo?" a="No. You can simply describe the job. A photo or short video usually gets you a sharper match, but text alone works fine on desktop." />
               {needsLicense && (
                 <Faq
                   q="Could this work need a licensed professional?"
-                  a="Local licensing or qualification requirements may apply depending on the job and location. GPB should match regulated work only to appropriately qualified providers where required by local law."
+                  a="Local licensing or qualification requirements may apply depending on the job and location. GetPros should match regulated work only to appropriately qualified providers where required by local law."
                 />
               )}
             </div>
@@ -160,7 +160,7 @@ function ServicePage() {
               <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Sample profiles</span>
             </div>
             <p className="mt-1 text-xs text-muted-foreground">
-              Example listings shown while GPB onboards verified pros in your area.
+              Example listings shown while GetPros onboards verified pros in your area.
             </p>
             <div className="mt-3 space-y-2">
               {matched.map((p) => (

@@ -20,10 +20,10 @@ import { transitionBooking } from "@/lib/schedule";
 export const Route = createFileRoute("/_authenticated/provider-dashboard")({
   head: () => ({
     meta: [
-      { title: "Provider dashboard — GPB" },
-      { name: "description", content: "Manage jobs, appointments, availability and your provider profile on GPB." },
-      { property: "og:title", content: "Provider dashboard — GPB" },
-      { property: "og:description", content: "Manage your GPB business in one place." },
+      { title: "Provider dashboard — GetPros" },
+      { name: "description", content: "Manage jobs, appointments, availability and your provider profile on GetPros." },
+      { property: "og:title", content: "Provider dashboard — GetPros" },
+      { property: "og:description", content: "Manage your GetPros business in one place." },
     ],
   }),
   component: ProviderDashboard,
@@ -129,7 +129,7 @@ function Requests({ userId }: { userId: string | undefined }) {
 
   const bookings = (data ?? []).filter((b) => b.status === "pending");
   if (bookings.length === 0) {
-    return <EmptyJobs title="No job requests yet" body="When a customer books you on GPB, their request will appear here for you to accept or decline." />;
+    return <EmptyJobs title="No job requests yet" body="When a customer books you on GetPros, their request will appear here for you to accept or decline." />;
   }
 
   return (
@@ -466,7 +466,7 @@ function BusinessProfile() {
   );
 }
 
-/** The real GPB app icon, reused to badge dashboard sections. */
+/** The real GetPros app icon, reused to badge dashboard sections. */
 function GpbMark() {
   return <BrandMark size={36} />;
 }
@@ -485,7 +485,7 @@ function VerificationCard({
   const steps = [
     { label: "Account created", done: true },
     { label: "Business profile completed", done: profileComplete },
-    { label: "GPB team review", done: verified },
+    { label: "GetPros team review", done: verified },
   ];
   const completed = steps.filter((s) => s.done).length;
   const pct = Math.round((completed / steps.length) * 100);
@@ -496,7 +496,7 @@ function VerificationCard({
       ? { label: "Complete your business profile", tone: "bg-muted text-foreground", icon: ShieldAlert }
       : inReview
         ? { label: "Verification pending", tone: "bg-amber-500/15 text-amber-700", icon: Clock3 }
-        : { label: "Ready for GPB review", tone: "bg-amber-500/15 text-amber-700", icon: Clock3 };
+        : { label: "Ready for GetPros review", tone: "bg-amber-500/15 text-amber-700", icon: Clock3 };
   const StateIcon = state.icon;
 
   return (
@@ -505,7 +505,7 @@ function VerificationCard({
         <GpbMark />
         <div>
           <div className="text-sm font-bold">Verification</div>
-          <div className="text-xs text-muted-foreground">GPB provider trust check</div>
+          <div className="text-xs text-muted-foreground">GetPros provider trust check</div>
         </div>
       </div>
 
@@ -539,10 +539,10 @@ function VerificationCard({
         {verified
           ? "Your verified badge is visible to customers."
           : !profileComplete
-            ? "Add your business name, service category and service ZIP so GPB can review your listing. Nothing has been submitted yet."
+            ? "Add your business name, service category and service ZIP so GetPros can review your listing. Nothing has been submitted yet."
             : inReview
-              ? "Your details are with the GPB team. No badge is shown to customers until the review completes."
-              : "Your profile is complete. Manual GPB review isn’t open yet — we’ll contact you when it starts, and no badge is shown to customers until then."}
+              ? "Your details are with the GetPros team. No badge is shown to customers until the review completes."
+              : "Your profile is complete. Manual GetPros review isn’t open yet — we’ll contact you when it starts, and no badge is shown to customers until then."}
       </p>
       <p className="mt-1 text-[11px] text-muted-foreground">Status: <span className="capitalize">{status.replace(/_/g, " ")}</span></p>
     </div>

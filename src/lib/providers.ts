@@ -102,7 +102,7 @@ export async function fetchProviderIdsForCategory(slug: string): Promise<string[
 }
 
 /**
- * A provider can only be booked when GPB has actually verified them and they
+ * A provider can only be booked when GetPros has actually verified them and they
  * are accepting work. `pending` verification is NOT bookable — the database
  * booking rules enforce exactly the same test, so the UI can never offer a pro
  * the server would reject.

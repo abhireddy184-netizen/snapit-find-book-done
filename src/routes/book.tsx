@@ -50,9 +50,9 @@ export const Route = createFileRoute("/book")({
   }),
   head: () => ({
     meta: [
-      { title: "Book a service — GPB" },
+      { title: "Book a service — GetPros" },
       { name: "description", content: "Book a trusted local pro in a few taps." },
-      { property: "og:title", content: "Book a service — GPB" },
+      { property: "og:title", content: "Book a service — GetPros" },
       { property: "og:description", content: "Book a trusted local pro in a few taps." },
     ],
   }),
@@ -102,7 +102,7 @@ function BookPage() {
   const [draftCategory, setDraftCategory] = useState<string | undefined>(undefined);
 
   // Load the real pro this booking will be assigned to. There is no fallback:
-  // a booking must name an actual GPB professional's account.
+  // a booking must name an actual GetPros professional's account.
   useEffect(() => {
     if (!providerParam) { setProviderState("missing"); return; }
     let cancelled = false;
@@ -386,7 +386,7 @@ function BookPage() {
               </div>
               <h1 className="mt-3 text-xl font-black">Choose a professional first</h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                GPB only books real, verified pros who are currently accepting work. We won't create a request that
+                GetPros only books real, verified pros who are currently accepting work. We won't create a request that
                 nobody receives.
               </p>
               <Link
@@ -422,7 +422,7 @@ function BookPage() {
           <div className="min-w-0">
             <div className="truncate text-sm font-black">{provider.business_name}</div>
             <div className="truncate text-xs text-muted-foreground">
-              {provider.service_category ?? "GPB pro"}
+              {provider.service_category ?? "GetPros pro"}
               {provider.service_zip ? ` · serves ${provider.service_zip}` : ""}
             </div>
           </div>
@@ -503,7 +503,7 @@ function BookPage() {
               )}
               <div className="mt-3 rounded-xl bg-muted/50 p-3 text-xs text-muted-foreground">
                 The professional you send this to sees your full service address with the request, so they can judge
-                travel before accepting. Nobody else on GPB can see it.
+                travel before accepting. Nobody else on GetPros can see it.
               </div>
             </StepWrap>
           )}
@@ -513,7 +513,7 @@ function BookPage() {
               title="Pick date & time"
               subtitle={
                 location
-                  ? `Times shown in ${location.city}, ${location.state} local time. GPB jobs run 8:00 AM–8:00 PM.`
+                  ? `Times shown in ${location.city}, ${location.state} local time. GetPros jobs run 8:00 AM–8:00 PM.`
                   : "Add a US ZIP code to your address and we'll show real local availability."
               }
             >

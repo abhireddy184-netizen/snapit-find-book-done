@@ -1,4 +1,4 @@
-/** Real service photography supplied by GPB. Unmapped services use an icon fallback. */
+/** Real service photography supplied by GetPros. Unmapped services use an icon fallback. */
 import applianceAsset from "@/assets/uploaded-services/appliance-repair.png.asset.json";
 import autoAsset from "@/assets/uploaded-services/auto-detailing.png.asset.json";
 import cleaningAsset from "@/assets/uploaded-services/home-cleaning.png.asset.json";

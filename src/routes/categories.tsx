@@ -7,10 +7,10 @@ import { Footer } from "./index";
 export const Route = createFileRoute("/categories")({
   head: () => ({
     meta: [
-      { title: "Browse services — GPB" },
-      { name: "description", content: "Browse every service category on GPB, from plumbing to beauty and spa." },
-      { property: "og:title", content: "Browse services — GPB" },
-      { property: "og:description", content: "Every GPB service in one place." },
+      { title: "Browse services — GetPros" },
+      { name: "description", content: "Browse every service category on GetPros, from plumbing to beauty and spa." },
+      { property: "og:title", content: "Browse services — GetPros" },
+      { property: "og:description", content: "Every GetPros service in one place." },
     ],
   }),
   component: CategoriesPage,
@@ -21,7 +21,7 @@ function CategoriesPage() {
     <AppShell>
       <div className="pt-6">
         <h1 className="text-3xl font-black md:text-4xl">Service categories</h1>
-        <p className="mt-2 max-w-xl text-muted-foreground">{catalog.length} master categories covering {TOTAL_SERVICES} GPB services. Pick a category to see every sub-service.</p>
+        <p className="mt-2 max-w-xl text-muted-foreground">{catalog.length} master categories covering {TOTAL_SERVICES} GetPros services. Pick a category to see every sub-service.</p>
       </div>
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {catalog.map((cat) => {

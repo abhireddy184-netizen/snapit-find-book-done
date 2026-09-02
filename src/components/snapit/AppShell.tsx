@@ -47,7 +47,7 @@ function TopBar() {
         </div>
         <nav className="hidden items-center justify-center gap-1 text-sm font-medium text-muted-foreground lg:flex xl:gap-2 [&>a]:whitespace-nowrap">
           <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-primary hover:bg-primary/5 transition-colors">
-            <Camera className="h-4 w-4" /> Show GPB
+            <Camera className="h-4 w-4" /> Show GetPros
           </Link>
           <Link to="/emergency" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-[color:var(--color-accent)] hover:bg-[color:var(--color-accent)]/10 transition-colors">
             <ShieldAlert className="h-4 w-4" /> Emergency
@@ -163,7 +163,7 @@ function BottomNav() {
   }> = [
     { key: "home", to: "/", label: "Home", icon: Home },
     { key: "search", to: "/search", label: "Search", icon: Search },
-    { key: "snap", to: "/snap", label: "Show GPB", icon: Camera, highlight: true },
+    { key: "snap", to: "/snap", label: "Show GetPros", icon: Camera, highlight: true },
     { key: "bookings", to: "/dashboard", label: "Bookings", icon: CalendarDays },
     // Signed-out visitors get a real entry point instead of a silent redirect.
     user
@@ -194,7 +194,7 @@ function BottomNav() {
                 key={it.key}
                 to={it.to}
                 className="-mt-7 flex flex-col items-center gap-1"
-                aria-label="Show GPB — camera diagnosis"
+                aria-label="Show GetPros — camera diagnosis"
               >
                 <span
                   className="grid h-14 w-14 place-items-center rounded-full text-white shadow-xl ring-4 ring-card transition-transform hover:scale-105"

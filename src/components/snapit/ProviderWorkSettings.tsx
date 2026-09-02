@@ -25,7 +25,7 @@ const HALF_HOURS = Array.from(
 
 /**
  * Provider work management: weekly hours, time off, pause, job length.
- * Hours are always inside the GPB platform window (8:00 AM–8:00 PM in the
+ * Hours are always inside the GetPros platform window (8:00 AM–8:00 PM in the
  * service location's local time) — a pro can narrow it, never extend it.
  */
 export function ProviderWorkSettings({ userId }: { userId: string | undefined }) {
@@ -136,7 +136,7 @@ export function ProviderWorkSettings({ userId }: { userId: string | undefined })
           <div>
             <h2 className="text-lg font-black">Weekly hours</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              GPB jobs run 8:00 AM–8:00 PM in the customer's local time. Set narrower hours if you want; you can't book
+              GetPros jobs run 8:00 AM–8:00 PM in the customer's local time. Set narrower hours if you want; you can't book
               outside the platform window.
             </p>
           </div>

@@ -244,7 +244,7 @@ function isBroad(q: string): boolean {
 
 /**
  * Returns a service only when the query unambiguously identifies exactly one
- * GPB sub-service. Broad trade/theme words never resolve.
+ * GetPros sub-service. Broad trade/theme words never resolve.
  */
 export function matchServiceIntent(raw: string): ServiceHit | null {
   const q = normalizeQuery(raw);
@@ -310,7 +310,7 @@ export function rankServices(raw: string, limit = 6): ServiceHit[] {
 const LOCATION_KEY = "gpb:last-location";
 
 /**
- * True when a value the user put in a location field is really a GPB service
+ * True when a value the user put in a location field is really a GetPros service
  * phrase ("Full body wax", "Pedicure", "Plumber"). Such values must never be
  * stored or used as a location.
  */

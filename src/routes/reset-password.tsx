@@ -8,10 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Reset your password — GPB" },
-      { name: "description", content: "Send yourself a secure GPB password reset link, then choose a new password." },
-      { property: "og:title", content: "Reset your password — GPB" },
-      { property: "og:description", content: "Recover access to your GetPerfectBoy.com account." },
+      { title: "Reset your password — GetPros" },
+      { name: "description", content: "Send yourself a secure GetPros password reset link, then choose a new password." },
+      { property: "og:title", content: "Reset your password — GetPros" },
+      { property: "og:description", content: "Recover access to your GetPros.ai account." },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -59,7 +59,7 @@ function ResetPasswordPage() {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (err) throw err;
-      setNotice("If that email has a GPB account, a reset link is on its way. Check your inbox and spam folder.");
+      setNotice("If that email has a GetPros account, a reset link is on its way. Check your inbox and spam folder.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "We couldn't send the reset email. Please try again.");
     } finally {

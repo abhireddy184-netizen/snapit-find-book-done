@@ -45,9 +45,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/_authenticated/job/$id")({
   head: () => ({
     meta: [
-      { title: "Job passport — GPB" },
+      { title: "Job passport — GetPros" },
       { name: "description", content: "Your permanent record for this job: diagnosis, standardized scope, quotes, booking, verification and proof." },
-      { property: "og:title", content: "Job passport — GPB" },
+      { property: "og:title", content: "Job passport — GetPros" },
       { property: "og:description", content: "Diagnosis, scope, quotes, booking and before/after proof in one record." },
     ],
   }),

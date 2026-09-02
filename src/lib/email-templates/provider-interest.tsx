@@ -30,13 +30,13 @@ const Email = ({
 }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>We&apos;ve received your GPB provider interest registration.</Preview>
+    <Preview>We&apos;ve received your GetPros provider interest registration.</Preview>
     <Body style={emailStyles.main}>
       <Container style={emailStyles.container}>
         <EmailHeader siteUrl={siteUrl} />
         <Heading style={emailStyles.heading}>Thanks, {fullName} — we&apos;ve got your details.</Heading>
         <Text style={emailStyles.paragraph}>
-          You registered your interest in joining GPB as a professional for{' '}
+          You registered your interest in joining GetPros as a professional for{' '}
           <strong>{categoryLabel}</strong>
           {city ? ` around ${city}${state ? `, ${state}` : ''}` : ''}.
         </Text>
@@ -45,7 +45,7 @@ const Email = ({
           <Text style={noticeTitle}>This is not approval or verification yet</Text>
           <Text style={noticeBody}>
             Registering interest simply tells us where to open next. It does not create an
-            account, and it does not make you a verified GPB pro. Verification happens after
+            account, and it does not make you a verified GetPros pro. Verification happens after
             a manual review of a completed business profile.
           </Text>
         </Section>
@@ -62,12 +62,12 @@ const Email = ({
 
         <Text style={steps}>
           1. Register interest ✓ &nbsp;→&nbsp; 2. Create your provider account &nbsp;→&nbsp;
-          3. Complete your business profile &nbsp;→&nbsp; 4. GPB review
+          3. Complete your business profile &nbsp;→&nbsp; 4. GetPros review
         </Text>
 
         <EmailFooter
           siteUrl={siteUrl}
-          reason="You're receiving this because you registered provider interest on GetPerfectBoy.com."
+          reason="You're receiving this because you registered provider interest on GetPros.ai."
         />
       </Container>
     </Body>
@@ -76,7 +76,7 @@ const Email = ({
 
 export const template = {
   component: Email,
-  subject: 'We received your GPB provider interest',
+  subject: 'We received your GetPros provider interest',
   displayName: 'Provider interest confirmation',
   previewData: {
     fullName: 'Jamie',
