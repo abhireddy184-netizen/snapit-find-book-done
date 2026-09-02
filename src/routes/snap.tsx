@@ -33,6 +33,7 @@ import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
 import { getCategoryBySlug } from "@/lib/catalog";
 import { detectServiceIntentInText } from "@/lib/search-intent";
+import { createFastPathAnalysis } from "@/lib/snap-fast-path";
 import { fetchBookableProviders, type ProviderMatch } from "@/lib/providers";
 import { extractZip, isZipCode, lookupZip } from "@/lib/us-zip";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
@@ -50,7 +51,7 @@ import {
 /** Hard ceiling for a single AI diagnosis request before we bail out. */
 // Text-only requests are fast (no visual pipeline); media needs more room.
 const ANALYSIS_TIMEOUT_MS = 34_000;
-const TEXT_ANALYSIS_TIMEOUT_MS = 18_000;
+const TEXT_ANALYSIS_TIMEOUT_MS = 12_500;
 
 type SnapSearch = { q?: string; loc?: string };
 
@@ -235,13 +236,26 @@ function SnapPage() {
     setImage(null);
     setMediaKind(null);
     setTextOnly(true);
-    // Deterministic catalogue hit -> the server resolves locally in ms.
-    setFastPath(Boolean(detectServiceIntentInText(typed)));
+    // A confident text-only catalog hit is resolved entirely in the browser.
+    // It never enters the image pipeline or waits on the AI gateway.
+    const deterministicHit = detectServiceIntentInText(typed);
+    setFastPath(Boolean(deterministicHit));
     setFrames([]);
     setNote(described);
     setAskedQuestions([]);
     setTurnCount(0);
     setLoading(true);
+    if (deterministicHit) {
+      setPhase("analyzing");
+      // Keep the transition perceptible without turning it into fake progress.
+      await new Promise((resolve) => setTimeout(resolve, 240));
+      if (runRef.current !== token) return;
+      setAnalysis(createFastPathAnalysis(typed, deterministicHit));
+      setLoading(false);
+      setPhase("idle");
+      busyRef.current = false;
+      return;
+    }
     await runDiagnosis([], described, token, { latestMessage: described, asked: [], turns: 0 });
   };
 
@@ -440,9 +454,18 @@ function SnapPage() {
             <p className="font-semibold">We couldn't finish that</p>
             <p className="mt-1 text-destructive/90">{error}</p>
             <div className="mt-3 flex flex-wrap gap-2">
+              {describeText.trim().length >= 4 && (
+                <button
+                  type="button"
+                  onClick={() => void runTextAnalysis()}
+                  className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" /> Retry request
+                </button>
+              )}
               <button
                 onClick={() => cameraRef.current?.click()}
-                className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground"
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-xs font-bold text-foreground"
               >
                 <Camera className="h-3.5 w-3.5" /> Retake photo
               </button>

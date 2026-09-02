@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { normalizeAnalysis } from "@/lib/snap-analyze.server";
 import { detectServiceIntentInText } from "@/lib/search-intent";
+import { createFastPathAnalysis } from "@/lib/snap-fast-path";
 
 /** The model's raw JSON for a wall-mounted TV photo: it guesses mounting. */
 const mountingGuess = JSON.stringify({
@@ -24,6 +25,17 @@ describe("free-text service intent", () => {
 
   it("keeps mounting distinct from repair", () => {
     expect(detectServiceIntentInText("can someone mount my tv")?.service.slug).toBe("tv-mounting");
+  });
+
+  it("resolves a broken sink locally to plumbing without clarification", () => {
+    const hit = detectServiceIntentInText("my sink is broken, fix it");
+    expect(hit?.category.slug).toBe("plumbing");
+    expect(hit?.service.slug).toBe("drain-clearing");
+    if (!hit) throw new Error("Expected a deterministic sink service match");
+    const result = createFastPathAnalysis("my sink is broken, fix it", hit);
+    expect(result.responseKind).toBe("diagnosis");
+    expect(result.clarifyingQuestions).toHaveLength(0);
+    expect(result.confidence).toBeGreaterThanOrEqual(0.9);
   });
 });
 
