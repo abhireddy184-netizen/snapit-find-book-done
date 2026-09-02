@@ -28,6 +28,19 @@ export const Route = createFileRoute("/services/$category/")({
       ],
     };
   },
+  notFoundComponent: () => (
+    <AppShell>
+      <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
+        <h1 className="text-xl font-black">We don't have that category</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The link may be out of date. Browse all 32 GPB categories to find the service you need.
+        </p>
+        <Link to="/services" className="mt-4 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
+          Browse all services
+        </Link>
+      </div>
+    </AppShell>
+  ),
   component: CategoryPage,
 });
 

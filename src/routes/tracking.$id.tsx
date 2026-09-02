@@ -18,6 +18,19 @@ export const Route = createFileRoute("/tracking/$id")({
     if (!provider) throw notFound();
     return { provider };
   },
+  notFoundComponent: () => (
+    <AppShell>
+      <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
+        <h1 className="text-xl font-black">Nothing to track on this link</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          This tracking link has expired or the job isn't live yet. Open the job from your bookings to see its status.
+        </p>
+        <Link to="/dashboard" className="mt-4 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
+          Go to my bookings
+        </Link>
+      </div>
+    </AppShell>
+  ),
   component: TrackingPage,
 });
 

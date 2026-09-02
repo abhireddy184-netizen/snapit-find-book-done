@@ -29,6 +29,25 @@ export const Route = createFileRoute("/services/$category/$service")({
       ],
     };
   },
+  notFoundComponent: () => (
+    <AppShell>
+      <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
+        <h1 className="text-xl font-black">We don't offer that service yet</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          This link doesn't match a GPB service. Browse the full catalogue, or show us the problem and we'll work out
+          which service you need.
+        </p>
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
+          <Link to="/services" className="inline-flex rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
+            Browse all services
+          </Link>
+          <Link to="/snap" className="inline-flex rounded-full border border-border px-4 py-2 text-sm font-bold">
+            Show GPB
+          </Link>
+        </div>
+      </div>
+    </AppShell>
+  ),
   component: ServicePage,
 });
 
