@@ -288,7 +288,16 @@ export function Footer() {
             <li><Link to="/services" className="hover:text-foreground">All services</Link></li>
           </ul>
         </div>
-        <FooterCol title="Support" links={["Help center", "Contact", "Trust & safety", "Cancellation"]} />
+        <div>
+          <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">Company</div>
+          <ul className="space-y-2">
+            <li><a href="/#how-it-works" className="hover:text-foreground">How it works</a></li>
+            <li><Link to="/emergency" className="hover:text-foreground">Emergency services</Link></li>
+            <li><Link to="/legal" hash="terms" className="hover:text-foreground">Trust &amp; safety</Link></li>
+            <li><Link to="/legal" hash="privacy" className="hover:text-foreground">Privacy</Link></li>
+          </ul>
+        </div>
+
         <div className="min-w-0">
           <div className="mb-2 text-xs font-bold uppercase tracking-wider text-foreground">Newsletter</div>
           <p className="mb-3 text-xs leading-relaxed">
