@@ -91,6 +91,11 @@ export function normalizeUnderstanding(raw: string, request: string): PlanUnders
   // Low confidence must never silently become a confident mistranslation: fall
   // back to the user's verbatim words as the canonical intent.
   const normalized = str("normalizedRequest");
+  const reply = str("conversationalReply").slice(0, 300);
+  const invitation = str("invitation").slice(0, 160);
+  // Only treat it as small talk when the model both said so AND wrote a reply —
+  // otherwise a real request would silently get no plan.
+  const conversational = str("actionability").toLowerCase() === "conversational" && Boolean(reply);
   return {
     languageCode: str("languageCode").slice(0, 12) || "en",
     languageName: str("languageName").slice(0, 40) || "English",
@@ -98,10 +103,14 @@ export function normalizeUnderstanding(raw: string, request: string): PlanUnders
     ...(script ? { script } : {}),
     normalizedRequest: (confidence < 0.35 ? `${request}${normalized ? ` (uncertain reading: ${normalized})` : ""}` : normalized) || request,
     confidence,
+    actionability: conversational ? "conversational" : "actionable",
+    ...(conversational ? { conversationalReply: reply } : {}),
+    ...(conversational && invitation ? { invitation } : {}),
     // Only surface a question when it is tied to a genuinely critical ambiguity.
-    ...(ambiguity && question ? { criticalAmbiguity: ambiguity, clarificationQuestion: question } : {}),
+    ...(!conversational && ambiguity && question ? { criticalAmbiguity: ambiguity, clarificationQuestion: question } : {}),
   };
 }
+
 
 /* ================= stage 2 — planning ================= */
 
