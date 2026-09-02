@@ -439,6 +439,8 @@ export function normalizePlan(
   location: string,
   nowClock: string,
   understanding?: PlanUnderstanding,
+  nowDate?: string,
+  timeZone?: string,
 ): GpbPlan {
 
   const match = raw.match(/\{[\s\S]*\}/);
@@ -446,8 +448,9 @@ export function normalizePlan(
   try {
     parsed = JSON.parse(match ? match[0] : raw) as Record<string, unknown>;
   } catch {
-    return buildFallbackPlan(request, location, nowClock, understanding);
+    return buildFallbackPlan(request, location, nowClock, understanding, nowDate, timeZone);
   }
+
 
   const rawTasks = Array.isArray(parsed['tasks']) ? (parsed['tasks'] as RawTask[]) : [];
   const tasks: PlanTask[] = rawTasks
