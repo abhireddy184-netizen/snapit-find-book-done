@@ -398,17 +398,19 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
 }
 
 function Stat({
-  label, value, icon: Icon, tone,
-}: { label: string; value: string; icon: LucideIcon; tone?: "danger" }) {
+  label, value, icon: Icon, tone, sub,
+}: { label: string; value: string; icon: LucideIcon; tone?: "danger"; sub?: string | null }) {
   return (
     <div className={`rounded-2xl border px-4 py-3 ${tone === "danger" ? "border-destructive/40 bg-destructive/5" : "border-border/60 bg-background"}`}>
       <dt dir="auto" className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
         <Icon className={`h-3.5 w-3.5 ${tone === "danger" ? "text-destructive" : "text-primary"}`} /> {label}
       </dt>
       <dd dir="auto" className={`mt-0.5 text-base font-black tracking-tight ${tone === "danger" ? "text-destructive" : ""}`}>{value}</dd>
+      {sub && <dd dir="auto" className="mt-0.5 text-[11px] font-semibold text-muted-foreground">{sub}</dd>}
     </div>
   );
 }
+
 
 /* ---------------- clarification card ---------------- */
 
