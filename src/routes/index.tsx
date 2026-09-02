@@ -10,9 +10,10 @@ import { Logo } from "@/components/snapit/Logo";
 import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
 import { OutcomeComposer } from "@/components/snapit/OutcomeComposer";
 import {
-  DailyLifeModules, ShowGpbBand, BrowseFallback,
-  SimpleFlow, HowGpbWorksDetails,
+  ShowGpbBand, BrowseFallback, HowGpbWorksDetails,
 } from "@/components/snapit/V2Sections";
+import { ServiceShowcase } from "@/components/snapit/ServiceShowcase";
+
 
 
 
@@ -54,10 +55,10 @@ function Landing() {
             <h1 className="max-w-[15ch] text-[clamp(2.125rem,5.4vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.03em] text-foreground">
               What service do you <span className="text-gradient-hero">need?</span>
             </h1>
-            <p className="mt-3.5 max-w-[44ch] text-[clamp(1.0625rem,1.2vw,1.2rem)] leading-relaxed text-muted-foreground">
-              Show GetPros a photo, speak it in any language, or type it. We work out the service you need and
-              find a local pro.
+            <p className="mt-3.5 max-w-[36ch] text-[clamp(1.0625rem,1.2vw,1.2rem)] leading-relaxed text-muted-foreground">
+              Show it, say it or type it — we find the right local pro.
             </p>
+
 
             {/* Desktop keeps a photo-first button because the composer sits in
                 the second column; on phones the composer already carries it. */}
@@ -108,11 +109,11 @@ function Landing() {
         </div>
       </section>
 
+      <ServiceShowcase />
       <ShowGpbBand />
-      <SimpleFlow />
-      <DailyLifeModules />
       <BrowseFallback />
       <HowGpbWorksDetails />
+
 
 
 
