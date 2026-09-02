@@ -133,6 +133,23 @@ export function OutcomeComposer() {
   /** Set when someone submits an empty request — nothing to understand yet. */
   const [emptyError, setEmptyError] = useState(false);
   const paused = useRef(false);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  /**
+   * Someone can start typing into the server-rendered textarea before React
+   * hydrates. Hydration would then overwrite the DOM value with the (empty)
+   * initial state and swallow those first characters, so we adopt whatever the
+   * field already holds on mount instead.
+   */
+  useEffect(() => {
+    const el = textareaRef.current;
+    const typed = el?.value ?? "";
+    if (typed) {
+      setRequest((current) => (current ? current : typed));
+      if (el && document.activeElement !== el) el.focus({ preventScroll: true });
+    }
+  }, []);
+
 
 
   // Voice input state — capabilities are detected after mount to avoid SSR/client mismatch.
