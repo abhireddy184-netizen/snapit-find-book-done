@@ -74,7 +74,7 @@ function CategoryPage() {
         </div>
         <Link
           to="/snap"
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-plum shadow-elevated transition-transform hover:scale-[1.02]"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-plum shadow-elevated transition-transform hover:scale-[1.01]"
         >
           <Camera className="h-4 w-4" /> Show us the problem
         </Link>
@@ -143,7 +143,7 @@ function ServicePicker({ category }: { category: MasterCategory }) {
                   decoding="async"
                   width={768}
                   height={512}
-                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                 />
               </div>
             )}

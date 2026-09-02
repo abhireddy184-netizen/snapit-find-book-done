@@ -142,7 +142,7 @@ function EmergencyStrip() {
             <ShieldAlert className="h-3.5 w-3.5" /> 24/7 Emergency
           </span>
           <h2 className="mt-2 text-lg font-black tracking-tight sm:text-xl">When it can't wait, flag it first.</h2>
-          <Link to="/emergency" className="mt-3 inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-2.5 text-sm font-bold text-destructive-foreground transition-transform hover:scale-[1.02]">
+          <Link to="/emergency" className="mt-3 inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-2.5 text-sm font-bold text-destructive-foreground transition-transform hover:scale-[1.01]">
             Get emergency help <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -181,7 +181,7 @@ function ProviderRecruitment() {
               id="provider-recruitment-cta"
               data-analytics-id="provider_interest_cta"
               data-analytics-location="homepage_provider_section"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-elevated transition-transform hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-elevated transition-transform hover:scale-[1.01]"
             >
               Register Your Interest <ArrowRight className="h-4 w-4" />
             </Link>

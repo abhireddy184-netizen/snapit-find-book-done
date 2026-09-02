@@ -234,7 +234,7 @@ export function RoomStory() {
         <Link
           to="/services/$category"
           params={{ category: active.category }}
-          className="mt-4 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-elevated transition-transform hover:scale-[1.02]"
+          className="mt-4 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-elevated transition-transform hover:scale-[1.01]"
           style={{ background: "var(--gradient-primary)" }}
         >
           Explore {active.service} <ArrowRight className="h-4 w-4" />
@@ -266,7 +266,7 @@ export function ProVerticals() {
           key={v.slug}
           to="/services/$category"
           params={{ category: v.slug }}
-          className="group relative overflow-hidden rounded-3xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-elevated"
+          className="group relative overflow-hidden rounded-3xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-elevated"
         >
           <span
             className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-15 blur-2xl transition-opacity group-hover:opacity-35"

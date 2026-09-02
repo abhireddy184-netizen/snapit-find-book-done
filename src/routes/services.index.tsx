@@ -47,7 +47,7 @@ function AllServicesPage() {
           </label>
           <Link
             to="/snap"
-            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-plum shadow-elevated transition-transform hover:scale-[1.02]"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-bold text-plum shadow-elevated transition-transform hover:scale-[1.01]"
           >
             <Sparkles className="h-4 w-4" /> Show us what you need
           </Link>
@@ -148,7 +148,7 @@ function ServiceRow({
     <Link
       to="/services/$category/$service"
       params={{ category: categorySlug, service: slug }}
-      className="card-lift group flex h-full flex-col rounded-3xl border border-border/60 bg-card p-4 shadow-sm hover:-translate-y-1 hover:border-secondary/40 hover:shadow-elevated"
+      className="card-lift group flex h-full flex-col rounded-3xl border border-border/60 bg-card p-4 shadow-sm hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-elevated"
     >
       <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{categoryName}</div>
       <div className="mt-1 text-sm font-black">{name}</div>

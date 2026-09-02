@@ -246,7 +246,7 @@ export function ShowGpbBand() {
             to="/snap"
             data-analytics-id="show_gpb_cta"
             data-analytics-location="homepage_band"
-            className="mt-5 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-elevated transition-transform hover:scale-[1.02]"
+            className="mt-5 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-elevated transition-transform hover:scale-[1.01]"
             style={{ background: "var(--gradient-primary)" }}
           >
             <Camera className="h-5 w-5" /> Show GetPros

@@ -119,7 +119,7 @@ function AuthNav() {
       <Link
         to="/register"
         search={{ redirect: undefined, role: undefined }}
-        className="inline-flex shrink-0 items-center rounded-full px-3.5 py-2 text-sm font-semibold text-white shadow-card transition-all hover:scale-[1.02] hover:shadow-elevated sm:px-4"
+        className="inline-flex shrink-0 items-center rounded-full px-3.5 py-2 text-sm font-semibold text-white shadow-card transition-all hover:scale-[1.01] hover:shadow-elevated sm:px-4"
         style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px color-mix(in oklab, var(--primary) 55%, transparent)" }}
       >
         Sign up
@@ -196,7 +196,7 @@ function BottomNav() {
                 aria-label="Show GetPros — camera diagnosis"
               >
                 <span
-                  className="grid h-14 w-14 place-items-center rounded-full text-white shadow-elevated ring-4 ring-card transition-transform hover:scale-105"
+                  className="grid h-14 w-14 place-items-center rounded-full text-white shadow-elevated ring-4 ring-card transition-transform hover:scale-[1.02]"
                   style={{ background: "var(--primary)", boxShadow: "0 16px 40px -12px color-mix(in oklab, var(--primary) 60%, transparent)" }}
                 >
                   <Icon className="h-6 w-6" />
@@ -259,7 +259,7 @@ export function GradientButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-sm font-semibold text-white shadow-elevated transition-all hover:scale-[1.02] hover:shadow-elevated active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100",
+        "group relative inline-flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-3 text-sm font-semibold text-white shadow-elevated transition-all hover:scale-[1.01] hover:shadow-elevated active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:scale-100",
         className
       )}
       style={{ background: bg, boxShadow: glow }}

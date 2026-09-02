@@ -531,7 +531,7 @@ function ReplanCard({
               <button
                 onClick={onApply}
                 data-analytics-id="replan_apply"
-                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-black text-white shadow-card transition-transform hover:scale-[1.02]"
+                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-black text-white shadow-card transition-transform hover:scale-[1.01]"
                 style={{ background: "var(--gradient-primary)" }}
               >
                 {r.applyLabel} <ArrowRight className="h-4 w-4" />

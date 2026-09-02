@@ -27,7 +27,7 @@ export function ShowGpbCallout() {
           id="show-gpb-cta-section"
           data-analytics-id="show_gpb_cta"
           data-analytics-location="homepage_callout"
-          className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-elevated transition-transform hover:scale-[1.02]"
+          className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-elevated transition-transform hover:scale-[1.01]"
           style={{ background: "var(--gradient-primary)" }}
         >
           <Camera className="h-5 w-5" /> Show GetPros
