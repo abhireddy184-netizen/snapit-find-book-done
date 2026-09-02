@@ -304,19 +304,34 @@ function PlanSkeleton({ request }: { request: string }) {
  * Shown when the message carried no task at all — a greeting, a joke, a test or
  * a general question. GPB answers briefly in the person's own language and
  * invites them to say what they need, instead of inventing a plan.
+ *
+ * The person's own words and GPB's reply are shown as two clearly separate
+ * blocks: GPB's banter is never presented as something the user asked for, and
+ * it never becomes the request text in the composer above.
  */
-function ConversationCard({ reply, invitation }: { reply: string; invitation?: string | undefined }) {
+function ConversationCard({
+  request, reply, invitation,
+}: { request: string; reply: string; invitation?: string | undefined }) {
   return (
-    <section aria-live="polite" className="mt-6 rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
-      <div className="flex items-start gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
-          <MessageCircle className="h-5 w-5" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p dir="auto" className="text-base font-bold leading-relaxed break-words">{reply}</p>
-          {invitation && (
-            <p dir="auto" className="mt-2 text-sm leading-relaxed text-muted-foreground break-words">{invitation}</p>
-          )}
+    <section aria-live="polite" className="mt-6 space-y-3">
+      {request.trim() && (
+        <div className="rounded-[22px] border border-border/60 bg-muted/40 p-4 sm:p-5">
+          <p className="text-[11px] font-black uppercase tracking-wider text-muted-foreground">You said</p>
+          <p dir="auto" className="mt-1 text-[17px] leading-relaxed break-words">{request.trim()}</p>
+        </div>
+      )}
+      <div className="rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+        <div className="flex items-start gap-3">
+          <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+            <MessageCircle className="h-5 w-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-black uppercase tracking-wider text-primary">GPB</p>
+            <p dir="auto" className="mt-1 text-[17px] font-bold leading-relaxed break-words sm:text-[18px]">{reply}</p>
+            {invitation && (
+              <p dir="auto" className="mt-2 text-[15px] leading-relaxed text-muted-foreground break-words sm:text-base">{invitation}</p>
+            )}
+          </div>
         </div>
       </div>
     </section>
