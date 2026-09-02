@@ -42,9 +42,23 @@ export const analyzeSnap = createServerFn({ method: "POST" })
     // Fast path: a text-only request whose words already name a catalogue
     // service (e.g. "my sink is broken") never needs the visual pipeline —
     // resolve it locally and return in milliseconds.
-    if (!hasMedia && note && detectServiceIntentInText(ctx.latestMessage || note)) {
-      return normalizeAnalysis("", true, false, note, { ...ctx, forceResolve: true });
+    const fastHit = !hasMedia && note ? detectServiceIntentInText(ctx.latestMessage || note) : null;
+    if (fastHit && note) {
+      const local = JSON.stringify({
+        responseKind: "diagnosis",
+        issueSource: "customer-described",
+        headline: `${fastHit.service.name} — that's what this sounds like.`,
+        categorySlug: fastHit.category.slug,
+        serviceSlug: fastHit.service.slug,
+        confidence: 0.82,
+        problem: note,
+        hasPriceEstimate: false,
+        urgency: "medium",
+        urgencyReason: "Based on what you described.",
+      });
+      return normalizeAnalysis(local, true, false, note, { ...ctx, forceResolve: true });
     }
+
 
     const content: ({ type: "text"; text: string } | { type: "image"; image: string })[] = [
       { type: "text", text: buildUserPrompt(note, hasMedia, images.length, ctx) },
