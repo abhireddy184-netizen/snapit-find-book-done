@@ -81,7 +81,7 @@ export function Logo({ compact = false, onColor = false }: { compact?: boolean; 
           <span className="block">
             {/* ".ai" only where there is room, so narrow phones show a clean
                 "GetPros" instead of a clipped wordmark. */}
-            <Wordmark size={17} short onColor={onColor} className="sm:hidden" />
+            <Wordmark size={17} short onColor={onColor} className="inline-block sm:hidden" />
             <Wordmark size={19} onColor={onColor} className="hidden sm:inline-block" />
           </span>
           <span className={`mt-1 hidden truncate text-[10px] font-medium sm:block ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
