@@ -1,7 +1,9 @@
 import { catalog } from "./catalog";
 import { matchServiceIntent, rankServices } from "./search-intent";
 import {
+  dayGap,
   formatClock,
+  isIsoDate,
   parseClock,
   resequence,
   toClockString,
@@ -11,6 +13,7 @@ import {
   type PlanUiCopy,
   type PlanUnderstanding,
 } from "./plan-model";
+
 
 const CATEGORY_SLUGS = new Set(catalog.map((c) => c.slug));
 const CHANNELS: ExecutionChannel[] = [
