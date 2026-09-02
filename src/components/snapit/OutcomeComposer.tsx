@@ -527,7 +527,7 @@ export function OutcomeComposer() {
     if (autoSecs === null) return;
     if (autoSecs > 0) return;
     cancelAutoSubmit();
-    goToPlan(request);
+    goToService(request);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoSecs]);
 
@@ -546,7 +546,7 @@ export function OutcomeComposer() {
       document.getElementById("gpb-outcome")?.focus();
       return;
     }
-    goToPlan(q);
+    goToService(q);
   };
 
 
@@ -679,7 +679,7 @@ export function OutcomeComposer() {
           </button>
           <button
             type="button"
-            onClick={() => goToPlan(request)}
+            onClick={() => goToService(request)}
             className="min-h-[40px] shrink-0 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground"
           >
             Build now
