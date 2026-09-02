@@ -860,17 +860,19 @@ function AnalysisView({
         />
         <Stat icon={Timer} label="Repair time" value={durationLabel} hint="Estimated on-site" />
         <Stat icon={UrgencyIcon} label="Urgency" value={u.label} hint={analysis.urgencyReason} />
-        <Stat
-          icon={Clock}
-          label="Fastest ETA"
-          value={`~${recommended?.eta ?? 10} min`}
-          hint={`${matched.length} pros nearby`}
-        />
+        {matched.length > 0 && (
+          <Stat
+            icon={Clock}
+            label="Fastest ETA"
+            value={`~${recommended?.eta ?? 10} min`}
+            hint={`${matched.length} pros in this trade`}
+          />
+        )}
       </div>
       )}
 
       {(analysis.clarifyingQuestions?.length ?? 0) > 0 && (
-        <ClarifyPanel questions={analysis.clarifyingQuestions!} onAnswer={onAnswer} />
+        <ClarifyPanel questions={analysis.clarifyingQuestions!} onAnswer={onAnswer} onResolve={onResolve} />
       )}
 
       {(analysis.serviceOptions?.length ?? 0) > 0 && (
