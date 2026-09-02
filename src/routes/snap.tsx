@@ -47,7 +47,13 @@ import {
 /** Hard ceiling for a single AI diagnosis request before we bail out. */
 const ANALYSIS_TIMEOUT_MS = 40_000;
 
+type SnapSearch = { q: string; loc: string };
+
 export const Route = createFileRoute("/snap")({
+  validateSearch: (search: Record<string, unknown>): SnapSearch => ({
+    q: typeof search["q"] === "string" ? search["q"] : "",
+    loc: search["loc"] == null ? "" : String(search["loc"]),
+  }),
   head: () => ({
     meta: [
       { title: "Show us the problem — AI diagnosis in seconds | GPB" },
@@ -58,6 +64,7 @@ export const Route = createFileRoute("/snap")({
   }),
   component: SnapPage,
 });
+
 
 const urgencyStyles: Record<string, { chip: string; label: string; icon: typeof ShieldAlert }> = {
   emergency: { chip: "bg-red-100 text-red-700 border-red-200", label: "Emergency", icon: ShieldAlert },
