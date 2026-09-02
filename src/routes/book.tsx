@@ -1,11 +1,22 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Check, Camera, ChevronLeft, ChevronRight, MapPin, Loader2 } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { providers, getProvider } from "@/lib/snapit-data";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { BOOKING_DRAFT_KEY } from "@/lib/bookings";
+import {
+  DEFAULT_DURATION_MINUTES,
+  DEFAULT_TRAVEL_BUFFER_MINUTES,
+  addDaysIso,
+  formatSlot,
+  resolveServiceLocation,
+  slotsForDate,
+  todayInZone,
+  zonedTimeToUtc,
+  type ServiceLocation,
+} from "@/lib/service-hours";
 
 type BookingDraft = {
   service: string;
@@ -16,24 +27,17 @@ type BookingDraft = {
   providerId?: string;
 };
 
-const dayOptions = ["Today", "Tomorrow", "Wed", "Thu", "Fri", "Sat"];
+/** Total minutes we must fit inside the 8:00 AM–8:00 PM local service window. */
+const TOTAL_MINUTES = DEFAULT_DURATION_MINUTES + DEFAULT_TRAVEL_BUFFER_MINUTES;
+/** Customers can't book a pro for right now — give everyone lead time. */
+const LEAD_TIME_MINUTES = 120;
 
-function resolveDate(label: string): string {
-  const d = new Date();
-  const index = dayOptions.indexOf(label);
-  if (index <= 1) {
-    d.setDate(d.getDate() + index);
-  } else {
-    const targets = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
-    const target = targets.indexOf(label.toLowerCase().slice(0, 3));
-    if (target >= 0) {
-      let diff = (target - d.getDay() + 7) % 7;
-      if (diff === 0) diff = 7;
-      d.setDate(d.getDate() + diff);
-    }
-  }
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+function dayLabel(isoDate: string, today: string): string {
+  if (isoDate === today) return "Today";
+  if (isoDate === addDaysIso(today, 1)) return "Tomorrow";
+  return new Date(`${isoDate}T12:00:00Z`).toLocaleDateString("en-US", {
+    weekday: "short", month: "short", day: "numeric", timeZone: "UTC",
+  });
 }
 
 type BookSearch = { provider?: string; job?: string; service?: string; pro?: string };
@@ -67,8 +71,9 @@ function BookPage() {
   const [details, setDetails] = useState("");
   const [photos, setPhotos] = useState<string[]>([]);
   const [address, setAddress] = useState("");
-  const [date, setDate] = useState("Tomorrow");
-  const [time, setTime] = useState("11:00 AM");
+  const [location, setLocation] = useState<ServiceLocation | null>(null);
+  const [dateIso, setDateIso] = useState<string | null>(null);
+  const [slotMinute, setSlotMinute] = useState<number | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -87,13 +92,52 @@ function BookPage() {
       if (draft.service) setService(draft.service);
       if (draft.details) setDetails(draft.details);
       if (draft.address) setAddress(draft.address);
-      if (draft.date) setDate(draft.date);
-      if (draft.time) setTime(draft.time);
+      if (draft.date) setDateIso(draft.date);
+      if (draft.time) setSlotMinute(Number(draft.time) || null);
       setStep(steps.length - 1);
     } catch {
       /* ignore malformed draft */
     }
   }, []);
+
+  // The service address decides the timezone — never the customer's device.
+  // A pro in Frisco works 8–8 Central even if the phone is set to Tokyo.
+  useEffect(() => {
+    let cancelled = false;
+    const value = address.trim();
+    if (!value) { setLocation(null); return; }
+    void resolveServiceLocation(value).then((loc) => {
+      if (!cancelled) setLocation(loc);
+    });
+    return () => { cancelled = true; };
+  }, [address]);
+
+  const timeZone = location?.timeZone ?? null;
+  const notBefore = useMemo(() => new Date(Date.now() + LEAD_TIME_MINUTES * 60_000), []);
+  const today = timeZone ? todayInZone(timeZone, notBefore) : null;
+
+  const days = useMemo(() => {
+    if (!timeZone || !today) return [] as { iso: string; label: string; slots: number[] }[];
+    return Array.from({ length: 7 }, (_, i) => {
+      const iso = addDaysIso(today, i);
+      return {
+        iso,
+        label: dayLabel(iso, today),
+        slots: slotsForDate(iso, { totalMinutes: TOTAL_MINUTES, timeZone, notBefore }),
+      };
+    }).filter((d) => d.slots.length > 0);
+  }, [timeZone, today, notBefore]);
+
+  // Keep the selection valid whenever the address (and so the calendar) changes.
+  useEffect(() => {
+    if (days.length === 0) { setDateIso(null); setSlotMinute(null); return; }
+    const current = days.find((d) => d.iso === dateIso) ?? days[0]!;
+    if (current.iso !== dateIso) setDateIso(current.iso);
+    if (slotMinute == null || !current.slots.includes(slotMinute)) setSlotMinute(current.slots[0]!);
+  }, [days, dateIso, slotMinute]);
+
+  const activeDay = days.find((d) => d.iso === dateIso) ?? null;
+  const scheduleReady = Boolean(timeZone && dateIso && slotMinute != null);
 
   const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
