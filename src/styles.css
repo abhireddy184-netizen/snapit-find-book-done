@@ -108,7 +108,7 @@
 }
 
 :root {
-  --radius: 1.25rem;
+  --radius: 1rem;
   /* GetPros.ai light-first: cool white-blue canvas, white cards, deep royal
      navy ink and primary, modern teal secondary/accent, refined slate for
      supporting text. Gradients are restrained navy -> blue -> teal. */
