@@ -11,7 +11,7 @@ import type { LucideIcon } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { buildPlan, type PlanResult } from "@/lib/plan.functions";
 import {
-  CHANNEL_META, DEFAULT_UI_COPY, demoAirportPlan, formatClock, formatPlanDate, move, parseClock,
+  addDays, CHANNEL_META, DEFAULT_UI_COPY, demoAirportPlan, formatClock, formatPlanDate, move, parseClock,
   planDeadlineMinutes, planEndMinutes, planLocale, resequence, uiCopy,
   type ExecutionChannel, type GpbPlan, type PlanTask, type PlanUiCopy,
 } from "@/lib/plan-model";
