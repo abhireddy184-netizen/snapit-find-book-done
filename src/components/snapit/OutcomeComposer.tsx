@@ -8,12 +8,13 @@ import { StableTranscript } from "@/lib/stable-transcript";
 
 
 const EXAMPLES = [
-  "I need dinner, groceries, and to be at DFW by 6 PM.",
-  "My parents arrive tomorrow. Get my apartment ready and pick them up.",
-  "I’m moving Saturday. Coordinate packing, movers, junk removal and cleaning.",
-  "My car is making a strange noise. Handle it.",
-  "Guests at 6pm — deep clean the living room and bath.",
+  "My kitchen sink is leaking under the cabinet.",
+  "I need a deep clean of a 2-bedroom apartment on Saturday.",
+  "Moving next weekend — need movers and packing help.",
+  "My TV won’t turn on. Can someone look at it?",
+  "Need someone to pick up a parcel and drop it at the post office.",
 ];
+
 
 const MAX_RECORD_MS = 60_000;
 // Rolling provisional transcription while the user is still speaking.
