@@ -7,10 +7,10 @@ export const Route = createFileRoute("/login")({
   }),
   head: () => ({
     meta: [
-      { title: "Log in — GPB" },
-      { name: "description", content: "Log in to GPB as a customer or service provider." },
-      { property: "og:title", content: "Log in — GPB" },
-      { property: "og:description", content: "Log in to GPB." },
+      { title: "Log in — GetPros" },
+      { name: "description", content: "Log in to GetPros as a customer or service provider." },
+      { property: "og:title", content: "Log in — GetPros" },
+      { property: "og:description", content: "Log in to GetPros." },
     ],
   }),
   component: LoginPage,
@@ -24,7 +24,7 @@ function LoginPage() {
       title="Welcome back"
       subtitle="Log in to book services or manage your business."
       redirectTo={redirect}
-      footer={<p>New to GPB? <Link to="/register" search={{ redirect: undefined, role: undefined }} className="font-semibold text-primary">Create an account</Link></p>}
+      footer={<p>New to GetPros? <Link to="/register" search={{ redirect: undefined, role: undefined }} className="font-semibold text-primary">Create an account</Link></p>}
     />
   );
 }

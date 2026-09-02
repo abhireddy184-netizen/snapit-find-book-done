@@ -24,15 +24,15 @@ const SITE_URL = "https://getperfectboy.com";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GetPerfectBoy — Show, say or type the service you need" },
-      { name: "description", content: "Show GPB a photo, speak it in any language, or type it. GPB works out the service you need and finds a local pro — home, cleaning, repairs, moving, errands and auto." },
-      { property: "og:title", content: "GetPerfectBoy — Show, say or type the service you need" },
-      { property: "og:description", content: "Show, say or type what you need. GPB finds the right local pro." },
+      { title: "GetPros.ai — Show, say or type the service you need" },
+      { name: "description", content: "Show GetPros a photo, speak it in any language, or type it. GetPros works out the service you need and finds a local pro — home, cleaning, repairs, moving, errands and auto." },
+      { property: "og:title", content: "GetPros.ai — Show, say or type the service you need" },
+      { property: "og:description", content: "Show, say or type what you need. GetPros finds the right local pro." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "GetPerfectBoy — Show, say or type the service you need" },
-      { name: "twitter:description", content: "Show, say or type what you need. GPB finds the right local pro." },
+      { name: "twitter:title", content: "GetPros.ai — Show, say or type the service you need" },
+      { name: "twitter:description", content: "Show, say or type what you need. GetPros finds the right local pro." },
     ],
     links: [{ rel: "canonical", href: SITE_URL + "/" }],
   }),
@@ -65,7 +65,7 @@ function Landing() {
               What service do you <span className="text-gradient-hero">need?</span>
             </h1>
             <p className="mt-2.5 max-w-[44ch] text-[clamp(0.9rem,1.2vw,1.15rem)] leading-relaxed text-muted-foreground">
-              Show GPB a photo, speak it in any language, or type it. We work out the service you need and
+              Show GetPros a photo, speak it in any language, or type it. We work out the service you need and
               find a local pro.
             </p>
 
@@ -78,7 +78,7 @@ function Landing() {
               className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-black text-white shadow-lg transition-transform hover:scale-[1.01] sm:w-auto"
               style={{ background: "var(--gradient-primary)" }}
             >
-              <Camera className="h-5 w-5" /> Show GPB a photo
+              <Camera className="h-5 w-5" /> Show GetPros a photo
             </Link>
 
             <div className="mt-4 lg:hidden">
@@ -103,7 +103,7 @@ function Landing() {
                 data-analytics-location="hero"
                 className="hover:text-foreground hover:underline"
               >
-                Join GPB as a pro
+                Join GetPros as a pro
               </Link>
             </div>
           </div>
@@ -240,7 +240,7 @@ export function Footer() {
       const res = await subscribe({ data: { email: value, source: "website_footer" } });
       if (res.status === "already_subscribed") {
         setState("already");
-        setMessage("You're already subscribed — thanks for being with GPB.");
+        setMessage("You're already subscribed — thanks for being with GetPros.");
       } else {
         setState("success");
         setMessage(
@@ -297,7 +297,7 @@ export function Footer() {
                 For Pros
               </Link>
             </li>
-            <li><Link to="/snap" data-analytics-id="show_gpb_cta" data-analytics-location="footer" className="hover:text-foreground">Show GPB</Link></li>
+            <li><Link to="/snap" data-analytics-id="show_gpb_cta" data-analytics-location="footer" className="hover:text-foreground">Show GetPros</Link></li>
             <li><Link to="/services" className="hover:text-foreground">All services</Link></li>
           </ul>
         </div>
@@ -305,7 +305,7 @@ export function Footer() {
         <div className="min-w-0">
           <div className="mb-2 text-xs font-bold uppercase tracking-wider text-foreground">Newsletter</div>
           <p className="mb-3 text-[11px] leading-relaxed">
-            General GPB news and new services — this is not the early access list.{" "}
+            General GetPros news and new services — this is not the early access list.{" "}
             <a href="/#early-access" className="font-semibold text-primary hover:underline">Join early access</a> to
             be notified when pros go live near you. Unsubscribe anytime.
           </p>
@@ -315,7 +315,7 @@ export function Footer() {
             noValidate
             className="flex min-w-0 overflow-hidden rounded-full border border-border/60 bg-card p-1 shadow-sm"
           >
-            <label htmlFor="gpb-newsletter-email" className="sr-only">Email address for GPB updates</label>
+            <label htmlFor="gpb-newsletter-email" className="sr-only">Email address for GetPros updates</label>
             <input
               id="gpb-newsletter-email"
               type="email"
@@ -347,7 +347,7 @@ export function Footer() {
         </div>
       </div>
       <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-border/60 pt-6 text-xs md:flex-row md:items-center">
-        <span>© {new Date().getFullYear()} GetPerfectBoy.com. All rights reserved.</span>
+        <span>© {new Date().getFullYear()} GetPros.ai. All rights reserved.</span>
         <div className="flex flex-wrap gap-5">
           <Link to="/legal" hash="privacy" className="hover:text-foreground">Privacy</Link>
           <Link to="/legal" hash="terms" className="hover:text-foreground">Terms</Link>

@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 
 /**
- * GPB wordmark. G and B stay on the baseline; the P drops ~12% below it.
+ * GetPros wordmark. G and B stay on the baseline; the P drops ~12% below it.
  * Pure text/CSS treatment so it stays crisp at every size.
  */
 export function Wordmark({
@@ -28,7 +28,7 @@ export function Wordmark({
 }
 
 /**
- * The GPB app-icon tile (gradient rounded square + dropped-P wordmark),
+ * The GetPros app-icon tile (gradient rounded square + dropped-P wordmark),
  * without the link/home behaviour. Use to badge in-app sections.
  */
 export function BrandMark({
@@ -62,7 +62,7 @@ export function BrandMark({
 export function Logo({ compact = false, onColor = false }: { compact?: boolean; onColor?: boolean }) {
 
   return (
-    <Link to="/" className="flex min-w-0 items-center gap-2.5" aria-label="GPB — GetPerfectBoy.com home">
+    <Link to="/" className="flex min-w-0 items-center gap-2.5" aria-label="GetPros — GetPros.ai home">
       <span
         className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-[13px] pb-0.5 shadow-md sm:h-10 sm:w-10"
         style={
@@ -80,7 +80,7 @@ export function Logo({ compact = false, onColor = false }: { compact?: boolean; 
           <span className={`block truncate text-[13.5px] font-black tracking-tight sm:text-base ${onColor ? "text-white" : "text-foreground"}`}>
             {/* ".com" only where there is room, so narrow phones show the full
                 name instead of a clipped "GetPerfectBo…". */}
-            GetPerfectBoy<span className="hidden min-[430px]:inline">.com</span>
+            GetPros.ai<span className="hidden min-[430px]:inline">.com</span>
           </span>
 
           <span className={`mt-1 hidden truncate text-[10px] font-medium sm:block ${onColor ? "text-white/80" : "text-muted-foreground"}`}>

@@ -14,13 +14,13 @@ export const Route = createFileRoute("/services/$category/")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Service not found — GPB" }, { name: "robots", content: "noindex" }] };
+      return { meta: [{ title: "Service not found — GetPros" }, { name: "robots", content: "noindex" }] };
     }
-    const title = `${loaderData.name} Services — GPB | GetPerfectBoy.com`;
+    const title = `${loaderData.name} Services — GetPros | GetPros.ai`;
     return {
       meta: [
         { title },
-        { name: "description", content: `${loaderData.tagline} Compare GPB ${loaderData.name.toLowerCase()} sub-services, typical pricing and local professionals.` },
+        { name: "description", content: `${loaderData.tagline} Compare GetPros ${loaderData.name.toLowerCase()} sub-services, typical pricing and local professionals.` },
         { property: "og:title", content: title },
         { property: "og:description", content: loaderData.tagline },
         { property: "og:type", content: "website" },
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/services/$category/")({
       <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
         <h1 className="text-xl font-black">We don't have that category</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          The link may be out of date. Browse all 32 GPB categories to find the service you need.
+          The link may be out of date. Browse all 32 GetPros categories to find the service you need.
         </p>
         <Link to="/services" className="mt-4 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
           Browse all services
@@ -87,7 +87,7 @@ function CategoryPage() {
         <p className="mt-4 rounded-2xl border border-border/60 bg-card px-4 py-3 text-xs leading-relaxed text-muted-foreground">
           {slug === "beauty-at-home"
             ? "At-home beauty availability varies by state/local rules and provider licensing."
-            : "Local licensing or qualification requirements may apply depending on the job and location. GPB should match regulated work only to appropriately qualified providers where required by local law."}
+            : "Local licensing or qualification requirements may apply depending on the job and location. GetPros should match regulated work only to appropriately qualified providers where required by local law."}
         </p>
       )}
     </AppShell>

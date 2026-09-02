@@ -33,10 +33,10 @@ export const Route = createFileRoute("/search")({
   }),
   head: () => ({
     meta: [
-      { title: "Find a pro near you — GetPerfectBoy.com" },
-      { name: "description", content: "Search local service professionals by ZIP code or city. GPB matches your job to pros who actually cover your area." },
-      { property: "og:title", content: "Find a pro near you — GetPerfectBoy.com" },
-      { property: "og:description", content: "Search local service professionals by ZIP code or city on GPB." },
+      { title: "Find a pro near you — GetPros.ai" },
+      { name: "description", content: "Search local service professionals by ZIP code or city. GetPros matches your job to pros who actually cover your area." },
+      { property: "og:title", content: "Find a pro near you — GetPros.ai" },
+      { property: "og:description", content: "Search local service professionals by ZIP code or city on GetPros." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -174,7 +174,7 @@ function SearchPage() {
 
       {serviceMatches.length > 0 && (
         <section className="mt-6">
-          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Matching GPB services</div>
+          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Matching GetPros services</div>
           <div className="mt-2 flex flex-wrap gap-2">
             {serviceMatches.map((hit, i) => (
               <Link
@@ -213,7 +213,7 @@ function SearchPage() {
 
         <div className="space-y-6">
           <section>
-            <h2 className="text-lg font-black">Professionals on GPB</h2>
+            <h2 className="text-lg font-black">Professionals on GetPros</h2>
             {loadingProviders ? (
               <p className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" /> Loading providers…
@@ -226,8 +226,8 @@ function SearchPage() {
               <div className="mt-3 rounded-3xl border border-dashed border-border p-6">
                 <p className="text-sm font-semibold">
                   {place
-                    ? `No GPB professional covers ${place.city}, ${place.state} yet.`
-                    : "No GPB professional has been matched to this search yet."}
+                    ? `No GetPros professional covers ${place.city}, ${place.state} yet.`
+                    : "No GetPros professional has been matched to this search yet."}
                 </p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   We’re onboarding pros across the USA. Show us the job and we’ll notify you as coverage opens in your area.
@@ -237,7 +237,7 @@ function SearchPage() {
                     Show us the problem <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                   <Link to="/provider-interest" className="inline-flex items-center rounded-full border border-border px-4 py-2 text-xs font-semibold hover:bg-muted">
-                    I’m a pro — join GPB
+                    I’m a pro — join GetPros
                   </Link>
                 </div>
               </div>
@@ -247,7 +247,7 @@ function SearchPage() {
           <section>
             <h2 className="text-lg font-black">Example profiles</h2>
             <p className="mt-1 text-xs font-medium text-muted-foreground">
-              Sample listings that show how GPB profiles look. These are demo profiles — they are not local providers and are not available to book in your area.
+              Sample listings that show how GetPros profiles look. These are demo profiles — they are not local providers and are not available to book in your area.
             </p>
             <div className="mt-3 space-y-3">
               {demoProviders.slice(0, 4).map((p) => (
@@ -285,14 +285,14 @@ function SearchPage() {
 
 function RealProviderCard({ match }: { match: ProviderMatch }) {
   const { provider, distanceMiles, place } = match;
-  const initials = (provider.business_name || "GPB").slice(0, 2).toUpperCase();
+  const initials = (provider.business_name || "GetPros").slice(0, 2).toUpperCase();
   return (
     <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
       <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
         <Avatar initials={initials} gradient="from-[#FF3D8D] to-[#5B6CFF]" size={56} />
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-1.5">
-            <div className="truncate text-base font-bold">{provider.business_name || "GPB professional"}</div>
+            <div className="truncate text-base font-bold">{provider.business_name || "GetPros professional"}</div>
             {provider.verification_status === "verified" && (
               <span className="inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-0.5 text-[10px] font-semibold text-mint-ink">
                 <ShieldCheck className="h-3 w-3" /> Verified

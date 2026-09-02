@@ -11,9 +11,9 @@ import { JOB_STATUS_FLOW, JOB_STATUS_STYLE, fetchJobs, jobStatusLabel, money, ty
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Your dashboard — GPB" },
-      { name: "description", content: "Manage your bookings, messages and saved pros on GPB." },
-      { property: "og:title", content: "Your dashboard — GPB" },
+      { title: "Your dashboard — GetPros" },
+      { name: "description", content: "Manage your bookings, messages and saved pros on GetPros." },
+      { property: "og:title", content: "Your dashboard — GetPros" },
       { property: "og:description", content: "Bookings, messages and saved pros — all in one place." },
     ],
   }),
@@ -255,7 +255,7 @@ function BookingCard({ booking }: { booking: Booking }) {
 function Saved() {
   return (
     <div>
-      <DemoNote>Sample pros shown for demo browsing — saved lists become real once providers join GPB.</DemoNote>
+      <DemoNote>Sample pros shown for demo browsing — saved lists become real once providers join GetPros.</DemoNote>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {providers.slice(0, 4).map((p) => (
           <Link key={p.id} to="/provider/$id" params={{ id: p.id }} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm hover:shadow-md">

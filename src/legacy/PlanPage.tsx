@@ -288,7 +288,7 @@ function PlanSkeleton({ request }: { request: string }) {
   return (
     <div className="mt-6 rounded-[24px] border border-border/60 bg-card p-6">
       <p className="flex items-center gap-2 text-sm font-bold">
-        <Loader2 className="h-4 w-4 animate-spin text-primary" /> GPB is sequencing your plan…
+        <Loader2 className="h-4 w-4 animate-spin text-primary" /> GetPros is sequencing your plan…
       </p>
       <p dir="auto" className="mt-1 text-xs text-muted-foreground">“{request}”</p>
       <div className="mt-4 space-y-2">
@@ -304,11 +304,11 @@ function PlanSkeleton({ request }: { request: string }) {
 
 /**
  * Shown when the message carried no task at all — a greeting, a joke, a test or
- * a general question. GPB answers briefly in the person's own language and
+ * a general question. GetPros answers briefly in the person's own language and
  * invites them to say what they need, instead of inventing a plan.
  *
- * The person's own words and GPB's reply are shown as two clearly separate
- * blocks: GPB's banter is never presented as something the user asked for, and
+ * The person's own words and GetPros's reply are shown as two clearly separate
+ * blocks: GetPros's banter is never presented as something the user asked for, and
  * it never becomes the request text in the composer above.
  */
 function ConversationCard({
@@ -328,7 +328,7 @@ function ConversationCard({
             <MessageCircle className="h-5 w-5" />
           </span>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-black uppercase tracking-wider text-primary">GPB</p>
+            <p className="text-[11px] font-black uppercase tracking-wider text-primary">GetPros</p>
             <p dir="auto" className="mt-1 reply-text font-bold break-words">{reply}</p>
             {invitation && (
               <p dir="auto" className="mt-2 text-[15px] leading-relaxed text-muted-foreground break-words sm:text-base">{invitation}</p>
@@ -802,7 +802,7 @@ function PlanDetails({ plan }: { plan: GpbPlan }) {
             <li key={n} dir="auto">· {n}</li>
           ))}
           {english && (
-            <li>· Home and local tasks link into the GPB service catalogue, where you choose and book a pro.</li>
+            <li>· Home and local tasks link into the GetPros service catalogue, where you choose and book a pro.</li>
           )}
         </ul>
       </details>

@@ -2,9 +2,9 @@ import React from 'react'
 import { Column, Hr, Img, Link, Row, Section, Text } from '@react-email/components'
 
 /**
- * Shared GPB email branding: header mark + standardized footer.
+ * Shared GetPros email branding: header mark + standardized footer.
  * Every registered template should use <EmailHeader /> and <EmailFooter />
- * so all GPB-controlled emails share one visual identity.
+ * so all GetPros-controlled emails share one visual identity.
  */
 
 export const SITE_URL = 'https://getperfectboy.com'
@@ -56,7 +56,7 @@ export function EmailHeader({ siteUrl = SITE_URL }: { siteUrl?: string }) {
               src={LOGO_URL}
               width="44"
               height="44"
-              alt="GPB — GetPerfectBoy.com"
+              alt="GetPros — GetPros.ai"
               style={{ display: 'block', borderRadius: '12px', border: '0', outline: 'none' }}
             />
           </Link>
@@ -71,7 +71,7 @@ export function EmailHeader({ siteUrl = SITE_URL }: { siteUrl?: string }) {
               color: brand.ink,
             }}
           >
-            GetPerfectBoy.com
+            GetPros.ai
           </Text>
           <Text style={{ margin: '2px 0 0', fontSize: '12px', color: brand.muted }}>
             Show it. We&apos;ll handle the rest.
@@ -97,7 +97,7 @@ export function EmailFooter({
       <Hr style={emailStyles.hr} />
       <Text style={emailStyles.small}>
         <Link href={siteUrl} style={{ color: brand.secondary, textDecoration: 'none', fontWeight: 700 }}>
-          GetPerfectBoy.com
+          GetPros.ai
         </Link>{' '}
         — AI-powered home &amp; personal services marketplace.
       </Text>

@@ -25,7 +25,7 @@ const PARTIAL_MIN_MS = 1_800;
 const PARTIAL_MAX_MS = 4_000;
 const MIN_PARTIAL_BYTES = 6_000;
 /**
- * After a voice request is finalized, GPB builds the plan on its own if the
+ * After a voice request is finalized, GetPros builds the plan on its own if the
  * person stays silent. Armed only after a real spoken transcript, never from
  * typing, and cancellable from the UI or by editing the text.
  */
@@ -162,7 +162,7 @@ export function OutcomeComposer() {
   const stableRef = useRef<StableTranscript | null>(null);
   // Text the recognition session started with — finals append onto this.
   const baseTextRef = useRef("");
-  /** Seconds left before GPB builds the plan on its own; null = not armed. */
+  /** Seconds left before GetPros builds the plan on its own; null = not armed. */
   const [autoSecs, setAutoSecs] = useState<number | null>(null);
   const autoTimerRef = useRef<number | null>(null);
   /** Exactly-once guard so auto and manual submit can never both fire. */
@@ -657,7 +657,7 @@ export function OutcomeComposer() {
       )}
       {emptyError && (
         <p id="gpb-outcome-error" role="alert" className="mt-1.5 text-xs font-semibold text-destructive">
-          Tell GPB what service you need — type it or tap the mic.
+          Tell GetPros what service you need — type it or tap the mic.
         </p>
       )}
 
@@ -717,7 +717,7 @@ export function OutcomeComposer() {
           data-analytics-location="hero_composer"
           className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground transition-colors hover:text-primary"
         >
-          <Camera className="h-4 w-4 text-primary" /> Or show GPB a photo instead
+          <Camera className="h-4 w-4 text-primary" /> Or show GetPros a photo instead
         </Link>
       </div>
 

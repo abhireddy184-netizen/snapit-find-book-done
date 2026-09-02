@@ -7,7 +7,7 @@ import { catalog } from "@/lib/catalog";
 import { supabase } from "@/integrations/supabase/client";
 import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 
-/** Show GPB callout — concise, mobile-first. */
+/** Show GetPros callout — concise, mobile-first. */
 export function ShowGpbCallout() {
   return (
     <section className="mt-10 overflow-hidden rounded-[24px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
@@ -16,9 +16,9 @@ export function ShowGpbCallout() {
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-black text-primary">
             <Sparkles className="h-3.5 w-3.5" /> Not sure what you need?
           </span>
-          <h2 className="mt-2 text-xl font-black tracking-tight sm:text-2xl">Show GPB the problem.</h2>
+          <h2 className="mt-2 text-xl font-black tracking-tight sm:text-2xl">Show GetPros the problem.</h2>
           <p className="mt-2 max-w-[52ch] text-sm text-muted-foreground">
-            Take a photo, record a short video, or just describe the job. GPB helps identify the
+            Take a photo, record a short video, or just describe the job. GetPros helps identify the
             service you need — and what a fair scope looks like.
           </p>
         </div>
@@ -30,7 +30,7 @@ export function ShowGpbCallout() {
           className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
           style={{ background: "var(--gradient-primary)" }}
         >
-          <Camera className="h-5 w-5" /> Show GPB
+          <Camera className="h-5 w-5" /> Show GetPros
         </Link>
       </div>
     </section>
@@ -93,15 +93,15 @@ export function EarlyAccessSection() {
             <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/15 px-3 py-1 text-[11px] font-black text-secondary">
               <MapPin className="h-3.5 w-3.5" /> Launching city by city
             </span>
-            <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">GPB is launching city by city</h2>
+            <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">GetPros is launching city by city</h2>
             <p className="mt-3 max-w-[52ch] text-sm text-muted-foreground">
               Join early access and be first to know when trusted local pros are available near you.
-              Coverage expands as verified professionals join GPB in each area — not every service is
+              Coverage expands as verified professionals join GetPros in each area — not every service is
               live everywhere yet.
             </p>
             <ul className="mt-5 space-y-2 text-sm">
               {[
-                "Early invite when GPB opens in your area",
+                "Early invite when GetPros opens in your area",
                 "No payment and no membership — it's a free list",
                 "Tell us the service you want first, so we prioritise it",
               ].map((l) => (
@@ -122,14 +122,14 @@ export function EarlyAccessSection() {
               </div>
               <h3 className="mt-4 text-xl font-black">You’re on the early access list</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                We’ll email you as soon as GPB opens in your area.
+                We’ll email you as soon as GetPros opens in your area.
               </p>
               <Link
                 to="/snap"
                 className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-md"
                 style={{ background: "var(--gradient-primary)" }}
               >
-                <Camera className="h-4 w-4" /> Show GPB a job now
+                <Camera className="h-4 w-4" /> Show GetPros a job now
               </Link>
             </div>
           ) : (
@@ -192,7 +192,7 @@ export function EarlyAccessSection() {
               </div>
               <p className="mt-3 text-center text-[11px] leading-relaxed text-muted-foreground">
                 Free to join — this isn’t a paid membership and doesn’t create an account. We’ll only use
-                your details to contact you about GPB availability near you, and you can ask us to remove
+                your details to contact you about GetPros availability near you, and you can ask us to remove
                 you at any time.
               </p>
             </form>

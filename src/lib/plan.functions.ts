@@ -20,7 +20,7 @@ const PLAN_MODEL = "google/gemini-3.7-flash";
 
 /**
  * Either a real plan, or a short conversational reply for messages that carry no
- * task at all (a greeting, a joke, a test). GPB answers those honestly instead
+ * task at all (a greeting, a joke, a test). GetPros answers those honestly instead
  * of fabricating a plan nobody asked for.
  */
 export type PlanResult =

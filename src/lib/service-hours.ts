@@ -1,5 +1,5 @@
 /**
- * GPB service scheduling rules — US launch.
+ * GetPros service scheduling rules — US launch.
  *
  * Hard platform window: 08:00–20:00 in the SERVICE LOCATION's local time.
  * The whole job (duration + travel/setup buffer) has to fit inside it, so a
@@ -281,7 +281,7 @@ export function nextAvailableSlot(
 
 /** Explain why a chosen local time is not bookable — plain language, no jargon. */
 export function windowViolation(minute: number, totalMinutes: number): string | null {
-  if (minute < SERVICE_WINDOW_START_MINUTE) return "GPB pros start at 8:00 AM local time.";
+  if (minute < SERVICE_WINDOW_START_MINUTE) return "GetPros pros start at 8:00 AM local time.";
   if (minute + totalMinutes > SERVICE_WINDOW_END_MINUTE) {
     return `This job needs about ${totalMinutes} minutes, so the latest start today is ${formatSlot(latestStartMinute(totalMinutes))} local time.`;
   }

@@ -8,9 +8,9 @@ import { categories } from "@/lib/snapit-data";
 export const Route = createFileRoute("/history")({
   head: () => ({
     meta: [
-      { title: "Diagnosis history — GPB" },
-      { name: "description", content: "Every GPB AI diagnosis you've saved, with cost estimates, urgency and matched pros." },
-      { property: "og:title", content: "Your GPB diagnosis history" },
+      { title: "Diagnosis history — GetPros" },
+      { name: "description", content: "Every GetPros AI diagnosis you've saved, with cost estimates, urgency and matched pros." },
+      { property: "og:title", content: "Your GetPros diagnosis history" },
       { property: "og:description", content: "Revisit past AI diagnoses and rebook the pros you loved." },
     ],
   }),

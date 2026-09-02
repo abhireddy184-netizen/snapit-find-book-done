@@ -11,7 +11,7 @@ import {
 
 const JOURNEY = [
   { icon: Camera, label: "Show it", detail: "Photo, video or a few words", tint: "var(--primary)" },
-  { icon: Sparkles, label: "GPB understands", detail: "Likely issue, urgency, cost range", tint: "var(--secondary)" },
+  { icon: Sparkles, label: "GetPros understands", detail: "Likely issue, urgency, cost range", tint: "var(--secondary)" },
   { icon: Wrench, label: "Exact service", detail: "One clear scope, matched pros", tint: "var(--lavender)" },
   { icon: ShieldCheck, label: "Fixed, with proof", detail: "Before & after kept for you", tint: "var(--coral)" },
 ];
@@ -192,7 +192,7 @@ export function RoomStory() {
                 <span className="block truncate text-sm font-black text-foreground">{active.service}</span>
               </span>
               <span className="ml-auto hidden shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-black text-primary sm:inline-flex">
-                <Sparkles className="h-3 w-3" /> GPB AI
+                <Sparkles className="h-3 w-3" /> GetPros AI
               </span>
             </div>
           </div>
@@ -202,7 +202,7 @@ export function RoomStory() {
       {/* Side list */}
       <div>
         <p className="text-sm leading-relaxed text-muted-foreground">
-          GPB reads the whole scene, not just one object. One photo can surface every service that space may need —
+          GetPros reads the whole scene, not just one object. One photo can surface every service that space may need —
           then <span className="font-semibold text-foreground">what you actually ask for</span> decides the exact job we scope and quote.
         </p>
         <ul className="mt-4 space-y-2">

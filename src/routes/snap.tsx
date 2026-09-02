@@ -60,9 +60,9 @@ export const Route = createFileRoute("/snap")({
 
   head: () => ({
     meta: [
-      { title: "Show us the problem — AI diagnosis in seconds | GPB" },
-      { name: "description", content: "Snap a photo or video of any problem. GPB's AI explains what it likely needs, builds a standardized job scope and helps you compare quotes from service pros." },
-      { property: "og:title", content: "Snap a Problem — AI diagnosis | GPB" },
+      { title: "Show us the problem — AI diagnosis in seconds | GetPros" },
+      { name: "description", content: "Snap a photo or video of any problem. GetPros's AI explains what it likely needs, builds a standardized job scope and helps you compare quotes from service pros." },
+      { property: "og:title", content: "Snap a Problem — AI diagnosis | GetPros" },
       { property: "og:description", content: "Point your camera. Get an instant diagnosis, estimate and matched pros." },
     ],
   }),
@@ -105,7 +105,7 @@ function SnapPage() {
   // Monotonic token: only the newest run is allowed to write state.
   const runRef = useRef(0);
   const busyRef = useRef(false);
-  // Conversation memory so GPB never re-asks a question or loses an answer.
+  // Conversation memory so GetPros never re-asks a question or loses an answer.
   const [askedQuestions, setAskedQuestions] = useState<string[]>([]);
   const [turnCount, setTurnCount] = useState(0);
   const [recent, setRecent] = useState<SnapHistoryEntry[]>([]);
@@ -218,7 +218,7 @@ function SnapPage() {
   const runTextAnalysis = async (override?: string) => {
     const typed = (override ?? describeText).trim();
     if (typed.length < 4 || busyRef.current) return;
-    // The service location travels with the request so GPB can match locally.
+    // The service location travels with the request so GetPros can match locally.
     const described = incomingLoc ? `${typed}\n(Service location: ${incomingLoc})` : typed;
     busyRef.current = true;
     const token = ++runRef.current;
@@ -337,11 +337,11 @@ function SnapPage() {
         <div className="pt-2">
 
           <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> One way to talk to GPB
+            <Sparkles className="h-3.5 w-3.5" /> One way to talk to GetPros
           </div>
           <h1 className="mt-3 text-3xl font-black tracking-tight md:text-4xl">Don’t know what service you need? Show us.</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Take a photo, record a video, upload an image, or simply describe the outcome you want. GPB works out
+            Take a photo, record a video, upload an image, or simply describe the outcome you want. GetPros works out
             what the job actually is and routes it to the right local professional. A photo is never required.
           </p>
         </div>
@@ -604,7 +604,7 @@ function ScanningOverlay({
         <div className="mt-5">
           <div className="text-center">
             <div className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-white/80">
-              <Sparkles className="h-3.5 w-3.5" /> GPB AI
+              <Sparkles className="h-3.5 w-3.5" /> GetPros AI
             </div>
             <div className="mt-1 text-lg font-black text-white">
               {phase === "preparing"
@@ -781,7 +781,7 @@ function AnalysisView({
     duration >= 60 ? `${(duration / 60).toFixed(duration % 60 === 0 ? 0 : 1)} hr` : `${duration} min`;
   const confidencePct = Math.round((analysis.confidence ?? 0.7) * 100);
 
-  // Real, verified, currently-bookable GPB pros for this exact trade near the
+  // Real, verified, currently-bookable GetPros pros for this exact trade near the
   // service ZIP. No samples, no filler from other trades: if nobody qualifies
   // the customer is told so honestly.
   const [matched, setMatched] = useState<ProviderMatch[]>([]);
@@ -1044,7 +1044,7 @@ function AnalysisView({
           </div>
           <p className="mt-1 text-muted-foreground">
             {hasZip
-              ? "We only show real GPB professionals who are verified and accepting work within their own service radius — never a sample profile and never someone from another trade."
+              ? "We only show real GetPros professionals who are verified and accepting work within their own service radius — never a sample profile and never someone from another trade."
               : "Add the ZIP code of your service address and we'll check which verified pros actually cover it."}
           </p>
         </div>
@@ -1056,7 +1056,7 @@ function AnalysisView({
           <div>
             <h2 className="text-lg font-black">Pros who can take this job</h2>
             <p className="text-xs text-muted-foreground">
-              Verified GPB professionals accepting work in this trade{hasZip ? " and covering your ZIP" : ""}.
+              Verified GetPros professionals accepting work in this trade{hasZip ? " and covering your ZIP" : ""}.
             </p>
           </div>
         </div>
@@ -1106,7 +1106,7 @@ function AnalysisView({
         <div className="text-xs text-muted-foreground">
           {showPricing
             ? "Estimates are AI-generated — the final price is confirmed by your pro after inspection."
-            : "No price shown yet — GPB avoids guessing a price until we understand the job."}
+            : "No price shown yet — GetPros avoids guessing a price until we understand the job."}
         </div>
         <div className="flex flex-wrap gap-2">
           <Link
@@ -1191,7 +1191,7 @@ function ClarifyPanel({
 }
 
 /**
- * A real GPB professional. Everything shown here comes from the pro's own
+ * A real GetPros professional. Everything shown here comes from the pro's own
  * public profile — we never invent ratings, ETAs or distances.
  */
 function ProCard({
@@ -1204,7 +1204,7 @@ function ProCard({
   onBook: () => void;
 }) {
   const p = match.provider;
-  const name = p.business_name?.trim() || "GPB professional";
+  const name = p.business_name?.trim() || "GetPros professional";
   const initials = name.split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? "").join("") || "GP";
   return (
     <div

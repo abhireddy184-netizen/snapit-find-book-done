@@ -83,7 +83,7 @@
 
 :root {
   --radius: 1.25rem;
-  /* GPB light-first: cool pearl canvas (#F4F2F3), white cards with light
+  /* GetPros light-first: cool pearl canvas (#F4F2F3), white cards with light
      lavender tints, dark charcoal-plum ink, signature pink→purple→blue gradient
      reserved for the logo and primary CTAs. Decorative mauve (#C0A9BD),
      neutral steel (#94A7AE) and trust sage (#64766A) are supporting accents —
@@ -156,7 +156,7 @@
 }
 
 .dark {
-  /* GPB dark: midnight navy-aubergine, never flat black. */
+  /* GetPros dark: midnight navy-aubergine, never flat black. */
   --background: oklch(0.182 0.045 300);
   --foreground: oklch(0.965 0.011 84);
   --card: oklch(0.235 0.052 300);
@@ -411,7 +411,7 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* GPB Pros on the Move — walking strip                                */
+/* GetPros Pros on the Move — walking strip                                */
 /* ------------------------------------------------------------------ */
 
 @keyframes gpb-walk-across {

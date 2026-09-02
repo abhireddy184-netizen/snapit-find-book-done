@@ -7,7 +7,7 @@ type ThemeCtx = { theme: Theme; toggle: () => void; setTheme: (t: Theme) => void
 const Ctx = createContext<ThemeCtx | null>(null);
 
 const THEME_KEY = "gpb-theme";
-/** Read once for backwards compatibility with the pre-GPB key. */
+/** Read once for backwards compatibility with the pre-GetPros key. */
 const LEGACY_THEME_KEY = "snapit-theme";
 
 function getInitial(): Theme {
@@ -15,7 +15,7 @@ function getInitial(): Theme {
   const stored =
     window.localStorage.getItem(THEME_KEY) ?? window.localStorage.getItem(LEGACY_THEME_KEY);
   if (stored === "light" || stored === "dark") return stored;
-  // GPB is light-first: new visitors always start in light mode.
+  // GetPros is light-first: new visitors always start in light mode.
   return "light";
 }
 

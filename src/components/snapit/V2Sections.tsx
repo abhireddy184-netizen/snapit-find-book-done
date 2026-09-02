@@ -16,7 +16,7 @@ const STEPS: { icon: LucideIcon; title: string; body: string }[] = [
   },
   {
     icon: ListChecks,
-    title: "GPB breaks it into tasks",
+    title: "GetPros breaks it into tasks",
     body: "We turn your request into a clear job brief: what’s likely needed, what it should cover, and what it typically costs.",
   },
   {
@@ -31,13 +31,13 @@ export function HowItWorks() {
     <section id="how-it-works" className="mt-14 scroll-mt-24">
       <header className="max-w-2xl">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-primary">
-          How GPB works
+          How GetPros works
         </span>
         <h2 className="mt-3 text-[clamp(1.5rem,3.4vw,2.25rem)] font-black leading-tight tracking-tight">
           You don’t need to know which service to choose.
         </h2>
         <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-          Most people know the outcome they want, not the trade that delivers it. GPB starts from the outcome.
+          Most people know the outcome they want, not the trade that delivers it. GetPros starts from the outcome.
         </p>
       </header>
 
@@ -118,7 +118,7 @@ export function OutcomeBundles() {
             One request. Multiple tasks.
           </h2>
           <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-            Real life rarely fits one service. GPB can help coordinate the pieces behind a single outcome.
+            Real life rarely fits one service. GetPros can help coordinate the pieces behind a single outcome.
           </p>
         </div>
         <Link to="/services" className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-primary hover:underline">
@@ -135,7 +135,7 @@ export function OutcomeBundles() {
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-base font-black tracking-tight">{b.title}</h3>
               <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                GPB can coordinate
+                GetPros can coordinate
               </span>
             </div>
             <p className="mt-2 text-sm italic leading-relaxed text-foreground/80">{b.request}</p>
@@ -191,7 +191,7 @@ export function DailyLifeModules() {
     <section className="mt-14">
       <header className="max-w-2xl">
         <h2 className="text-[clamp(1.5rem,3.4vw,2.25rem)] font-black leading-tight tracking-tight">
-          Services people ask GPB for.
+          Services people ask GetPros for.
         </h2>
         <p className="mt-2 text-sm text-muted-foreground sm:text-base">
           Six of the most requested areas — each one starts with your request, not a category list.
@@ -225,7 +225,7 @@ export function DailyLifeModules() {
   );
 }
 
-/* ---------------- 4) Show GPB (elevated) ---------------- */
+/* ---------------- 4) Show GetPros (elevated) ---------------- */
 
 export function ShowGpbBand() {
   return (
@@ -239,7 +239,7 @@ export function ShowGpbBand() {
             Don’t know what’s wrong? Show us.
           </h2>
           <p className="mt-2 max-w-[54ch] text-sm leading-relaxed text-muted-foreground">
-            Point your camera at the problem, record a few seconds of video, or upload a photo. GPB reads
+            Point your camera at the problem, record a few seconds of video, or upload a photo. GetPros reads
             the scene, tells you what it likely needs, and turns it into the same clear job brief.
           </p>
           <Link
@@ -249,14 +249,14 @@ export function ShowGpbBand() {
             className="mt-5 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-lg transition-transform hover:scale-[1.02]"
             style={{ background: "var(--gradient-primary)" }}
           >
-            <Camera className="h-5 w-5" /> Show GPB
+            <Camera className="h-5 w-5" /> Show GetPros
           </Link>
         </div>
         <ul className="grid gap-2 text-sm">
           {[
             "Photo, video, or plain text — all work",
             "We separate what’s detected from what you described",
-            "Low confidence? GPB asks instead of guessing",
+            "Low confidence? GetPros asks instead of guessing",
           ].map((l) => (
             <li key={l} className="flex items-start gap-2 rounded-2xl border border-border/60 bg-background px-4 py-3">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -286,7 +286,7 @@ export function TrustSection() {
           Built so you can hand it over.
         </h2>
         <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-          Handing off a job means trusting the process. Here’s what GPB puts in writing.
+          Handing off a job means trusting the process. Here’s what GetPros puts in writing.
         </p>
       </header>
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -301,7 +301,7 @@ export function TrustSection() {
         ))}
       </div>
       <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground">
-        GPB is in early access and launching city by city — coverage grows as verified professionals join each area.
+        GetPros is in early access and launching city by city — coverage grows as verified professionals join each area.
       </p>
     </section>
   );
@@ -316,7 +316,7 @@ export function BrowseFallback() {
         <div className="min-w-0">
           <h2 className="text-base font-black tracking-tight sm:text-lg">Prefer to browse? Choose a service.</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            The full GPB catalogue is still here — every category and sub-service.
+            The full GetPros catalogue is still here — every category and sub-service.
           </p>
         </div>
         <Link
@@ -334,8 +334,8 @@ export function BrowseFallback() {
    day planner — the services-only experience does not link to /plan. */
 
 const FLOW: { icon: LucideIcon; title: string; body: string }[] = [
-  { icon: Camera, title: "Show or tell GPB", body: "Photo, voice in any language, or plain text — whatever is easiest." },
-  { icon: ListChecks, title: "See what's needed", body: "GPB turns it into a short, clear service request you can edit." },
+  { icon: Camera, title: "Show or tell GetPros", body: "Photo, voice in any language, or plain text — whatever is easiest." },
+  { icon: ListChecks, title: "See what's needed", body: "GetPros turns it into a short, clear service request you can edit." },
   { icon: HardHat, title: "Get a local pro", body: "We match a real, available pro near you — or tell you honestly if there isn't one yet." },
 ];
 
@@ -370,7 +370,7 @@ export function HowGpbWorksDetails() {
     <section id="how-it-works" className="mt-10 scroll-mt-24">
       <details className="group rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-base font-black tracking-tight">
-          How GPB works
+          How GetPros works
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border/60 text-muted-foreground transition-transform group-open:rotate-90">
             <ArrowRight className="h-4 w-4" />
           </span>
@@ -389,8 +389,8 @@ export function HowGpbWorksDetails() {
           <div className="rounded-2xl border border-border/60 bg-background p-4">
             <h3 className="text-sm font-black tracking-tight">Who does the work</h3>
             <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-              Home, cleaning, repairs, moving, errands and auto requests go through the GPB service
-              catalogue and local professionals. GPB only shows pros that are real, verified and available
+              Home, cleaning, repairs, moving, errands and auto requests go through the GetPros service
+              catalogue and local professionals. GetPros only shows pros that are real, verified and available
               in your area — otherwise it says so plainly.
             </p>
           </div>
@@ -405,7 +405,7 @@ export function HowGpbWorksDetails() {
         </div>
 
         <p className="mt-4 text-[11px] leading-relaxed text-muted-foreground">
-          GPB is in early access and launching city by city. Nothing is booked until you say so.
+          GetPros is in early access and launching city by city. Nothing is booked until you say so.
         </p>
       </details>
     </section>

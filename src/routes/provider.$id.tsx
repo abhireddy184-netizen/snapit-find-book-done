@@ -13,12 +13,12 @@ export const Route = createFileRoute("/provider/$id")({
   head: ({ loaderData }) => ({
     meta: loaderData
       ? [
-          { title: `${loaderData.provider.name} — GPB` },
+          { title: `${loaderData.provider.name} — GetPros` },
           { name: "description", content: loaderData.provider.description },
-          { property: "og:title", content: `${loaderData.provider.name} — GPB` },
+          { property: "og:title", content: `${loaderData.provider.name} — GetPros` },
           { property: "og:description", content: loaderData.provider.description },
         ]
-      : [{ title: "Provider — GPB" }, { name: "robots", content: "noindex" }],
+      : [{ title: "Provider — GetPros" }, { name: "robots", content: "noindex" }],
   }),
   notFoundComponent: () => (
     <AppShell>

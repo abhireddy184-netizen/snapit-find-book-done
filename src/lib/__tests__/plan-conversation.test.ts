@@ -6,13 +6,13 @@ import {
 } from "../plan.server";
 
 /**
- * Casual banter must stay banter: GPB answers playfully and does NOT invent a
+ * Casual banter must stay banter: GetPros answers playfully and does NOT invent a
  * task. The classic case is a Telugu "ఏం కావాలి రా?" ("what do you want?"),
- * where GPB jokes about two kilos of potatoes — that joke is GPB's own words
+ * where GetPros jokes about two kilos of potatoes — that joke is GetPros's own words
  * and must never be turned into a grocery request.
  */
 describe("conversational vs actionable", () => {
-  it("keeps a casual Telugu question conversational, with GPB's joke as the reply only", () => {
+  it("keeps a casual Telugu question conversational, with GetPros's joke as the reply only", () => {
     const raw = JSON.stringify({
       languageCode: "te",
       languageName: "తెలుగు",
@@ -29,7 +29,7 @@ describe("conversational vs actionable", () => {
     const u = normalizeUnderstanding(raw, "ఏం కావాలి రా?");
     expect(u.actionability).toBe("conversational");
     expect(u.conversationalReply).toContain("బంగాళాదుంపలు");
-    // The user's own words stay the canonical request — never GPB's joke.
+    // The user's own words stay the canonical request — never GetPros's joke.
     expect(u.normalizedRequest).toBe("ఏం కావాలి రా?");
     expect(u.clarificationQuestion).toBeUndefined();
   });
@@ -67,7 +67,7 @@ describe("conversational vs actionable", () => {
 });
 
 describe("understanding prompt guardrails", () => {
-  it("forbids treating GPB's own banter as the user's request", () => {
+  it("forbids treating GetPros's own banter as the user's request", () => {
     expect(UNDERSTAND_SYSTEM_PROMPT).toMatch(/YOUR OWN WORDS ARE NEVER THE USER'S REQUEST/);
     expect(UNDERSTAND_SYSTEM_PROMPT).toMatch(/potatoes/i);
   });

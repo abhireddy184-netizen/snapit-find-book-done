@@ -19,7 +19,7 @@ export const analyzeSnap = createServerFn({ method: "POST" })
         forceResolve: z.boolean().optional(),
       })
       .refine((v) => Boolean(v.imageDataUrl || v.imageDataUrls?.length || v.note?.trim()), {
-        message: "Add a photo, a video or a description so GPB can help.",
+        message: "Add a photo, a video or a description so GetPros can help.",
       })
       .parse(input),
   )

@@ -220,7 +220,7 @@ export function ProsOnTheMove({ slim = false }: { slim?: boolean } = {}) {
   const Figure = pro.Figure;
 
   return (
-    <section className={slim ? "mt-4" : "mt-6"} aria-label="GPB pros on the move">
+    <section className={slim ? "mt-4" : "mt-6"} aria-label="GetPros pros on the move">
       <div
         className="relative overflow-hidden rounded-[22px] border border-border/50 px-4 py-2.5 sm:rounded-[24px] md:px-6 lg:px-8"
         style={{ backgroundColor: "color-mix(in oklab, var(--card) 86%, var(--background))" }}
@@ -238,7 +238,7 @@ export function ProsOnTheMove({ slim = false }: { slim?: boolean } = {}) {
         <div className="relative flex items-center justify-between gap-3">
           <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.14em] text-muted-foreground">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            GPB pros on the move
+            GetPros pros on the move
           </span>
           <span className="hidden text-[11px] text-muted-foreground sm:inline">Matched in minutes, near you</span>
         </div>

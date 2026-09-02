@@ -12,10 +12,10 @@ import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 export const Route = createFileRoute("/provider-interest")({
   head: () => ({
     meta: [
-      { title: "Register your interest as a pro — GetPerfectBoy.com" },
-      { name: "description", content: "Join the GPB provider interest list. Tell us your trade and ZIP code and we'll reach out as onboarding opens in your area." },
-      { property: "og:title", content: "Register your interest as a pro — GetPerfectBoy.com" },
-      { property: "og:description", content: "Tell GPB your trade and service ZIP to be contacted as pro onboarding opens near you." },
+      { title: "Register your interest as a pro — GetPros.ai" },
+      { name: "description", content: "Join the GetPros provider interest list. Tell us your trade and ZIP code and we'll reach out as onboarding opens in your area." },
+      { property: "og:title", content: "Register your interest as a pro — GetPros.ai" },
+      { property: "og:description", content: "Tell GetPros your trade and service ZIP to be contacted as pro onboarding opens near you." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -91,7 +91,7 @@ function ProviderInterestPage() {
           </div>
           <h1 className="mt-6 text-3xl font-black">You’re on the list</h1>
           <p className="mt-3 text-muted-foreground">
-            You’re on the GPB provider interest list. We’ll contact you as onboarding opens in your area.
+            You’re on the GetPros provider interest list. We’ll contact you as onboarding opens in your area.
             {emailSent ? " A confirmation email is on its way." : ""}
           </p>
           <p className="mt-2 text-xs text-muted-foreground">
@@ -125,7 +125,7 @@ function ProviderInterestPage() {
           <div className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">For professionals</div>
           <h1 className="mt-4 text-4xl font-black tracking-tight md:text-5xl">Register your interest</h1>
           <p className="mt-4 max-w-lg text-muted-foreground">
-            GPB is onboarding professionals across the USA, across {catalog.length} service categories and {TOTAL_SERVICES}+ services.
+            GetPros is onboarding professionals across the USA, across {catalog.length} service categories and {TOTAL_SERVICES}+ services.
             Tell us your trade and where you work, and we’ll be in touch as onboarding opens near you.
           </p>
           <ul className="mt-6 space-y-2 text-sm">

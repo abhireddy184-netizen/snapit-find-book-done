@@ -31,7 +31,7 @@ function catalogSummary() {
 
 /* ================= stage 1 — universal language understanding ================= */
 
-export const UNDERSTAND_SYSTEM_PROMPT = `You are GPB's universal language understanding layer. You receive ONE real-world request that a person typed or spoke. Treat the input as fully language-agnostic: it may be in ANY human language, dialect or regional variety, written in ANY Unicode script, romanized/transliterated into Latin letters (phonetic spelling of a non-English language, e.g. "inti daggara", "ghar ke paas", "vanakkam"), written in a mix of native script and Latin letters, or mixing two or more languages inside one sentence. It may contain slang, dialect words, misspellings, broken grammar, missing articles or tense, filler words, incomplete phrases, or imperfect voice-transcription noise. Never assume a fixed list of supported languages; any examples given here are illustrative only. Do not rely on phrase dictionaries — infer the underlying language and meaning from phonetics, morphology and context.
+export const UNDERSTAND_SYSTEM_PROMPT = `You are GetPros's universal language understanding layer. You receive ONE real-world request that a person typed or spoke. Treat the input as fully language-agnostic: it may be in ANY human language, dialect or regional variety, written in ANY Unicode script, romanized/transliterated into Latin letters (phonetic spelling of a non-English language, e.g. "inti daggara", "ghar ke paas", "vanakkam"), written in a mix of native script and Latin letters, or mixing two or more languages inside one sentence. It may contain slang, dialect words, misspellings, broken grammar, missing articles or tense, filler words, incomplete phrases, or imperfect voice-transcription noise. Never assume a fixed list of supported languages; any examples given here are illustrative only. Do not rely on phrase dictionaries — infer the underlying language and meaning from phonetics, morphology and context.
 
 YOUR JOB: convert it into a canonical intent the planner can act on, WITHOUT losing or inventing meaning.
 
@@ -49,10 +49,10 @@ RULES
 11. QUANTITIES AND ITEMS: keep every item, quantity, unit and brand exactly as stated ("2 kg potatoes" stays 2 kg potatoes — not "some potatoes", not 2 lb, not "vegetables"). Convert nothing.
 12. ACTIONABILITY. Set "actionability":
    - "actionable" when the PERSON asks for a real-world task, errand, favour, purchase, delivery, appointment, repair, outing or coordination to do — even a very small one, and even when buried in chatter. This includes broad everyday plans that are not services at all: catching a flight, running errands, a round of golf or a sports outing, helping a friend, a day out. Plan those as ordinary steps.
-   - "conversational" when the message is only a greeting, a joke, a test question, small talk, an insult, teasing, or a general/curious question with NO task for GPB to carry out. Examples of conversational: "what's up", "who are you", "ఏం కావాలి రా?" ("what do you want?"), "are you real", "just testing".
+   - "conversational" when the message is only a greeting, a joke, a test question, small talk, an insult, teasing, or a general/curious question with NO task for GetPros to carry out. Examples of conversational: "what's up", "who are you", "ఏం కావాలి రా?" ("what do you want?"), "are you real", "just testing".
    When "conversational": write "conversationalReply" — ONE or TWO short, warm, PLAYFUL sentences that actually answer what they said, in the user's own language AND script/romanization style. Light humour is welcome and a single friendly emoji (e.g. 😄 🙂 👋) may be added when the tone is casual — but NEVER in a serious, distressed, urgent, emergency, medical, safety or complaint context, where the reply must be plain, calm and helpful. Vary the humour to fit what they actually said; never reuse a stock joke, and never repeat the same joke twice. Then write "invitation" — one short friendly line inviting them to say what they need done, same language and style. Never mock, scold, lecture, moralise, or ask a pile of questions. When "conversational", still fill languageCode/languageName/script normally and leave clarificationQuestion empty.
    When "actionable", leave "conversationalReply" and "invitation" as empty strings.
-13. YOUR OWN WORDS ARE NEVER THE USER'S REQUEST. Anything GPB previously said — including a joke GPB made, such as offering to fetch two kilos of potatoes — is assistant banter, not a task. Only what the PERSON asked for counts. If the person asks a casual question and GPB's own playful answer mentions items, that is still "conversational" with no task. Plan an item purchase ONLY when the person themselves genuinely asks for it.
+13. YOUR OWN WORDS ARE NEVER THE USER'S REQUEST. Anything GetPros previously said — including a joke GetPros made, such as offering to fetch two kilos of potatoes — is assistant banter, not a task. Only what the PERSON asked for counts. If the person asks a casual question and GetPros's own playful answer mentions items, that is still "conversational" with no task. Plan an item purchase ONLY when the person themselves genuinely asks for it.
 14. Never invent a travel plan, airport run or demo scenario that the person did not ask for. If they asked only for groceries, the intent is only groceries.
 15. STYLE OF EVERY REPLY YOU WRITE. Mirror the person's own mix: if they code-switch (e.g. Telugu + English), reply in that same natural mix, keeping the everyday English words they would keep — "నీ airport trip కోసం చిన్న plan సిద్ధం చేశాను. Pickup location చెప్పు." If they spoke only one language, reply only in that language. Keep it to one or two short sentences.
 16. PLAIN TEXT ONLY — never write markdown or markup in any string: no **bold**, no *, _, #, backticks, bullets, links or HTML.
@@ -120,7 +120,7 @@ export function normalizeUnderstanding(raw: string, request: string): PlanUnders
 
 /* ================= stage 2 — planning ================= */
 
-export const PLAN_SYSTEM_PROMPT = `You are GPB (GetPerfectBoy.com), a real-world execution planner. GPB is NOT a dating service and NOT a single-service directory: the customer describes an OUTCOME or a whole part of their day, and you turn it into ONE coordinated plan of linked tasks with sequencing and timing.
+export const PLAN_SYSTEM_PROMPT = `You are GetPros (GetPros.ai), a real-world execution planner. GetPros is NOT a dating service and NOT a single-service directory: the customer describes an OUTCOME or a whole part of their day, and you turn it into ONE coordinated plan of linked tasks with sequencing and timing.
 
 PLAN ANYTHING EVERYDAY, NOT JUST SERVICES
 - The request may be a plain part of someone's life: catching a flight, a run of errands, a favour for a friend, a round of golf or a sports outing, a day out, a family visit. Plan those as ordinary, human steps.
@@ -131,12 +131,12 @@ PLAN ANYTHING EVERYDAY, NOT JUST SERVICES
 Break the request into 2-8 child tasks. For each task decide:
 - title: short imperative outcome ("Deep clean the apartment", "Grocery pickup on the way").
 - channel, exactly one of:
-  * "gpb-pro" — a local service professional GPB can route to (cleaning, handyman, moving, auto, lawn, beauty-at-home, errands, etc.). Use a categorySlug/serviceSlug from the catalog below.
+  * "gpb-pro" — a local service professional GetPros can route to (cleaning, handyman, moving, auto, lawn, beauty-at-home, errands, etc.). Use a categorySlug/serviceSlug from the catalog below.
   * "food-partner" — prepared food / restaurant ordering (future partner integration).
   * "grocery-partner" — grocery pickup or delivery (future partner integration).
   * "ride-partner" — rides, airport transport, driving someone (future partner integration).
   * "user-action" — something only the customer can do (leave home, be at the gate, unlock the door).
-  * "not-supported" — GPB cannot coordinate it. Be honest rather than inventing capability.
+  * "not-supported" — GetPros cannot coordinate it. Be honest rather than inventing capability.
 - durationMinutes: realistic, including travel where the task involves moving.
 - parallel: true when it can run at the same time as the previous task, false when it must follow it.
 - dependsOn: ids of tasks that must finish first (use the ids you assign).
@@ -148,7 +148,7 @@ TIMING AND DATES
 - The END of an outing is NOT a deadline. Being somewhere by a stated time is a deadline; leaving a bar afterwards is not.
 - If a time would genuinely help ("tonight", "tomorrow night" with no hour), keep the plan flexible and put ONE short question in "clarifyTitle"-style wording via "notes" — e.g. "When would you like to go?" — instead of guessing an hour.
 - "tomorrow night" / "tonight" set the DATE, not a clock time: keep tomorrow's date in the customer's own timezone and still leave the deadline empty.
-- TRAVEL TIMES ARE ESTIMATES. GPB has no live routing data, so never present a travel or wait duration as exact — word it as an estimate in the task detail.
+- TRAVEL TIMES ARE ESTIMATES. GetPros has no live routing data, so never present a travel or wait duration as exact — word it as an estimate in the task detail.
 - Set "startClock" as 24h "HH:MM" for when the plan should begin.
 
 - DATES MATTER. You are given today's date. If the request names a future date or day ("September 13", "Saturday", "tomorrow"), set "startDate" and "deadlineDate" as "YYYY-MM-DD" for the day the work and the deadline actually fall on. NEVER schedule a future-dated plan as if it started at the current clock time today, and never mark a future deadline as already missed.
@@ -323,7 +323,7 @@ export function buildFallbackPlan(
     tasks.push({
       id: nextId("t"),
       title: fragment.length > 48 ? `${fragment.slice(0, 46)}…` : fragment,
-      detail: "GPB will confirm what this needs before anything is booked.",
+      detail: "GetPros will confirm what this needs before anything is booked.",
       channel: "user-action",
       startOffsetMinutes: 0,
       durationMinutes: 30,
@@ -336,7 +336,7 @@ export function buildFallbackPlan(
     tasks.push({
       id: nextId("t"),
       title: request.slice(0, 60) || "Your request",
-      detail: "Tell GPB a little more and we'll break this into steps.",
+      detail: "Tell GetPros a little more and we'll break this into steps.",
       channel: "user-action",
       startOffsetMinutes: 0,
       durationMinutes: 30,
@@ -348,7 +348,7 @@ export function buildFallbackPlan(
   return finalizePlan(
     {
       outcome: request.trim(),
-      summary: "GPB drafted this plan from your request. Adjust the order, timing or steps — nothing is booked.",
+      summary: "GetPros drafted this plan from your request. Adjust the order, timing or steps — nothing is booked.",
       location,
       startClock: nowClock,
       ...(nowDate ? { startDate: nowDate } : {}),
@@ -433,7 +433,7 @@ export function finalizePlan(plan: GpbPlan, nowClock: string, nowDate?: string):
   if (tasks.some((t) => !["gpb-pro", "user-action"].includes(t.channel))) {
     notes.add(
       plan.partnerDisclaimer?.trim() ||
-        "Food, grocery and ride steps sit in GPB's expanding orchestration network — those partner integrations are not live yet.",
+        "Food, grocery and ride steps sit in GetPros's expanding orchestration network — those partner integrations are not live yet.",
     );
   }
 
