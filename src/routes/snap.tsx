@@ -248,7 +248,7 @@ function SnapPage() {
     setTextOnly(true);
     // A confident text-only catalog hit is resolved entirely in the browser.
     // It never enters the image pipeline or waits on the AI gateway.
-    const deterministicHit = detectServiceIntentInText(typed);
+    const deterministicHit = detectServiceIntentInText(typed) ?? matchServiceIntent(typed);
     setFastPath(Boolean(deterministicHit));
     setFrames([]);
     setNote(described);
@@ -595,7 +595,7 @@ function ScanningOverlay({
   useEffect(() => {
     setSlow(false);
     // Only flag a genuine backend delay, never a staged animation.
-    const slowTimer = setTimeout(() => setSlow(true), 8000);
+    const slowTimer = setTimeout(() => setSlow(true), 4000);
     return () => clearTimeout(slowTimer);
   }, [phase]);
 

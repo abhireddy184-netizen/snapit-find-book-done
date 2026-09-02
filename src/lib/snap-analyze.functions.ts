@@ -55,7 +55,7 @@ export const analyzeSnap = createServerFn({ method: "POST" })
     for (const image of images) content.push({ type: "image", image });
 
     // Hard server-side budget so a slow upstream can never hang the UI.
-    const budgetMs = hasMedia ? 28_000 : 12_000;
+    const budgetMs = hasMedia ? 28_000 : 5_500;
     try {
       const { text } = await generateText({
         // Fast multimodal chat model: no reasoning round-trips, so simple
