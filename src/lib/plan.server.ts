@@ -331,6 +331,8 @@ export function buildFallbackPlan(
       summary: "GPB drafted this plan from your request. Adjust the order, timing or steps — nothing is booked.",
       location,
       startClock: nowClock,
+      ...(nowDate ? { startDate: nowDate } : {}),
+      ...(timeZone ? { timeZone } : {}),
       bufferMinutes: 20,
       tasks,
       notes: [],
@@ -339,7 +341,9 @@ export function buildFallbackPlan(
       ...(understanding ? { understanding } : {}),
     },
     nowClock,
+    nowDate,
   );
+
 }
 
 /* ---------------- shared finishing pass ---------------- */
