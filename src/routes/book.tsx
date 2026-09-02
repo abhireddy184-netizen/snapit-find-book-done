@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronLeft, ChevronRight, MapPin, Loader2, ShieldCheck, AlertTriangle } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { useAuth } from "@/lib/auth";
@@ -12,6 +12,7 @@ import type { WeeklyHours } from "@/lib/service-hours";
 import {
   addDaysIso,
   formatSlot,
+  LEAD_TIME_MINUTES,
   resolveServiceLocation,
   slotsForDate,
   todayInZone,
@@ -29,9 +30,6 @@ type BookingDraft = {
   categorySlug?: string;
   jobId?: string;
 };
-
-/** Customers can't book a pro for right now — give everyone lead time. */
-const LEAD_TIME_MINUTES = 120;
 
 function dayLabel(isoDate: string, today: string): string {
   if (isoDate === today) return "Today";
@@ -161,7 +159,9 @@ function BookPage() {
           replace: true,
         });
       }
-      setStep(steps.length - 1);
+      // Land on the schedule step when the draft carried a time, so any slot
+      // that expired while the customer signed in is visible, never silent.
+      setStep(draft.date ? 3 : steps.length - 1);
     } catch {
       /* ignore malformed draft */
     }
@@ -171,11 +171,14 @@ function BookPage() {
 
   // The service address decides the timezone — never the customer's device.
   // A pro in Frisco works 8–8 Central even if the phone is set to Tokyo.
+  // The previous location is dropped the moment the address is edited, so no
+  // schedule is ever shown for a place the customer has already changed.
   useEffect(() => {
     let cancelled = false;
     const value = address.trim();
     setLocationChecked(false);
-    if (!value) { setLocation(null); return; }
+    setLocation(null);
+    if (!value) return;
     void resolveServiceLocation(value).then((loc) => {
       if (!cancelled) { setLocation(loc); setLocationChecked(true); }
     });
@@ -203,24 +206,40 @@ function BookPage() {
   }, [timeZone, today, provider, hours, busy, durationMinutes, bufferMinutes, notBefore]);
 
   // Keep the selection valid, and tell the customer when their saved slot went
-  // away instead of silently moving them to another day.
+  // away instead of silently moving them to another day. An empty calendar —
+  // a closed week, a new address, a pro who just paused — clears it too.
   useEffect(() => {
-    if (days.length === 0) return;
+    if (scheduleLoading || !timeZone) return;
     const current = days.find((d) => d.iso === dateIso);
     if (!current) {
       if (dateIso || slotMinute != null) setSlotWasReset(true);
-      setDateIso(null);
-      setSlotMinute(null);
+      if (dateIso) setDateIso(null);
+      if (slotMinute != null) setSlotMinute(null);
       return;
     }
     if (slotMinute != null && !current.slots.includes(slotMinute)) {
       setSlotWasReset(true);
       setSlotMinute(null);
     }
-  }, [days, dateIso, slotMinute]);
+  }, [days, dateIso, slotMinute, scheduleLoading, timeZone]);
 
   const activeDay = days.find((d) => d.iso === dateIso) ?? null;
   const scheduleReady = Boolean(timeZone && dateIso && slotMinute != null);
+
+  // One stable key per distinct request. Retrying the same confirmation reuses
+  // it (so the database rejects the duplicate); changing the pro, the slot or
+  // the address makes it a genuinely different request.
+  const keySeed = `${provider?.user_id ?? ""}|${jobId ?? ""}|${dateIso ?? ""}|${slotMinute ?? ""}|${address.trim()}`;
+  const keyRef = useRef<{ seed: string; key: string } | null>(null);
+  if (keyRef.current?.seed !== keySeed) {
+    keyRef.current = {
+      seed: keySeed,
+      key: typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    };
+  }
+  const requestKey = keyRef.current.key;
 
   const next = () => setStep((s) => Math.min(s + 1, steps.length - 1));
   const back = () => setStep((s) => Math.max(s - 1, 0));
@@ -278,12 +297,21 @@ function BookPage() {
       buffer_minutes: bufferMinutes,
       service_timezone: location.timeZone,
       status: "pending",
+      // A retry of the same request can never become a second booking.
+      idempotency_key: requestKey,
     });
 
-    if (insertError) {
+    // 23505 on the idempotency index means this exact request already landed —
+    // a double tap or a retried network call, not a new booking.
+    const alreadySent =
+      insertError != null &&
+      ((insertError as { code?: string }).code === "23505" ||
+        /idempotency/i.test(insertError.message));
+
+    if (insertError && !alreadySent) {
       setSubmitting(false);
       // Someone else may have taken the slot while this form was open.
-      const taken = /overlap|exclusion|conflict/i.test(insertError.message);
+      const taken = /overlap|exclusion|conflict|just taken/i.test(insertError.message);
       setError(
         taken
           ? "That time was just taken. Pick another slot and we'll try again."
@@ -298,15 +326,23 @@ function BookPage() {
     }
 
     if (jobId) {
-      await supabase
+      // The booking is only PENDING until the pro accepts, so the job stays in
+      // "quotes requested" — it flips to booked from the pro's acceptance, not
+      // from sending the request. A failure here is surfaced, never swallowed.
+      const { error: jobError } = await supabase
         .from("service_requests")
         .update({
-          status: "booked",
           service_address: address.trim(),
           preferred_date: dateIso,
           preferred_time: timeLabel,
         })
         .eq("id", jobId);
+      if (jobError) {
+        setSubmitting(false);
+        setError(
+          "Your request was sent, but we couldn't update the job record. Open the job to check its details.",
+        );
+      }
     }
 
     setSubmitting(false);
@@ -466,7 +502,8 @@ function BookPage() {
                 </p>
               )}
               <div className="mt-3 rounded-xl bg-muted/50 p-3 text-xs text-muted-foreground">
-                Your exact address is only shared with the pro after they confirm.
+                The professional you send this to sees your full service address with the request, so they can judge
+                travel before accepting. Nobody else on GPB can see it.
               </div>
             </StepWrap>
           )}
@@ -573,7 +610,13 @@ function BookPage() {
             {step < steps.length - 1 ? (
               <GradientButton
                 onClick={next}
-                disabled={(step === 0 && !service.trim()) || (step === 3 && !scheduleReady)}
+                disabled={
+                  (step === 0 && !service.trim()) ||
+                  // Never move on with a half-resolved address: the timezone
+                  // decides every slot shown on the next step.
+                  (step === 2 && (!address.trim() || !location)) ||
+                  (step === 3 && !scheduleReady)
+                }
               >
                 Continue <ChevronRight className="h-4 w-4" />
               </GradientButton>

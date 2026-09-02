@@ -17,6 +17,11 @@ export const SERVICE_WINDOW_START_MINUTE = 8 * 60; // 08:00 local
 export const SERVICE_WINDOW_END_MINUTE = 20 * 60; // 20:00 local
 export const DEFAULT_DURATION_MINUTES = 60;
 export const DEFAULT_TRAVEL_BUFFER_MINUTES = 15;
+/**
+ * Customers can't book a pro for right now. This mirrors the database rule
+ * exactly — the trigger rejects anything closer, so the UI must not offer it.
+ */
+export const LEAD_TIME_MINUTES = 120;
 
 /* --------------------------------------------------------------- timezones */
 
@@ -233,23 +238,24 @@ export function slotsForDate(isoDate: string, opts: SlotOptions): number[] {
     : hours.filter((h) => h.weekday === weekday);
 
   // Provider hours may narrow the platform window, never extend it.
+  // The occupied block — job PLUS travel/setup buffer — has to fit; a pro is
+  // never held past 8:00 PM local or past the end of their own working day.
+  const occupiedMinutes = durationMinutes + bufferMinutes;
   const ranges = source
     .map((h) => ({
       start: Math.max(h.startMinute, SERVICE_WINDOW_START_MINUTE),
       end: Math.min(h.endMinute, SERVICE_WINDOW_END_MINUTE),
     }))
-    .filter((r) => r.end - r.start >= durationMinutes);
+    .filter((r) => r.end - r.start >= occupiedMinutes);
 
   const offRanges = timeOff.map((t) => [Date.parse(t.startsAt), Date.parse(t.endsAt)] as const);
   const busyRanges = busy.map((b) => [Date.parse(b.startAt), Date.parse(b.endAt)] as const);
   const out: number[] = [];
 
   for (const range of ranges) {
-    for (let m = range.start; m + durationMinutes <= range.end; m += stepMinutes) {
+    for (let m = range.start; m + occupiedMinutes <= range.end; m += stepMinutes) {
       const startUtc = zonedTimeToUtc(isoDate, m, timeZone).getTime();
-      // The job itself must fit the window; the travel buffer only holds the pro.
-      const endUtc = startUtc + durationMinutes * 60_000;
-      const occupiedEndUtc = endUtc + bufferMinutes * 60_000;
+      const occupiedEndUtc = startUtc + occupiedMinutes * 60_000;
       if (startUtc < notBefore.getTime()) continue;
       if (offRanges.some(([s, e]) => startUtc < e && occupiedEndUtc > s)) continue;
       if (busyRanges.some(([s, e]) => startUtc < e && occupiedEndUtc > s)) continue;
