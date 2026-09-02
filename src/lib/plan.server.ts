@@ -362,20 +362,36 @@ function withReplan(plan: GpbPlan): GpbPlan {
   };
 }
 
-/** Order, time and caveat a plan so the UI always gets a coherent object. */
-export function finalizePlan(plan: GpbPlan, nowClock: string): GpbPlan {
+/**
+ * Order, time and caveat a plan so the UI always gets a coherent object.
+ *
+ * Date-aware: a deadline on a later calendar day is measured from the plan's own
+ * start day, so a 8:00 PM target next week is never treated as "already past"
+ * tonight, and the plan is only pinned to the current clock when it starts today.
+ */
+export function finalizePlan(plan: GpbPlan, nowClock: string, nowDate?: string): GpbPlan {
   const tasks = resequence(plan.tasks);
   const total = tasks.reduce(
     (max, t) => Math.max(max, t.startOffsetMinutes + t.durationMinutes),
     0,
   );
 
+  const startDate = isIsoDate(plan.startDate) ? plan.startDate : isIsoDate(nowDate) ? nowDate : undefined;
+  const deadlineDate = isIsoDate(plan.deadlineDate) ? plan.deadlineDate : startDate;
+  const startsToday = !startDate || !isIsoDate(nowDate) || startDate === nowDate;
+
   let startClock = plan.startClock || nowClock;
   if (plan.deadline) {
-    const latestStart = parseClock(plan.deadline) - plan.bufferMinutes - total;
-    const earliest = parseClock(nowClock);
-    startClock = toClockString(Math.max(earliest, Math.min(parseClock(startClock), latestStart)));
+    // Deadline relative to the plan's start day; a later date adds whole days.
+    const deadlineAbs = parseClock(plan.deadline) + dayGap(startDate, deadlineDate) * 1440;
+    const latestStart = deadlineAbs - plan.bufferMinutes - total;
+    // Only "no earlier than now" when the plan actually runs today.
+    const earliest = startsToday ? parseClock(nowClock) : 0;
+    startClock = toClockString(
+      Math.max(0, Math.max(earliest, Math.min(parseClock(startClock), latestStart))),
+    );
   }
+
 
   // Disclaimers come from the planner in the customer's own language; the
   // English strings are a fallback only.
