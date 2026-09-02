@@ -149,15 +149,33 @@ function BookPage() {
       setStep(3);
       return;
     }
+    if (!location) {
+      setError("Add a US ZIP code to your address so we can schedule in your local time.");
+      setStep(3);
+      return;
+    }
+    if (!dateIso || slotMinute == null) {
+      setError("Pick a date and start time for your job.");
+      setStep(4);
+      return;
+    }
 
     if (!user) {
       if (typeof window !== "undefined") {
-        const draft: BookingDraft = { service, details, address, date, time, providerId: pro.id };
+        const draft: BookingDraft = {
+          service, details, address, date: dateIso, time: String(slotMinute), providerId: pro.id,
+        };
         window.localStorage.setItem(BOOKING_DRAFT_KEY, JSON.stringify(draft));
       }
       await navigate({ to: "/login", search: { redirect: "/book" } });
       return;
     }
+
+    // Store the exact instant alongside the local wall time, so the job means
+    // the same moment to the customer and the pro wherever each of them is.
+    const startAt = zonedTimeToUtc(dateIso, slotMinute, location.timeZone);
+    const endAt = new Date(startAt.getTime() + DEFAULT_DURATION_MINUTES * 60_000);
+    const timeLabel = formatSlot(slotMinute);
 
     setSubmitting(true);
     const { error: insertError } = await supabase.from("bookings").insert({
@@ -168,8 +186,11 @@ function BookPage() {
       service,
       details: details || null,
       service_address: address.trim(),
-      scheduled_date: resolveDate(date),
-      scheduled_time: time,
+      scheduled_date: dateIso,
+      scheduled_time: timeLabel,
+      start_at: startAt.toISOString(),
+      end_at: endAt.toISOString(),
+      service_timezone: location.timeZone,
       status: "pending",
     });
     setSubmitting(false);
@@ -185,11 +206,12 @@ function BookPage() {
         .update({
           status: "booked",
           service_address: address.trim(),
-          preferred_date: resolveDate(date),
-          preferred_time: time,
+          preferred_date: dateIso,
+          preferred_time: timeLabel,
         })
         .eq("id", jobId);
     }
+
 
     setConfirmed(true);
     setTimeout(() => {
@@ -295,23 +317,58 @@ function BookPage() {
           )}
 
           {step === 4 && (
-            <StepWrap title="Pick date & time" subtitle="Choose what works best for you.">
-              <div className="mb-4 flex flex-wrap gap-2">
-                {dayOptions.map((d) => (
-                  <button key={d} onClick={() => setDate(d)} className={`rounded-xl border px-4 py-2 text-sm font-semibold ${date === d ? "border-primary bg-primary text-white" : "border-border bg-background"}`}>
-                    {d}
+            <StepWrap
+              title="Pick date & time"
+              subtitle={
+                location
+                  ? `Times shown in ${location.city}, ${location.state} local time. GPB jobs run 8:00 AM–8:00 PM.`
+                  : "Add a US ZIP code to your address and we'll show real local availability."
+              }
+            >
+              {!location ? (
+                <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                  We schedule in the service address's own timezone, so we need a US ZIP code first.
+                  <button onClick={() => setStep(3)} className="ml-1 font-bold text-primary underline">
+                    Add your address
                   </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
-                {["9:00 AM", "11:00 AM", "1:00 PM", "3:30 PM", "5:00 PM", "7:00 PM"].map((t) => (
-                  <button key={t} onClick={() => setTime(t)} className={`rounded-full border px-3 py-2 text-xs font-semibold ${time === t ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
-                    {t}
-                  </button>
-                ))}
-              </div>
+                </div>
+              ) : days.length === 0 ? (
+                <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                  No openings in the next 7 days for a job this length. Try a different address or contact support.
+                </div>
+              ) : (
+                <>
+                  <div className="-mx-1 mb-4 flex snap-x gap-2 overflow-x-auto px-1 pb-1">
+                    {days.map((d) => (
+                      <button
+                        key={d.iso}
+                        onClick={() => { setDateIso(d.iso); setSlotMinute(d.slots[0]!); }}
+                        className={`shrink-0 snap-start rounded-xl border px-4 py-2 text-sm font-semibold ${dateIso === d.iso ? "border-primary bg-primary text-white" : "border-border bg-background"}`}
+                      >
+                        {d.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+                    {(activeDay?.slots ?? []).map((m) => (
+                      <button
+                        key={m}
+                        onClick={() => setSlotMinute(m)}
+                        className={`rounded-full border px-3 py-2 text-xs font-semibold ${slotMinute === m ? "border-primary bg-primary/10 text-primary" : "border-border"}`}
+                      >
+                        {formatSlot(m)}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    We hold about {DEFAULT_DURATION_MINUTES} minutes for the job plus {DEFAULT_TRAVEL_BUFFER_MINUTES} minutes
+                    of travel, and the earliest slot is {LEAD_TIME_MINUTES / 60} hours from now.
+                  </p>
+                </>
+              )}
             </StepWrap>
           )}
+
 
           {step === 5 && (
             <StepWrap title="Review your request" subtitle="Confirm the details below to send it to your pro.">
@@ -327,7 +384,15 @@ function BookPage() {
                 <Row label="Details" value={details || "—"} />
                 <Row label="Photos" value={`${photos.length} attached`} />
                 <Row label="Address" value={address || "—"} />
-                <Row label="Date & time" value={`${date} · ${time}`} />
+                <Row
+                  label="Date & time"
+                  value={
+                    dateIso && slotMinute != null && location
+                      ? `${dayLabel(dateIso, todayInZone(location.timeZone, notBefore))} · ${formatSlot(slotMinute)} (${location.city}, ${location.state})`
+                      : "Not set"
+                  }
+                />
+
                 <Row label="Estimated start" value={`$${pro.startingPrice}`} />
               </dl>
             </StepWrap>
@@ -342,7 +407,10 @@ function BookPage() {
               <ChevronLeft className="h-4 w-4" /> Back
             </button>
             {step < steps.length - 1 ? (
-              <GradientButton onClick={next}>Continue <ChevronRight className="h-4 w-4" /></GradientButton>
+              <GradientButton onClick={next} disabled={step === 4 && !scheduleReady}>
+                Continue <ChevronRight className="h-4 w-4" />
+              </GradientButton>
+
             ) : (
               <GradientButton onClick={() => void submit()} disabled={submitting || authLoading}>
                 {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</> : <>Confirm request <Check className="h-4 w-4" /></>}
