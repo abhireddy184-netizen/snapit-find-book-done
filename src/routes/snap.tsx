@@ -101,6 +101,10 @@ function SnapPage() {
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<"idle" | "preparing" | "analyzing">("idle");
   const [pendingPreview, setPendingPreview] = useState<string | null>(null);
+  // True while a typed request that already maps to a catalogue service is
+  // resolving: it never touches the visual pipeline, so we show a short
+  // transition instead of the full scanning sequence.
+  const [fastPath, setFastPath] = useState(false);
   const analyze = useServerFn(analyzeSnap);
   const cameraRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
