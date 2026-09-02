@@ -266,6 +266,8 @@ export function OutcomeComposer() {
 
     // Accumulated final segments for this session; interim shows live.
     let finals = "";
+    // Latest text this session produced — used to arm the silent countdown.
+    let lastText = "";
 
     rec.onresult = (e) => {
       let interim = "";
@@ -278,6 +280,7 @@ export function OutcomeComposer() {
       const spoken = (finals + interim).trim();
       const base = baseTextRef.current;
       const next = base ? (spoken ? `${base} ${spoken}` : base) : spoken;
+      lastText = next;
       setRequest(next);
     };
 
@@ -293,7 +296,10 @@ export function OutcomeComposer() {
     rec.onend = () => {
       recRef.current = null;
       setVoiceStatus((s) => (s === "listening" ? "idle" : s));
+      // Only when this session actually recognised speech.
+      if (finals.trim()) armAutoSubmit(lastText);
     };
+
 
     try {
       rec.start();
