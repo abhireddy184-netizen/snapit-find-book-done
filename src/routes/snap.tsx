@@ -954,15 +954,10 @@ function AnalysisView({
         </div>
         <p className="mt-1 text-sm text-muted-foreground">{analysis.problem}</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          <button
-            onClick={() => onAnswer?.("")}
-            className="hidden"
-            aria-hidden
-          />
           {category && (
             <Link
-              to="/category/$slug"
-              params={{ slug: category.slug }}
+              to="/services/$category"
+              params={{ category: category.slug }}
               className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-2 text-xs font-semibold hover:bg-muted"
             >
               Change service
