@@ -69,7 +69,18 @@ export type PlanUnderstanding = {
   criticalAmbiguity?: string;
   /** One concise question, in the user's language, when confirmation is required. */
   clarificationQuestion?: string;
+  /**
+   * Whether there is a real task to plan. "conversational" covers greetings,
+   * jokes, tests and general questions — GPB answers briefly instead of
+   * fabricating a plan. Language-agnostic: decided by meaning, not keywords.
+   */
+  actionability?: "actionable" | "conversational";
+  /** Short, friendly reply in the user's own language/script when conversational. */
+  conversationalReply?: string;
+  /** Gentle one-line invitation to state a task, in the user's own language. */
+  invitation?: string;
 };
+
 
 /**
  * Language-aware UI copy returned by the planner so the plan page can speak the
