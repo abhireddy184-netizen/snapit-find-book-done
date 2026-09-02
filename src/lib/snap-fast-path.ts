@@ -1,5 +1,5 @@
 import type { ServiceHit } from "@/lib/catalog";
-import type { SnapAnalysis } from "@/lib/snap-analyze.server";
+import type { SnapAnalysis } from "@/lib/snap-analyze.functions";
 
 /** Build a complete diagnosis without an AI/network round trip for a clear catalog match. */
 export function createFastPathAnalysis(request: string, hit: ServiceHit): SnapAnalysis {

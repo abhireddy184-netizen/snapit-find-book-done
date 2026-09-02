@@ -427,7 +427,7 @@ function SnapPage() {
         )}
 
         {!image && !analysis && describeMode && (
-          <div className="mt-4 rounded-3xl border border-secondary/30 bg-card p-5 shadow-sm animate-fade-in">
+          <div className="mb-24 mt-4 rounded-3xl border border-secondary/30 bg-card p-5 shadow-sm animate-fade-in md:mb-0">
             <label className="block text-sm font-bold">Tell us what you need</label>
             <p className="mt-1 text-xs text-muted-foreground">
               Plain language is perfect — e.g. “the seat on my sofa has sunk down and feels soft underneath”.
