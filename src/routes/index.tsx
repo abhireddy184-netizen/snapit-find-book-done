@@ -102,12 +102,12 @@ function Landing() {
         </div>
       </section>
 
+      <ShowGpbBand />
       <SimpleFlow />
-      <ExamplePlanPreview />
       <DailyLifeModules />
       <BrowseFallback />
-      <ShowGpbBand />
       <HowGpbWorksDetails />
+
 
 
       <EmergencyStrip />
