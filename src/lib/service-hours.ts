@@ -63,10 +63,14 @@ const ZIP3_ZONE: Record<string, string> = {
   "979": MOUNTAIN, "838": PACIFIC,
 };
 
-/** IANA timezone for a validated US ZIP place. */
-export function zoneForPlace(place: Pick<ZipPlace, "zip" | "state">): string {
+/**
+ * IANA timezone for a validated US ZIP place, or null when we cannot map the
+ * place to a zone we trust. We never guess: an unknown territory is reported
+ * as unsupported rather than silently scheduled in Central time.
+ */
+export function zoneForPlace(place: Pick<ZipPlace, "zip" | "state">): string | null {
   const zip3 = place.zip.slice(0, 3);
-  return ZIP3_ZONE[zip3] ?? STATE_ZONE[place.state.toUpperCase()] ?? CENTRAL;
+  return ZIP3_ZONE[zip3] ?? STATE_ZONE[place.state.toUpperCase()] ?? null;
 }
 
 export type ServiceLocation = {
@@ -78,12 +82,14 @@ export type ServiceLocation = {
   label: string;
 };
 
-function toServiceLocation(place: ZipPlace): ServiceLocation {
+function toServiceLocation(place: ZipPlace): ServiceLocation | null {
+  const timeZone = zoneForPlace(place);
+  if (!timeZone) return null;
   return {
     zip: place.zip,
     city: place.city,
     state: place.state,
-    timeZone: zoneForPlace(place),
+    timeZone,
     label: `${place.city}, ${place.state} ${place.zip}`,
   };
 }
