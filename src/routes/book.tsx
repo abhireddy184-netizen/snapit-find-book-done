@@ -407,7 +407,10 @@ function BookPage() {
               <ChevronLeft className="h-4 w-4" /> Back
             </button>
             {step < steps.length - 1 ? (
-              <GradientButton onClick={next}>Continue <ChevronRight className="h-4 w-4" /></GradientButton>
+              <GradientButton onClick={next} disabled={step === 4 && !scheduleReady}>
+                Continue <ChevronRight className="h-4 w-4" />
+              </GradientButton>
+
             ) : (
               <GradientButton onClick={() => void submit()} disabled={submitting || authLoading}>
                 {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</> : <>Confirm request <Check className="h-4 w-4" /></>}
