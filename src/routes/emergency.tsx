@@ -7,9 +7,9 @@ export const Route = createFileRoute("/emergency")({
   head: () => ({
     meta: [
       { title: "24/7 Emergency Services — GetPros" },
-      { name: "description", content: "Burst pipe, no power, no heat or lockout? GetPros dispatches vetted emergency pros to your door in minutes." },
+      { name: "description", content: "Burst pipe, no power, no heat or lockout? Tell GetPros what happened and we will route your urgent request to emergency pros." },
       { property: "og:title", content: "24/7 Emergency Services — GetPros" },
-      { property: "og:description", content: "Fast, verified emergency pros dispatched in minutes." },
+      { property: "og:description", content: "Send an urgent service request to GetPros emergency pros." },
     ],
   }),
   component: EmergencyPage,
@@ -25,7 +25,7 @@ const emergencyTypes = [
 ];
 
 function EmergencyPage() {
-  const emergencyPros = providers.slice(0, 3).map((p, i) => ({ ...p, eta: [8, 12, 17][i] }));
+  const emergencyPros = providers.slice(0, 3);
   return (
     <AppShell>
       <section className="relative overflow-hidden rounded-3xl border border-red-200 bg-gradient-to-br from-red-50 via-white to-orange-50 p-6 md:p-10">
@@ -40,7 +40,7 @@ function EmergencyPage() {
               <span className="text-red-600">We're on it.</span>
             </h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground md:text-base">
-              Vetted on-call pros dispatched in minutes for the most common home emergencies. Average arrival under 20 minutes.
+              Tell us what happened and we will route your urgent request to on-call pros for the most common home emergencies. Response times depend on pro availability in your area.
             </p>
           </div>
           <a
@@ -67,17 +67,18 @@ function EmergencyPage() {
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-bold">{t.label}</div>
                 <div className="mt-0.5 inline-flex items-center gap-1 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" /> ~{t.eta} min avg arrival
+                  <Clock className="h-3 w-3" /> Urgent request
                 </div>
               </div>
-              <span className="text-xs font-semibold text-red-600 opacity-0 transition-opacity group-hover:opacity-100">Dispatch →</span>
+              <span className="text-xs font-semibold text-red-600 opacity-0 transition-opacity group-hover:opacity-100">Start →</span>
             </Link>
           ))}
         </div>
       </section>
 
       <section className="mt-10">
-        <h2 className="text-lg font-black">On-call now near you</h2>
+        <h2 className="text-lg font-black">Example emergency pro profiles</h2>
+        <p className="mt-1 text-xs text-muted-foreground">Example profiles shown for illustration — not live availability.</p>
         <div className="mt-4 space-y-3">
           {emergencyPros.map((p) => (
             <div key={p.id} className="flex flex-col gap-3 surface-card p-4 sm:flex-row sm:items-center">
@@ -95,15 +96,12 @@ function EmergencyPage() {
                 <span className="inline-flex items-center gap-1 font-semibold">
                   <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating}
                 </span>
-                <span className="inline-flex items-center gap-1 rounded-full bg-mint/25 px-2 py-0.5 font-bold text-mint-ink">
-                  <span className="h-1.5 w-1.5 rounded-full bg-mint" /> Available now
-                </span>
-                <span className="inline-flex items-center gap-1 text-muted-foreground">
-                  <Clock className="h-3 w-3" /> {p.eta} min
+                <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 font-bold uppercase tracking-wide text-muted-foreground">
+                  Example profile
                 </span>
               </div>
-              <Link to="/tracking/$id" params={{ id: p.id }}>
-                <GradientButton>Dispatch now</GradientButton>
+              <Link to="/provider/$id" params={{ id: p.id }}>
+                <GradientButton>View profile</GradientButton>
               </Link>
             </div>
           ))}
@@ -111,7 +109,7 @@ function EmergencyPage() {
       </section>
 
       <div className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-800">
-        <strong>Life-threatening emergency?</strong> Call 911 immediately. GetPros dispatches trade professionals, not first responders.
+        <strong>Life-threatening emergency?</strong> Call 911 immediately. GetPros routes requests to trade professionals, not first responders.
       </div>
     </AppShell>
   );
