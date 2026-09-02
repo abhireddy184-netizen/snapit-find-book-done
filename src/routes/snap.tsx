@@ -991,7 +991,7 @@ function AnalysisView({
         </div>
       )}
 
-
+      {matched.length > 0 && (
       <div id="pros-list" className="scroll-mt-20">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
