@@ -716,11 +716,13 @@ function AnalysisView({
   image,
   onReset,
   onAnswer,
+  onResolve,
 }: {
   analysis: SnapAnalysis;
   image: string | null;
   onReset: () => void;
   onAnswer?: (text: string) => void;
+  onResolve?: () => void;
 }) {
   const navigate = useNavigate();
   const u = urgencyStyles[analysis.urgency] ?? urgencyStyles.medium;
@@ -728,9 +730,9 @@ function AnalysisView({
   const category = getCategoryBySlug(analysis.categorySlug);
   const pool = providerPoolFor(analysis.categorySlug);
   const showPricing = analysis.hasPriceEstimate;
-  // Discovery states (options / needs-info / no-issue / safety-redirect) must be
-  // narrowed by the customer before we show pricing, ETAs or professionals.
-  const showPros = analysis.responseKind === "diagnosis" && analysis.hasPriceEstimate;
+  // Once the service is known we always progress to professionals — a missing
+  // price estimate must never block the customer from reaching someone.
+  const showPros = analysis.responseKind === "diagnosis" && Boolean(analysis.categorySlug);
   const sourceLabel: Record<string, string> = {
     detected: "Detected issue",
     possible: "Possible issue",
