@@ -285,6 +285,50 @@ export function toClockString(minutes: number): string {
   return `${String(Math.floor(total / 60)).padStart(2, "0")}:${String(total % 60).padStart(2, "0")}`;
 }
 
+/* ---------------- date helpers ---------------- */
+
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+export function isIsoDate(value: string | undefined): value is string {
+  return typeof value === "string" && ISO_DATE.test(value);
+}
+
+/** Whole calendar days from `from` to `to` (both "YYYY-MM-DD"); 0 when unknown. */
+export function dayGap(from: string | undefined, to: string | undefined): number {
+  if (!isIsoDate(from) || !isIsoDate(to)) return 0;
+  const a = Date.parse(`${from}T00:00:00Z`);
+  const b = Date.parse(`${to}T00:00:00Z`);
+  if (Number.isNaN(a) || Number.isNaN(b)) return 0;
+  return Math.round((b - a) / 86_400_000);
+}
+
+/**
+ * Deadline expressed in minutes from the plan's own start day, so a target on a
+ * later date is never treated as "already in the past" earlier today.
+ */
+export function planDeadlineMinutes(plan: GpbPlan): number | null {
+  if (!plan.deadline) return null;
+  return parseClock(plan.deadline) + dayGap(plan.startDate, plan.deadlineDate) * 1440;
+}
+
+/** Long, localized date label ("Saturday, 13 September") for a plan date. */
+export function formatPlanDate(date: string | undefined, locale?: string): string | null {
+  if (!isIsoDate(date)) return null;
+  const ms = Date.parse(`${date}T12:00:00Z`);
+  if (Number.isNaN(ms)) return null;
+  try {
+    return new Intl.DateTimeFormat(locale || "en", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    }).format(new Date(ms));
+  } catch {
+    return date;
+  }
+}
+
+
 /** Recompute offsets from ordering + parallel flags, skipping skipped tasks. */
 export function resequence(tasks: PlanTask[]): PlanTask[] {
   let cursor = 0;
