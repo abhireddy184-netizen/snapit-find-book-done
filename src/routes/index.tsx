@@ -12,8 +12,9 @@ import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
 import { OutcomeComposer } from "@/components/snapit/OutcomeComposer";
 import {
   DailyLifeModules, ShowGpbBand, BrowseFallback,
-  SimpleFlow, ExamplePlanPreview, HowGpbWorksDetails,
+  SimpleFlow, HowGpbWorksDetails,
 } from "@/components/snapit/V2Sections";
+
 
 
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
