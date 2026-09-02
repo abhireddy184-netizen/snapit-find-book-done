@@ -26,6 +26,7 @@ export function AppShell({ children, hideBottomNav = false }: { children: ReactN
 
 function TopBar() {
   const [scrolled, setScrolled] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -54,7 +55,7 @@ function TopBar() {
             onClick={(e) => {
               // Already on Show GP with a photo/result open: reset in place
               // and reopen the camera instead of a no-op same-route navigation.
-              if (useRouterState.getState().location.pathname === "/snap") {
+              if (pathname === "/snap") {
                 e.preventDefault();
                 window.dispatchEvent(new Event("getpros:recapture"));
               }
