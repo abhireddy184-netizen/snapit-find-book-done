@@ -134,10 +134,10 @@
   --gradient-accent: linear-gradient(135deg, oklch(0.72 0.16 32), oklch(0.615 0.225 352));
   --gradient-hero: linear-gradient(135deg, oklch(0.30 0.10 300) 0%, oklch(0.60 0.235 348) 48%, oklch(0.545 0.215 268) 100%);
   --gradient-plum: linear-gradient(150deg, oklch(0.22 0.062 298) 0%, oklch(0.30 0.105 310) 52%, oklch(0.38 0.145 292) 100%);
-  --gradient-soft: linear-gradient(180deg, oklch(0.994 0.006 85), oklch(0.958 0.020 300));
-  --gradient-mesh: radial-gradient(at 16% 0%, oklch(0.615 0.225 352 / 0.16) 0px, transparent 54%), radial-gradient(at 86% 6%, oklch(0.545 0.215 268 / 0.18) 0px, transparent 50%), radial-gradient(at 48% 100%, oklch(0.30 0.10 300 / 0.12) 0px, transparent 55%);
-  --shadow-card: 0 1px 2px oklch(0.238 0.058 296 / 0.05), 0 8px 24px -12px oklch(0.238 0.058 296 / 0.16);
-  --shadow-elevated: 0 4px 12px -4px oklch(0.238 0.058 296 / 0.12), 0 24px 48px -20px oklch(0.238 0.058 296 / 0.22);
+  --gradient-soft: linear-gradient(180deg, oklch(1 0 0), oklch(0.951 0.012 330));
+  --gradient-mesh: radial-gradient(at 16% 0%, oklch(0.615 0.225 352 / 0.14) 0px, transparent 54%), radial-gradient(at 86% 6%, oklch(0.545 0.215 268 / 0.16) 0px, transparent 50%), radial-gradient(at 48% 100%, oklch(0.761 0.038 330 / 0.22) 0px, transparent 55%);
+  --shadow-card: 0 1px 2px oklch(0.262 0.030 300 / 0.05), 0 8px 24px -12px oklch(0.262 0.030 300 / 0.14);
+  --shadow-elevated: 0 4px 12px -4px oklch(0.262 0.030 300 / 0.10), 0 24px 48px -20px oklch(0.262 0.030 300 / 0.20);
   --shadow-elegant: 0 20px 50px -20px oklch(0.545 0.215 268 / 0.35);
   --shadow-glow: 0 0 0 1px oklch(1 0 0 / 0.7) inset, 0 20px 60px -20px oklch(0.615 0.225 352 / 0.40);
   --chart-1: oklch(0.605 0.225 352);
