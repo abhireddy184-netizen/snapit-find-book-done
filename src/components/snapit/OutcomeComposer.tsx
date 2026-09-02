@@ -517,17 +517,23 @@ export function OutcomeComposer() {
           id="gpb-outcome"
           dir="auto"
           value={request}
-          onChange={(e) => setRequest(e.target.value)}
+          onChange={(e) => {
+            setRequest(e.target.value);
+            if (emptyError) setEmptyError(false);
+          }}
           onFocus={() => (paused.current = true)}
           onBlur={() => (paused.current = false)}
           rows={3}
+          aria-invalid={emptyError}
+          aria-describedby={emptyError ? "gpb-outcome-error" : undefined}
           /* While the mic is active the rotating examples stop competing with
              what the person is actually saying. */
           placeholder={voiceActive ? "" : EXAMPLES[i]}
-          className={`min-h-[112px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3.5 pe-[3.75rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:pe-16 ${
-            voiceActive ? "bg-primary/5 ring-2 ring-primary/60" : ""
+          className={`min-h-[96px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3 pe-[3.5rem] text-[15px] leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:py-3.5 sm:pe-16 ${
+            voiceActive ? "bg-primary/5 ring-2 ring-primary/60" : emptyError ? "ring-2 ring-destructive/70" : ""
           }`}
         />
+
         {voiceActive && !request && (
           <span
             aria-hidden
