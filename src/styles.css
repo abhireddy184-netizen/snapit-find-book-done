@@ -260,6 +260,13 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
+  /* GetPros.ai wordmark: geometric rounded sans, brand-only. */
+  .brand-font {
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system,
+      "Segoe UI", Roboto, sans-serif;
+    font-feature-settings: "ss01" on;
+  }
+
   img, video, canvas, svg {
     max-width: 100%;
   }

@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "GetPros.ai — Show it. Tell us. Get it fixed." },
-      { name: "description", content: "Show a photo, a video or just describe it. GetPros’s AI works out what you actually need, turns it into one clear job, and connects you with verified local professionals across home, beauty and personal care." },
+      { name: "description", content: "Show a photo, a video or just describe it. GetPros.ai works out what you actually need, turns it into one clear job, and connects you with verified local professionals across home, beauty and personal care." },
       { name: "keywords", content: "AI local services, AI home services, plumber near me, electrician near me, handyman, HVAC, cleaning services, lawn care, appliance repair, beauty services, home maintenance, AI marketplace, on-demand services, GetPros" },
       { name: "author", content: "GetPros" },
       { property: "og:site_name", content: "GetPros.ai" },
@@ -88,8 +88,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { property: "og:title", content: "GetPros.ai — Show it. Tell us. Get it fixed." },
       { name: "twitter:title", content: "GetPros.ai — Show it. Tell us. Get it fixed." },
-      { property: "og:description", content: "Show a photo, a video or just describe it. GetPros’s AI works out what you actually need, turns it into one clear job, and connects you with verified local professionals across home, beauty and personal care." },
-      { name: "twitter:description", content: "Show a photo, a video or just describe it. GetPros’s AI works out what you actually need, turns it into one clear job, and connects you with verified local professionals across home, beauty and personal care." },
+      { property: "og:description", content: "Show a photo, a video or just describe it. GetPros.ai works out what you actually need, turns it into one clear job, and connects you with verified local professionals across home, beauty and personal care." },
+      { name: "twitter:description", content: "Show a photo, a video or just describe it. GetPros.ai works out what you actually need, turns it into one clear job, and connects you with verified local professionals across home, beauty and personal care." },
     ],
     links: [
       {
@@ -100,7 +100,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Noto+Sans+Telugu:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Tamil:wght@400;500;700&family=Noto+Sans+Arabic:wght@400;500;700&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Noto+Sans+Telugu:wght@400;500;700&family=Noto+Sans+Devanagari:wght@400;500;700&family=Noto+Sans+Tamil:wght@400;500;700&family=Noto+Sans+Arabic:wght@400;500;700&display=swap",
       },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
