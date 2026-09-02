@@ -4,9 +4,13 @@ import { haversineMiles, loadZipIndex, type ZipPlace } from "@/lib/us-zip";
 
 export type ProviderRow = Database["public"]["Tables"]["provider_profiles"]["Row"];
 
-/** Public-safe columns only — provider_profiles is readable by anon. */
+/**
+ * Public-safe columns only. The database also enforces this: `anon` and
+ * `authenticated` hold column-level SELECT grants that exclude `phone`, so a
+ * hand-written query cannot widen it.
+ */
 const PUBLIC_COLUMNS =
-  "id, user_id, business_name, service_category, service_area, starting_price, availability, bio, verification_status, service_zip, service_radius_miles";
+  "id, user_id, business_name, service_category, service_area, starting_price, availability, bio, verification_status, service_zip, service_radius_miles, accepting_bookings, default_duration_minutes, travel_buffer_minutes";
 
 export type PublicProvider = Pick<
   ProviderRow,
@@ -21,6 +25,9 @@ export type PublicProvider = Pick<
   | "verification_status"
   | "service_zip"
   | "service_radius_miles"
+  | "accepting_bookings"
+  | "default_duration_minutes"
+  | "travel_buffer_minutes"
 >;
 
 export type ProviderMatch = {
