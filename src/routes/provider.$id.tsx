@@ -20,6 +20,19 @@ export const Route = createFileRoute("/provider/$id")({
         ]
       : [{ title: "Provider — GPB" }, { name: "robots", content: "noindex" }],
   }),
+  notFoundComponent: () => (
+    <AppShell>
+      <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
+        <h1 className="text-xl font-black">This pro profile isn't available</h1>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The profile may have been removed, or the link is out of date. Search for another pro in your area.
+        </p>
+        <Link to="/search" search={{ q: "", loc: "" }} className="mt-4 inline-flex rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">
+          Find a pro
+        </Link>
+      </div>
+    </AppShell>
+  ),
   component: ProviderPage,
 });
 
