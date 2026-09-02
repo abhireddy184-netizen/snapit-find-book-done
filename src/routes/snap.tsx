@@ -751,18 +751,20 @@ function AnalysisView({
   onReset,
   onAnswer,
   onResolve,
+  serviceLocation,
 }: {
   analysis: SnapAnalysis;
   image: string | null;
   onReset: () => void;
   onAnswer?: (text: string) => void;
   onResolve?: () => void;
+  /** Free text the customer gave for where the job is, e.g. "Frisco, TX 75034". */
+  serviceLocation?: string;
 }) {
   const navigate = useNavigate();
   const u = urgencyStyles[analysis.urgency] ?? urgencyStyles.medium;
   const UrgencyIcon = u.icon;
   const category = getCategoryBySlug(analysis.categorySlug);
-  const pool = providerPoolFor(analysis.categorySlug);
   const showPricing = analysis.hasPriceEstimate;
   // Once the service is known we always progress to professionals — a missing
   // price estimate must never block the customer from reaching someone.
@@ -778,19 +780,29 @@ function AnalysisView({
     duration >= 60 ? `${(duration / 60).toFixed(duration % 60 === 0 ? 0 : 1)} hr` : `${duration} min`;
   const confidencePct = Math.round((analysis.confidence ?? 0.7) * 100);
 
-  // Only pros who actually cover this trade — never top up the list with
-  // unrelated professionals just to fill the screen.
-  const matched: MatchedProvider[] = useMemo(() => {
-    const sorted = providers
-      .filter((p) => p.category === pool)
-      .slice()
-      .sort((a, b) => (b.rating !== a.rating ? b.rating - a.rating : a.distance - b.distance))
-      .slice(0, 5);
-    return sorted.map((p, i) => ({ ...p, eta: [7, 12, 18, 26, 34][i] ?? 40 }));
-  }, [pool]);
+  // Real, verified, currently-bookable GPB pros for this exact trade near the
+  // service ZIP. No samples, no filler from other trades: if nobody qualifies
+  // the customer is told so honestly.
+  const [matched, setMatched] = useState<ProviderMatch[]>([]);
+  const [prosLoading, setProsLoading] = useState(false);
+  const locText = (serviceLocation ?? "").trim();
+
+  useEffect(() => {
+    if (!showPros || !analysis.categorySlug) { setMatched([]); return; }
+    let cancelled = false;
+    setProsLoading(true);
+    const zip = isZipCode(locText) ? locText : extractZip(locText);
+    void (async () => {
+      const place = zip ? await lookupZip(zip) : null;
+      const list = await fetchBookableProviders(analysis.categorySlug, place).catch(() => []);
+      if (!cancelled) { setMatched(list.slice(0, 5)); setProsLoading(false); }
+    })();
+    return () => { cancelled = true; };
+  }, [showPros, analysis.categorySlug, locText]);
 
   const recommended = matched[0];
   const others = matched.slice(1);
+  const hasZip = Boolean(isZipCode(locText) || extractZip(locText));
 
   // Save to history exactly once per analysis
   const savedRef = useRef(false);
