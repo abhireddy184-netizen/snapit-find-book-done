@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { subscribeToUpdates } from "@/lib/subscribe.functions";
 import {
-  ArrowRight, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
+  ArrowRight, Camera, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
   Facebook, Instagram, Twitter, Youtube,
 } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
@@ -24,15 +24,15 @@ const SITE_URL = "https://getperfectboy.com";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GetPerfectBoy — Tell GPB what you need done" },
-      { name: "description", content: "Tell GPB what needs to happen. We build the plan and coordinate the right local help — home, errands, auto, moving, family help and emergencies." },
-      { property: "og:title", content: "GetPerfectBoy — Tell GPB what you need done" },
-      { property: "og:description", content: "Tell GPB what needs to happen. We build the plan and coordinate the right help." },
+      { title: "GetPerfectBoy — Show, say or type the service you need" },
+      { name: "description", content: "Show GPB a photo, speak it in any language, or type it. GPB works out the service you need and finds a local pro — home, cleaning, repairs, moving, errands and auto." },
+      { property: "og:title", content: "GetPerfectBoy — Show, say or type the service you need" },
+      { property: "og:description", content: "Show, say or type what you need. GPB finds the right local pro." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "GetPerfectBoy — Tell GPB what you need done" },
-      { name: "twitter:description", content: "Tell GPB what needs to happen. We build the plan and coordinate the right help." },
+      { name: "twitter:title", content: "GetPerfectBoy — Show, say or type the service you need" },
+      { name: "twitter:description", content: "Show, say or type what you need. GPB finds the right local pro." },
     ],
     links: [{ rel: "canonical", href: SITE_URL + "/" }],
   }),
@@ -179,9 +179,8 @@ function ProviderRecruitment() {
           <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-[11px] font-bold backdrop-blur">For professionals</div>
           <h2 className="text-2xl font-black tracking-tight md:text-3xl">Get clearer jobs, not vague leads.</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90">
-            Pros set their service category, service area/radius, availability and starting price — and as GPB
-            orchestration expands, relevant subtasks of a customer's plan can be routed into the provider flow,
-            with scope and location attached.
+            Pros set their service category, service area/radius, availability and starting price — customer
+            requests arrive with the scope and location already attached.
             {" "}{catalog.length} categories, {TOTAL_SERVICES}+ services — register your interest before launch.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2.5">
@@ -207,7 +206,7 @@ function ProviderRecruitment() {
         <ul className="space-y-2 text-sm">
           {[
             "Free profile with your service ZIP and radius",
-            "Only subtasks that match your category and service area",
+            "Only requests that match your category and service area",
             "Set your own prices, availability and coverage",
           ].map((l) => (
             <li key={l} className="flex items-start gap-2 rounded-2xl bg-white/10 px-4 py-2.5 backdrop-blur">
@@ -263,7 +262,7 @@ export function Footer() {
         <div className="min-w-0">
           <Logo />
           <p className="mt-3 max-w-xs text-xs leading-relaxed">
-            You tell us the outcome. We handle the work — with trusted local professionals.
+            Show, say or type the service you need. We connect you with trusted local pros.
           </p>
           <div className="mt-4 flex items-center gap-2">
             {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (
