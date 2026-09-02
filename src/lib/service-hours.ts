@@ -17,6 +17,11 @@ export const SERVICE_WINDOW_START_MINUTE = 8 * 60; // 08:00 local
 export const SERVICE_WINDOW_END_MINUTE = 20 * 60; // 20:00 local
 export const DEFAULT_DURATION_MINUTES = 60;
 export const DEFAULT_TRAVEL_BUFFER_MINUTES = 15;
+/**
+ * Customers can't book a pro for right now. This mirrors the database rule
+ * exactly — the trigger rejects anything closer, so the UI must not offer it.
+ */
+export const LEAD_TIME_MINUTES = 120;
 
 /* --------------------------------------------------------------- timezones */
 
