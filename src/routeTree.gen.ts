@@ -16,7 +16,6 @@ import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProviderInterestRouteImport } from './routes/provider-interest'
-import { Route as PlanRouteImport } from './routes/plan'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LegalRouteImport } from './routes/legal'
 import { Route as HistoryRouteImport } from './routes/history'
@@ -68,11 +67,6 @@ const RegisterRoute = RegisterRouteImport.update({
 const ProviderInterestRoute = ProviderInterestRouteImport.update({
   id: '/provider-interest',
   path: '/provider-interest',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlanRoute = PlanRouteImport.update({
-  id: '/plan',
-  path: '/plan',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -170,7 +164,6 @@ export interface FileRoutesByFullPath {
   '/history': typeof HistoryRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
-  '/plan': typeof PlanRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -196,7 +189,6 @@ export interface FileRoutesByTo {
   '/history': typeof HistoryRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
-  '/plan': typeof PlanRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -223,7 +215,6 @@ export interface FileRoutesById {
   '/history': typeof HistoryRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
-  '/plan': typeof PlanRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -251,7 +242,6 @@ export interface FileRouteTypes {
     | '/history'
     | '/legal'
     | '/login'
-    | '/plan'
     | '/provider-interest'
     | '/register'
     | '/reset-password'
@@ -277,7 +267,6 @@ export interface FileRouteTypes {
     | '/history'
     | '/legal'
     | '/login'
-    | '/plan'
     | '/provider-interest'
     | '/register'
     | '/reset-password'
@@ -303,7 +292,6 @@ export interface FileRouteTypes {
     | '/history'
     | '/legal'
     | '/login'
-    | '/plan'
     | '/provider-interest'
     | '/register'
     | '/reset-password'
@@ -331,7 +319,6 @@ export interface RootRouteChildren {
   HistoryRoute: typeof HistoryRoute
   LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
-  PlanRoute: typeof PlanRoute
   ProviderInterestRoute: typeof ProviderInterestRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -393,13 +380,6 @@ declare module '@tanstack/react-router' {
       path: '/provider-interest'
       fullPath: '/provider-interest'
       preLoaderRoute: typeof ProviderInterestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/plan': {
-      id: '/plan'
-      path: '/plan'
-      fullPath: '/plan'
-      preLoaderRoute: typeof PlanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -564,7 +544,6 @@ const rootRouteChildren: RootRouteChildren = {
   HistoryRoute: HistoryRoute,
   LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
-  PlanRoute: PlanRoute,
   ProviderInterestRoute: ProviderInterestRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
