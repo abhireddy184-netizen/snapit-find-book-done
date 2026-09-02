@@ -995,57 +995,14 @@ function AnalysisView({
       <div id="pros-list" className="scroll-mt-20">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-black">Service pros nearby</h2>
-            <p className="text-xs text-muted-foreground">Demo data — sample profiles shown while real pros are onboarded.</p>
+            <h2 className="text-lg font-black">What a pro list will look like</h2>
+            <p className="text-xs text-muted-foreground">
+              Sample profiles only — no real GPB pros cover this trade in your area yet, so none of these can be
+              booked, messaged or sent a quote request.
+            </p>
           </div>
-          <button
-            onClick={() => {
-              setQuoteMode((v) => !v);
-              setSelected([]);
-            }}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-semibold transition-colors ${
-              quoteMode ? "border-primary bg-primary/10 text-primary" : "border-border text-foreground hover:bg-muted"
-            }`}
-          >
-            {quoteMode ? (
-              <>
-                <X className="h-3.5 w-3.5" /> Cancel
-              </>
-            ) : (
-              <>
-                <Send className="h-3.5 w-3.5" /> Request quotes
-              </>
-            )}
-          </button>
         </div>
 
-        {quoteMode && (
-          <div className="mb-3 flex items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/5 px-4 py-3 text-xs animate-fade-in">
-            <div className="flex items-center gap-2 font-semibold text-primary">
-              <Sparkles className="h-4 w-4" /> Select up to 5 pros to request quotes
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="rounded-full bg-primary/10 px-2 py-1 font-bold text-primary">
-                {selected.length}/5
-              </span>
-              <GradientButton
-                onClick={sendQuoteRequests}
-                disabled={selected.length === 0 || sent}
-                className="px-4 py-2 text-xs"
-              >
-                {sent ? (
-                  <>
-                    <Check className="h-3.5 w-3.5" /> Sent!
-                  </>
-                ) : (
-                  <>
-                    <Send className="h-3.5 w-3.5" /> Send ({selected.length})
-                  </>
-                )}
-              </GradientButton>
-            </div>
-          </div>
-        )}
 
         <div className="grid gap-3">
           {recommended && (
@@ -1265,31 +1222,13 @@ function ProCard({
         </div>
       </div>
 
-      {!quoteMode && (
-        <div className="mt-4 grid grid-cols-[1fr_auto_auto] gap-2">
-          <button
-            onClick={onBook}
-            className="inline-flex items-center justify-center gap-1.5 rounded-full py-2.5 text-xs font-bold text-white shadow-sm transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            style={{ background: "var(--gradient-primary)" }}
-          >
-            Book Now <ArrowRight className="h-3.5 w-3.5" />
-          </button>
-          <button
-            onClick={onMessage}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted"
-            aria-label="Message pro"
-          >
-            <MessageCircle className="h-4 w-4" />
-          </button>
-          <button
-            onClick={onCall}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted"
-            aria-label="Call pro"
-          >
-            <Phone className="h-4 w-4" />
-          </button>
-        </div>
-      )}
+      {/*
+        These are illustrative profiles, not GPB accounts. Booking, messaging
+        or calling them would go nowhere, so we say so instead of pretending.
+      */}
+      <div className="mt-4 rounded-2xl bg-muted/60 px-3 py-2 text-[11px] font-medium text-muted-foreground">
+        Sample profile — not a real GPB pro yet, so it can't be booked or contacted.
+      </div>
     </div>
   );
 }

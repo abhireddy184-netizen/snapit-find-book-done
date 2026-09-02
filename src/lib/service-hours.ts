@@ -63,10 +63,14 @@ const ZIP3_ZONE: Record<string, string> = {
   "979": MOUNTAIN, "838": PACIFIC,
 };
 
-/** IANA timezone for a validated US ZIP place. */
-export function zoneForPlace(place: Pick<ZipPlace, "zip" | "state">): string {
+/**
+ * IANA timezone for a validated US ZIP place, or null when we cannot map the
+ * place to a zone we trust. We never guess: an unknown territory is reported
+ * as unsupported rather than silently scheduled in Central time.
+ */
+export function zoneForPlace(place: Pick<ZipPlace, "zip" | "state">): string | null {
   const zip3 = place.zip.slice(0, 3);
-  return ZIP3_ZONE[zip3] ?? STATE_ZONE[place.state.toUpperCase()] ?? CENTRAL;
+  return ZIP3_ZONE[zip3] ?? STATE_ZONE[place.state.toUpperCase()] ?? null;
 }
 
 export type ServiceLocation = {
@@ -78,12 +82,14 @@ export type ServiceLocation = {
   label: string;
 };
 
-function toServiceLocation(place: ZipPlace): ServiceLocation {
+function toServiceLocation(place: ZipPlace): ServiceLocation | null {
+  const timeZone = zoneForPlace(place);
+  if (!timeZone) return null;
   return {
     zip: place.zip,
     city: place.city,
     state: place.state,
-    timeZone: zoneForPlace(place),
+    timeZone,
     label: `${place.city}, ${place.state} ${place.zip}`,
   };
 }
@@ -181,13 +187,20 @@ export type WeeklyHours = { weekday: number; startMinute: number; endMinute: num
 export type TimeOff = { startsAt: string; endsAt: string };
 
 export type SlotOptions = {
-  /** Total minutes that must fit: service duration + travel/setup buffer. */
-  totalMinutes: number;
+  /** On-site service length. Must fit the platform window and the pro's hours. */
+  durationMinutes: number;
+  /** Travel/setup time held after the job. Blocks the pro but may run past hours. */
+  bufferMinutes?: number;
   timeZone: string;
-  /** Provider weekly hours; empty means "platform window". */
-  hours?: WeeklyHours[];
+  /**
+   * The pro's weekly hours. An array — including an empty one — is
+   * AUTHORITATIVE: a weekday with no row is a closed day and yields no slots.
+   * Pass `undefined`/`null` only when no pro is chosen yet and the caller
+   * deliberately wants the bare platform window.
+   */
+  hours?: WeeklyHours[] | null;
   timeOff?: TimeOff[];
-  /** Already-taken [start,end) instants for this provider. */
+  /** Already-taken [start,end) instants for this provider, buffer included. */
   busy?: { startAt: string; endAt: string }[];
   /** Earliest bookable moment (lead time already applied). */
   notBefore?: Date;
@@ -207,32 +220,39 @@ function weekdayForDate(isoDate: string): number {
 /** Bookable start minutes for one local date, honouring every rule. */
 export function slotsForDate(isoDate: string, opts: SlotOptions): number[] {
   const {
-    totalMinutes, timeZone, hours = [], timeOff = [], busy = [],
+    durationMinutes, bufferMinutes = 0, timeZone, hours, timeOff = [], busy = [],
     notBefore = new Date(), stepMinutes = 30,
   } = opts;
 
   const weekday = weekdayForDate(isoDate);
-  const dayHours = hours.filter((h) => h.weekday === weekday);
+
+  // An hours array is authoritative: no row for this weekday means closed.
+  // Only an explicitly absent array falls back to the bare platform window.
+  const source = hours == null
+    ? [{ weekday, startMinute: SERVICE_WINDOW_START_MINUTE, endMinute: SERVICE_WINDOW_END_MINUTE }]
+    : hours.filter((h) => h.weekday === weekday);
 
   // Provider hours may narrow the platform window, never extend it.
-  const ranges = (dayHours.length > 0 ? dayHours : [{ weekday, startMinute: SERVICE_WINDOW_START_MINUTE, endMinute: SERVICE_WINDOW_END_MINUTE }])
+  const ranges = source
     .map((h) => ({
       start: Math.max(h.startMinute, SERVICE_WINDOW_START_MINUTE),
       end: Math.min(h.endMinute, SERVICE_WINDOW_END_MINUTE),
     }))
-    .filter((r) => r.end - r.start >= totalMinutes);
+    .filter((r) => r.end - r.start >= durationMinutes);
 
   const offRanges = timeOff.map((t) => [Date.parse(t.startsAt), Date.parse(t.endsAt)] as const);
   const busyRanges = busy.map((b) => [Date.parse(b.startAt), Date.parse(b.endAt)] as const);
   const out: number[] = [];
 
   for (const range of ranges) {
-    for (let m = range.start; m + totalMinutes <= range.end; m += stepMinutes) {
+    for (let m = range.start; m + durationMinutes <= range.end; m += stepMinutes) {
       const startUtc = zonedTimeToUtc(isoDate, m, timeZone).getTime();
-      const endUtc = startUtc + totalMinutes * 60_000;
+      // The job itself must fit the window; the travel buffer only holds the pro.
+      const endUtc = startUtc + durationMinutes * 60_000;
+      const occupiedEndUtc = endUtc + bufferMinutes * 60_000;
       if (startUtc < notBefore.getTime()) continue;
-      if (offRanges.some(([s, e]) => startUtc < e && endUtc > s)) continue;
-      if (busyRanges.some(([s, e]) => startUtc < e && endUtc > s)) continue;
+      if (offRanges.some(([s, e]) => startUtc < e && occupiedEndUtc > s)) continue;
+      if (busyRanges.some(([s, e]) => startUtc < e && occupiedEndUtc > s)) continue;
       out.push(m);
     }
   }

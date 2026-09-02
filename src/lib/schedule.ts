@@ -35,21 +35,23 @@ export async function fetchAvailability(providerId: string): Promise<WeeklyHours
   return (data ?? []).map((r) => ({ weekday: r.weekday, startMinute: r.start_minute, endMinute: r.end_minute }));
 }
 
-/** Replace the whole week in one go — simplest correct model for a small grid. */
-export async function saveAvailability(providerId: string, hours: WeeklyHours[]): Promise<void> {
+/**
+ * Replace the whole week atomically through a security-definer function.
+ * Doing this as delete+insert from the client could leave the provider with
+ * no rows (read as "closed", never as "open") if the insert failed; the RPC
+ * runs both halves in one transaction instead. An empty array means
+ * "closed all week" and is saved as such — it never falls back to all-open.
+ */
+export async function saveAvailability(_providerId: string, hours: WeeklyHours[]): Promise<void> {
   const clamped = hours
     .map((h) => ({
-      provider_id: providerId,
       weekday: h.weekday,
       start_minute: Math.max(SERVICE_WINDOW_START_MINUTE, Math.min(h.startMinute, SERVICE_WINDOW_END_MINUTE - 30)),
       end_minute: Math.min(SERVICE_WINDOW_END_MINUTE, Math.max(h.endMinute, SERVICE_WINDOW_START_MINUTE + 30)),
     }))
     .filter((h) => h.end_minute > h.start_minute);
 
-  const { error: delError } = await supabase.from("provider_availability").delete().eq("provider_id", providerId);
-  if (delError) throw delError;
-  if (clamped.length === 0) return;
-  const { error } = await supabase.from("provider_availability").insert(clamped);
+  const { error } = await supabase.rpc("replace_provider_availability", { _hours: clamped });
   if (error) throw error;
 }
 
@@ -80,19 +82,24 @@ export function toTimeOffRanges(rows: TimeOffRow[]): TimeOff[] {
   return rows.map((r) => ({ startsAt: r.starts_at, endsAt: r.ends_at }));
 }
 
-/** Booked time for a provider that new slots must avoid. */
-export async function fetchBusy(providerId: string): Promise<{ startAt: string; endAt: string }[]> {
-  const { data, error } = await supabase
-    .from("bookings")
-    .select("start_at,end_at,status")
-    .eq("provider_id", providerId)
-    .in("status", ["pending", "confirmed", "in_progress"])
-    .not("start_at", "is", null)
-    .gte("start_at", new Date().toISOString());
+/**
+ * Time a provider is unavailable, as anonymous [start,end) intervals.
+ * This RPC deliberately exposes no customer, address, reason or job detail —
+ * it merges bookings (job + travel buffer) and time off into bare ranges, so
+ * a customer picking a slot never reads another customer's data.
+ */
+export async function fetchBusy(
+  providerId: string,
+  from: Date = new Date(),
+  to: Date = new Date(Date.now() + 45 * 86_400_000),
+): Promise<{ startAt: string; endAt: string }[]> {
+  const { data, error } = await supabase.rpc("provider_busy_intervals", {
+    _provider_id: providerId,
+    _from: from.toISOString(),
+    _to: to.toISOString(),
+  });
   if (error) throw error;
-  return (data ?? [])
-    .filter((b): b is { start_at: string; end_at: string; status: BookingStatus } => Boolean(b.start_at && b.end_at))
-    .map((b) => ({ startAt: b.start_at, endAt: b.end_at }));
+  return (data ?? []).map((r) => ({ startAt: r.starts_at, endAt: r.ends_at }));
 }
 
 /* --------------------------------------------------------- job transitions */
