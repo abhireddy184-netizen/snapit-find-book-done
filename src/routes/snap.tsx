@@ -30,8 +30,9 @@ import {
 } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
-import { providers, type Provider } from "@/lib/snapit-data";
-import { getCategoryBySlug, providerPoolFor } from "@/lib/catalog";
+import { getCategoryBySlug } from "@/lib/catalog";
+import { fetchBookableProviders, type ProviderMatch } from "@/lib/providers";
+import { extractZip, isZipCode, lookupZip } from "@/lib/us-zip";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
 import { useAuth } from "@/lib/auth";
 import { createJobFromAnalysis } from "@/lib/jobs";
@@ -524,6 +525,7 @@ function SnapPage() {
             onReset={reset}
             onAnswer={(t) => void runFollowUp(t)}
             onResolve={() => void resolveNow()}
+            serviceLocation={incomingLoc}
           />
 
         )}
