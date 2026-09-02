@@ -7,10 +7,10 @@ import { providers } from "@/lib/snapit-data";
 export const Route = createFileRoute("/tracking/$id")({
   head: ({ params }) => ({
     meta: [
-      { title: `Tracking ${params.id} — GetPros` },
-      { name: "description", content: "Track your GetPros pro in real time — see their ETA, route and arrival status." },
-      { property: "og:title", content: "Live pro tracking — GetPros" },
-      { property: "og:description", content: "Real-time ETA and route updates for your booked pro." },
+      { title: `Tracking preview ${params.id} — GetPros` },
+      { name: "description", content: "Preview of the GetPros job tracking screen using example data." },
+      { property: "og:title", content: "Job tracking preview — GetPros" },
+      { property: "og:description", content: "Example tracking screen — not live provider data." },
     ],
   }),
   loader: ({ params }) => {
@@ -67,7 +67,7 @@ function TrackingPage() {
       <div className="mx-auto max-w-3xl space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Live tracking</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Tracking preview · example data</div>
             <h1 className="text-2xl font-black md:text-3xl">Your pro is on the way</h1>
           </div>
           <div className="rounded-full bg-primary/10 px-4 py-2 text-center">
