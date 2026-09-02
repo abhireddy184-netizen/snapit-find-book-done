@@ -103,7 +103,10 @@ function PlanPage() {
 
   const result = query.data;
   const conversation =
-    !isDemo && result && result.kind === "conversation" ? result : undefined;
+    !isDemo && result?.kind === "conversation"
+      ? (result as Extract<PlanResult, { kind: "conversation" }>)
+      : undefined;
+
 
   const basePlan: GpbPlan | undefined = isDemo
     ? demoAirportPlan()
