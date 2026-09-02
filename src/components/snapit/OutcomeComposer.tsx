@@ -126,7 +126,10 @@ export function OutcomeComposer() {
   const [request, setRequest] = useState("");
   const [loc, setLoc] = useState("");
   const [i, setI] = useState(0);
+  /** Set when someone submits an empty request — /plan would silently show the demo. */
+  const [emptyError, setEmptyError] = useState(false);
   const paused = useRef(false);
+
 
   // Voice input state — capabilities are detected after mount to avoid SSR/client mismatch.
   const [voiceSupported, setVoiceSupported] = useState(false);
