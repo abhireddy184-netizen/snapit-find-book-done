@@ -255,11 +255,11 @@ function PlanHeader({
           <textarea
             id="plan-request"
             dir="auto"
-            rows={2}
+            rows={3}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={c.requestPlaceholder}
-            className="min-h-[68px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3 text-[17px] leading-relaxed outline-none placeholder:text-muted-foreground focus:bg-muted/60"
+            className="min-h-[92px] w-full resize-y rounded-2xl bg-muted/40 px-4 py-3 text-[17px] leading-relaxed outline-none placeholder:text-muted-foreground focus:bg-muted/60"
           />
           <label htmlFor="plan-loc" className="sr-only">{c.locationPlaceholder}</label>
           <input
