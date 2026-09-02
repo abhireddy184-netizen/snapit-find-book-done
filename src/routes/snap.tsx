@@ -662,8 +662,11 @@ function ScanningOverlay({
             <X className="h-4 w-4" /> Cancel
           </button>
           <p className="mt-2 text-center text-xs text-white/60">
-            This usually takes a few seconds. You can cancel any time.
+            {slow
+              ? "This is taking longer than usual — we'll fall back to a best match shortly. You can cancel any time."
+              : "This usually takes a few seconds. You can cancel any time."}
           </p>
+
         </div>
         <style>{`@keyframes scanline{0%{transform:translateY(0)}50%{transform:translateY(216px)}100%{transform:translateY(0)}}`}</style>
       </div>
