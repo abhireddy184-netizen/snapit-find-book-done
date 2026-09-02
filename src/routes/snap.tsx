@@ -184,13 +184,15 @@ function SnapPage() {
     await runDiagnosis(prepared.frames, "", token);
   };
 
+  const runDiagnosisFresh = runDiagnosis;
+
   const runAnalysis = async () => {
     if (!image || busyRef.current) return;
     busyRef.current = true;
     const token = ++runRef.current;
     setLoading(true);
     setError(null);
-    await runDiagnosis(frames, note, token);
+    await runDiagnosisFresh(frames, note, token, { latestMessage: note });
   };
 
   /** Text-only path — no photo required (essential on desktop). */
@@ -206,8 +208,10 @@ function SnapPage() {
     setTextOnly(true);
     setFrames([]);
     setNote(described);
+    setAskedQuestions([]);
+    setTurnCount(0);
     setLoading(true);
-    await runDiagnosis([], described, token);
+    await runDiagnosis([], described, token, { latestMessage: described, asked: [], turns: 0 });
   };
 
   /** Abandon any in-flight work and go back to a usable screen. */
@@ -224,13 +228,29 @@ function SnapPage() {
     const text = extra.trim();
     if (!text || busyRef.current) return;
     const merged = [note, text].filter(Boolean).join(" ");
+    const turns = turnCount + 1;
     busyRef.current = true;
     const token = ++runRef.current;
     setNote(merged);
+    setTurnCount(turns);
     setAnalysis(null);
     setError(null);
     setLoading(true);
-    await runDiagnosis(frames, merged, token);
+    await runDiagnosis(frames, merged, token, { latestMessage: text, turns });
+  };
+
+  /**
+   * "Find a professional" / "Not sure" — stop clarifying and resolve with what
+   * we already know, leaving the remaining detail to the pro.
+   */
+  const resolveNow = async () => {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    const token = ++runRef.current;
+    setAnalysis(null);
+    setError(null);
+    setLoading(true);
+    await runDiagnosis(frames, note, token, { latestMessage: note, forceResolve: true });
   };
 
   const reset = () => {
@@ -240,6 +260,8 @@ function SnapPage() {
     setFrames([]);
     setMediaKind(null);
     setNote("");
+    setAskedQuestions([]);
+    setTurnCount(0);
     setTextOnly(false);
     setDescribeMode(false);
     setDescribeText("");
@@ -249,6 +271,7 @@ function SnapPage() {
     setPhase("idle");
     setPendingPreview(null);
   };
+
 
   // Clearing the input value lets the user pick the exact same file again.
   const onPick = (kind: "photo" | "video" | "upload") => (e: React.ChangeEvent<HTMLInputElement>) => {
