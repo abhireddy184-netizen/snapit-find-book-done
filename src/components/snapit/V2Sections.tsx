@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import {
   ArrowRight, MessageSquareText, ListChecks, HardHat, Home, PackageCheck, Car,
   Truck, HeartHandshake, ShieldAlert, ShieldCheck, FileText, Images, Activity,
-  Camera, Sparkles, UtensilsCrossed, ShoppingBasket, CarFront, UserRound, Route,
+  Camera, Sparkles,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
