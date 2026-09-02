@@ -76,13 +76,21 @@ const urgencyStyles: Record<string, { chip: string; label: string; icon: typeof 
 };
 
 function SnapPage() {
+  // A spoken/typed service request handed over from the home composer (or an
+  // old /plan link) arrives as ?q= — same flow, no separate planning step.
+  const search = Route.useSearch();
+  const incomingRequest = (search.q ?? "").trim();
+  const incomingLoc = (search.loc ?? "").trim();
+  const autoRanRef = useRef(false);
+
   const [image, setImage] = useState<string | null>(null);
   const [frames, setFrames] = useState<string[]>([]);
   const [mediaKind, setMediaKind] = useState<"photo" | "video" | "upload" | null>(null);
   const [note, setNote] = useState("");
-  const [describeMode, setDescribeMode] = useState(false);
-  const [describeText, setDescribeText] = useState("");
+  const [describeMode, setDescribeMode] = useState(incomingRequest.length > 0);
+  const [describeText, setDescribeText] = useState(incomingRequest);
   const [textOnly, setTextOnly] = useState(false);
+
   const [analysis, setAnalysis] = useState<SnapAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
