@@ -142,8 +142,9 @@ export const DEFAULT_UI_COPY: Required<PlanUiCopy> = {
   stepsLabel: "Steps",
   bufferLabel: "Buffer",
   tasksWord: "tasks",
-  spareSuffix: "min spare",
-  overSuffix: "min over",
+  spareSuffix: "spare",
+  overSuffix: "over",
+
   detailsHeading: "How this will be handled",
   clarifyTitle: "One detail to confirm",
   clarifyHint: "Answer in any language — GPB will rebuild the plan.",
