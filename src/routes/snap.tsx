@@ -177,6 +177,7 @@ function SnapPage() {
     setImage(null);
     setFrames([]);
     setTextOnly(false);
+    setFastPath(false);
     setDescribeMode(false);
     setMediaKind(kind);
     setNote("");
@@ -234,6 +235,8 @@ function SnapPage() {
     setImage(null);
     setMediaKind(null);
     setTextOnly(true);
+    // Deterministic catalogue hit -> the server resolves locally in ms.
+    setFastPath(Boolean(detectServiceIntentInText(typed)));
     setFrames([]);
     setNote(described);
     setAskedQuestions([]);
@@ -522,6 +525,7 @@ function SnapPage() {
           <ScanningOverlay
             image={image ?? pendingPreview}
             phase={phase}
+            fast={fastPath}
             onCancel={cancelAnalysis}
           />
         )}
