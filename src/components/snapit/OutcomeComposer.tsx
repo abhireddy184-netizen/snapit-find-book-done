@@ -469,8 +469,17 @@ export function OutcomeComposer() {
       else stopRecordingAndTranscribe();
     }
     const q = request.trim();
+    // An empty request lands on /plan's demo plan, which reads like a real
+    // answer to a request that was never made. Ask for the words instead.
+    if (!q) {
+      setEmptyError(true);
+      document.getElementById("gpb-outcome")?.focus();
+      return;
+    }
+    setEmptyError(false);
     void navigate({ to: "/plan", search: { q, loc: loc.trim() } });
   };
+
 
   const micTitle = !voiceSupported
     ? "Voice input isn’t supported in this browser — type instead"
