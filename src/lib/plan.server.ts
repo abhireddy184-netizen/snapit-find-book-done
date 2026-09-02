@@ -42,18 +42,33 @@ RULES
 7. "confidence" 0-1: how sure you are of the intent. Grammar problems, romanization, dialect or misspellings alone should NOT lower confidence. Lower it only when the actual meaning is unclear.
 8. Ask for clarification ONLY when a single critical detail would materially change execution and cannot be inferred: an impossible-to-infer AM vs PM, two genuinely plausible airports/cities, pickup vs dropoff, or which person. In that case set "criticalAmbiguity" (short, English, internal) and "clarificationQuestion" (ONE short question written in the USER'S OWN language AND their own script/romanization style). Otherwise leave both as empty strings. Never ask about minor uncertainty; a sensible default is better than a question.
 9. LOW CONFIDENCE (you genuinely cannot tell what was said or which language it is): do NOT translate it into something plausible and do NOT guess a different language. Keep the original wording untouched inside "normalizedRequest", set a low "confidence", and ask ONE short clarification written in the same language/script the user appears to have used (plain English only if even that is unclear).
+10. CASUAL PREAMBLE: people often open with teasing, jokes, greetings, self-talk or thinking-aloud before the real ask ("hey what's up man, anyway — I need 2 kg potatoes"). Ignore the preamble as content, but DO extract the real task that follows or precedes it. Never let a joking or informal tone turn into "no task".
+11. QUANTITIES AND ITEMS: keep every item, quantity, unit and brand exactly as stated ("2 kg potatoes" stays 2 kg potatoes — not "some potatoes", not 2 lb, not "vegetables"). Convert nothing.
+12. ACTIONABILITY. Set "actionability":
+   - "actionable" when there is a real-world task, errand, purchase, delivery, appointment, repair or coordination to do — even a very small one, and even when buried in chatter.
+   - "conversational" when the message is only a greeting, a joke, a test, small talk, an insult, or a general question with no task to carry out.
+   When "conversational": write "conversationalReply" — ONE or TWO short, warm, plain sentences answering or acknowledging what they actually said, in the user's own language AND script/romanization style. Then write "invitation" — one short friendly line inviting them to say what they need done, same language and style. Never mock, scold, lecture, moralise, force jokes back, or ask a pile of questions. When "conversational", still fill languageCode/languageName/script normally and leave clarificationQuestion empty.
+   When "actionable", leave "conversationalReply" and "invitation" as empty strings.
+13. Never invent a travel plan, airport run or demo scenario that the person did not ask for. If they asked only for groceries, the intent is only groceries.
 
 Return ONLY minified JSON, no markdown:
-{"languageCode":string,"languageName":string,"script":"native"|"latin"|"mixed","codeSwitched":boolean,"normalizedRequest":string,"confidence":number,"criticalAmbiguity":string,"clarificationQuestion":string}`;
+{"languageCode":string,"languageName":string,"script":"native"|"latin"|"mixed","codeSwitched":boolean,"actionability":"actionable"|"conversational","normalizedRequest":string,"confidence":number,"criticalAmbiguity":string,"clarificationQuestion":string,"conversationalReply":string,"invitation":string}`;
 
-export function buildUnderstandUserPrompt(request: string, location: string, nowClock: string) {
+export function buildUnderstandUserPrompt(
+  request: string,
+  location: string,
+  nowClock: string,
+  nowDate?: string,
+  timeZone?: string,
+) {
   return [
     `Raw request (verbatim): "${request}"`,
     location ? `Location context: ${location}` : "No location given.",
-    `Current local time is roughly ${formatClock(parseClock(nowClock))}.`,
+    `Current local time is roughly ${formatClock(parseClock(nowClock))}${nowDate ? ` on ${nowDate}` : ""}${timeZone ? ` (${timeZone})` : ""}.`,
     "Return JSON only.",
   ].join("\n");
 }
+
 
 /** Parse the understanding stage; always returns something usable. */
 export function normalizeUnderstanding(raw: string, request: string): PlanUnderstanding {
