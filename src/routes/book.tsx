@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronLeft, ChevronRight, MapPin, Loader2, ShieldCheck, AlertTriangle } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { useAuth } from "@/lib/auth";
@@ -12,6 +12,7 @@ import type { WeeklyHours } from "@/lib/service-hours";
 import {
   addDaysIso,
   formatSlot,
+  LEAD_TIME_MINUTES,
   resolveServiceLocation,
   slotsForDate,
   todayInZone,
@@ -29,9 +30,6 @@ type BookingDraft = {
   categorySlug?: string;
   jobId?: string;
 };
-
-/** Customers can't book a pro for right now — give everyone lead time. */
-const LEAD_TIME_MINUTES = 120;
 
 function dayLabel(isoDate: string, today: string): string {
   if (isoDate === today) return "Today";
