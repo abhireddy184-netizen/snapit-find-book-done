@@ -487,6 +487,8 @@ export function OutcomeComposer() {
 
   const toggleVoice = () => {
     if (transcribing) return;
+    // Any new mic interaction supersedes a pending auto-submit.
+    cancelAutoSubmit();
     if (listening) {
       if (recRef.current) stopListening();
       else stopRecordingAndTranscribe();
@@ -507,6 +509,25 @@ export function OutcomeComposer() {
 
   };
 
+  /** Single exit point for both manual submit and the silent countdown. */
+  const goToPlan = (text: string) => {
+    const q = text.trim();
+    if (!q || submittedRef.current) return;
+    submittedRef.current = true;
+    cancelAutoSubmit();
+    setEmptyError(false);
+    void navigate({ to: "/plan", search: { q, loc: loc.trim() } });
+  };
+
+  // Countdown reaching zero builds the plan — never a booking, order or message.
+  useEffect(() => {
+    if (autoSecs === null) return;
+    if (autoSecs > 0) return;
+    cancelAutoSubmit();
+    goToPlan(request);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSecs]);
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (listening) {
@@ -517,13 +538,14 @@ export function OutcomeComposer() {
     // An empty request lands on /plan's demo plan, which reads like a real
     // answer to a request that was never made. Ask for the words instead.
     if (!q) {
+      cancelAutoSubmit();
       setEmptyError(true);
       document.getElementById("gpb-outcome")?.focus();
       return;
     }
-    setEmptyError(false);
-    void navigate({ to: "/plan", search: { q, loc: loc.trim() } });
+    goToPlan(q);
   };
+
 
 
   const micTitle = !voiceSupported
