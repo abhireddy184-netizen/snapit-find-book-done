@@ -161,6 +161,13 @@ export function AuthForm({
                 </>
               )}
             </GradientButton>
+            {mode === "login" && (
+              <p className="pt-1 text-center text-xs">
+                <Link to="/reset-password" className="font-semibold text-primary hover:underline">
+                  Forgot your password?
+                </Link>
+              </p>
+            )}
           </form>
 
           <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
