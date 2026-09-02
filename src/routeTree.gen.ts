@@ -13,6 +13,7 @@ import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as SnapRouteImport } from './routes/snap'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SearchRouteImport } from './routes/search'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProviderInterestRouteImport } from './routes/provider-interest'
 import { Route as PlanRouteImport } from './routes/plan'
@@ -51,6 +52,11 @@ const ServicesRoute = ServicesRouteImport.update({
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RegisterRoute = RegisterRouteImport.update({
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/plan': typeof PlanRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRouteWithChildren
   '/snap': typeof SnapRoute
@@ -184,6 +191,7 @@ export interface FileRoutesByTo {
   '/plan': typeof PlanRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/snap': typeof SnapRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/plan': typeof PlanRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRouteWithChildren
   '/snap': typeof SnapRoute
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/plan'
     | '/provider-interest'
     | '/register'
+    | '/reset-password'
     | '/search'
     | '/services'
     | '/snap'
@@ -259,6 +269,7 @@ export interface FileRouteTypes {
     | '/plan'
     | '/provider-interest'
     | '/register'
+    | '/reset-password'
     | '/search'
     | '/snap'
     | '/unsubscribe'
@@ -283,6 +294,7 @@ export interface FileRouteTypes {
     | '/plan'
     | '/provider-interest'
     | '/register'
+    | '/reset-password'
     | '/search'
     | '/services'
     | '/snap'
@@ -309,6 +321,7 @@ export interface RootRouteChildren {
   PlanRoute: typeof PlanRoute
   ProviderInterestRoute: typeof ProviderInterestRoute
   RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   ServicesRoute: typeof ServicesRouteWithChildren
   SnapRoute: typeof SnapRoute
@@ -346,6 +359,13 @@ declare module '@tanstack/react-router' {
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/register': {
@@ -526,6 +546,7 @@ const rootRouteChildren: RootRouteChildren = {
   PlanRoute: PlanRoute,
   ProviderInterestRoute: ProviderInterestRoute,
   RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   ServicesRoute: ServicesRouteWithChildren,
   SnapRoute: SnapRoute,
