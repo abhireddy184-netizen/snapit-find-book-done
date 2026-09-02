@@ -199,12 +199,9 @@ export function latestStartMinute(totalMinutes: number): number {
   return SERVICE_WINDOW_END_MINUTE - totalMinutes;
 }
 
-function weekdayInZone(isoDate: string, timeZone: string): number {
-  // Noon avoids any DST edge when deriving the weekday.
-  return zonedTimeToUtc(isoDate, 12 * 60, timeZone).getUTCDay() ===
-    new Date(`${isoDate}T12:00:00Z`).getUTCDay()
-    ? new Date(`${isoDate}T12:00:00Z`).getUTCDay()
-    : new Date(`${isoDate}T12:00:00Z`).getUTCDay();
+function weekdayForDate(isoDate: string): number {
+  // The weekday belongs to the calendar date itself, so noon UTC is safe.
+  return new Date(`${isoDate}T12:00:00Z`).getUTCDay();
 }
 
 /** Bookable start minutes for one local date, honouring every rule. */
@@ -214,7 +211,7 @@ export function slotsForDate(isoDate: string, opts: SlotOptions): number[] {
     notBefore = new Date(), stepMinutes = 30,
   } = opts;
 
-  const weekday = weekdayInZone(isoDate, timeZone);
+  const weekday = weekdayForDate(isoDate);
   const dayHours = hours.filter((h) => h.weekday === weekday);
 
   // Provider hours may narrow the platform window, never extend it.
