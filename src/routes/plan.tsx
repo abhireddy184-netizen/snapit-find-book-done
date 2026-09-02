@@ -626,7 +626,7 @@ function TaskRow({
         skipped ? "border-dashed border-border/60 opacity-60" : "border-border/60"
       }`}
     >
-      <div className="grid gap-3 sm:grid-cols-[5.5rem_auto_minmax(0,1fr)_auto] sm:items-start">
+      <div className="grid gap-3 sm:grid-cols-[5.5rem_auto_minmax(0,1fr)] sm:items-start">
         <div className="flex items-center gap-2 sm:block">
           <span className="text-sm font-black tracking-tight text-foreground">{skipped ? "—" : clock}</span>
           <span className="block text-[11px] font-semibold text-muted-foreground">
