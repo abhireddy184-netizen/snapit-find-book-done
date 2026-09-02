@@ -50,7 +50,7 @@ function TopBar() {
               destinations (How it works, For Pros, Early Access) live in the
               footer so the header stays calm. */}
           <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">
-            <Camera className="h-4 w-4" /> Show GetPros
+            <Camera className="h-4 w-4" /> Show GP
           </Link>
           <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Services</Link>
           <Link to="/emergency" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 font-semibold text-destructive hover:bg-destructive/10 transition-colors">
@@ -162,7 +162,7 @@ function BottomNav() {
   }> = [
     { key: "home", to: "/", label: "Home", icon: Home },
     { key: "search", to: "/search", label: "Search", icon: Search },
-    { key: "snap", to: "/snap", label: "Show GetPros", icon: Camera, highlight: true },
+    { key: "snap", to: "/snap", label: "Show GP", icon: Camera, highlight: true },
     { key: "bookings", to: "/dashboard", label: "Bookings", icon: CalendarDays },
     // Signed-out visitors get a real entry point instead of a silent redirect.
     user
@@ -192,16 +192,16 @@ function BottomNav() {
               <Link
                 key={it.key}
                 to={it.to}
-                className="-mt-7 flex flex-col items-center gap-1"
-                aria-label="Show GetPros — camera diagnosis"
+                className="-mt-7 flex flex-col items-center gap-1.5"
+                aria-label="Show GP — camera diagnosis"
               >
                 <span
-                  className="grid h-14 w-14 place-items-center rounded-full text-white shadow-elevated ring-4 ring-card transition-transform hover:scale-[1.02]"
-                  style={{ background: "var(--primary)", boxShadow: "0 16px 40px -12px color-mix(in oklab, var(--primary) 60%, transparent)" }}
+                  className="grid h-14 w-14 place-items-center rounded-full text-white shadow-elevated ring-[3px] ring-card transition-transform hover:scale-[1.02]"
+                  style={{ background: "var(--gradient-primary)", boxShadow: "0 16px 40px -12px color-mix(in oklab, var(--primary) 60%, transparent)" }}
                 >
                   <Icon className="h-6 w-6" />
                 </span>
-                <span className="text-xs font-bold text-primary">{it.label}</span>
+                <span className="text-[10px] font-bold text-foreground">{it.label}</span>
               </Link>
             );
           }

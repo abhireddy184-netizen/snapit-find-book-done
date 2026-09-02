@@ -21,8 +21,8 @@ const TILES: Tile[] = [
   { slug: "hvac", name: "AC / HVAC", line: "Repairs and tune-ups", img: hvac },
   { slug: "handyman", name: "Handyman", line: "Your punch list, done", img: handyman },
   { slug: "appliances", name: "Appliance Repair", line: "Fridge, washer, oven", img: appliances },
-  { slug: "beauty-at-home", name: "Beauty at Home", line: "Salon-quality, at home", img: beauty },
-  { slug: "auto-mobile", name: "Auto Services", line: "They come to you", img: auto },
+  { slug: "beauty-at-home", name: "Beauty", line: "At-home salon services", img: beauty },
+  { slug: "auto-mobile", name: "Auto", line: "They come to you", img: auto },
   { slug: "moving", name: "Moving", line: "Pack, lift, deliver", img: moving },
   { slug: "lawn-outdoor", name: "Lawn Care", line: "Mow, trim, clean up", img: lawn },
 ];
@@ -42,6 +42,7 @@ function Card({ tile }: { tile: Tile }) {
           decoding="async"
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
+        <span className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />
       </div>
       <div className="min-w-0 p-3">
         <div className="truncate text-sm font-black tracking-tight text-foreground">{tile.name}</div>

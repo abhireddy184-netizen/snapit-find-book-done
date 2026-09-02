@@ -25,7 +25,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "GetPros.ai — Show, say or type the service you need" },
-      { name: "description", content: "Show GetPros a photo, speak it in any language, or type it. GetPros works out the service you need and finds a local pro — home, cleaning, repairs, moving, errands and auto." },
+      { name: "description", content: "Show GP a photo, speak it in any language, or type it. We work out the service you need and find a local pro — home, cleaning, repairs, moving, errands and auto." },
       { property: "og:title", content: "GetPros.ai — Show, say or type the service you need" },
       { property: "og:description", content: "Show, say or type what you need. GetPros finds the right local pro." },
       { property: "og:type", content: "website" },
@@ -52,11 +52,11 @@ function Landing() {
           <div className="min-w-0">
             {/* Branding lives in the header only — repeating the wordmark here
                 pushed the headline below the fold on phones. */}
-            <h1 className="max-w-[15ch] text-[clamp(2.125rem,5.4vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.03em] text-foreground">
-              What service do you <span className="text-gradient-hero">need?</span>
+            <h1 className="max-w-[14ch] text-[clamp(2.25rem,5.6vw,4.25rem)] font-extrabold leading-[1.02] tracking-[-0.04em] text-foreground">
+              What do you <span className="text-gradient-hero">need?</span>
             </h1>
-            <p className="mt-3.5 max-w-[36ch] text-[clamp(1.0625rem,1.2vw,1.2rem)] leading-relaxed text-muted-foreground">
-              Show it, say it or type it — we find the right local pro.
+            <p className="mt-3 max-w-[36ch] text-[clamp(1rem,1.15vw,1.15rem)] leading-relaxed text-muted-foreground">
+              Type it, say it, or show it — we’ll find the right pro.
             </p>
 
 
@@ -67,10 +67,10 @@ function Landing() {
               id="hero-show-gpb-cta"
               data-analytics-id="show_gpb_cta"
               data-analytics-location="hero_primary"
-              className="mt-6 hidden items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-bold text-white shadow-elevated transition-transform duration-200 hover:scale-[1.01] lg:inline-flex"
+              className="mt-6 hidden items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold text-white shadow-elevated transition-transform duration-200 hover:scale-[1.01] lg:inline-flex"
               style={{ background: "var(--gradient-primary)" }}
             >
-              <Camera className="h-5 w-5" /> Show GetPros a photo
+              <Camera className="h-5 w-5" /> Show GP a photo
             </Link>
 
             <div className="mt-5 lg:hidden">
@@ -79,7 +79,7 @@ function Landing() {
 
 
 
-            <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-muted-foreground">
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-muted-foreground">
               <a
                 href="#early-access"
                 id="hero-early-access-cta"
@@ -96,7 +96,7 @@ function Landing() {
                 data-analytics-location="hero"
                 className="hover:text-foreground hover:underline"
               >
-                Join GetPros as a pro
+                Join as a pro
               </Link>
             </div>
           </div>
@@ -136,13 +136,13 @@ function EmergencyStrip() {
     { label: "Lockout", icon: Lock },
   ];
   return (
-    <section className="mt-10 overflow-hidden rounded-2xl border border-destructive/25 bg-card p-4 sm:p-5">
+    <section className="mt-8 overflow-hidden rounded-2xl border border-destructive/25 bg-card p-4 sm:p-5">
       <div className="grid gap-4 md:grid-cols-[1fr_1.1fr] md:items-center">
         <div className="min-w-0">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive px-2.5 py-1 text-xs font-black text-destructive-foreground">
             <ShieldAlert className="h-3.5 w-3.5" /> 24/7 Emergency
           </span>
-          <h2 className="mt-2 text-lg font-black tracking-tight sm:text-xl">When it can't wait, flag it first.</h2>
+          <h2 className="mt-2 text-lg font-black tracking-tight sm:text-xl">Can’t wait? Get help now.</h2>
           <Link to="/emergency" className="mt-3 inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-2.5 text-sm font-bold text-destructive-foreground transition-transform hover:scale-[1.01]">
             Get emergency help <ArrowRight className="h-4 w-4" />
           </Link>
@@ -166,15 +166,14 @@ function EmergencyStrip() {
 
 function ProviderRecruitment() {
   return (
-    <section className="mt-10 overflow-hidden rounded-2xl px-5 py-8 text-white sm:px-8 md:py-10" style={{ background: "var(--gradient-primary)" }}>
+    <section className="mt-8 overflow-hidden rounded-2xl px-5 py-7 text-white sm:px-8 md:py-10" style={{ background: "var(--gradient-primary)" }}>
       <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr] lg:items-center">
         <div className="min-w-0">
-          <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-bold backdrop-blur">For professionals</div>
-          <h2 className="text-2xl font-black tracking-tight md:text-3xl">Get clearer jobs, not vague leads.</h2>
+          <div className="mb-2 inline-flex rounded-full bg-white/20 px-3 py-1 text-xs font-bold backdrop-blur">For pros</div>
+          <h2 className="text-2xl font-black tracking-tight md:text-3xl">Clearer jobs. Less noise.</h2>
           <p className="mt-2 max-w-xl text-sm text-white/90">
-            Pros set their service category, service area/radius, availability and starting price — customer
-            requests arrive with the scope and location already attached.
-            {" "}{catalog.length} categories, {TOTAL_SERVICES}+ services — register your interest before launch.
+            Customer requests arrive with scope and location already attached.
+            {" "}{catalog.length} categories, {TOTAL_SERVICES}+ services.
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2.5">
             <Link
@@ -184,23 +183,23 @@ function ProviderRecruitment() {
               data-analytics-location="homepage_provider_section"
               className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-elevated transition-transform hover:scale-[1.01]"
             >
-              Register Your Interest <ArrowRight className="h-4 w-4" />
+              Register Interest <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               to="/register"
               search={{ redirect: undefined, role: "provider" }}
               className="text-sm font-semibold text-white/85 underline underline-offset-4 transition-colors hover:text-white"
             >
-              Or create a full pro account
+              Create pro account
             </Link>
           </div>
 
         </div>
         <ul className="space-y-2 text-sm">
           {[
-            "Free profile with your service ZIP and radius",
-            "Only requests that match your category and service area",
-            "Set your own prices, availability and coverage",
+            "Free profile with ZIP and radius",
+            "Only matching requests reach you",
+            "Set your prices and availability",
           ].map((l) => (
             <li key={l} className="flex items-start gap-2 rounded-2xl bg-white/10 px-4 py-2.5 backdrop-blur">
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> {l}
@@ -250,12 +249,12 @@ export function Footer() {
   };
 
   return (
-    <footer className="mt-14 border-t border-border/60 pt-10 pb-6 text-sm text-muted-foreground">
+    <footer className="mt-12 border-t border-border/60 pt-10 pb-6 text-sm text-muted-foreground">
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
         <div className="min-w-0">
           <Logo showTagline />
           <p className="mt-3 max-w-xs text-xs leading-relaxed">
-            Show, say or type the service you need. We connect you with trusted local pros.
+            Type, say, or show what you need. We find the right local pro.
           </p>
         </div>
 
@@ -284,7 +283,7 @@ export function Footer() {
                 For Pros
               </Link>
             </li>
-            <li><Link to="/snap" data-analytics-id="show_gpb_cta" data-analytics-location="footer" className="hover:text-foreground">Show GetPros</Link></li>
+            <li><Link to="/snap" data-analytics-id="show_gpb_cta" data-analytics-location="footer" className="hover:text-foreground">Show GP</Link></li>
             <li><Link to="/services" className="hover:text-foreground">All services</Link></li>
           </ul>
         </div>
@@ -301,9 +300,8 @@ export function Footer() {
         <div className="min-w-0">
           <div className="mb-2 text-xs font-bold uppercase tracking-wider text-foreground">Newsletter</div>
           <p className="mb-3 text-xs leading-relaxed">
-            General GetPros news and new services — this is not the early access list.{" "}
-            <a href="/#early-access" className="font-semibold text-primary hover:underline">Join early access</a> to
-            be notified when pros go live near you. Unsubscribe anytime.
+            GetPros news and new services.{" "}
+            <a href="/#early-access" className="font-semibold text-primary hover:underline">Join early access</a> for launch alerts.
           </p>
 
           <form

@@ -159,7 +159,7 @@ export const DEFAULT_UI_COPY: Required<PlanUiCopy> = {
   errorTitle: "We couldn't build that plan just now.",
   retryLabel: "Try again",
   snapCtaTitle: "Easier to show than say it?",
-  snapCtaBody: "Send GetPros a photo or video instead.",
+  snapCtaBody: "Send GP a photo or video instead.",
   earlyCtaTitle: "Want GetPros to run plans like this?",
   earlyCtaBody: "Join early access — launching city by city.",
 };
