@@ -49,7 +49,18 @@ function TopBar() {
           {/* One emphasis per row: Sign up is the only filled CTA. Secondary
               destinations (How it works, For Pros, Early Access) live in the
               footer so the header stays calm. */}
-          <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">
+          <Link
+            to="/snap"
+            onClick={(e) => {
+              // Already on Show GP with a photo/result open: reset in place
+              // and reopen the camera instead of a no-op same-route navigation.
+              if (useRouterState.getState().location.pathname === "/snap") {
+                e.preventDefault();
+                window.dispatchEvent(new Event("getpros:recapture"));
+              }
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors"
+          >
             <Camera className="h-4 w-4" /> Show GP
           </Link>
           <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Services</Link>
