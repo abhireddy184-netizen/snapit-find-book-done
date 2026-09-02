@@ -248,7 +248,7 @@ function PlanHeader({
 
       <form
         onSubmit={(e) => { e.preventDefault(); if (q.trim()) onSubmit(q.trim(), l.trim()); }}
-        className="mt-5 grid gap-2 rounded-2xl border border-border/60 bg-card p-3 shadow-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start"
+        className="mt-5 grid gap-2 surface-card p-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start"
       >
         <div className="grid min-w-0 gap-2">
           <label htmlFor="plan-request" className="sr-only">{c.requestPlaceholder}</label>
@@ -286,7 +286,7 @@ function PlanHeader({
 
 function PlanSkeleton({ request }: { request: string }) {
   return (
-    <div className="mt-6 rounded-2xl border border-border/60 bg-card p-6">
+    <div className="mt-6 surface-card p-6">
       <p className="flex items-center gap-2 text-sm font-bold">
         <Loader2 className="h-4 w-4 animate-spin text-primary" /> GetPros is sequencing your plan…
       </p>
@@ -322,7 +322,7 @@ function ConversationCard({
           <p dir="auto" className="mt-1 reply-text break-words">{request.trim()}</p>
         </div>
       )}
-      <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+      <div className="surface-card p-5 sm:p-6">
         <div className="flex items-start gap-3">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
             <MessageCircle className="h-5 w-5" />
@@ -359,7 +359,7 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
   const endDateLabel = end >= 1440 ? formatPlanDate(addDays(plan.startDate, Math.floor(end / 1440)), locale) : null;
 
   return (
-    <section className="mt-6 overflow-hidden rounded-2xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+    <section className="mt-6 overflow-hidden surface-card p-5 sm:p-6">
       <div className="flex flex-wrap items-center gap-2">
         {isDemo && (
           <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-black uppercase tracking-wider text-primary">
@@ -765,7 +765,7 @@ function PlanDetails({ plan }: { plan: GpbPlan }) {
         </p>
       )}
 
-      <details className="group rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
+      <details className="group surface-card p-5">
         <summary dir="auto" className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-black tracking-tight">
           {c.detailsHeading}
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border/60 text-muted-foreground transition-transform group-open:rotate-90">
@@ -817,7 +817,7 @@ function NextSteps({ c }: { c: Copy }) {
         to="/snap"
         data-analytics-id="show_gpb_cta"
         data-analytics-location="plan_page"
-        className="flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30"
+        className="flex items-center justify-between gap-3 surface-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30"
       >
         <span>
           <span dir="auto" className="block text-sm font-black tracking-tight">{c.snapCtaTitle}</span>
@@ -829,7 +829,7 @@ function NextSteps({ c }: { c: Copy }) {
         href="/#early-access"
         data-analytics-id="early_access_cta"
         data-analytics-location="plan_page"
-        className="flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30"
+        className="flex items-center justify-between gap-3 surface-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30"
       >
         <span>
           <span dir="auto" className="block text-sm font-black tracking-tight">{c.earlyCtaTitle}</span>

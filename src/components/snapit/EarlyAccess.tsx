@@ -10,7 +10,7 @@ import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 /** Show GetPros callout — concise, mobile-first. */
 export function ShowGpbCallout() {
   return (
-    <section className="mt-10 overflow-hidden rounded-2xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+    <section className="mt-10 overflow-hidden surface-card p-5 sm:p-6">
       <div className="grid gap-4 md:grid-cols-[1.3fr_auto] md:items-center">
         <div className="min-w-0">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-black text-primary">
@@ -87,7 +87,7 @@ export function EarlyAccessSection() {
 
   return (
     <section id="early-access" className="mt-12 scroll-mt-24">
-      <div className="overflow-hidden rounded-2xl border border-border/60 bg-card p-5 shadow-sm sm:p-8">
+      <div className="overflow-hidden surface-card p-5 sm:p-8">
         <div className="grid gap-7 lg:grid-cols-[1fr_1fr] lg:items-start">
           <div className="min-w-0">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/15 px-3 py-1 text-xs font-black text-secondary">

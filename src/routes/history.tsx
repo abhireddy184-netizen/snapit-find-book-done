@@ -81,7 +81,7 @@ function HistoryPage() {
               return (
                 <div
                   key={entry.id}
-                  className="group flex gap-3 overflow-hidden rounded-3xl border border-border/60 bg-card p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-elevated"
+                  className="group flex gap-3 overflow-hidden surface-card p-3 transition-all hover:-translate-y-0.5 hover:shadow-elevated"
                 >
                   <img src={entry.thumbnail} alt="Diagnosis" className="h-28 w-28 shrink-0 rounded-2xl object-cover" />
                   <div className="min-w-0 flex-1">

@@ -451,7 +451,7 @@ function SnapPage() {
 
         {image && !analysis && (
           <div className="mt-6 space-y-4">
-            <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm">
+            <div className="relative overflow-hidden surface-card">
               <img src={image} alt="Captured problem" className="w-full max-h-[420px] object-contain bg-muted/30" />
               <div className="absolute top-3 left-3 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
                 {mediaKind === "video" ? "Video frame" : mediaKind === "photo" ? "Photo" : "Uploaded"}
@@ -496,7 +496,7 @@ function SnapPage() {
                 onChange={(e) => setNote(e.target.value)}
                 rows={3}
                 placeholder="e.g. Kitchen sink drips constantly, started yesterday…"
-                className="mt-1 w-full resize-none rounded-2xl border border-border/60 bg-card p-3 text-sm outline-none focus:border-primary"
+                className="mt-1 w-full resize-none surface-card p-3 text-sm outline-none focus:border-primary"
               />
             </label>
             {error && (
@@ -842,11 +842,11 @@ function AnalysisView({
     <div className="mt-6 space-y-5 animate-fade-in">
       <div className={`grid gap-4 ${image ? "md:grid-cols-[240px_1fr]" : ""}`}>
         {image && (
-          <div className="overflow-hidden rounded-2xl border border-border/60 bg-card">
+          <div className="overflow-hidden surface-card">
             <img src={image} alt="Diagnosed" className="h-full max-h-[240px] w-full object-cover" />
           </div>
         )}
-        <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
+        <div className="surface-card p-5">
           <div className="flex flex-wrap items-center gap-2">
             {category && (
               <span
@@ -947,7 +947,7 @@ function AnalysisView({
       )}
 
       {analysis.recommendedActions?.length > 0 && (
-        <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
+        <div className="surface-card p-5">
           <div className="text-sm font-bold">While you wait</div>
           <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
             {analysis.recommendedActions.map((a) => (
@@ -979,7 +979,7 @@ function AnalysisView({
             </div>
           )}
           {(analysis.nextSteps?.length ?? 0) > 0 && (
-            <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
+            <div className="surface-card p-5">
               <div className="mb-2 inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-primary">
                 <ArrowRight className="h-3.5 w-3.5" /> Suggested next steps
               </div>
@@ -1282,7 +1282,7 @@ function Stat({
   hint?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
+    <div className="surface-card p-4">
       <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
         <Icon className="h-3.5 w-3.5 text-primary" /> {label}
       </div>
@@ -1351,7 +1351,7 @@ function RecentDiagnoses({ entries }: { entries: SnapHistoryEntry[] }) {
             <Link
               key={entry.id}
               to="/history"
-              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card"
+              className="group flex items-center gap-3 surface-card p-3 transition-all hover:-translate-y-0.5 hover:shadow-card"
             >
               <div className="relative shrink-0">
                 {entry.thumbnail ? (

@@ -20,7 +20,7 @@ export const Route = createFileRoute("/tracking/$id")({
   },
   notFoundComponent: () => (
     <AppShell>
-      <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
+      <div className="mx-auto max-w-md surface-card p-6 text-center">
         <h1 className="text-xl font-black">Nothing to track on this link</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           This tracking link has expired or the job isn't live yet. Open the job from your bookings to see its status.
@@ -78,7 +78,7 @@ function TrackingPage() {
 
         <MapPreview progress={progress} providerInitials={provider.initials} gradient={provider.gradient} />
 
-        <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
+        <div className="surface-card p-4">
           <div className="flex items-center gap-3">
             <Avatar initials={provider.initials} gradient={provider.gradient} size={56} />
             <div className="min-w-0 flex-1">
@@ -103,7 +103,7 @@ function TrackingPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
+        <div className="surface-card p-5">
           <div className="text-sm font-bold">Trip progress</div>
           <ol className="mt-4 space-y-3">
             {stages.map((s, i) => {
@@ -133,17 +133,17 @@ function TrackingPage() {
         </div>
 
         <div className="grid grid-cols-3 gap-2 text-center text-xs">
-          <div className="rounded-2xl border border-border/60 bg-card p-3">
+          <div className="surface-card p-3">
             <MapPin className="mx-auto h-4 w-4 text-primary" />
             <div className="mt-1 font-bold">{provider.distance} mi</div>
             <div className="text-muted-foreground">Distance</div>
           </div>
-          <div className="rounded-2xl border border-border/60 bg-card p-3">
+          <div className="surface-card p-3">
             <Clock className="mx-auto h-4 w-4 text-primary" />
             <div className="mt-1 font-bold">{eta} min</div>
             <div className="text-muted-foreground">Arrival</div>
           </div>
-          <div className="rounded-2xl border border-border/60 bg-card p-3">
+          <div className="surface-card p-3">
             <Navigation className="mx-auto h-4 w-4 text-primary" />
             <div className="mt-1 font-bold">{Math.round(progress * 100)}%</div>
             <div className="text-muted-foreground">Route</div>

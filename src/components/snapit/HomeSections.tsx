@@ -18,7 +18,7 @@ export function AiJourneyStrip() {
       {STEPS.map((s, i) => (
         <li
           key={s.label}
-          className="flex min-w-[70%] snap-start items-center gap-2.5 rounded-2xl border border-border/60 bg-card px-3 py-2.5 shadow-sm min-[430px]:min-w-[58%] md:min-w-0"
+          className="flex min-w-[70%] snap-start items-center gap-2.5 surface-card px-3 py-2.5 min-[430px]:min-w-[58%] md:min-w-0"
         >
           <span
             className="grid h-8 w-8 shrink-0 place-items-center rounded-xl text-white"
@@ -59,7 +59,7 @@ export function CategoryIconRow() {
           className="group flex w-[74px] shrink-0 flex-col items-center gap-1.5 sm:w-auto"
         >
           <span
-            className="grid h-14 w-14 place-items-center rounded-2xl border border-border/60 bg-card shadow-sm transition-all group-hover:-translate-y-0.5 group-hover:shadow-card"
+            className="grid h-14 w-14 place-items-center surface-card transition-all group-hover:-translate-y-0.5 group-hover:shadow-card"
             style={{ color: c.tint }}
           >
             <c.icon className="h-6 w-6" />
@@ -124,7 +124,7 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
               key={`${categorySlug}/${service.slug}`}
               to="/services/$category/$service"
               params={{ category: categorySlug, service: service.slug }}
-              className="group w-[154px] shrink-0 snap-start overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-card min-[430px]:w-[168px] md:w-auto"
+              className="group w-[154px] shrink-0 snap-start overflow-hidden surface-card transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-card min-[430px]:w-[168px] md:w-auto"
             >
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
                 {img ? (

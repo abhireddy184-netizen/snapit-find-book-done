@@ -59,7 +59,7 @@ function EmergencyPage() {
             <Link
               key={t.slug}
               to="/snap"
-              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-red-300 hover:shadow-elevated"
+              className="group flex items-center gap-3 surface-card p-4 transition-all hover:-translate-y-0.5 hover:border-red-300 hover:shadow-elevated"
             >
               <div className={`grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${t.color} text-white shadow-card`}>
                 <t.icon className="h-5 w-5" />
@@ -80,7 +80,7 @@ function EmergencyPage() {
         <h2 className="text-lg font-black">On-call now near you</h2>
         <div className="mt-4 space-y-3">
           {emergencyPros.map((p) => (
-            <div key={p.id} className="flex flex-col gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm sm:flex-row sm:items-center">
+            <div key={p.id} className="flex flex-col gap-3 surface-card p-4 sm:flex-row sm:items-center">
               <div className="flex items-center gap-3">
                 <Avatar initials={p.initials} gradient={p.gradient} />
                 <div>

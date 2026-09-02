@@ -45,7 +45,7 @@ export function HowItWorks() {
         {STEPS.map((s, i) => (
           <li
             key={s.title}
-            className="relative overflow-hidden rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card"
+            className="relative overflow-hidden surface-card p-5 transition-all hover:-translate-y-0.5 hover:shadow-card"
           >
             <span className="absolute right-4 top-3 text-4xl font-black leading-none text-muted-foreground/15">
               {i + 1}
@@ -130,7 +130,7 @@ export function OutcomeBundles() {
         {BUNDLES.map((b) => (
           <article
             key={b.title}
-            className="flex w-[82%] shrink-0 snap-start flex-col rounded-2xl border border-border/60 bg-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-card min-[430px]:w-[74%] md:w-auto"
+            className="flex w-[82%] shrink-0 snap-start flex-col surface-card p-5 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-card min-[430px]:w-[74%] md:w-auto"
           >
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-base font-black tracking-tight">{b.title}</h3>
@@ -205,7 +205,7 @@ export function DailyLifeModules() {
             {...(m.category
               ? { to: "/services/$category" as const, params: { category: m.category } }
               : { to: "/emergency" as const })}
-            className="group flex items-start gap-3.5 rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-card sm:p-5"
+            className="group flex items-start gap-3.5 surface-card p-4 transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-card sm:p-5"
           >
             <span
               className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-border/60 bg-background"
@@ -229,7 +229,7 @@ export function DailyLifeModules() {
 
 export function ShowGpbBand() {
   return (
-    <section className="mt-14 overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm">
+    <section className="mt-14 overflow-hidden surface-card">
       <div className="grid gap-5 p-5 sm:p-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <div className="min-w-0">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-black text-primary">
@@ -291,7 +291,7 @@ export function TrustSection() {
       </header>
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {TRUST.map((t) => (
-          <div key={t.title} className="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
+          <div key={t.title} className="surface-card p-5">
             <span className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/10 text-primary">
               <t.icon className="h-5 w-5" />
             </span>
@@ -346,7 +346,7 @@ export function SimpleFlow() {
         {FLOW.map((s, i) => (
           <li
             key={s.title}
-            className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-card"
+            className="surface-card p-6 transition-all hover:-translate-y-0.5 hover:shadow-card"
           >
             <span
               className="grid h-12 w-12 place-items-center rounded-2xl text-white shadow-card"
@@ -368,7 +368,7 @@ export function SimpleFlow() {
 export function HowGpbWorksDetails() {
   return (
     <section id="how-it-works" className="mt-10 scroll-mt-24">
-      <details className="group rounded-2xl border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+      <details className="group surface-card p-5 sm:p-6">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-base font-black tracking-tight">
           How GetPros works
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border/60 text-muted-foreground transition-transform group-open:rotate-90">

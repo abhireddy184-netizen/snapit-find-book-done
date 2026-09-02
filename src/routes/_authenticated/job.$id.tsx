@@ -122,7 +122,7 @@ function JobPassport() {
   if (!job) {
     return (
       <AppShell>
-        <div className="rounded-3xl border border-border/60 bg-card p-10 text-center">
+        <div className="surface-card p-10 text-center">
           <h1 className="text-lg font-black">Job not found</h1>
           <p className="mt-2 text-sm text-muted-foreground">This job may have been removed.</p>
           <Link to="/dashboard" className="mt-4 inline-block text-sm font-semibold text-primary">Back to dashboard</Link>
@@ -168,7 +168,7 @@ function JobPassport() {
 
 function FlowStrip({ step }: { step: number }) {
   return (
-    <div className="mt-5 overflow-x-auto rounded-3xl border border-border/60 bg-card p-4 shadow-sm">
+    <div className="mt-5 overflow-x-auto surface-card p-4">
       <div className="flex min-w-max items-center gap-2">
         {FLOW.map((label, i) => {
           const done = i < step;
@@ -195,7 +195,7 @@ function FlowStrip({ step }: { step: number }) {
 
 function Card({ title, icon: Icon, children, action }: { title: string; icon: typeof ClipboardList; children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <section className="mt-4 rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
+    <section className="mt-4 surface-card p-5">
       <div className="flex items-center justify-between gap-3">
         <div className="inline-flex items-center gap-2 text-sm font-black">
           <Icon className="h-4 w-4 text-primary" /> {title}

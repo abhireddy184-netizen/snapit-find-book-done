@@ -135,14 +135,14 @@ function ProviderInterestPage() {
               "Before & after proof recorded on every job",
               "No listing fee to register interest",
             ].map((l) => (
-              <li key={l} className="flex items-start gap-2 rounded-2xl border border-border/60 bg-card px-4 py-3">
+              <li key={l} className="flex items-start gap-2 surface-card px-4 py-3">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> {l}
               </li>
             ))}
           </ul>
         </div>
 
-        <form onSubmit={submit} className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm">
+        <form onSubmit={submit} className="surface-card p-6">
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Full name" value={fullName} onChange={setFullName} placeholder="Jamie Rivera" required />
             <Field label="Email" type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />

@@ -102,7 +102,7 @@ function Jobs({ userId }: { userId: string | undefined }) {
 
   if (jobs.length === 0) {
     return (
-      <div className="rounded-3xl border border-border/60 bg-card p-10 text-center shadow-sm">
+      <div className="surface-card p-10 text-center">
         <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--primary)" }}>
           <Camera className="h-6 w-6" />
         </div>
@@ -144,7 +144,7 @@ function JobCard({ job }: { job: Job }) {
     <Link
       to="/job/$id"
       params={{ id: job.id }}
-      className="block rounded-2xl border border-border/60 bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-elevated"
+      className="block surface-card p-4 transition-all hover:-translate-y-0.5 hover:shadow-elevated"
     >
       <div className="flex flex-wrap items-center gap-2">
         <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">{job.category_label}</span>
@@ -184,7 +184,7 @@ function Bookings({ userId }: { userId: string | undefined }) {
   const bookings = data ?? [];
   if (bookings.length === 0) {
     return (
-      <div className="rounded-3xl border border-border/60 bg-card p-10 text-center shadow-sm">
+      <div className="surface-card p-10 text-center">
         <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--primary)" }}>
           <Camera className="h-6 w-6" />
         </div>
@@ -230,7 +230,7 @@ function BookingCard({ booking }: { booking: Booking }) {
   const name = booking.provider_name_snapshot || "Pro to be assigned";
   const initials = name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
   return (
-    <div className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
+    <div className="surface-card p-4">
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
         <Avatar initials={initials} gradient="from-[#2C5CA8] to-[#2FA8C0]" />
         <div className="min-w-0">
@@ -258,7 +258,7 @@ function Saved() {
       <DemoNote>Sample pros shown for demo browsing — saved lists become real once providers join GetPros.</DemoNote>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {providers.slice(0, 4).map((p) => (
-          <Link key={p.id} to="/provider/$id" params={{ id: p.id }} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm hover:shadow-card">
+          <Link key={p.id} to="/provider/$id" params={{ id: p.id }} className="surface-card p-4 hover:shadow-card">
             <div className="flex items-center gap-3">
               <Avatar initials={p.initials} gradient={p.gradient} />
               <div className="min-w-0">
@@ -284,7 +284,7 @@ function Messages() {
   return (
     <div>
       <DemoNote>Messaging is not live yet — this is a sample preview of the inbox.</DemoNote>
-      <div className="rounded-2xl border border-border/60 bg-card divide-y divide-border/60">
+      <div className="surface-card divide-y divide-border/60">
         {providers.slice(0, 4).map((p, i) => (
           <div key={p.id} className="flex items-center gap-3 p-4">
             <Avatar initials={p.initials} gradient={p.gradient} />
@@ -309,7 +309,7 @@ function Profile() {
 
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
+      <div className="surface-card p-6">
         <div className="flex items-center gap-4">
           <Avatar initials={initials} gradient="from-[#2C5CA8] to-[#2FA8C0]" size={64} />
           <div className="min-w-0">
@@ -331,7 +331,7 @@ function Profile() {
           <LogOut className="h-4 w-4" /> Log out
         </button>
       </div>
-      <div className="rounded-2xl border border-border/60 bg-card p-6 shadow-sm">
+      <div className="surface-card p-6">
         <div className="text-sm font-bold">Saved addresses</div>
         <p className="mt-2 text-xs text-muted-foreground">Address book is coming soon. For now, you enter the service address with each booking.</p>
       </div>

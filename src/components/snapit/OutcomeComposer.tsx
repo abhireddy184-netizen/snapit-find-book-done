@@ -574,7 +574,7 @@ export function OutcomeComposer() {
     <form
       onSubmit={submit}
       data-analytics-id="outcome_composer"
-      className="rounded-2xl border border-border/60 bg-card p-3 shadow-[var(--shadow-elevated)] sm:p-4"
+      className="surface-card p-3 shadow-[var(--shadow-elevated)] sm:p-4"
     >
       <label htmlFor="gpb-outcome" className="sr-only">
         Describe the service you need

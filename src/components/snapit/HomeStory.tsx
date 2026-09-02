@@ -132,7 +132,7 @@ export function RoomStory() {
   return (
     <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-8 xl:gap-10">
       {/* Canvas */}
-      <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card shadow-[var(--shadow-elevated)]">
+      <div className="relative overflow-hidden surface-card shadow-[var(--shadow-elevated)]">
         <div className="relative aspect-[4/3] w-full overflow-hidden">
           {/* Room illustration, drawn in CSS */}
           <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, color-mix(in oklab, var(--primary) 7%, var(--card)) 0%, color-mix(in oklab, var(--secondary) 8%, var(--card)) 68%, color-mix(in oklab, var(--foreground) 8%, var(--card)) 68.5%, color-mix(in oklab, var(--foreground) 12%, var(--card)) 100%)" }} />
@@ -266,7 +266,7 @@ export function ProVerticals() {
           key={v.slug}
           to="/services/$category"
           params={{ category: v.slug }}
-          className="group relative overflow-hidden rounded-3xl border border-border/60 bg-card p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-elevated"
+          className="group relative overflow-hidden surface-card p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-elevated"
         >
           <span
             className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full opacity-15 blur-2xl transition-opacity group-hover:opacity-35"

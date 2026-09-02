@@ -22,7 +22,7 @@ export const Route = createFileRoute("/provider/$id")({
   }),
   notFoundComponent: () => (
     <AppShell>
-      <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
+      <div className="mx-auto max-w-md surface-card p-6 text-center">
         <h1 className="text-xl font-black">This pro profile isn't available</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           The profile may have been removed, or the link is out of date. Search for another pro in your area.
@@ -48,7 +48,7 @@ function ProviderPage() {
 
   return (
     <AppShell>
-      <section className="mt-4 overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm">
+      <section className="mt-4 overflow-hidden surface-card">
         <div className={`h-32 bg-gradient-to-br ${p.gradient}`} />
         <div className="p-6">
           <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-4 sm:flex sm:items-center sm:justify-between">
@@ -86,7 +86,7 @@ function ProviderPage() {
       </Section>
 
       <Section title="Services & pricing">
-        <div className="rounded-2xl border border-border/60 bg-card divide-y divide-border/60">
+        <div className="surface-card divide-y divide-border/60">
           {p.services.map((s) => (
             <div key={s.name} className="flex items-center justify-between p-4">
               <div className="text-sm font-medium">{s.name}</div>
@@ -97,7 +97,7 @@ function ProviderPage() {
       </Section>
 
       <Section title="Availability">
-        <div className="rounded-2xl border border-border/60 bg-card p-5">
+        <div className="surface-card p-5">
           <div className="flex gap-2 overflow-x-auto pb-2">
             {days.map((d, i) => (
               <button
@@ -130,7 +130,7 @@ function ProviderPage() {
       <Section title={`Reviews (${p.reviews})`}>
         <div className="space-y-3">
           {p.reviewList.map((r) => (
-            <div key={r.name} className="rounded-2xl border border-border/60 bg-card p-4">
+            <div key={r.name} className="surface-card p-4">
               <div className="flex items-center justify-between">
                 <div className="text-sm font-bold">{r.name}</div>
                 <div className="text-xs text-muted-foreground">{r.date}</div>

@@ -95,7 +95,7 @@ function useProviderBookings(userId: string | undefined) {
 
 function EmptyJobs({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-3xl border border-border/60 bg-card p-10 text-center shadow-sm">
+    <div className="surface-card p-10 text-center">
       <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--primary)" }}>
         <Inbox className="h-6 w-6" />
       </div>
@@ -138,7 +138,7 @@ function Requests({ userId }: { userId: string | undefined }) {
         <p className="rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-medium text-destructive">{actionError}</p>
       )}
       {bookings.map((b) => (
-        <div key={b.id} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
+        <div key={b.id} className="surface-card p-4">
           <JobRow booking={b} />
           <div className="mt-3 flex gap-2">
             <button
@@ -212,7 +212,7 @@ function Schedule({ userId }: { userId: string | undefined }) {
         <p className="rounded-2xl border border-destructive/30 bg-destructive/10 p-3 text-xs font-medium text-destructive">{actionError}</p>
       )}
       {upcoming.map((b) => (
-        <div key={b.id} className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
+        <div key={b.id} className="surface-card p-4">
           <JobRow booking={b} />
           <div className="mt-3 flex flex-wrap gap-2">
             {b.status === "confirmed" ? (
@@ -367,7 +367,7 @@ function BusinessProfile() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
-      <form onSubmit={save} className="rounded-3xl border border-border/60 bg-card p-6 shadow-sm">
+      <form onSubmit={save} className="surface-card p-6">
         <div className="flex items-center gap-3">
           <GpbMark />
           <div>
@@ -500,7 +500,7 @@ function VerificationCard({
   const StateIcon = state.icon;
 
   return (
-    <div className="rounded-3xl border border-border/60 bg-card p-5 shadow-sm">
+    <div className="surface-card p-5">
       <div className="flex items-center gap-3">
         <GpbMark />
         <div>

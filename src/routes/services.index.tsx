@@ -148,7 +148,7 @@ function ServiceRow({
     <Link
       to="/services/$category/$service"
       params={{ category: categorySlug, service: slug }}
-      className="card-lift group flex h-full flex-col rounded-3xl border border-border/60 bg-card p-4 shadow-sm hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-elevated"
+      className="card-lift group flex h-full flex-col surface-card p-4 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-elevated"
     >
       <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{categoryName}</div>
       <div className="mt-1 text-sm font-black">{name}</div>

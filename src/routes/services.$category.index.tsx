@@ -30,7 +30,7 @@ export const Route = createFileRoute("/services/$category/")({
   },
   notFoundComponent: () => (
     <AppShell>
-      <div className="mx-auto max-w-md rounded-3xl border border-border/60 bg-card p-6 text-center">
+      <div className="mx-auto max-w-md surface-card p-6 text-center">
         <h1 className="text-xl font-black">We don't have that category</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           The link may be out of date. Browse all 32 GetPros categories to find the service you need.
@@ -84,7 +84,7 @@ function CategoryPage() {
       <ServicePicker category={category} />
 
       {(licenseRequired || slug === "beauty-at-home") && (
-        <p className="mt-4 rounded-2xl border border-border/60 bg-card px-4 py-3 text-xs leading-relaxed text-muted-foreground">
+        <p className="mt-4 surface-card px-4 py-3 text-xs leading-relaxed text-muted-foreground">
           {slug === "beauty-at-home"
             ? "At-home beauty availability varies by state/local rules and provider licensing."
             : "Local licensing or qualification requirements may apply depending on the job and location. GetPros should match regulated work only to appropriately qualified providers where required by local law."}
@@ -132,7 +132,7 @@ function ServicePicker({ category }: { category: MasterCategory }) {
             key={sv.slug}
             to="/services/$category/$service"
             params={{ category: category.slug, service: sv.slug }}
-            className="card-lift group flex h-full items-center gap-3 overflow-hidden rounded-2xl border border-border/60 bg-card p-2.5 shadow-sm hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-card sm:flex-col sm:items-stretch sm:gap-0 sm:rounded-3xl sm:p-0"
+            className="card-lift group flex h-full items-center gap-3 overflow-hidden surface-card p-2.5 hover:-translate-y-0.5 hover:border-secondary/40 hover:shadow-card sm:flex-col sm:items-stretch sm:gap-0 sm:rounded-3xl sm:p-0"
           >
             {serviceScene(category.slug, sv.slug) && (
               <div className="relative h-16 w-20 shrink-0 overflow-hidden rounded-xl bg-muted sm:h-auto sm:w-full sm:rounded-none sm:aspect-[16/9]">
