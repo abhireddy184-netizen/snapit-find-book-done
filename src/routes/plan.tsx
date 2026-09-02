@@ -11,7 +11,7 @@ import type { LucideIcon } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { buildPlan, type PlanResult } from "@/lib/plan.functions";
 import {
-  CHANNEL_META, DEFAULT_UI_COPY, demoAirportPlan, formatClock, formatPlanDate, move, parseClock,
+  addDays, CHANNEL_META, DEFAULT_UI_COPY, demoAirportPlan, formatClock, formatPlanDate, move, parseClock,
   planDeadlineMinutes, planEndMinutes, planLocale, resequence, uiCopy,
   type ExecutionChannel, type GpbPlan, type PlanTask, type PlanUiCopy,
 } from "@/lib/plan-model";
@@ -355,6 +355,8 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
   const deadlineDateLabel = formatPlanDate(plan.deadlineDate ?? plan.startDate, locale);
   // Only worth showing the day on the target when it differs from the start day.
   const showDeadlineDate = Boolean(plan.deadlineDate && plan.deadlineDate !== plan.startDate);
+  // The plan can run past midnight (a late outing), so carry the day forward.
+  const endDateLabel = end >= 1440 ? formatPlanDate(addDays(plan.startDate, Math.floor(end / 1440)), locale) : null;
 
   return (
     <section className="mt-6 overflow-hidden rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
@@ -393,7 +395,9 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
         <Stat
           label={plan.deadline ? c.targetLabel : c.planEndsLabel}
           value={formatClock(plan.deadline ? parseClock(plan.deadline) : end, locale)}
-          sub={showDeadlineDate ? deadlineDateLabel : null}
+          // Show the day whenever the target sits on another date, and whenever
+          // the plan itself runs past midnight — "2:01" alone is ambiguous.
+          sub={plan.deadline ? (showDeadlineDate ? deadlineDateLabel : null) : endDateLabel}
           icon={Clock}
         />
         <Stat
@@ -409,6 +413,7 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
           tone={slack != null && slack < 0 ? "danger" : undefined}
         />
       </dl>
+
     </section>
   );
 
@@ -581,6 +586,7 @@ function Timeline({
             task={task}
             index={i}
             clock={formatClock(start + task.startOffsetMinutes, locale)}
+            dayShift={Math.floor((start + task.startOffsetMinutes) / 1440)}
             isLast={i === plan.tasks.length - 1}
             onMove={(dir) => onChange(move(plan.tasks, i, i + dir))}
             onToggleSkip={() =>
@@ -604,9 +610,9 @@ function Timeline({
 }
 
 function TaskRow({
-  c, task, index, clock, isLast, onMove, onToggleSkip, onRename, onDuration,
+  c, task, index, clock, dayShift, isLast, onMove, onToggleSkip, onRename, onDuration,
 }: {
-  c: Copy; task: PlanTask; index: number; clock: string; isLast: boolean;
+  c: Copy; task: PlanTask; index: number; clock: string; dayShift: number; isLast: boolean;
   onMove: (dir: number) => void; onToggleSkip: () => void;
   onRename: (title: string) => void; onDuration: (minutes: number) => void;
 }) {
@@ -621,9 +627,15 @@ function TaskRow({
         skipped ? "border-dashed border-border/60 opacity-60" : "border-border/60"
       }`}
     >
-      <div className="grid gap-3 sm:grid-cols-[5.5rem_auto_minmax(0,1fr)_auto] sm:items-start">
+      <div className="grid gap-3 sm:grid-cols-[5.5rem_auto_minmax(0,1fr)] sm:items-start">
         <div className="flex items-center gap-2 sm:block">
-          <span className="text-sm font-black tracking-tight text-foreground">{skipped ? "—" : clock}</span>
+          <span className="text-sm font-black tracking-tight text-foreground">
+            {skipped ? "—" : clock}
+            {/* Past midnight the bare clock is ambiguous, so mark the next day. */}
+            {!skipped && dayShift > 0 && (
+              <span className="ml-1 align-top text-[10px] font-bold text-muted-foreground">+{dayShift}d</span>
+            )}
+          </span>
           <span className="block text-[11px] font-semibold text-muted-foreground">
             {task.durationMinutes > 0 ? `${task.durationMinutes} ${c.minutesShort}` : ""}
           </span>
@@ -673,55 +685,60 @@ function TaskRow({
             )}
           </div>
 
+          {/* Default card stays short and legible: only Edit shows. Duration,
+              skip and reordering are mechanics, revealed on demand. */}
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               onClick={() => setEditing((v) => !v)}
-              className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-bold hover:bg-muted"
+              className="rounded-full border border-border bg-background px-3 py-1.5 text-[12px] font-bold hover:bg-muted"
             >
               {editing ? c.doneLabel : c.editLabel}
             </button>
-            <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
-              <span className="sr-only sm:not-sr-only">{c.durationLabel}</span>
-              <input
-                type="number"
-                min={0}
-                max={480}
-                step={5}
-                value={task.durationMinutes}
-                onChange={(e) => onDuration(Math.max(0, Math.min(480, Number(e.target.value) || 0)))}
-                aria-label={`Duration in minutes for ${task.title}`}
-                className="w-16 rounded-full border border-border bg-background px-2.5 py-1.5 text-[11px] font-bold outline-none"
-              />
-              {c.minutesShort}
-            </label>
-            <button
-              onClick={onToggleSkip}
-              className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-bold hover:bg-muted"
-            >
-              {skipped ? c.restoreLabel : c.skipLabel}
-            </button>
           </div>
-        </div>
 
-        <div className="flex gap-1.5 sm:flex-col">
-          <button
-            onClick={() => onMove(-1)}
-            disabled={index === 0}
-            aria-label={`Move ${task.title} earlier`}
-            className="grid h-8 w-8 place-items-center rounded-full border border-border bg-background disabled:opacity-30 hover:bg-muted"
-          >
-            <ArrowUp className="h-3.5 w-3.5" />
-          </button>
-          <button
-            onClick={() => onMove(1)}
-            disabled={isLast}
-            aria-label={`Move ${task.title} later`}
-            className="grid h-8 w-8 place-items-center rounded-full border border-border bg-background disabled:opacity-30 hover:bg-muted"
-          >
-            <ArrowDown className="h-3.5 w-3.5" />
-          </button>
+          {editing && (
+            <div className="mt-2 flex flex-wrap items-center gap-2 rounded-2xl border border-border/60 bg-muted/30 p-2.5">
+              <label className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground">
+                <span>{c.durationLabel}</span>
+                <input
+                  type="number"
+                  min={0}
+                  max={480}
+                  step={5}
+                  value={task.durationMinutes}
+                  onChange={(e) => onDuration(Math.max(0, Math.min(480, Number(e.target.value) || 0)))}
+                  aria-label={`Duration in minutes for ${task.title}`}
+                  className="w-16 rounded-full border border-border bg-background px-2.5 py-1.5 text-[11px] font-bold outline-none"
+                />
+                {c.minutesShort}
+              </label>
+              <button
+                onClick={onToggleSkip}
+                className="rounded-full border border-border bg-background px-3 py-1.5 text-[11px] font-bold hover:bg-muted"
+              >
+                {skipped ? c.restoreLabel : c.skipLabel}
+              </button>
+              <button
+                onClick={() => onMove(-1)}
+                disabled={index === 0}
+                aria-label={`Move ${task.title} earlier`}
+                className="grid h-8 w-8 place-items-center rounded-full border border-border bg-background disabled:opacity-30 hover:bg-muted"
+              >
+                <ArrowUp className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => onMove(1)}
+                disabled={isLast}
+                aria-label={`Move ${task.title} later`}
+                className="grid h-8 w-8 place-items-center rounded-full border border-border bg-background disabled:opacity-30 hover:bg-muted"
+              >
+                <ArrowDown className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
+
     </li>
   );
 }

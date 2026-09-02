@@ -444,3 +444,11 @@ export function demoAirportPlan(): GpbPlan {
     source: "demo",
   };
 }
+
+/** "YYYY-MM-DD" shifted by whole days; undefined when the input is not a date. */
+export function addDays(date: string | undefined, days: number): string | undefined {
+  if (!isIsoDate(date)) return undefined;
+  const ms = Date.parse(`${date}T12:00:00Z`) + days * 86_400_000;
+  if (Number.isNaN(ms)) return undefined;
+  return new Date(ms).toISOString().slice(0, 10);
+}

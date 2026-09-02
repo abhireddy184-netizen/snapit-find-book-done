@@ -143,8 +143,14 @@ Break the request into 2-8 child tasks. For each task decide:
 - locationNote: short route/location hint when relevant ("On route to DFW", "At home").
 
 TIMING AND DATES
-- If the request names a hard deadline (e.g. "by 6 PM", "before 8:30"), set "deadline" as 24h "HH:MM" and work backwards, leaving bufferMinutes (15-25) of safety before it.
+- ONLY THE CUSTOMER SETS A TARGET TIME. Set "deadline" and "deadlineStated":true ONLY when the customer themselves stated a hard time they must meet ("by 6 PM", "before 8:30", "my flight is at 7"). Then work backwards, leaving bufferMinutes (15-25) of safety before it.
+- If they did NOT state a time, leave "deadline" as an empty string and "deadlineStated":false. NEVER invent a target, closing time, arrival time or end time. An untimed outing ("I want to go to a sports bar", "let's play golf") is a flexible ordered plan with no deadline and no buffer.
+- The END of an outing is NOT a deadline. Being somewhere by a stated time is a deadline; leaving a bar afterwards is not.
+- If a time would genuinely help ("tonight", "tomorrow night" with no hour), keep the plan flexible and put ONE short question in "clarifyTitle"-style wording via "notes" — e.g. "When would you like to go?" — instead of guessing an hour.
+- "tomorrow night" / "tonight" set the DATE, not a clock time: keep tomorrow's date in the customer's own timezone and still leave the deadline empty.
+- TRAVEL TIMES ARE ESTIMATES. GPB has no live routing data, so never present a travel or wait duration as exact — word it as an estimate in the task detail.
 - Set "startClock" as 24h "HH:MM" for when the plan should begin.
+
 - DATES MATTER. You are given today's date. If the request names a future date or day ("September 13", "Saturday", "tomorrow"), set "startDate" and "deadlineDate" as "YYYY-MM-DD" for the day the work and the deadline actually fall on. NEVER schedule a future-dated plan as if it started at the current clock time today, and never mark a future deadline as already missed.
 - If no date is stated, set "startDate" and "deadlineDate" to today's date (or tomorrow's when the stated time has clearly already passed today).
 - FLIGHTS: a flight departure time is NOT the deadline. The deadline is being at the airport ahead of departure — typically 2 hours before for domestic and 3 hours for international — plus travel time. Say plainly in the task detail which time is departure and which is airport arrival.
@@ -182,7 +188,7 @@ CATALOG (categorySlug: serviceSlugs)
 ${catalogSummary()}
 
 Return ONLY minified JSON, no markdown:
-{"outcome":string,"summary":string,"deadline":string,"startClock":string,"startDate":string,"deadlineDate":string,"bufferMinutes":number,"tasks":[{"id":string,"title":string,"detail":string,"channel":string,"categorySlug":string,"serviceSlug":string,"durationMinutes":number,"parallel":boolean,"dependsOn":[string],"locationNote":string}],"notes":[string],"bookingDisclaimer":string,"partnerDisclaimer":string,"uiCopy":{"stepsHeading":string,"stepsHint":string,"resetLabel":string,"editLabel":string,"doneLabel":string,"skipLabel":string,"restoreLabel":string,"durationLabel":string,"minutesShort":string,"findProLabel":string,"planStartsLabel":string,"targetLabel":string,"planEndsLabel":string,"stepsLabel":string,"bufferLabel":string,"tasksWord":string,"spareSuffix":string,"overSuffix":string,"detailsHeading":string,"clarifyTitle":string,"clarifyHint":string,"clarifyPlaceholder":string,"clarifySubmit":string,"clarifyDismiss":string,"pageTitle":string,"pageIntro":string,"requestPlaceholder":string,"locationPlaceholder":string,"buildLabel":string,"errorTitle":string,"retryLabel":string,"snapCtaTitle":string,"snapCtaBody":string,"earlyCtaTitle":string,"earlyCtaBody":string}}
+{"outcome":string,"summary":string,"deadline":string,"deadlineStated":boolean,"startClock":string,"startDate":string,"deadlineDate":string,"bufferMinutes":number,"tasks":[{"id":string,"title":string,"detail":string,"channel":string,"categorySlug":string,"serviceSlug":string,"durationMinutes":number,"parallel":boolean,"dependsOn":[string],"locationNote":string}],"notes":[string],"bookingDisclaimer":string,"partnerDisclaimer":string,"uiCopy":{"stepsHeading":string,"stepsHint":string,"resetLabel":string,"editLabel":string,"doneLabel":string,"skipLabel":string,"restoreLabel":string,"durationLabel":string,"minutesShort":string,"findProLabel":string,"planStartsLabel":string,"targetLabel":string,"planEndsLabel":string,"stepsLabel":string,"bufferLabel":string,"tasksWord":string,"spareSuffix":string,"overSuffix":string,"detailsHeading":string,"clarifyTitle":string,"clarifyHint":string,"clarifyPlaceholder":string,"clarifySubmit":string,"clarifyDismiss":string,"pageTitle":string,"pageIntro":string,"requestPlaceholder":string,"locationPlaceholder":string,"buildLabel":string,"errorTitle":string,"retryLabel":string,"snapCtaTitle":string,"snapCtaBody":string,"earlyCtaTitle":string,"earlyCtaBody":string}}
 Keep every string short and plain-language.`;
 
 export function buildPlanUserPrompt(
@@ -501,12 +507,20 @@ export function normalizePlan(
 
   if (!tasks.length) return buildFallbackPlan(request, location, nowClock, understanding, nowDate, timeZone);
 
-  const deadline =
+  // A target time may only come from the customer. The model must flag whether
+  // the deadline was actually stated; anything it invents is discarded so an
+  // untimed outing ("I want to go to a sports bar") never gets a fake target,
+  // a fake buffer, or an "over" warning measured against it.
+  const deadlineStated = parsed['deadlineStated'] === true;
+  const rawDeadline =
     typeof parsed['deadline'] === "string" && /^\d{1,2}:\d{2}$/.test(parsed['deadline'] as string)
       ? toClockString(parseClock(parsed['deadline'] as string))
       : // English regex is a last-resort fallback only; the canonical intent above
         // is what carries non-English deadlines.
         extractDeadline(understanding?.normalizedRequest ?? request);
+  const regexDeadline = extractDeadline(understanding?.normalizedRequest ?? request);
+  const deadline = deadlineStated || regexDeadline ? rawDeadline : undefined;
+
 
   const isoDate = (k: string) => {
     const v = parsed[k];
