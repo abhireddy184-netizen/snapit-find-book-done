@@ -1129,19 +1129,6 @@ function AnalysisView({
         </div>
       </div>
 
-      {messagingId && (
-        <MessageProSheet
-          pro={matched.find((p) => p.id === messagingId)!}
-          problem={analysis.problem}
-          onClose={() => setMessagingId(null)}
-        />
-      )}
-      {callingId && (
-        <CallProSheet
-          pro={matched.find((p) => p.id === callingId)!}
-          onClose={() => setCallingId(null)}
-        />
-      )}
     </div>
   );
 }
