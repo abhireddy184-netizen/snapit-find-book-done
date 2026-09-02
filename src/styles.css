@@ -514,3 +514,16 @@
     padding-inline: 0;
   }
 }
+
+/* Comfortable reading size for AI replies and plan body copy.
+   Script-neutral: no tight tracking, generous leading so Telugu/Devanagari
+   conjuncts and matras never clip. */
+@utility reply-text {
+  font-size: 1.0625rem; /* 17px */
+  line-height: 1.75;
+  letter-spacing: normal;
+  overflow-wrap: anywhere;
+  @media (min-width: 640px) {
+    font-size: 1.125rem; /* 18px */
+  }
+}
