@@ -63,9 +63,14 @@ function ProviderPage() {
                 <span className="mt-1 inline-flex rounded-full bg-muted px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-muted-foreground">Demo profile</span>
               </div>
             </div>
-            <Link to="/book" search={{ provider: p.id }} className="shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold text-white shadow-card" style={{ background: "var(--gradient-primary)" }}>
-              Book Now
+            <Link
+              to="/search"
+              search={{ q: p.category ?? "", loc: "", pros: 1 }}
+              className="shrink-0 rounded-full border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+            >
+              Find bookable pros
             </Link>
+
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
