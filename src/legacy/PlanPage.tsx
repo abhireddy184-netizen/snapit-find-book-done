@@ -29,26 +29,26 @@ function asString(v: unknown): string {
   return v == null ? "" : String(v);
 }
 
-export const Route = createFileRoute("/plan")({
-  validateSearch: (search: Record<string, unknown>): PlanSearch => ({
-    ...(search['demo'] ? { demo: true } : {}),
-    q: asString(search['q']),
-    loc: asString(search['loc']),
-  }),
-  head: () => ({
-    meta: [
-      { title: "Your GPB Plan — one plan for what you need done" },
-      { name: "description", content: "Tell GPB what you need done and get one clear plan with steps and timing. Nothing is booked until you say so." },
-      { property: "og:title", content: "Your GPB Plan — one plan for what you need done" },
-      { property: "og:description", content: "GPB turns what you need done into one clear, timed plan." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Your GPB plan" },
-      { name: "twitter:description", content: "One request. One clear plan." },
-    ],
-  }),
-  component: PlanPage,
-});
+/**
+ * DEFERRED (services-only launch): the general day-planner UI is kept here,
+ * intact but unlinked from routing. To restore it, move this file back to
+ * `src/routes/plan.tsx` and re-add the `createFileRoute("/plan")` export with
+ * the search validation below.
+ */
+const Route = {
+  useSearch: (): PlanSearch => {
+    if (typeof window === "undefined") return { q: "", loc: "" };
+    const p = new URLSearchParams(window.location.search);
+    return {
+      ...(p.get("demo") ? { demo: true } : {}),
+      q: asString(p.get("q")),
+      loc: asString(p.get("loc")),
+    };
+  },
+};
+
+export default PlanPage;
+
 
 const CHANNEL_ICON: Record<ExecutionChannel, LucideIcon> = {
   "gpb-pro": HardHat,
