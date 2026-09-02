@@ -149,15 +149,33 @@ function BookPage() {
       setStep(3);
       return;
     }
+    if (!location) {
+      setError("Add a US ZIP code to your address so we can schedule in your local time.");
+      setStep(3);
+      return;
+    }
+    if (!dateIso || slotMinute == null) {
+      setError("Pick a date and start time for your job.");
+      setStep(4);
+      return;
+    }
 
     if (!user) {
       if (typeof window !== "undefined") {
-        const draft: BookingDraft = { service, details, address, date, time, providerId: pro.id };
+        const draft: BookingDraft = {
+          service, details, address, date: dateIso, time: String(slotMinute), providerId: pro.id,
+        };
         window.localStorage.setItem(BOOKING_DRAFT_KEY, JSON.stringify(draft));
       }
       await navigate({ to: "/login", search: { redirect: "/book" } });
       return;
     }
+
+    // Store the exact instant alongside the local wall time, so the job means
+    // the same moment to the customer and the pro wherever each of them is.
+    const startAt = zonedTimeToUtc(dateIso, slotMinute, location.timeZone);
+    const endAt = new Date(startAt.getTime() + DEFAULT_DURATION_MINUTES * 60_000);
+    const timeLabel = formatSlot(slotMinute);
 
     setSubmitting(true);
     const { error: insertError } = await supabase.from("bookings").insert({
@@ -168,8 +186,11 @@ function BookPage() {
       service,
       details: details || null,
       service_address: address.trim(),
-      scheduled_date: resolveDate(date),
-      scheduled_time: time,
+      scheduled_date: dateIso,
+      scheduled_time: timeLabel,
+      start_at: startAt.toISOString(),
+      end_at: endAt.toISOString(),
+      service_timezone: location.timeZone,
       status: "pending",
     });
     setSubmitting(false);
@@ -185,11 +206,12 @@ function BookPage() {
         .update({
           status: "booked",
           service_address: address.trim(),
-          preferred_date: resolveDate(date),
-          preferred_time: time,
+          preferred_date: dateIso,
+          preferred_time: timeLabel,
         })
         .eq("id", jobId);
     }
+
 
     setConfirmed(true);
     setTimeout(() => {
