@@ -159,7 +159,9 @@ function BookPage() {
           replace: true,
         });
       }
-      setStep(steps.length - 1);
+      // Land on the schedule step when the draft carried a time, so any slot
+      // that expired while the customer signed in is visible, never silent.
+      setStep(draft.date ? 3 : steps.length - 1);
     } catch {
       /* ignore malformed draft */
     }
@@ -169,11 +171,14 @@ function BookPage() {
 
   // The service address decides the timezone — never the customer's device.
   // A pro in Frisco works 8–8 Central even if the phone is set to Tokyo.
+  // The previous location is dropped the moment the address is edited, so no
+  // schedule is ever shown for a place the customer has already changed.
   useEffect(() => {
     let cancelled = false;
     const value = address.trim();
     setLocationChecked(false);
-    if (!value) { setLocation(null); return; }
+    setLocation(null);
+    if (!value) return;
     void resolveServiceLocation(value).then((loc) => {
       if (!cancelled) { setLocation(loc); setLocationChecked(true); }
     });
@@ -201,21 +206,22 @@ function BookPage() {
   }, [timeZone, today, provider, hours, busy, durationMinutes, bufferMinutes, notBefore]);
 
   // Keep the selection valid, and tell the customer when their saved slot went
-  // away instead of silently moving them to another day.
+  // away instead of silently moving them to another day. An empty calendar —
+  // a closed week, a new address, a pro who just paused — clears it too.
   useEffect(() => {
-    if (days.length === 0) return;
+    if (scheduleLoading || !timeZone) return;
     const current = days.find((d) => d.iso === dateIso);
     if (!current) {
       if (dateIso || slotMinute != null) setSlotWasReset(true);
-      setDateIso(null);
-      setSlotMinute(null);
+      if (dateIso) setDateIso(null);
+      if (slotMinute != null) setSlotMinute(null);
       return;
     }
     if (slotMinute != null && !current.slots.includes(slotMinute)) {
       setSlotWasReset(true);
       setSlotMinute(null);
     }
-  }, [days, dateIso, slotMinute]);
+  }, [days, dateIso, slotMinute, scheduleLoading, timeZone]);
 
   const activeDay = days.find((d) => d.iso === dateIso) ?? null;
   const scheduleReady = Boolean(timeZone && dateIso && slotMinute != null);
