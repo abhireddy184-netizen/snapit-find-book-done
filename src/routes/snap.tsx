@@ -32,6 +32,7 @@ import {
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
 import { getCategoryBySlug } from "@/lib/catalog";
+import { detectServiceIntentInText } from "@/lib/search-intent";
 import { fetchBookableProviders, type ProviderMatch } from "@/lib/providers";
 import { extractZip, isZipCode, lookupZip } from "@/lib/us-zip";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
@@ -100,6 +101,10 @@ function SnapPage() {
   const [error, setError] = useState<string | null>(null);
   const [phase, setPhase] = useState<"idle" | "preparing" | "analyzing">("idle");
   const [pendingPreview, setPendingPreview] = useState<string | null>(null);
+  // True while a typed request that already maps to a catalogue service is
+  // resolving: it never touches the visual pipeline, so we show a short
+  // transition instead of the full scanning sequence.
+  const [fastPath, setFastPath] = useState(false);
   const analyze = useServerFn(analyzeSnap);
   const cameraRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
@@ -172,6 +177,7 @@ function SnapPage() {
     setImage(null);
     setFrames([]);
     setTextOnly(false);
+    setFastPath(false);
     setDescribeMode(false);
     setMediaKind(kind);
     setNote("");
@@ -229,6 +235,8 @@ function SnapPage() {
     setImage(null);
     setMediaKind(null);
     setTextOnly(true);
+    // Deterministic catalogue hit -> the server resolves locally in ms.
+    setFastPath(Boolean(detectServiceIntentInText(typed)));
     setFrames([]);
     setNote(described);
     setAskedQuestions([]);
@@ -517,6 +525,7 @@ function SnapPage() {
           <ScanningOverlay
             image={image ?? pendingPreview}
             phase={phase}
+            fast={fastPath}
             onCancel={cancelAnalysis}
           />
         )}
@@ -540,10 +549,12 @@ function SnapPage() {
 function ScanningOverlay({
   image,
   phase,
+  fast = false,
   onCancel,
 }: {
   image: string | null;
   phase: "idle" | "preparing" | "analyzing";
+  fast?: boolean;
   onCancel: () => void;
 }) {
   const steps = [
@@ -572,6 +583,30 @@ function ScanningOverlay({
       clearTimeout(slowTimer);
     };
   }, [steps.length, phase]);
+
+  // Fast path: a typed request that already names a service resolves in
+  // milliseconds, so a full scanning sequence would be theatre. Show a small,
+  // honest transition instead.
+  if (fast) {
+    return (
+      <div className="fixed inset-0 z-50 grid place-items-center bg-background/80 px-6 backdrop-blur-sm animate-fade-in">
+        <div className="w-full max-w-sm surface-card p-5 text-center">
+          <Loader2 className="mx-auto h-6 w-6 animate-spin text-primary" />
+          <p className="mt-3 text-base font-bold">Matching your request…</p>
+          <p className="mt-1 text-sm text-muted-foreground">Finding the right service and local pros.</p>
+          <button
+            type="button"
+            onClick={onCancel}
+            data-testid="snap-cancel"
+            className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border px-4 text-sm font-bold hover:bg-muted"
+          >
+            <X className="h-4 w-4" /> Cancel
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden animate-fade-in">
       {/* Ambient blurred image + gradient wash */}
@@ -579,6 +614,7 @@ function ScanningOverlay({
         className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl opacity-60"
         style={image ? { backgroundImage: `url(${image})` } : undefined}
       />
+
       <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, oklch(0.215 0.070 266 / 0.90), oklch(0.320 0.110 250 / 0.80) 60%, oklch(0.215 0.070 266 / 0.94))" }} />
       {/* Floating orbs */}
       <div className="absolute -left-24 top-1/4 h-80 w-80 rounded-full bg-primary/30 blur-3xl animate-pulse" />
