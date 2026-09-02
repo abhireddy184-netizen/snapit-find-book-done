@@ -49,6 +49,9 @@
   --color-coral-ink: var(--coral-ink);
   --color-sky: var(--sky);
   --color-plum: var(--plum);
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-slate: var(--brand-slate);
   --color-coral: var(--coral);
   --color-lavender: var(--lavender);
   --color-lemon: var(--lemon);
@@ -112,6 +115,10 @@
   --lemon-ink: oklch(0.52 0.12 60);
   --coral-ink: oklch(0.55 0.16 32);
   --plum: oklch(0.262 0.030 300);
+  /* GetPros.ai brand marks: deep royal navy + modern teal, slate for ".ai". */
+  --brand-navy: oklch(0.315 0.115 264);
+  --brand-teal: oklch(0.640 0.128 199);
+  --brand-slate: oklch(0.560 0.032 258);
   --coral: oklch(0.71 0.155 30);
   --lavender: oklch(0.66 0.19 292);
   --lemon: oklch(0.86 0.09 88);
@@ -157,6 +164,9 @@
 
 .dark {
   /* GetPros dark: midnight navy-aubergine, never flat black. */
+  --brand-navy: oklch(0.760 0.095 264);
+  --brand-teal: oklch(0.782 0.115 195);
+  --brand-slate: oklch(0.740 0.024 258);
   --background: oklch(0.182 0.045 300);
   --foreground: oklch(0.965 0.011 84);
   --card: oklch(0.235 0.052 300);
