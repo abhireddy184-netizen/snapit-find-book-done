@@ -522,6 +522,9 @@ export function normalizePlan(
         typeof parsed['startClock'] === "string" && /^\d{1,2}:\d{2}$/.test(parsed['startClock'])
           ? toClockString(parseClock(parsed['startClock']))
           : nowClock,
+      ...(startDate ? { startDate } : {}),
+      ...(deadline && deadlineDate ? { deadlineDate } : {}),
+      ...(timeZone ? { timeZone } : {}),
       bufferMinutes: Math.min(45, Math.max(10, Math.round(Number(parsed['bufferMinutes'] ?? 20)))),
       tasks,
       notes: Array.isArray(parsed['notes'])
@@ -535,6 +538,7 @@ export function normalizePlan(
       ...(str("partnerDisclaimer") ? { partnerDisclaimer: str("partnerDisclaimer") } : {}),
     },
     nowClock,
-
+    nowDate,
   );
+
 }
