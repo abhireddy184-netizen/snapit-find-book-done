@@ -1089,12 +1089,20 @@ function AnalysisView({
   );
 }
 
-function ClarifyPanel({ questions, onAnswer }: { questions: string[]; onAnswer?: (text: string) => void }) {
+function ClarifyPanel({
+  questions,
+  onAnswer,
+  onResolve,
+}: {
+  questions: string[];
+  onAnswer?: (text: string) => void;
+  onResolve?: () => void;
+}) {
   const [answer, setAnswer] = useState("");
   return (
     <div className="rounded-3xl border border-secondary/30 bg-card p-5 shadow-sm">
       <div className="inline-flex items-center gap-1.5 text-sm font-black">
-        <Sparkles className="h-4 w-4 text-secondary" /> A couple of quick questions
+        <Sparkles className="h-4 w-4 text-secondary" /> One quick thing
       </div>
       <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
         {questions.map((q) => (
@@ -1107,7 +1115,7 @@ function ClarifyPanel({ questions, onAnswer }: { questions: string[]; onAnswer?:
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
         rows={3}
-        placeholder="Answer here and we'll narrow it down…"
+        placeholder="Answer here — or skip and let the pro sort out the details…"
         className="mt-3 w-full resize-none rounded-2xl border border-border/60 bg-background p-3 text-sm outline-none focus:border-secondary"
       />
       <GradientButton
@@ -1117,6 +1125,22 @@ function ClarifyPanel({ questions, onAnswer }: { questions: string[]; onAnswer?:
       >
         <ArrowRight className="h-4 w-4" /> Continue
       </GradientButton>
+      {onResolve && (
+        <div className="mt-2 flex flex-col gap-2 sm:flex-row">
+          <button
+            onClick={onResolve}
+            className="w-full rounded-full border border-primary/40 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary hover:bg-primary/10"
+          >
+            Find a professional
+          </button>
+          <button
+            onClick={onResolve}
+            className="w-full rounded-full border border-border bg-background px-4 py-3 text-sm font-semibold hover:bg-muted"
+          >
+            Not sure — decide with the pro
+          </button>
+        </div>
+      )}
     </div>
   );
 }
