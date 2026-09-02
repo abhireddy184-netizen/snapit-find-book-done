@@ -744,20 +744,13 @@ function AnalysisView({
     duration >= 60 ? `${(duration / 60).toFixed(duration % 60 === 0 ? 0 : 1)} hr` : `${duration} min`;
   const confidencePct = Math.round((analysis.confidence ?? 0.7) * 100);
 
+  // Only pros who actually cover this trade — never top up the list with
+  // unrelated professionals just to fill the screen.
   const matched: MatchedProvider[] = useMemo(() => {
-    const inCat = providers.filter((p) => p.category === pool);
-    const others = providers.filter((p) => p.category !== pool);
-    const merged = [...inCat, ...others];
-    // Sort in-category first by rating desc then distance asc, then top up with adjacent pros
-    const sorted = merged
+    const sorted = providers
+      .filter((p) => p.category === pool)
       .slice()
-      .sort((a, b) => {
-        const catA = a.category === pool ? 0 : 1;
-        const catB = b.category === pool ? 0 : 1;
-        if (catA !== catB) return catA - catB;
-        if (b.rating !== a.rating) return b.rating - a.rating;
-        return a.distance - b.distance;
-      })
+      .sort((a, b) => (b.rating !== a.rating ? b.rating - a.rating : a.distance - b.distance))
       .slice(0, 5);
     return sorted.map((p, i) => ({ ...p, eta: [7, 12, 18, 26, 34][i] ?? 40 }));
   }, [pool]);
