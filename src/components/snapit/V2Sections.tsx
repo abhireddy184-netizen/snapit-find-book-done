@@ -11,18 +11,18 @@ import type { LucideIcon } from "lucide-react";
 const STEPS: { icon: LucideIcon; title: string; body: string }[] = [
   {
     icon: MessageSquareText,
-    title: "Tell us the outcome",
-    body: "Describe the result you want — or show it with a photo or video. No category picking, no service jargon.",
+    title: "Tell us",
+    body: "Type, say, or show what you need.",
   },
   {
     icon: ListChecks,
-    title: "GetPros breaks it into tasks",
-    body: "We turn your request into a clear job brief: what’s likely needed, what it should cover, and what it typically costs.",
+    title: "We understand",
+    body: "GetPros turns it into a clear job brief.",
   },
   {
     icon: HardHat,
-    title: "Trusted pros get it done",
-    body: "The brief goes to local professionals for the work — so you get a real scope instead of guessing which trade to call.",
+    title: "A pro handles it",
+    body: "Matched to a verified local pro near you.",
   },
 ];
 
@@ -31,13 +31,13 @@ export function HowItWorks() {
     <section id="how-it-works" className="mt-14 scroll-mt-24">
       <header className="max-w-2xl">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-primary">
-          How GetPros works
+          How it works
         </span>
         <h2 className="mt-3 text-[clamp(1.5rem,3.4vw,2.25rem)] font-black leading-tight tracking-tight">
-          You don’t need to know which service to choose.
+          Start with what you need.
         </h2>
         <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-          Most people know the outcome they want, not the trade that delivers it. GetPros starts from the outcome.
+          We figure out the right service and match you with a local pro.
         </p>
       </header>
 
@@ -77,34 +77,34 @@ type Bundle = {
 
 const BUNDLES: Bundle[] = [
   {
-    title: "Guests coming tomorrow",
-    request: "“My parents are visiting tomorrow. Get my apartment ready.”",
-    tasks: ["Deep clean", "Bathroom refresh", "Bed & room setup"],
+    title: "Guests arriving",
+    request: "“Get my apartment ready.”",
+    tasks: ["Deep clean", "Bathroom refresh", "Bed setup"],
     category: "cleaning",
   },
   {
     title: "Moving day",
-    request: "“I’m moving Saturday. Help me get everything done.”",
-    tasks: ["Packing help", "Movers", "Junk removal", "Move-out clean"],
+    request: "“Help me move Saturday.”",
+    tasks: ["Packing", "Movers", "Junk removal", "Move-out clean"],
     category: "moving",
   },
   {
     title: "Car problem",
-    request: "“My car is making a strange noise. Handle it.”",
-    tasks: ["Describe or show the issue", "Route to mobile auto help"],
+    request: "“My car is making a strange noise.”",
+    tasks: ["Diagnose", "Route to mobile auto help"],
     category: "auto-mobile",
   },
   {
     title: "Vacation prep",
-    request: "“We’re away for ten days. Keep the house fine.”",
-    tasks: ["Home check", "Plant & yard care", "Household tasks"],
+    request: "“Keep the house fine while we’re away.”",
+    tasks: ["Home check", "Plant care", "Yard tidy"],
     category: "lawn-outdoor",
   },
   {
     title: "Help my parents",
-    request: "“My parents need a hand around the house this week.”",
+    request: "“A hand around the house this week.”",
     tasks: ["Errands", "Household help", "Check-in visit"],
-    note: "Practical household support only — not medical or nursing care.",
+    note: "Practical help only — not medical or nursing care.",
     category: "errands",
   },
 ];
@@ -118,11 +118,11 @@ export function OutcomeBundles() {
             One request. Multiple tasks.
           </h2>
           <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-            Real life rarely fits one service. GetPros can help coordinate the pieces behind a single outcome.
+            Big jobs often need more than one service.
           </p>
         </div>
         <Link to="/services" className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-primary hover:underline">
-          Browse all services <ArrowRight className="h-3.5 w-3.5" />
+          Browse all <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </header>
 
@@ -135,7 +135,7 @@ export function OutcomeBundles() {
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-base font-black tracking-tight">{b.title}</h3>
               <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                GetPros can coordinate
+                GetPros coordinates
               </span>
             </div>
             <p className="mt-2 text-sm italic leading-relaxed text-foreground/80">{b.request}</p>
@@ -156,7 +156,7 @@ export function OutcomeBundles() {
                 params={{ category: b.category }}
                 className="inline-flex items-center gap-1.5 text-xs font-black text-primary hover:underline"
               >
-                Start this request <ArrowRight className="h-3.5 w-3.5" />
+                Start request <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           </article>
@@ -178,12 +178,12 @@ type ModuleCard = {
 };
 
 const MODULES: ModuleCard[] = [
-  { icon: Home, title: "Home", body: "Repairs, cleaning, installs and upkeep.", category: "handyman", tone: "var(--primary)" },
-  { icon: PackageCheck, title: "Errands & returns", body: "Pickups, drop-offs and the small stuff.", category: "errands", tone: "var(--secondary)" },
-  { icon: Car, title: "Auto help", body: "Mobile detailing, diagnosis and routing.", category: "auto-mobile", tone: "var(--sky-ink)" },
-  { icon: Truck, title: "Moving & travel prep", body: "Packing, movers, junk and move-out cleans.", category: "moving", tone: "var(--coral-ink)" },
-  { icon: HeartHandshake, title: "Family assistance", body: "Household help and errands for loved ones.", category: "errands", tone: "var(--lavender)" },
-  { icon: ShieldAlert, title: "Emergency help", body: "Burst pipe, no power, no heat, lockout.", href: "/emergency", tone: "var(--destructive)" },
+  { icon: Home, title: "Home", body: "Repairs, cleaning, installs.", category: "handyman", tone: "var(--primary)" },
+  { icon: PackageCheck, title: "Errands", body: "Pickups, drop-offs, small tasks.", category: "errands", tone: "var(--secondary)" },
+  { icon: Car, title: "Auto", body: "Mobile detailing and repair.", category: "auto-mobile", tone: "var(--sky-ink)" },
+  { icon: Truck, title: "Moving", body: "Packing, lifting, move-out clean.", category: "moving", tone: "var(--coral-ink)" },
+  { icon: HeartHandshake, title: "Family help", body: "Errands and household help.", category: "errands", tone: "var(--lavender)" },
+  { icon: ShieldAlert, title: "Emergency", body: "Burst pipe, no power, lockout.", href: "/emergency", tone: "var(--destructive)" },
 ];
 
 export function DailyLifeModules() {
@@ -191,10 +191,10 @@ export function DailyLifeModules() {
     <section className="mt-14">
       <header className="max-w-2xl">
         <h2 className="text-[clamp(1.5rem,3.4vw,2.25rem)] font-black leading-tight tracking-tight">
-          Services people ask GetPros for.
+          Popular services
         </h2>
         <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-          Six of the most requested areas — each one starts with your request, not a category list.
+          Start with any of these — or just describe your job.
         </p>
       </header>
 
@@ -225,21 +225,21 @@ export function DailyLifeModules() {
   );
 }
 
-/* ---------------- 4) Show GetPros (elevated) ---------------- */
+/* ---------------- 4) Show GP (elevated) ---------------- */
 
 export function ShowGpbBand() {
   return (
-    <section className="mt-14 overflow-hidden surface-card">
+    <section className="mt-12 overflow-hidden surface-card">
       <div className="grid gap-5 p-5 sm:p-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
         <div className="min-w-0">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-black text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> Another way to ask
+            <Sparkles className="h-3.5 w-3.5" /> Not sure?
           </span>
           <h2 className="mt-3 text-[clamp(1.4rem,3.2vw,2.1rem)] font-black leading-tight tracking-tight">
-            Don’t know what’s wrong? Show us.
+            Show us the problem.
           </h2>
           <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-muted-foreground">
-            Point your camera at the problem. GetPros reads the scene and turns it into a clear job brief.
+            Point your camera at it. We’ll turn the scene into a clear job brief.
           </p>
 
           <Link
@@ -249,14 +249,14 @@ export function ShowGpbBand() {
             className="mt-5 inline-flex items-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-elevated transition-transform hover:scale-[1.01]"
             style={{ background: "var(--gradient-primary)" }}
           >
-            <Camera className="h-5 w-5" /> Show GetPros
+            <Camera className="h-5 w-5" /> Show GP
           </Link>
         </div>
         <ul className="grid gap-2 text-sm">
           {[
-            "Photo, video, or plain text — all work",
-            "We separate what’s detected from what you described",
-            "Low confidence? GetPros asks instead of guessing",
+            "Photo, video, or text",
+            "We read the scene and your words",
+            "Low confidence? We ask, not guess",
           ].map((l) => (
             <li key={l} className="flex items-start gap-2 rounded-2xl border border-border/60 bg-background px-4 py-3">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
@@ -272,10 +272,10 @@ export function ShowGpbBand() {
 /* ---------------- 5) Trust ---------------- */
 
 const TRUST: { icon: LucideIcon; title: string; body: string }[] = [
-  { icon: FileText, title: "A clear job brief", body: "Every request becomes a written scope both sides can see — no vague enquiries." },
-  { icon: ShieldCheck, title: "Provider profiles", body: "Pros register with their service area, coverage and details before they can be matched." },
-  { icon: Images, title: "Before & after proof", body: "Completed jobs can store before and after images with the job record." },
-  { icon: Activity, title: "Transparent status", body: "Follow the request from brief to booked to done in your dashboard." },
+  { icon: FileText, title: "Clear scope", body: "A written brief both sides can see." },
+  { icon: ShieldCheck, title: "Verified pros", body: "Pros register service area and coverage first." },
+  { icon: Images, title: "Proof of work", body: "Before & after images kept with the job." },
+  { icon: Activity, title: "Track status", body: "Follow the job from brief to done." },
 ];
 
 export function TrustSection() {
@@ -283,10 +283,10 @@ export function TrustSection() {
     <section className="mt-14">
       <header className="max-w-2xl">
         <h2 className="text-[clamp(1.5rem,3.4vw,2.25rem)] font-black leading-tight tracking-tight">
-          Built so you can hand it over.
+          Hand it off with confidence.
         </h2>
         <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-          Handing off a job means trusting the process. Here’s what GetPros puts in writing.
+          Every job gets a clear scope, a verified pro, and tracked status.
         </p>
       </header>
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -301,7 +301,7 @@ export function TrustSection() {
         ))}
       </div>
       <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
-        GetPros is in early access and launching city by city — coverage grows as verified professionals join each area.
+        Launching city by city as verified pros join each area.
       </p>
     </section>
   );
@@ -311,19 +311,19 @@ export function TrustSection() {
 
 export function BrowseFallback() {
   return (
-    <section className="mt-12 rounded-2xl border border-dashed border-border bg-muted/25 p-5 sm:p-6">
+    <section className="mt-10 rounded-2xl border border-dashed border-border bg-muted/25 p-5 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-base font-black tracking-tight sm:text-lg">Prefer to browse? Choose a service.</h2>
+          <h2 className="text-base font-black tracking-tight sm:text-lg">Prefer to browse?</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            The full GetPros catalogue is still here — every category and sub-service.
+            The full GetPros catalogue is here.
           </p>
         </div>
         <Link
           to="/services"
           className="inline-flex shrink-0 items-center gap-2 rounded-full border border-border bg-card px-5 py-2.5 text-sm font-bold text-foreground transition-colors hover:border-primary/40 hover:text-primary"
         >
-          Browse services <ArrowRight className="h-4 w-4" />
+          Browse <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
     </section>
@@ -334,9 +334,9 @@ export function BrowseFallback() {
    day planner — the services-only experience does not link to /plan. */
 
 const FLOW: { icon: LucideIcon; title: string; body: string }[] = [
-  { icon: Camera, title: "Show or tell GetPros", body: "Photo, voice in any language, or plain text — whatever is easiest." },
-  { icon: ListChecks, title: "See what's needed", body: "GetPros turns it into a short, clear service request you can edit." },
-  { icon: HardHat, title: "Get a local pro", body: "We match a real, available pro near you — or tell you honestly if there isn't one yet." },
+  { icon: Camera, title: "Show or tell", body: "Photo, voice, or text." },
+  { icon: ListChecks, title: "See what’s needed", body: "We turn it into a clear service request." },
+  { icon: HardHat, title: "Get a local pro", body: "Matched to a verified pro near you." },
 ];
 
 export function SimpleFlow() {
@@ -367,10 +367,10 @@ export function SimpleFlow() {
 
 export function HowGpbWorksDetails() {
   return (
-    <section id="how-it-works" className="mt-10 scroll-mt-24">
+    <section id="how-it-works" className="mt-8 scroll-mt-24">
       <details className="group surface-card p-5 sm:p-6">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-base font-black tracking-tight">
-          How GetPros works
+          How it works
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border/60 text-muted-foreground transition-transform group-open:rotate-90">
             <ArrowRight className="h-4 w-4" />
           </span>
@@ -389,9 +389,8 @@ export function HowGpbWorksDetails() {
           <div className="rounded-2xl border border-border/60 bg-background p-4">
             <h3 className="text-sm font-black tracking-tight">Who does the work</h3>
             <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
-              Home, cleaning, repairs, moving, errands and auto requests go through the GetPros service
-              catalogue and local professionals. GetPros only shows pros that are real, verified and available
-              in your area — otherwise it says so plainly.
+              Home, cleaning, repairs, moving, errands and auto requests go to verified local professionals.
+              We only show pros that are available in your area — otherwise we say so plainly.
             </p>
           </div>
           <div className="rounded-2xl border border-border/60 bg-background p-4">
@@ -405,7 +404,7 @@ export function HowGpbWorksDetails() {
         </div>
 
         <p className="mt-4 text-xs leading-relaxed text-muted-foreground">
-          GetPros is in early access and launching city by city. Nothing is booked until you say so.
+          Launching city by city. Nothing is booked until you confirm.
         </p>
       </details>
     </section>

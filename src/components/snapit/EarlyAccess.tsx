@@ -7,19 +7,18 @@ import { catalog } from "@/lib/catalog";
 import { supabase } from "@/integrations/supabase/client";
 import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 
-/** Show GetPros callout — concise, mobile-first. */
+/** Show GP callout — concise, mobile-first. */
 export function ShowGpbCallout() {
   return (
     <section className="mt-10 overflow-hidden surface-card p-5 sm:p-6">
       <div className="grid gap-4 md:grid-cols-[1.3fr_auto] md:items-center">
         <div className="min-w-0">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-black text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> Not sure what you need?
+            <Sparkles className="h-3.5 w-3.5" /> Not sure?
           </span>
-          <h2 className="mt-2 text-xl font-black tracking-tight sm:text-2xl">Show GetPros the problem.</h2>
+          <h2 className="mt-2 text-xl font-black tracking-tight sm:text-2xl">Show GP the problem.</h2>
           <p className="mt-2 max-w-[52ch] text-sm text-muted-foreground">
-            Take a photo, record a short video, or just describe the job. GetPros helps identify the
-            service you need — and what a fair scope looks like.
+            Take a photo, record a video, or describe the job. We’ll identify the right service.
           </p>
         </div>
         <Link
@@ -30,7 +29,7 @@ export function ShowGpbCallout() {
           className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-black text-white shadow-elevated transition-transform hover:scale-[1.01]"
           style={{ background: "var(--gradient-primary)" }}
         >
-          <Camera className="h-5 w-5" /> Show GetPros
+          <Camera className="h-5 w-5" /> Show GP
         </Link>
       </div>
     </section>
@@ -86,7 +85,7 @@ export function EarlyAccessSection() {
   }
 
   return (
-    <section id="early-access" className="mt-12 scroll-mt-24">
+    <section id="early-access" className="mt-10 scroll-mt-24">
       <div className="overflow-hidden surface-card p-5 sm:p-8">
         <div className="grid gap-7 lg:grid-cols-[1fr_1fr] lg:items-start">
           <div className="min-w-0">
@@ -95,15 +94,13 @@ export function EarlyAccessSection() {
             </span>
             <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">GetPros is launching city by city</h2>
             <p className="mt-3 max-w-[52ch] text-sm text-muted-foreground">
-              Join early access and be first to know when trusted local pros are available near you.
-              Coverage expands as verified professionals join GetPros in each area — not every service is
-              live everywhere yet.
+              Join early access and be first to know when verified local pros are available near you.
             </p>
             <ul className="mt-5 space-y-2 text-sm">
               {[
                 "Early invite when GetPros opens in your area",
-                "No payment and no membership — it's a free list",
-                "Tell us the service you want first, so we prioritise it",
+                "Free — no payment or membership",
+                "Tell us the service you want first",
               ].map((l) => (
                 <li key={l} className="flex items-start gap-2 rounded-2xl border border-border/60 bg-background px-4 py-2.5">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" /> {l}
@@ -120,16 +117,16 @@ export function EarlyAccessSection() {
               >
                 <CheckCircle2 className="h-7 w-7" />
               </div>
-              <h3 className="mt-4 text-xl font-black">You’re on the early access list</h3>
+              <h3 className="mt-4 text-xl font-black">You’re on the list</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                We’ll email you as soon as GetPros opens in your area.
+                We’ll email you when GetPros opens in your area.
               </p>
               <Link
                 to="/snap"
                 className="mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white shadow-card"
                 style={{ background: "var(--gradient-primary)" }}
               >
-                <Camera className="h-4 w-4" /> Show GetPros a job now
+                <Camera className="h-4 w-4" /> Show GP a job now
               </Link>
             </div>
           ) : (
@@ -141,10 +138,10 @@ export function EarlyAccessSection() {
               className="rounded-3xl border border-border/60 bg-background p-5 shadow-sm sm:p-6"
             >
               <div className="grid gap-3 sm:grid-cols-2">
-                <Field label="Full name" value={fullName} onChange={setFullName} placeholder="Jamie Rivera" />
+                <Field label="Name" value={fullName} onChange={setFullName} placeholder="Jamie Rivera" />
                 <Field label="Email" type="email" value={email} onChange={setEmail} placeholder="you@email.com" />
                 <div>
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">City or ZIP</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">City or ZIP code</span>
                   <LocationAutocomplete
                     value={loc}
                     onChange={setLoc}
@@ -161,13 +158,13 @@ export function EarlyAccessSection() {
                   )}
                 </div>
                 <label className="block">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Service interested in</span>
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Service</span>
                   <select
                     value={interest}
                     onChange={(e) => setInterest(e.target.value)}
                     className="mt-1 w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-primary"
                   >
-                    <option value="">Choose a service</option>
+                    <option value="">Choose one</option>
                     {ALL_SERVICE_OPTIONS.map((n) => (
                       <option key={n} value={n}>{n}</option>
                     ))}
@@ -191,9 +188,7 @@ export function EarlyAccessSection() {
                 </GradientButton>
               </div>
               <p className="mt-3 text-center text-xs leading-relaxed text-muted-foreground">
-                Free to join — this isn’t a paid membership and doesn’t create an account. We’ll only use
-                your details to contact you about GetPros availability near you, and you can ask us to remove
-                you at any time.
+                Free to join. We’ll only contact you about GetPros availability near you.
               </p>
             </form>
           )}

@@ -1,19 +1,13 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Camera, Loader2, Mic, Sparkles, Square } from "lucide-react";
+import { Camera, Loader2, Mic, Square } from "lucide-react";
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { transcribeVoice } from "@/lib/transcribe-voice.functions";
 import { startVoiceActivityMonitor, type VoiceActivityMonitor } from "@/lib/voice-activity";
 import { StableTranscript } from "@/lib/stable-transcript";
 
 
-const EXAMPLES = [
-  "My kitchen sink is leaking under the cabinet.",
-  "I need a deep clean of a 2-bedroom apartment on Saturday.",
-  "Moving next weekend — need movers and packing help.",
-  "My TV won’t turn on. Can someone look at it?",
-  "Need someone to pick up a parcel and drop it at the post office.",
-];
+const EXAMPLE = "My kitchen sink is leaking under the cabinet.";
 
 
 const MAX_RECORD_MS = 60_000;
@@ -136,7 +130,6 @@ export function OutcomeComposer() {
   const navigate = useNavigate();
   const [request, setRequest] = useState("");
   const [loc, setLoc] = useState("");
-  const [i, setI] = useState(0);
   /** Set when someone submits an empty request — nothing to understand yet. */
   const [emptyError, setEmptyError] = useState(false);
   const paused = useRef(false);
@@ -190,14 +183,7 @@ export function OutcomeComposer() {
   };
 
 
-  useEffect(() => {
-    // Examples rotate only while the composer is idle — never during voice input.
-    if (voiceStatus === "listening" || voiceStatus === "transcribing") return;
-    const t = window.setInterval(() => {
-      if (!paused.current) setI((v) => (v + 1) % EXAMPLES.length);
-    }, 3800);
-    return () => window.clearInterval(t);
-  }, [voiceStatus]);
+  // Placeholder is static; no rotating examples needed.
 
 
   // Feature-detect voice input on mount (avoids SSR hydration mismatch).
@@ -574,10 +560,10 @@ export function OutcomeComposer() {
     <form
       onSubmit={submit}
       data-analytics-id="outcome_composer"
-      className="surface-card p-3 shadow-[var(--shadow-elevated)] sm:p-4"
+      className="surface-card p-3 shadow-[var(--shadow-elevated)] ring-1 ring-primary/[0.06] sm:p-4"
     >
       <label htmlFor="gpb-outcome" className="sr-only">
-        Describe the service you need
+        Describe what you need
       </label>
       {/* Direction follows what the person actually typed: any RTL script
           (Arabic, Hebrew, Urdu, Persian, …) flips the text and the logical
@@ -596,12 +582,12 @@ export function OutcomeComposer() {
 
           onFocus={() => (paused.current = true)}
           onBlur={() => (paused.current = false)}
-          rows={3}
+          rows={2}
           aria-invalid={emptyError}
           aria-describedby={emptyError ? "gpb-outcome-error" : undefined}
           /* While the mic is active the rotating examples stop competing with
              what the person is actually saying. */
-          placeholder={voiceActive ? "" : EXAMPLES[i]}
+          placeholder={voiceActive ? "" : "Tell us what you need"}
           className={`min-h-[96px] w-full resize-none rounded-2xl bg-muted/40 px-4 py-3 pe-[3.5rem] text-sm leading-relaxed outline-none transition-colors placeholder:text-muted-foreground focus:bg-muted/60 sm:min-h-[102px] sm:py-3.5 sm:pe-16 ${
             voiceActive ? "bg-primary/5 ring-2 ring-primary/60" : emptyError ? "ring-2 ring-destructive/70" : ""
           }`}
@@ -644,7 +630,7 @@ export function OutcomeComposer() {
       </div>
 
       <p aria-live="polite" className="sr-only">
-        Example request: {EXAMPLES[i]}
+        Example request: {EXAMPLE}
       </p>
       <p aria-live="polite" role="status" className="sr-only">
         {statusLine ?? ""}
@@ -657,7 +643,7 @@ export function OutcomeComposer() {
       )}
       {emptyError && (
         <p id="gpb-outcome-error" role="alert" className="mt-1.5 text-xs font-semibold text-destructive">
-          Tell GetPros what service you need — type it or tap the mic.
+          Tell us what you need — type or tap the mic.
         </p>
       )}
 
@@ -668,7 +654,7 @@ export function OutcomeComposer() {
           className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-primary/30 bg-primary/5 px-3 py-2.5"
         >
           <p className="min-w-0 flex-1 text-xs font-bold text-primary">
-            Finding your service in {autoSecs}s — say more or edit to keep going.
+            Finding your service in {autoSecs}s…
           </p>
           <button
             type="button"
@@ -689,14 +675,13 @@ export function OutcomeComposer() {
 
 
 
-      <div className="mt-2.5 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+      <div className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
         <div className="min-w-0">
           <LocationAutocomplete
             value={loc}
-
             onChange={setLoc}
-            aria-label="ZIP or city"
-            placeholder="ZIP or city"
+            aria-label="ZIP code or city"
+            placeholder="ZIP code or city"
             fieldClassName="rounded-2xl bg-muted/40 px-4 py-3"
           />
         </div>
@@ -706,7 +691,7 @@ export function OutcomeComposer() {
           className="inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-sm font-black text-white shadow-elevated transition-transform hover:scale-[1.01] sm:w-auto"
           style={{ background: "var(--gradient-primary)" }}
         >
-          <Sparkles className="h-4 w-4" /> Find a pro
+          Find a pro
         </button>
       </div>
 
@@ -715,9 +700,9 @@ export function OutcomeComposer() {
           to="/snap"
           data-analytics-id="show_gpb_cta"
           data-analytics-location="hero_composer"
-          className="inline-flex items-center gap-2 text-xs font-bold text-muted-foreground transition-colors hover:text-primary"
+          className="inline-flex items-center gap-2 rounded-full bg-muted/50 px-3.5 py-2 text-xs font-bold text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
         >
-          <Camera className="h-4 w-4 text-primary" /> Or show GetPros a photo instead
+          <Camera className="h-4 w-4 text-primary" /> Show GP a photo
         </Link>
       </div>
 
