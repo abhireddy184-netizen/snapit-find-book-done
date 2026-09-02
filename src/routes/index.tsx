@@ -7,7 +7,7 @@ import {
   Facebook, Instagram, Twitter, Youtube,
 } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
-import { Logo, Wordmark } from "@/components/snapit/Logo";
+import { Logo } from "@/components/snapit/Logo";
 import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
 import { OutcomeComposer } from "@/components/snapit/OutcomeComposer";
 import {
