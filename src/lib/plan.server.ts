@@ -501,12 +501,20 @@ export function normalizePlan(
 
   if (!tasks.length) return buildFallbackPlan(request, location, nowClock, understanding, nowDate, timeZone);
 
-  const deadline =
+  // A target time may only come from the customer. The model must flag whether
+  // the deadline was actually stated; anything it invents is discarded so an
+  // untimed outing ("I want to go to a sports bar") never gets a fake target,
+  // a fake buffer, or an "over" warning measured against it.
+  const deadlineStated = parsed['deadlineStated'] === true;
+  const rawDeadline =
     typeof parsed['deadline'] === "string" && /^\d{1,2}:\d{2}$/.test(parsed['deadline'] as string)
       ? toClockString(parseClock(parsed['deadline'] as string))
       : // English regex is a last-resort fallback only; the canonical intent above
         // is what carries non-English deadlines.
         extractDeadline(understanding?.normalizedRequest ?? request);
+  const regexDeadline = extractDeadline(understanding?.normalizedRequest ?? request);
+  const deadline = deadlineStated || regexDeadline ? rawDeadline : undefined;
+
 
   const isoDate = (k: string) => {
     const v = parsed[k];
