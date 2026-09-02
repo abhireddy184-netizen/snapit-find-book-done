@@ -669,7 +669,7 @@ function ScanningOverlay({
                   ) : (
                     <div className="h-4 w-4 rounded-full border border-white/40" />
                   )}
-                  <span className={done ? "text-white/50 line-through" : ""}>{s}</span>
+                  <span className={done ? "text-white/55" : ""}>{s}</span>
                 </div>
               );
             })}
@@ -678,18 +678,17 @@ function ScanningOverlay({
             type="button"
             onClick={onCancel}
             data-testid="snap-cancel"
-            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-bold text-white backdrop-blur transition hover:bg-white/20"
+            className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
           >
             <X className="h-4 w-4" /> Cancel
           </button>
-          <p className="mt-2 text-center text-xs text-white/60">
-            {slow
-              ? "This is taking longer than usual — we'll fall back to a best match shortly. You can cancel any time."
-              : "This usually takes a few seconds. You can cancel any time."}
-          </p>
-
+          {slow && (
+            <p className="mt-2 text-center text-xs text-white/60">
+              This is taking longer than usual — you can cancel any time.
+            </p>
+          )}
         </div>
-        <style>{`@keyframes scanline{0%{transform:translateY(0)}50%{transform:translateY(${fast ? 148 : 216}px)}100%{transform:translateY(0)}}`}</style>
+        <style>{`@keyframes scanline{0%{transform:translateY(0)}50%{transform:translateY(${fast ? 148 : 216}px)}100%{transform:translateY(0)}}@keyframes scanbar{0%{transform:translateX(-110%)}100%{transform:translateX(320%)}}`}</style>
       </div>
     </div>
   );
