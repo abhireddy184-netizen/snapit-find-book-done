@@ -295,6 +295,32 @@ function PlanSkeleton({ request }: { request: string }) {
   );
 }
 
+/* ---------------- conversational reply ---------------- */
+
+/**
+ * Shown when the message carried no task at all — a greeting, a joke, a test or
+ * a general question. GPB answers briefly in the person's own language and
+ * invites them to say what they need, instead of inventing a plan.
+ */
+function ConversationCard({ reply, invitation }: { reply: string; invitation?: string | undefined }) {
+  return (
+    <section aria-live="polite" className="mt-6 rounded-[26px] border border-border/60 bg-card p-5 shadow-sm sm:p-6">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+          <MessageCircle className="h-5 w-5" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p dir="auto" className="text-base font-bold leading-relaxed break-words">{reply}</p>
+          {invitation && (
+            <p dir="auto" className="mt-2 text-sm leading-relaxed text-muted-foreground break-words">{invitation}</p>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
 /* ---------------- summary ---------------- */
 
 function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
