@@ -100,7 +100,7 @@ function SnapPage() {
   const [analysis, setAnalysis] = useState<SnapAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [phase, setPhase] = useState<"idle" | "preparing" | "analyzing">("idle");
+  const [phase, setPhase] = useState<"idle" | "preparing" | "analyzing" | "matching">("idle");
   const [pendingPreview, setPendingPreview] = useState<string | null>(null);
   // True while a typed request that already maps to a catalogue service is
   // resolving: it never touches the visual pipeline, so we show a short
@@ -152,6 +152,8 @@ function SnapPage() {
         "The AI is taking longer than usual. Please retry or send it again.",
       );
       if (runRef.current !== token) return;
+      // Real stage change: understanding/finding is done, we now have a match.
+      setPhase("matching");
       setAnalysis(result);
       if (result.clarifyingQuestions?.length) {
         setAskedQuestions((prev) => [...new Set([...prev, ...result.clarifyingQuestions!])].slice(0, 12));
@@ -246,10 +248,7 @@ function SnapPage() {
     setTurnCount(0);
     setLoading(true);
     if (deterministicHit) {
-      setPhase("analyzing");
-      // Keep the transition perceptible without turning it into fake progress.
-      await new Promise((resolve) => setTimeout(resolve, 240));
-      if (runRef.current !== token) return;
+      // Enough information already: resolve immediately, no artificial delay.
       setAnalysis(createFastPathAnalysis(typed, deterministicHit));
       setLoading(false);
       setPhase("idle");
