@@ -152,18 +152,30 @@ function useKeyboardOpen() {
 
 function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const keyboardOpen = useKeyboardOpen();
+  const { user } = useAuth();
   const items = [
-    { to: "/", label: "Home", icon: Home },
-    { to: "/search", label: "Search", icon: Search },
-    { to: "/snap", label: "Show GPB", icon: Camera, highlight: true },
-    { to: "/dashboard", label: "Bookings", icon: CalendarDays },
-    { to: "/dashboard", label: "Profile", icon: User },
+    { key: "home", to: "/" as const, label: "Home", icon: Home },
+    { key: "search", to: "/search" as const, label: "Search", icon: Search },
+    { key: "snap", to: "/snap" as const, label: "Show GPB", icon: Camera, highlight: true },
+    { key: "bookings", to: "/dashboard" as const, label: "Bookings", icon: CalendarDays },
+    // Signed-out visitors get a real entry point instead of a silent redirect.
+    user
+      ? { key: "profile", to: "/dashboard" as const, label: "Profile", icon: User }
+      : { key: "profile", to: "/login" as const, label: "Log in", icon: User },
   ];
   return (
-    <nav className="fixed inset-x-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md px-4 md:hidden">
+    <nav
+      aria-hidden={keyboardOpen}
+      className={cn(
+        "fixed inset-x-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md px-4 transition-all duration-200 md:hidden",
+        keyboardOpen && "pointer-events-none translate-y-[140%] opacity-0"
+      )}
+    >
       <div className="glass-strong mx-auto flex items-stretch justify-around rounded-full px-2 py-2 shadow-[0_20px_60px_-20px_color-mix(in oklab, var(--plum) 22%, transparent)]">
         {items.map((it, i) => {
-          const active = pathname === it.to && (i === 0 ? pathname === "/" : true);
+          const active = it.key === "home" ? pathname === "/" : pathname.startsWith(it.to);
+
           const Icon = it.icon;
           if (it.highlight) {
             return (
