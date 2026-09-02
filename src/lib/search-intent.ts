@@ -347,3 +347,36 @@ export function recallLocation(): string {
     return value;
   } catch { return ""; }
 }
+
+/**
+ * Scans free-form customer text (a photo note, a clarification answer, a voice
+ * transcript) for an unambiguous service phrase anywhere inside it. Unlike
+ * matchServiceIntent this does not require the whole string to be the service,
+ * so "actually it's a TV repair, the screen is black" resolves. Longest phrase
+ * wins so "tv repair" beats a shorter overlapping alias.
+ */
+export function detectServiceIntentInText(raw: string): ServiceHit | null {
+  const q = normalizeQuery(raw);
+  if (!q) return null;
+  const direct = matchServiceIntent(q);
+  if (direct) return direct;
+
+  const padded = ` ${q} `;
+  const phrases = Object.keys(ALIASES)
+    .filter((phrase) => padded.includes(` ${phrase} `))
+    .sort((a, b) => b.length - a.length);
+  for (const phrase of phrases) {
+    const target = ALIASES[phrase];
+    if (!target) continue;
+    const [cat, svc] = target.split("/");
+    const found = buildIndex().find(
+      (e) => e.hit.category.slug === cat && e.hit.service.slug === svc,
+    );
+    if (found) return found.hit;
+  }
+
+  // Fall back to an exact service-name mention ("Cushion & Foam Replacement").
+  const named = buildIndex().filter((e) => e.nameKey.length > 6 && padded.includes(` ${e.nameKey} `));
+  if (named.length === 1 && named[0]) return named[0].hit;
+  return null;
+}
