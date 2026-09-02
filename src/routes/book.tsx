@@ -502,7 +502,8 @@ function BookPage() {
                 </p>
               )}
               <div className="mt-3 rounded-xl bg-muted/50 p-3 text-xs text-muted-foreground">
-                Your exact address is only shared with the pro after they confirm.
+                The professional you send this to sees your full service address with the request, so they can judge
+                travel before accepting. Nobody else on GPB can see it.
               </div>
             </StepWrap>
           )}
