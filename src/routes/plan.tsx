@@ -5,15 +5,17 @@ import { useEffect, useState } from "react";
 import {
   ArrowRight, ArrowUp, ArrowDown, Clock, Loader2, MapPin, RotateCcw, Sparkles,
   TriangleAlert, Undo2, HardHat, Languages, HelpCircle, ShoppingBasket, UtensilsCrossed, CarFront, UserRound, CircleSlash,
+  MessageCircle, CalendarDays,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
-import { buildPlan } from "@/lib/plan.functions";
+import { buildPlan, type PlanResult } from "@/lib/plan.functions";
 import {
-  CHANNEL_META, DEFAULT_UI_COPY, demoAirportPlan, formatClock, move, parseClock, planEndMinutes,
-  planLocale, resequence, uiCopy,
+  CHANNEL_META, DEFAULT_UI_COPY, demoAirportPlan, formatClock, formatPlanDate, move, parseClock,
+  planDeadlineMinutes, planEndMinutes, planLocale, resequence, uiCopy,
   type ExecutionChannel, type GpbPlan, type PlanTask, type PlanUiCopy,
 } from "@/lib/plan-model";
+
 
 type Copy = Required<PlanUiCopy>;
 
