@@ -147,7 +147,15 @@ const ALIASES: Record<string, string> = {
   "recessed lighting": "electrical/recessed-lighting",
 
   /* Handyman */
+  "electrician": "electrical/outlet-switch-repair",
+  "need an electrician": "electrical/outlet-switch-repair",
+  "ac repairing": "hvac/ac-repair",
+  "need ac repair": "hvac/ac-repair",
+  "house cleaner": "cleaning/standard-cleaning",
+  "home cleaning": "cleaning/standard-cleaning",
+  "need cleaning": "cleaning/standard-cleaning",
   "handyman": "handyman/handyman-hour",
+
   "handy man": "handyman/handyman-hour",
   "handywoman": "handyman/handyman-hour",
   "odd jobs": "handyman/small-repairs",

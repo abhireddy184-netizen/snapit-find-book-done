@@ -557,13 +557,15 @@ function ScanningOverlay({
   fast?: boolean;
   onCancel: () => void;
 }) {
-  const steps = [
-    "Understanding what you need…",
-    "Checking the visible details…",
-    "Matching possible services…",
-    "Checking confidence…",
-    "Preparing the next step…",
-  ];
+  const steps = fast
+    ? ["Reading your request…", "Matching the right service…", "Finding local pros…"]
+    : [
+        "Understanding what you need…",
+        "Checking the visible details…",
+        "Matching possible services…",
+        "Checking confidence…",
+        "Preparing the next step…",
+      ];
   const [stepIndex, setStepIndex] = useState(0);
   const [progress, setProgress] = useState(6);
   const [slow, setSlow] = useState(false);
@@ -571,10 +573,10 @@ function ScanningOverlay({
     if (phase === "preparing") return;
     const stepTimer = setInterval(() => {
       setStepIndex((i) => (i < steps.length - 1 ? i + 1 : i));
-    }, 1200);
+    }, fast ? 380 : 1200);
     // Cap well short of 100 so the bar never appears frozen at 94-99%.
     const progressTimer = setInterval(() => {
-      setProgress((p) => (p < 88 ? p + Math.max(1, Math.round((90 - p) * 0.08)) : p));
+      setProgress((p) => (p < 88 ? p + Math.max(1, Math.round((90 - p) * (fast ? 0.22 : 0.08))) : p));
     }, 180);
     const slowTimer = setTimeout(() => setSlow(true), 9000);
     return () => {
@@ -582,30 +584,9 @@ function ScanningOverlay({
       clearInterval(progressTimer);
       clearTimeout(slowTimer);
     };
-  }, [steps.length, phase]);
+  }, [steps.length, phase, fast]);
 
-  // Fast path: a typed request that already names a service resolves in
-  // milliseconds, so a full scanning sequence would be theatre. Show a small,
-  // honest transition instead.
-  if (fast) {
-    return (
-      <div className="fixed inset-0 z-50 grid place-items-center bg-background/80 px-6 backdrop-blur-sm animate-fade-in">
-        <div className="w-full max-w-sm surface-card p-5 text-center">
-          <Loader2 className="mx-auto h-6 w-6 animate-spin text-primary" />
-          <p className="mt-3 text-base font-bold">Matching your request…</p>
-          <p className="mt-1 text-sm text-muted-foreground">Finding the right service and local pros.</p>
-          <button
-            type="button"
-            onClick={onCancel}
-            data-testid="snap-cancel"
-            className="mt-4 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-border px-4 text-sm font-bold hover:bg-muted"
-          >
-            <X className="h-4 w-4" /> Cancel
-          </button>
-        </div>
-      </div>
-    );
-  }
+
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden animate-fade-in">
@@ -621,23 +602,32 @@ function ScanningOverlay({
       <div className="absolute -right-24 bottom-1/4 h-96 w-96 rounded-full bg-secondary/25 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
 
 
-      <div className="relative mx-4 w-full max-w-md rounded-2xl border border-white/15 bg-white/10 p-6 shadow-elevated backdrop-blur-2xl animate-scale-in">
+      <div className="relative mx-4 w-full max-w-md rounded-2xl border border-white/15 bg-white/10 p-5 shadow-elevated backdrop-blur-2xl animate-scale-in sm:p-6">
         <div className="relative overflow-hidden rounded-2xl border border-white/20">
           {image ? (
-            <img src={image} alt="Analyzing" className="h-64 w-full object-cover" />
+            <img src={image} alt="Analyzing" className={fast ? "h-40 w-full object-cover" : "h-64 w-full object-cover"} />
           ) : (
-            <div className="grid h-64 w-full place-items-center bg-plum/40">
+            <div
+              className={`grid w-full place-items-center ${fast ? "h-40" : "h-64"}`}
+              style={{ background: "linear-gradient(150deg, oklch(0.245 0.075 264), oklch(0.330 0.095 232))" }}
+            >
               <Loader2 className="h-8 w-8 animate-spin text-white/80" />
             </div>
           )}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-1.5 animate-[scanline_1.8s_ease-in-out_infinite]" style={{ background: "var(--gradient-primary)", boxShadow: "0 0 32px color-mix(in oklab, var(--primary) 85%, transparent)" }} />
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-primary/30 mix-blend-overlay" />
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-1.5 animate-[scanline_1.8s_ease-in-out_infinite]"
+            style={{
+              background: "linear-gradient(90deg, transparent, var(--secondary), var(--primary), transparent)",
+              boxShadow: "0 0 32px color-mix(in oklab, var(--secondary) 80%, transparent)",
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-secondary/10 via-transparent to-primary/30 mix-blend-overlay" />
           {/* Corner brackets */}
-          <div className="absolute left-2 top-2 h-5 w-5 border-l-2 border-t-2 border-white/70 rounded-tl-md" />
-          <div className="absolute right-2 top-2 h-5 w-5 border-r-2 border-t-2 border-white/70 rounded-tr-md" />
-          <div className="absolute left-2 bottom-2 h-5 w-5 border-l-2 border-b-2 border-white/70 rounded-bl-md" />
-          <div className="absolute right-2 bottom-2 h-5 w-5 border-r-2 border-b-2 border-white/70 rounded-br-md" />
-          <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
+          <div className="absolute left-2 top-2 h-5 w-5 rounded-tl-md border-l-2 border-t-2 border-white/70" />
+          <div className="absolute right-2 top-2 h-5 w-5 rounded-tr-md border-r-2 border-t-2 border-white/70" />
+          <div className="absolute bottom-2 left-2 h-5 w-5 rounded-bl-md border-b-2 border-l-2 border-white/70" />
+          <div className="absolute bottom-2 right-2 h-5 w-5 rounded-br-md border-b-2 border-r-2 border-white/70" />
+          <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/45 px-3 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur">
             <ScanLine className="h-3 w-3 animate-pulse" /> AI scanning
           </div>
           <div className="absolute bottom-3 right-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-black text-primary shadow">
@@ -646,25 +636,28 @@ function ScanningOverlay({
         </div>
         <div className="mt-5">
           <div className="text-center">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.2em] text-white/80">
+            <div className="inline-flex items-center gap-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-white/75">
               <Sparkles className="h-3.5 w-3.5" /> GetPros AI
             </div>
-            <div className="mt-1 text-lg font-black text-white">
-              {phase === "preparing"
-                ? image
-                  ? "Preparing your media"
-                  : "Understanding your request"
-                : image
-                  ? "Analyzing what you sent"
-                  : "Analyzing your request"}
+            <div className="mt-1.5 text-[1.0625rem] font-black leading-snug tracking-[-0.01em] text-white sm:text-lg">
+              {fast
+                ? "Matching your request"
+                : phase === "preparing"
+                  ? image
+                    ? "Preparing your media"
+                    : "Understanding your request"
+                  : image
+                    ? "Analyzing what you sent"
+                    : "Analyzing your request"}
             </div>
           </div>
           <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white/15">
             <div
               className="h-full rounded-full transition-[width] duration-200 ease-out"
-              style={{ width: `${progress}%`, background: "var(--primary)" }}
+              style={{ width: `${progress}%`, background: "linear-gradient(90deg, var(--primary), var(--secondary))" }}
             />
           </div>
+
           <div className="mt-4 space-y-2">
             {steps.map((s, i) => {
               const done = i < stepIndex;
@@ -704,7 +697,7 @@ function ScanningOverlay({
           </p>
 
         </div>
-        <style>{`@keyframes scanline{0%{transform:translateY(0)}50%{transform:translateY(216px)}100%{transform:translateY(0)}}`}</style>
+        <style>{`@keyframes scanline{0%{transform:translateY(0)}50%{transform:translateY(${fast ? 148 : 216}px)}100%{transform:translateY(0)}}`}</style>
       </div>
     </div>
   );

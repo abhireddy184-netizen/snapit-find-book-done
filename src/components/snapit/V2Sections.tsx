@@ -238,10 +238,10 @@ export function ShowGpbBand() {
           <h2 className="mt-3 text-[clamp(1.4rem,3.2vw,2.1rem)] font-black leading-tight tracking-tight">
             Don’t know what’s wrong? Show us.
           </h2>
-          <p className="mt-2 max-w-[54ch] text-sm leading-relaxed text-muted-foreground">
-            Point your camera at the problem, record a few seconds of video, or upload a photo. GetPros reads
-            the scene, tells you what it likely needs, and turns it into the same clear job brief.
+          <p className="mt-2 max-w-[44ch] text-sm leading-relaxed text-muted-foreground">
+            Point your camera at the problem. GetPros reads the scene and turns it into a clear job brief.
           </p>
+
           <Link
             to="/snap"
             data-analytics-id="show_gpb_cta"
