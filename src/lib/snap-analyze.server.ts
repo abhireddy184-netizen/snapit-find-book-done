@@ -252,6 +252,11 @@ export function normalizeAnalysis(
   )
     .filter((q) => !alreadyAsked.has(String(q).trim().toLowerCase()))
     .slice(0, 2);
+  // Nothing new left to ask, but we know the trade: progress instead of stalling.
+  if (categorySlug && responseKind === "needs-info" && freshQuestions.length === 0) {
+    responseKind = "diagnosis";
+  }
+  const questions = suppressQuestions || responseKind === "diagnosis" ? [] : freshQuestions;
 
   return {
     responseKind,
