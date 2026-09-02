@@ -1076,6 +1076,8 @@ function AnalysisView({
           </div>
         </div>
       </div>
+      )}
+
 
       </>
       )}
