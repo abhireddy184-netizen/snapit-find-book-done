@@ -252,7 +252,10 @@ export function buildFallbackPlan(
   location: string,
   nowClock: string,
   understanding?: PlanUnderstanding,
+  nowDate?: string,
+  timeZone?: string,
 ): GpbPlan {
+
   const fragments = splitFragments(request);
   const tasks: PlanTask[] = [];
 
