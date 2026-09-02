@@ -334,7 +334,13 @@ export function Footer() {
       </div>
       <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-border/60 pt-6 text-xs md:flex-row md:items-center">
         <span>© {new Date().getFullYear()} GetPerfectBoy.com. All rights reserved.</span>
-        <div className="flex flex-wrap gap-5"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Cookies</a><a href="#">Accessibility</a></div>
+        <div className="flex flex-wrap gap-5">
+          <Link to="/legal" hash="privacy" className="hover:text-foreground">Privacy</Link>
+          <Link to="/legal" hash="terms" className="hover:text-foreground">Terms</Link>
+          <Link to="/legal" hash="cookies" className="hover:text-foreground">Cookies</Link>
+          <Link to="/legal" hash="accessibility" className="hover:text-foreground">Accessibility</Link>
+          <Link to="/categories" className="hover:text-foreground">All categories</Link>
+        </div>
       </div>
     </footer>
   );

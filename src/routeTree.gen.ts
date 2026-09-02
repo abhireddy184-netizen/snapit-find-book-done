@@ -18,6 +18,7 @@ import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProviderInterestRouteImport } from './routes/provider-interest'
 import { Route as PlanRouteImport } from './routes/plan'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LegalRouteImport } from './routes/legal'
 import { Route as HistoryRouteImport } from './routes/history'
 import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as CategoriesRouteImport } from './routes/categories'
@@ -77,6 +78,11 @@ const PlanRoute = PlanRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalRoute = LegalRouteImport.update({
+  id: '/legal',
+  path: '/legal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoryRoute = HistoryRouteImport.update({
@@ -162,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/categories': typeof CategoriesRoute
   '/emergency': typeof EmergencyRoute
   '/history': typeof HistoryRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/plan': typeof PlanRoute
   '/provider-interest': typeof ProviderInterestRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/categories': typeof CategoriesRoute
   '/emergency': typeof EmergencyRoute
   '/history': typeof HistoryRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/plan': typeof PlanRoute
   '/provider-interest': typeof ProviderInterestRoute
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/categories': typeof CategoriesRoute
   '/emergency': typeof EmergencyRoute
   '/history': typeof HistoryRoute
+  '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/plan': typeof PlanRoute
   '/provider-interest': typeof ProviderInterestRoute
@@ -240,6 +249,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/emergency'
     | '/history'
+    | '/legal'
     | '/login'
     | '/plan'
     | '/provider-interest'
@@ -265,6 +275,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/emergency'
     | '/history'
+    | '/legal'
     | '/login'
     | '/plan'
     | '/provider-interest'
@@ -290,6 +301,7 @@ export interface FileRouteTypes {
     | '/categories'
     | '/emergency'
     | '/history'
+    | '/legal'
     | '/login'
     | '/plan'
     | '/provider-interest'
@@ -317,6 +329,7 @@ export interface RootRouteChildren {
   CategoriesRoute: typeof CategoriesRoute
   EmergencyRoute: typeof EmergencyRoute
   HistoryRoute: typeof HistoryRoute
+  LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
   PlanRoute: typeof PlanRoute
   ProviderInterestRoute: typeof ProviderInterestRoute
@@ -394,6 +407,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal': {
+      id: '/legal'
+      path: '/legal'
+      fullPath: '/legal'
+      preLoaderRoute: typeof LegalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/history': {
@@ -542,6 +562,7 @@ const rootRouteChildren: RootRouteChildren = {
   CategoriesRoute: CategoriesRoute,
   EmergencyRoute: EmergencyRoute,
   HistoryRoute: HistoryRoute,
+  LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
   PlanRoute: PlanRoute,
   ProviderInterestRoute: ProviderInterestRoute,
