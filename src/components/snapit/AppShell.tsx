@@ -26,6 +26,7 @@ export function AppShell({ children, hideBottomNav = false }: { children: ReactN
 
 function TopBar() {
   const [scrolled, setScrolled] = useState(false);
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     onScroll();
@@ -49,7 +50,18 @@ function TopBar() {
           {/* One emphasis per row: Sign up is the only filled CTA. Secondary
               destinations (How it works, For Pros, Early Access) live in the
               footer so the header stays calm. */}
-          <Link to="/snap" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">
+          <Link
+            to="/snap"
+            onClick={(e) => {
+              // Already on Show GP with a photo/result open: reset in place
+              // and reopen the camera instead of a no-op same-route navigation.
+              if (pathname === "/snap") {
+                e.preventDefault();
+                window.dispatchEvent(new Event("getpros:recapture"));
+              }
+            }}
+            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors"
+          >
             <Camera className="h-4 w-4" /> Show GP
           </Link>
           <Link to="/services" className="rounded-full px-3 py-1.5 hover:text-foreground hover:bg-muted transition-colors">Services</Link>
@@ -192,6 +204,15 @@ function BottomNav() {
               <Link
                 key={it.key}
                 to={it.to}
+                onClick={(e) => {
+                  // Already on the Show GP screen with a photo/result open:
+                  // clear that state and reopen the camera in place instead
+                  // of a no-op navigation to the current route.
+                  if (pathname === "/snap") {
+                    e.preventDefault();
+                    window.dispatchEvent(new Event("getpros:recapture"));
+                  }
+                }}
                 className="-mt-7 flex flex-col items-center gap-1.5"
                 aria-label="Show GP — camera diagnosis"
               >

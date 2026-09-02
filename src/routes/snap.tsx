@@ -124,6 +124,17 @@ function SnapPage() {
     // Invalidate any in-flight run when the page unmounts.
     runRef.current += 1;
   }, []);
+  // Tapping the center Show GP camera while this page is open: wipe the old
+  // photo/result and immediately reopen the camera so the new shot replaces it.
+  useEffect(() => {
+    const recapture = () => {
+      reset();
+      requestAnimationFrame(() => cameraRef.current?.click());
+    };
+    window.addEventListener("getpros:recapture", recapture);
+    return () => window.removeEventListener("getpros:recapture", recapture);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // Release the temporary preview blob URL whenever it's replaced or cleared.
   useEffect(() => {
     if (!pendingPreview) return;
@@ -602,7 +613,7 @@ function ScanningOverlay({
 
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden animate-fade-in">
+    <div className="pointer-events-none fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden animate-fade-in">
       {/* Ambient blurred image + gradient wash */}
       <div
         className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl opacity-60"
@@ -615,7 +626,9 @@ function ScanningOverlay({
       <div className="absolute -right-24 bottom-1/4 h-96 w-96 rounded-full bg-secondary/25 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
 
 
-      <div className="relative mx-4 w-full max-w-md rounded-2xl border border-white/15 bg-white/10 p-5 shadow-elevated backdrop-blur-2xl animate-scale-in sm:p-6">
+      {/* Backdrop lets taps through (e.g. the bottom-nav camera for an instant
+          re-capture); only this card — including Cancel — stays interactive. */}
+      <div className="pointer-events-auto relative mx-4 w-full max-w-md rounded-2xl border border-white/15 bg-white/10 p-5 shadow-elevated backdrop-blur-2xl animate-scale-in sm:p-6">
         <div className="relative overflow-hidden rounded-2xl border border-white/20">
           {image ? (
             <img src={image} alt="Analyzing" className={fast ? "h-40 w-full object-cover" : "h-64 w-full object-cover"} />
