@@ -185,7 +185,9 @@ function PlanPage() {
         </div>
       )}
 
-      {conversation && <ConversationCard reply={conversation.reply} invitation={conversation.invitation} />}
+      {conversation && (
+        <ConversationCard request={search.q} reply={conversation.reply} invitation={conversation.invitation} />
+      )}
 
       {plan && (
 
