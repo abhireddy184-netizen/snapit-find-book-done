@@ -485,7 +485,7 @@ export function normalizePlan(
       };
     });
 
-  if (!tasks.length) return buildFallbackPlan(request, location, nowClock, understanding);
+  if (!tasks.length) return buildFallbackPlan(request, location, nowClock, understanding, nowDate, timeZone);
 
   const deadline =
     typeof parsed['deadline'] === "string" && /^\d{1,2}:\d{2}$/.test(parsed['deadline'] as string)
@@ -493,6 +493,15 @@ export function normalizePlan(
       : // English regex is a last-resort fallback only; the canonical intent above
         // is what carries non-English deadlines.
         extractDeadline(understanding?.normalizedRequest ?? request);
+
+  const isoDate = (k: string) => {
+    const v = parsed[k];
+    return typeof v === "string" && isIsoDate(v.trim()) ? v.trim() : undefined;
+  };
+  const startDate = isoDate("startDate") ?? nowDate;
+  const deadlineDate = isoDate("deadlineDate") ?? startDate;
+
+
 
   const rawCopy = (parsed['uiCopy'] ?? {}) as Record<string, unknown>;
   const copy: PlanUiCopy = {};
