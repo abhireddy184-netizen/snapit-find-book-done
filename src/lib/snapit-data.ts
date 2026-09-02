@@ -23,16 +23,16 @@ export type Category = {
 };
 
 export const categories: Category[] = [
-  { slug: "plumbing", name: "Plumbing", description: "Leaks, drains, water heaters and installs.", icon: Wrench, color: "from-[#FF3D8D] to-[#FF7A45]", accent: "pink", hex: "#FF3D8D" },
+  { slug: "plumbing", name: "Plumbing", description: "Leaks, drains, water heaters and installs.", icon: Wrench, color: "from-[#2C5CA8] to-[#2FA8C0]", accent: "pink", hex: "#2C5CA8" },
   { slug: "electrical", name: "Electrical", description: "Wiring, outlets, lighting and safety checks.", icon: Zap, color: "from-[#FFD83D] to-[#FF9E2C]", accent: "yellow", hex: "#F0A81E" },
-  { slug: "hvac", name: "HVAC", description: "Heating, cooling, tune-ups and repair.", icon: Wind, color: "from-[#6EC8FF] to-[#3AA6F0]", accent: "sky", hex: "#3AA6F0" },
+  { slug: "hvac", name: "HVAC", description: "Heating, cooling, tune-ups and repair.", icon: Wind, color: "from-[#2FA8C0] to-[#3AA6F0]", accent: "sky", hex: "#3AA6F0" },
   { slug: "house-cleaning", name: "House Cleaning", description: "Deep cleans, recurring and move-outs.", icon: Sparkles, color: "from-[#4ED6A0] to-[#22B486]", accent: "mint", hex: "#22B486" },
-  { slug: "handyman", name: "Handyman", description: "Small repairs, mounting and assembly.", icon: Hammer, color: "from-[#FF7A45] to-[#FF3D8D]", accent: "coral", hex: "#FF7A45" },
+  { slug: "handyman", name: "Handyman", description: "Small repairs, mounting and assembly.", icon: Hammer, color: "from-[#2FA8C0] to-[#2C5CA8]", accent: "coral", hex: "#2FA8C0" },
   { slug: "lawn-care", name: "Lawn Care", description: "Mowing, trimming and yard cleanups.", icon: Trees, color: "from-[#8BDD5B] to-[#4ED6A0]", accent: "lime", hex: "#4ED6A0" },
-  { slug: "appliance-repair", name: "Appliance Repair", description: "Fridge, washer, dryer and dishwasher fixes.", icon: Refrigerator, color: "from-[#B58CFF] to-[#8A5CF0]", accent: "lavender", hex: "#8A5CF0" },
-  { slug: "beauty-spa", name: "Beauty & Spa", description: "In-home beauty, massage and wellness.", icon: Scissors, color: "from-[#FF3D8D] to-[#B58CFF]", accent: "magenta", hex: "#FF3D8D" },
-  { slug: "moving-help", name: "Moving Help", description: "Loaders, movers and packing pros.", icon: Truck, color: "from-[#6EC8FF] to-[#B58CFF]", accent: "periwinkle", hex: "#6EC8FF" },
-  { slug: "auto-services", name: "Auto Services", description: "Mobile mechanics and detailing.", icon: Car, color: "from-[#3A163F] to-[#8A5CF0]", accent: "plum", hex: "#8A5CF0" },
+  { slug: "appliance-repair", name: "Appliance Repair", description: "Fridge, washer, dryer and dishwasher fixes.", icon: Refrigerator, color: "from-[#4C86C6] to-[#2F4E96]", accent: "lavender", hex: "#2F4E96" },
+  { slug: "beauty-spa", name: "Beauty & Spa", description: "In-home beauty, massage and wellness.", icon: Scissors, color: "from-[#2C5CA8] to-[#4C86C6]", accent: "magenta", hex: "#2C5CA8" },
+  { slug: "moving-help", name: "Moving Help", description: "Loaders, movers and packing pros.", icon: Truck, color: "from-[#2FA8C0] to-[#4C86C6]", accent: "periwinkle", hex: "#2FA8C0" },
+  { slug: "auto-services", name: "Auto Services", description: "Mobile mechanics and detailing.", icon: Car, color: "from-[#3A163F] to-[#2F4E96]", accent: "plum", hex: "#2F4E96" },
 ];
 
 export function getCategory(slug: string) {
@@ -63,12 +63,12 @@ export type Provider = {
 };
 
 const gradients = [
-  "from-[#FF3D8D] to-[#FF7A45]",
+  "from-[#2C5CA8] to-[#2FA8C0]",
   "from-[#FFD83D] to-[#FF9E2C]",
-  "from-[#4ED6A0] to-[#6EC8FF]",
-  "from-[#6EC8FF] to-[#B58CFF]",
-  "from-[#B58CFF] to-[#FF3D8D]",
-  "from-[#FF7A45] to-[#FFD83D]",
+  "from-[#4ED6A0] to-[#2FA8C0]",
+  "from-[#2FA8C0] to-[#4C86C6]",
+  "from-[#4C86C6] to-[#2C5CA8]",
+  "from-[#2FA8C0] to-[#FFD83D]",
 ];
 
 export const providers: Provider[] = [

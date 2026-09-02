@@ -573,10 +573,11 @@ function ScanningOverlay({
         className="absolute inset-0 scale-110 bg-cover bg-center blur-2xl opacity-60"
         style={image ? { backgroundImage: `url(${image})` } : undefined}
       />
-      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, oklch(0.274 0.084 322 / 0.88), oklch(0.45 0.19 350 / 0.78) 60%, oklch(0.274 0.084 322 / 0.92))" }} />
+      <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, oklch(0.215 0.070 266 / 0.90), oklch(0.320 0.110 250 / 0.80) 60%, oklch(0.215 0.070 266 / 0.94))" }} />
       {/* Floating orbs */}
       <div className="absolute -left-24 top-1/4 h-80 w-80 rounded-full bg-primary/30 blur-3xl animate-pulse" />
-      <div className="absolute -right-24 bottom-1/4 h-96 w-96 rounded-full bg-fuchsia-500/20 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute -right-24 bottom-1/4 h-96 w-96 rounded-full bg-secondary/25 blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+
 
       <div className="relative mx-4 w-full max-w-md rounded-[28px] border border-white/15 bg-white/10 p-6 shadow-2xl backdrop-blur-2xl animate-scale-in">
         <div className="relative overflow-hidden rounded-2xl border border-white/20">

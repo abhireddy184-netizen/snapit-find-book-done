@@ -418,7 +418,7 @@ function BookPage() {
         </div>
 
         <div className="mb-4 flex items-center gap-3 rounded-2xl border border-border/60 bg-card p-4 shadow-sm">
-          <Avatar initials={provider.business_name.slice(0, 2).toUpperCase()} gradient={category?.gradient ?? "from-[#E2704B] to-[#C0468F]"} />
+          <Avatar initials={provider.business_name.slice(0, 2).toUpperCase()} gradient={category?.gradient ?? "from-[#2C5CA8] to-[#1F3A73]"} />
           <div className="min-w-0">
             <div className="truncate text-sm font-black">{provider.business_name}</div>
             <div className="truncate text-xs text-muted-foreground">

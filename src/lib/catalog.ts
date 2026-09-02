@@ -157,7 +157,7 @@ const s = (
 export const catalog: MasterCategory[] = [
   {
     slug: "plumbing", name: "Plumbing", tagline: "Leaks, drains, fixtures and water heaters.",
-    icon: Wrench, hex: "#E2704B", gradient: "from-[#E2704B] to-[#C0468F]", providerCategory: "plumbing",
+    icon: Wrench, hex: "#2C5CA8", gradient: "from-[#2C5CA8] to-[#1F3A73]", providerCategory: "plumbing",
     popular: true, emergency: true,
     services: [
       s("drain-clearing", "Drain Clearing", "Slow or blocked sinks, tubs and showers cleared.", 120, 320, { featured: true, licensed: true, cues: ["sink", "drain", "standing water"] }),
@@ -174,7 +174,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "electrical", name: "Electrical", tagline: "Outlets, lighting, panels and safety.",
-    icon: Zap, hex: "#B983FF", gradient: "from-[#B983FF] to-[#6F4CD8]", providerCategory: "electrical",
+    icon: Zap, hex: "#4C86C6", gradient: "from-[#4C86C6] to-[#2F4E96]", providerCategory: "electrical",
     popular: true, emergency: true,
     services: [
       s("light-fixture-installation", "Light Fixture Installation", "Pendants, chandeliers, flush mounts and more.", 110, 420, { featured: true, licensed: true, cues: ["light", "fixture", "chandelier"] }),
@@ -190,7 +190,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "hvac", name: "Heating & Cooling", tagline: "AC, furnaces, tune-ups and air quality.",
-    icon: Wind, hex: "#5FB6E8", gradient: "from-[#5FB6E8] to-[#7B7BE8]", providerCategory: "hvac",
+    icon: Wind, hex: "#2FA8C0", gradient: "from-[#2FA8C0] to-[#3B82C4]", providerCategory: "hvac",
     popular: true, emergency: true,
     services: [
       s("ac-repair", "AC Repair", "Warm air, short cycling or a system that won't start.", 140, 900, { featured: true, licensed: true, cues: ["air conditioner", "ac unit", "vent"] }),
@@ -204,7 +204,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "appliances", name: "Appliance Service", tagline: "Repair and installation for major appliances.",
-    icon: Refrigerator, hex: "#7B7BE8", gradient: "from-[#7B7BE8] to-[#B983FF]", providerCategory: "appliance-repair",
+    icon: Refrigerator, hex: "#3B82C4", gradient: "from-[#3B82C4] to-[#4C86C6]", providerCategory: "appliance-repair",
     popular: true,
     services: [
       s("refrigerator-repair", "Refrigerator Repair", "Not cooling, leaking, icing or noisy fridges.", 140, 650, { featured: true, cues: ["refrigerator", "fridge", "freezer"] }),
@@ -221,7 +221,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "cleaning", name: "Home Cleaning", tagline: "Standard, deep and move-out cleaning.",
-    icon: Sparkles, hex: "#4FC59A", gradient: "from-[#4FC59A] to-[#5FB6E8]", providerCategory: "house-cleaning",
+    icon: Sparkles, hex: "#1F9187", gradient: "from-[#1F9187] to-[#2FA8C0]", providerCategory: "house-cleaning",
     popular: true,
     services: [
       s("standard-cleaning", "Standard House Cleaning", "Regular upkeep for the whole home.", 110, 260, { featured: true }),
@@ -235,7 +235,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "carpet-upholstery-cleaning", name: "Carpet & Upholstery Cleaning", tagline: "Deep-clean soft surfaces and remove stains.",
-    icon: Brush, hex: "#4FC59A", gradient: "from-[#4FC59A] to-[#7B7BE8]", providerCategory: "house-cleaning",
+    icon: Brush, hex: "#1F9187", gradient: "from-[#1F9187] to-[#3B82C4]", providerCategory: "house-cleaning",
     services: [
       s("carpet-cleaning", "Carpet Cleaning", "Hot water extraction for rooms and stairs.", 120, 400, { featured: true, cues: ["carpet", "rug"] }),
       s("upholstery-cleaning", "Upholstery Cleaning", "Sofas, chairs and sectionals refreshed.", 110, 350, { featured: true, cues: ["sofa", "couch", "fabric"] }),
@@ -246,7 +246,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "handyman", name: "Handyman", tagline: "The punch list, knocked out in one visit.",
-    icon: Hammer, hex: "#E2704B", gradient: "from-[#E2704B] to-[#E8A24B]", providerCategory: "handyman",
+    icon: Hammer, hex: "#2C5CA8", gradient: "from-[#2C5CA8] to-[#46B39A]", providerCategory: "handyman",
     popular: true,
     services: [
       s("handyman-hour", "General Handyman (hourly)", "Bring your list — one pro, one visit.", 75, 130, { featured: true, unit: "per hour" }),
@@ -260,7 +260,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "mounting-installation", name: "Mounting & Installation", tagline: "TVs, shelves, mirrors, art and hardware.",
-    icon: Tv, hex: "#6F4CD8", gradient: "from-[#6F4CD8] to-[#C0468F]", providerCategory: "handyman",
+    icon: Tv, hex: "#2F4E96", gradient: "from-[#2F4E96] to-[#1F3A73]", providerCategory: "handyman",
     popular: true,
     services: [
       s("tv-mounting", "TV Mounting", "Secure wall mount with cables tidied.", 100, 350, { featured: true, cues: ["tv", "television", "blank wall"] }),
@@ -275,7 +275,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "furniture", name: "Furniture Services", tagline: "Assembly, repair, upholstery and cushions.",
-    icon: Sofa, hex: "#C0468F", gradient: "from-[#C0468F] to-[#6F4CD8]", providerCategory: "handyman",
+    icon: Sofa, hex: "#1F3A73", gradient: "from-[#1F3A73] to-[#2F4E96]", providerCategory: "handyman",
     popular: true,
     services: [
       s("furniture-assembly", "Furniture Assembly", "Flat-pack built right, first time.", 70, 300, { featured: true, cues: ["flat pack", "box furniture"] }),
@@ -289,7 +289,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "painting", name: "Painting", tagline: "Interior, exterior, cabinets and accents.",
-    icon: PaintRoller, hex: "#E8A24B", gradient: "from-[#E8A24B] to-[#E2704B]", providerCategory: "handyman",
+    icon: PaintRoller, hex: "#46B39A", gradient: "from-[#46B39A] to-[#2C5CA8]", providerCategory: "handyman",
     popular: true,
     services: [
       s("interior-painting", "Interior Painting", "Rooms, ceilings and trim, cleanly cut in.", 350, 2500, { featured: true, cues: ["wall", "room", "scuffed paint"] }),
@@ -302,7 +302,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "walls-drywall", name: "Walls & Drywall", tagline: "Patching, texture, wallpaper and repairs.",
-    icon: LayoutGrid, hex: "#E8A24B", gradient: "from-[#E8A24B] to-[#C0468F]", providerCategory: "handyman",
+    icon: LayoutGrid, hex: "#46B39A", gradient: "from-[#46B39A] to-[#1F3A73]", providerCategory: "handyman",
     services: [
       s("drywall-patching", "Drywall Patch & Hole Repair", "Doorknob dents to large cut-outs.", 110, 500, { featured: true, cues: ["hole in wall", "crack", "drywall"] }),
       s("texture-matching", "Texture Matching", "Knockdown, orange peel and smooth finishes.", 150, 600 ),
@@ -314,7 +314,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "tile-grout", name: "Tile & Grout", tagline: "Repair, regrouting, sealing and new tile.",
-    icon: LayoutGrid, hex: "#5FB6E8", gradient: "from-[#5FB6E8] to-[#4FC59A]", providerCategory: "handyman",
+    icon: LayoutGrid, hex: "#2FA8C0", gradient: "from-[#2FA8C0] to-[#1F9187]", providerCategory: "handyman",
     services: [
       s("tile-repair", "Tile Repair & Replacement", "Cracked, loose or hollow tiles replaced.", 150, 700, { featured: true, cues: ["tile", "cracked tile"] }),
       s("grout-cleaning", "Grout Cleaning & Sealing", "Bring grout lines back to their original color.", 150, 500, { featured: true, cues: ["grout", "dirty grout"] }),
@@ -326,7 +326,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "flooring", name: "Flooring", tagline: "Install, repair and refinish any floor.",
-    icon: LayoutGrid, hex: "#E2704B", gradient: "from-[#E2704B] to-[#7B7BE8]", providerCategory: "handyman",
+    icon: LayoutGrid, hex: "#2C5CA8", gradient: "from-[#2C5CA8] to-[#3B82C4]", providerCategory: "handyman",
     services: [
       s("lvp-laminate-installation", "Vinyl Plank & Laminate Installation", "Durable click-lock flooring installed.", 700, 4500, { featured: true }),
       s("hardwood-installation", "Hardwood Installation", "Solid and engineered hardwood.", 1500, 9000 ),
@@ -338,7 +338,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "doors-windows", name: "Doors, Windows & Coverings", tagline: "Fit, repair and dress openings.",
-    icon: DoorOpen, hex: "#7B7BE8", gradient: "from-[#7B7BE8] to-[#5FB6E8]", providerCategory: "handyman",
+    icon: DoorOpen, hex: "#3B82C4", gradient: "from-[#3B82C4] to-[#2FA8C0]", providerCategory: "handyman",
     services: [
       s("interior-door-installation", "Interior Door Installation", "Slab or pre-hung doors fitted.", 180, 700, { cues: ["door"] }),
       s("exterior-door-installation", "Exterior Door Installation", "Entry doors, weather-sealed.", 400, 2200 ),
@@ -351,7 +351,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "smart-home", name: "Smart Home & Tech", tagline: "Doorbells, cameras, Wi-Fi and setup.",
-    icon: Wifi, hex: "#6F4CD8", gradient: "from-[#6F4CD8] to-[#5FB6E8]", providerCategory: "electrical",
+    icon: Wifi, hex: "#2F4E96", gradient: "from-[#2F4E96] to-[#2FA8C0]", providerCategory: "electrical",
     services: [
       s("smart-doorbell-installation", "Smart Doorbell Installation", "Video doorbell wired and configured.", 110, 350, { featured: true, cues: ["doorbell"] }),
       s("security-camera-installation", "Security Camera Installation", "Indoor and outdoor camera systems.", 200, 1500, { featured: true, cues: ["camera", "security"] }),
@@ -364,7 +364,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "moving", name: "Moving & Heavy Lifting", tagline: "Load, move, pack and place.",
-    icon: Truck, hex: "#5FB6E8", gradient: "from-[#5FB6E8] to-[#6F4CD8]", providerCategory: "moving-help",
+    icon: Truck, hex: "#2FA8C0", gradient: "from-[#2FA8C0] to-[#2F4E96]", providerCategory: "moving-help",
     popular: true,
     services: [
       s("local-moving", "Local Moving Help", "Two pros and a truck for local moves.", 250, 1400, { featured: true }),
@@ -377,7 +377,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "junk-removal", name: "Junk Removal & Hauling", tagline: "Clear it out and haul it away.",
-    icon: Trash2, hex: "#4FC59A", gradient: "from-[#4FC59A] to-[#E8A24B]", providerCategory: "moving-help",
+    icon: Trash2, hex: "#1F9187", gradient: "from-[#1F9187] to-[#46B39A]", providerCategory: "moving-help",
     services: [
       s("single-item-removal", "Single Item Removal", "One couch, mattress or appliance gone.", 80, 250, { featured: true, cues: ["old furniture", "mattress"] }),
       s("full-junk-removal", "Full Junk Removal", "Truckload clear-outs.", 200, 800 ),
@@ -388,7 +388,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "lawn-outdoor", name: "Lawn & Outdoor", tagline: "Mowing, trimming, cleanup and irrigation.",
-    icon: Trees, hex: "#4FC59A", gradient: "from-[#4FC59A] to-[#8DD35F]", providerCategory: "lawn-care",
+    icon: Trees, hex: "#1F9187", gradient: "from-[#1F9187] to-[#5FC2B0]", providerCategory: "lawn-care",
     popular: true,
     services: [
       s("lawn-mowing", "Lawn Mowing & Edging", "Regular cuts with clean edges.", 45, 150, { featured: true, cues: ["lawn", "grass", "yard"] }),
@@ -403,7 +403,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "exterior-cleaning", name: "Exterior Cleaning", tagline: "Pressure washing, gutters and windows.",
-    icon: Droplets, hex: "#5FB6E8", gradient: "from-[#5FB6E8] to-[#4FC59A]", providerCategory: "house-cleaning",
+    icon: Droplets, hex: "#2FA8C0", gradient: "from-[#2FA8C0] to-[#1F9187]", providerCategory: "house-cleaning",
     services: [
       s("pressure-washing", "Pressure Washing", "Driveways, siding, decks and patios.", 150, 650, { featured: true, cues: ["driveway", "siding", "moss"] }),
       s("gutter-cleaning", "Gutter Cleaning", "Clear downspouts before the next storm.", 120, 400, { featured: true, cues: ["gutter"] }),
@@ -414,7 +414,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "outdoor-structures", name: "Fence, Deck & Patio", tagline: "Build, repair and refresh outdoor structures.",
-    icon: Fence, hex: "#E8A24B", gradient: "from-[#E8A24B] to-[#4FC59A]", providerCategory: "handyman",
+    icon: Fence, hex: "#46B39A", gradient: "from-[#46B39A] to-[#1F9187]", providerCategory: "handyman",
     services: [
       s("fence-repair", "Fence Repair", "Leaning posts, broken boards, gate sag.", 150, 900, { cues: ["fence"] }),
       s("fence-installation", "Fence Installation", "Wood, vinyl and metal fencing.", 1500, 9000 ),
@@ -426,7 +426,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "garage", name: "Garage & Doors", tagline: "Garage doors, openers and storage.",
-    icon: Home, hex: "#7B7BE8", gradient: "from-[#7B7BE8] to-[#E2704B]", providerCategory: "handyman",
+    icon: Home, hex: "#3B82C4", gradient: "from-[#3B82C4] to-[#2C5CA8]", providerCategory: "handyman",
     services: [
       s("garage-door-repair", "Garage Door Repair", "Springs, rollers, cables and alignment.", 150, 700, { featured: true, cues: ["garage door"] }),
       s("garage-opener-installation", "Garage Opener Installation", "Smart openers installed and paired.", 200, 700 ),
@@ -436,7 +436,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "pest-control", name: "Pest Control", tagline: "Treatment and prevention, done safely.",
-    icon: Bug, hex: "#8DD35F", gradient: "from-[#8DD35F] to-[#4FC59A]", providerCategory: "handyman",
+    icon: Bug, hex: "#5FC2B0", gradient: "from-[#5FC2B0] to-[#1F9187]", providerCategory: "handyman",
     services: [
       s("general-pest-treatment", "General Pest Treatment", "Ants, roaches and common household pests.", 120, 400, { licensed: true }),
       s("rodent-control", "Rodent Control & Exclusion", "Trapping plus sealing entry points.", 200, 900, { licensed: true }),
@@ -447,7 +447,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "locksmith", name: "Locksmith & Access", tagline: "Lockouts, rekeying and hardware.",
-    icon: KeyRound, hex: "#C0468F", gradient: "from-[#C0468F] to-[#E2704B]", providerCategory: "handyman",
+    icon: KeyRound, hex: "#1F3A73", gradient: "from-[#1F3A73] to-[#2C5CA8]", providerCategory: "handyman",
     emergency: true,
     services: [
       s("lockout-service", "Lockout Service", "Back inside without damage.", 90, 300, { licensed: true, featured: true }),
@@ -458,7 +458,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "roofing-exterior", name: "Roofing & Exterior", tagline: "Leaks, repairs and exterior surfaces.",
-    icon: Home, hex: "#E2704B", gradient: "from-[#E2704B] to-[#6F4CD8]", providerCategory: "handyman",
+    icon: Home, hex: "#2C5CA8", gradient: "from-[#2C5CA8] to-[#2F4E96]", providerCategory: "handyman",
     services: [
       s("roof-leak-repair", "Roof Leak Repair", "Find and stop the leak.", 250, 1500, { licensed: true, cues: ["ceiling stain", "roof"] }),
       s("shingle-replacement", "Shingle Repair & Replacement", "Wind and storm damage.", 300, 2500, { licensed: true }),
@@ -469,7 +469,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "pool-spa", name: "Pool & Spa", tagline: "Cleaning, chemistry and equipment.",
-    icon: Waves, hex: "#5FB6E8", gradient: "from-[#5FB6E8] to-[#7B7BE8]", providerCategory: "handyman",
+    icon: Waves, hex: "#2FA8C0", gradient: "from-[#2FA8C0] to-[#3B82C4]", providerCategory: "handyman",
     services: [
       s("pool-cleaning", "Pool Cleaning & Maintenance", "Skim, vacuum, brush and balance.", 100, 350, { licensed: true }),
       s("pool-equipment-repair", "Pool Equipment Repair", "Pumps, filters and heaters.", 180, 1200, { licensed: true }),
@@ -479,7 +479,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "organization", name: "Home Organization", tagline: "Systems that actually stay tidy.",
-    icon: Boxes, hex: "#B983FF", gradient: "from-[#B983FF] to-[#4FC59A]", providerCategory: "house-cleaning",
+    icon: Boxes, hex: "#4C86C6", gradient: "from-[#4C86C6] to-[#1F9187]", providerCategory: "house-cleaning",
     services: [
       s("closet-organization", "Closet Organization", "Sorted, systemized and labeled.", 150, 700, { featured: true }),
       s("kitchen-pantry-organization", "Kitchen & Pantry Organization", "Zones that make cooking easier.", 150, 700 ),
@@ -490,7 +490,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "beauty-at-home", name: "Beauty at Home", tagline: "Salon-quality, at your door.",
-    icon: Scissors, hex: "#C0468F", gradient: "from-[#C0468F] to-[#B983FF]", providerCategory: "beauty-spa",
+    icon: Scissors, hex: "#1F3A73", gradient: "from-[#1F3A73] to-[#4C86C6]", providerCategory: "beauty-spa",
     popular: true,
     services: [
       s("haircut-styling", "Haircut & Styling", "Cuts and styling in your own space.", 45, 180, { featured: true, licensed: true, cues: ["hair", "haircut"] }),
@@ -513,7 +513,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "auto-mobile", name: "Auto & Mobile Services", tagline: "They come to your driveway.",
-    icon: Car, hex: "#6F4CD8", gradient: "from-[#6F4CD8] to-[#E2704B]", providerCategory: "auto-services",
+    icon: Car, hex: "#2F4E96", gradient: "from-[#2F4E96] to-[#2C5CA8]", providerCategory: "auto-services",
     popular: true,
     services: [
       s("mobile-car-detailing", "Mobile Car Detailing", "Interior and exterior detail at home.", 90, 400, { featured: true, cues: ["car", "vehicle"] }),
@@ -527,7 +527,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "pet-household", name: "Pet-Related Home Services", tagline: "Pet-friendly help around the house.",
-    icon: PawPrint, hex: "#E8A24B", gradient: "from-[#E8A24B] to-[#B983FF]", providerCategory: "house-cleaning",
+    icon: PawPrint, hex: "#46B39A", gradient: "from-[#46B39A] to-[#4C86C6]", providerCategory: "house-cleaning",
     services: [
       s("pet-odor-treatment", "Pet Odor & Stain Treatment", "Carpets, upholstery and floors.", 100, 400, { cues: ["pet stain"] }),
       s("pet-door-installation", "Pet Door Installation", "Doors, walls and screens.", 150, 600 ),
@@ -538,7 +538,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "seasonal", name: "Seasonal Services", tagline: "Right help at the right time of year.",
-    icon: Snowflake, hex: "#5FB6E8", gradient: "from-[#5FB6E8] to-[#C0468F]", providerCategory: "handyman",
+    icon: Snowflake, hex: "#2FA8C0", gradient: "from-[#2FA8C0] to-[#1F3A73]", providerCategory: "handyman",
     services: [
       s("holiday-light-installation", "Holiday Light Installation", "Hung, timed and taken down after.", 200, 1200 ),
       s("snow-removal", "Snow Removal", "Driveways, walkways and salting.", 60, 300 ),
@@ -549,7 +549,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "errands", name: "Errands & Personal Assistance", tagline: "Time back in your week.",
-    icon: Boxes, hex: "#B983FF", gradient: "from-[#B983FF] to-[#5FB6E8]", providerCategory: "moving-help",
+    icon: Boxes, hex: "#4C86C6", gradient: "from-[#4C86C6] to-[#2FA8C0]", providerCategory: "moving-help",
     services: [
       s("shopping-delivery", "Shopping & Pickup", "Store runs and curbside pickups.", 30, 120 ),
       s("waiting-service", "Wait Service", "Someone home for a delivery or repair.", 40, 150, { unit: "per hour" }),
@@ -559,7 +559,7 @@ export const catalog: MasterCategory[] = [
   },
   {
     slug: "emergency-home", name: "Emergency Home Services", tagline: "24/7 triage when it can't wait.",
-    icon: ShieldAlert, hex: "#D64545", gradient: "from-[#D64545] to-[#E2704B]", providerCategory: "plumbing",
+    icon: ShieldAlert, hex: "#D64545", gradient: "from-[#D64545] to-[#2C5CA8]", providerCategory: "plumbing",
     emergency: true,
     services: [
       s("burst-pipe", "Burst Pipe & Flooding", "Shut-off, containment and repair.", 250, 2500, { licensed: true, featured: true }),
