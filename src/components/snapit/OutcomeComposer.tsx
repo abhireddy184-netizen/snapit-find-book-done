@@ -582,11 +582,14 @@ export function OutcomeComposer() {
           {statusLine}
         </p>
       )}
-
+      {emptyError && (
+        <p id="gpb-outcome-error" role="alert" className="mt-1.5 text-xs font-semibold text-destructive">
+          Tell GPB what you need first — type it or tap the mic.
+        </p>
+      )}
 
       <div className="mt-2.5 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-        <div className="min-w-0">
-          <LocationAutocomplete
+
             value={loc}
             onChange={setLoc}
             aria-label="ZIP or city"
