@@ -35,21 +35,23 @@ export async function fetchAvailability(providerId: string): Promise<WeeklyHours
   return (data ?? []).map((r) => ({ weekday: r.weekday, startMinute: r.start_minute, endMinute: r.end_minute }));
 }
 
-/** Replace the whole week in one go — simplest correct model for a small grid. */
-export async function saveAvailability(providerId: string, hours: WeeklyHours[]): Promise<void> {
+/**
+ * Replace the whole week atomically through a security-definer function.
+ * Doing this as delete+insert from the client could leave the provider with
+ * no rows (read as "closed", never as "open") if the insert failed; the RPC
+ * runs both halves in one transaction instead. An empty array means
+ * "closed all week" and is saved as such — it never falls back to all-open.
+ */
+export async function saveAvailability(_providerId: string, hours: WeeklyHours[]): Promise<void> {
   const clamped = hours
     .map((h) => ({
-      provider_id: providerId,
       weekday: h.weekday,
       start_minute: Math.max(SERVICE_WINDOW_START_MINUTE, Math.min(h.startMinute, SERVICE_WINDOW_END_MINUTE - 30)),
       end_minute: Math.min(SERVICE_WINDOW_END_MINUTE, Math.max(h.endMinute, SERVICE_WINDOW_START_MINUTE + 30)),
     }))
     .filter((h) => h.end_minute > h.start_minute);
 
-  const { error: delError } = await supabase.from("provider_availability").delete().eq("provider_id", providerId);
-  if (delError) throw delError;
-  if (clamped.length === 0) return;
-  const { error } = await supabase.from("provider_availability").insert(clamped);
+  const { error } = await supabase.rpc("replace_provider_availability", { _hours: clamped });
   if (error) throw error;
 }
 
