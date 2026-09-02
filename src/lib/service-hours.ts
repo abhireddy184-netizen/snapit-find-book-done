@@ -187,13 +187,20 @@ export type WeeklyHours = { weekday: number; startMinute: number; endMinute: num
 export type TimeOff = { startsAt: string; endsAt: string };
 
 export type SlotOptions = {
-  /** Total minutes that must fit: service duration + travel/setup buffer. */
-  totalMinutes: number;
+  /** On-site service length. Must fit the platform window and the pro's hours. */
+  durationMinutes: number;
+  /** Travel/setup time held after the job. Blocks the pro but may run past hours. */
+  bufferMinutes?: number;
   timeZone: string;
-  /** Provider weekly hours; empty means "platform window". */
-  hours?: WeeklyHours[];
+  /**
+   * The pro's weekly hours. An array — including an empty one — is
+   * AUTHORITATIVE: a weekday with no row is a closed day and yields no slots.
+   * Pass `undefined`/`null` only when no pro is chosen yet and the caller
+   * deliberately wants the bare platform window.
+   */
+  hours?: WeeklyHours[] | null;
   timeOff?: TimeOff[];
-  /** Already-taken [start,end) instants for this provider. */
+  /** Already-taken [start,end) instants for this provider, buffer included. */
   busy?: { startAt: string; endAt: string }[];
   /** Earliest bookable moment (lead time already applied). */
   notBefore?: Date;
