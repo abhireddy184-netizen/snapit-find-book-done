@@ -42,48 +42,41 @@ export const Route = createFileRoute("/")({
 function Landing() {
   return (
     <AppShell>
-      {/* Hero — outcome-first composer */}
+      {/* Hero — outcome-first composer. One clean surface: no gradient orbs,
+          no mesh. The composer is the single action on phones. */}
       <section
-        className="gpb-bleed fade-up relative -mt-4 overflow-hidden border-b border-border/50 py-9 sm:py-12 lg:py-16 xl:py-20 md:-mt-6"
+        className="gpb-bleed fade-up relative -mt-4 overflow-hidden border-b border-border/50 py-10 sm:py-14 lg:py-20 xl:py-24 md:-mt-6"
         style={{ backgroundColor: "color-mix(in oklab, var(--card) 92%, var(--background))" }}
       >
-        <div
-          className="pointer-events-none absolute -right-24 -top-28 h-[26rem] w-[26rem] rounded-full opacity-20 blur-3xl"
-          style={{ background: "var(--gradient-primary)" }}
-          aria-hidden="true"
-        />
-        <div
-          className="pointer-events-none absolute -bottom-40 -left-32 h-[24rem] w-[24rem] rounded-full opacity-[0.13] blur-3xl"
-          style={{ background: "var(--gradient-secondary)" }}
-          aria-hidden="true"
-        />
         <div className="gpb-shell relative grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-14 xl:gap-20">
           <div className="min-w-0">
             {/* Branding lives in the header only — repeating the wordmark here
                 pushed the headline below the fold on phones. */}
-            <h1 className="max-w-[15ch] text-[clamp(2rem,5.6vw,4.2rem)] font-black leading-[1.05] tracking-tight text-foreground">
+            <h1 className="max-w-[15ch] text-[clamp(2.125rem,5.4vw,4rem)] font-extrabold leading-[1.05] tracking-[-0.03em] text-foreground">
               What service do you <span className="text-gradient-hero">need?</span>
             </h1>
-            <p className="mt-2.5 max-w-[44ch] text-[clamp(0.9rem,1.2vw,1.15rem)] leading-relaxed text-muted-foreground">
+            <p className="mt-3.5 max-w-[44ch] text-[clamp(1.0625rem,1.2vw,1.2rem)] leading-relaxed text-muted-foreground">
               Show GetPros a photo, speak it in any language, or type it. We work out the service you need and
               find a local pro.
             </p>
 
-            {/* Photo-first: the camera is the headline action, on every size. */}
+            {/* Desktop keeps a photo-first button because the composer sits in
+                the second column; on phones the composer already carries it. */}
             <Link
               to="/snap"
               id="hero-show-gpb-cta"
               data-analytics-id="show_gpb_cta"
               data-analytics-location="hero_primary"
-              className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-4 text-base font-black text-white shadow-elevated transition-transform hover:scale-[1.01] sm:w-auto"
+              className="mt-6 hidden items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-bold text-white shadow-elevated transition-transform duration-200 hover:scale-[1.01] lg:inline-flex"
               style={{ background: "var(--gradient-primary)" }}
             >
               <Camera className="h-5 w-5" /> Show GetPros a photo
             </Link>
 
-            <div className="mt-4 lg:hidden">
+            <div className="mt-5 lg:hidden">
               <OutcomeComposer />
             </div>
+
 
 
             <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-muted-foreground">
