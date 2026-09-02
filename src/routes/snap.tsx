@@ -1024,19 +1024,27 @@ function AnalysisView({
 
       <JobScopeCta analysis={analysis} image={image} />
 
-      {matched.length > 0 ? (
+      {prosLoading ? (
+        <div className="flex items-center gap-2 rounded-3xl border border-border/60 bg-muted/40 p-5 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Looking for verified {analysis.category || "service"} pros
+          {hasZip ? " near your service address" : ""}…
+        </div>
+      ) : matched.length > 0 ? (
         <GradientButton
           onClick={() => document.getElementById("pros-list")?.scrollIntoView({ behavior: "smooth", block: "start" })}
           className="w-full justify-center py-4 text-base"
         >
-          <ShieldCheck className="h-5 w-5" /> Browse service pros
+          <ShieldCheck className="h-5 w-5" /> Browse {matched.length} available {matched.length === 1 ? "pro" : "pros"}
         </GradientButton>
       ) : (
         <div className="rounded-3xl border border-border/60 bg-muted/40 p-5 text-sm">
-          <div className="font-black">No {analysis.category || "matching"} pros on GPB yet in this trade.</div>
+          <div className="font-black">
+            No verified {analysis.category || "matching"} pros are covering {hasZip ? "your area" : "this trade"} yet.
+          </div>
           <p className="mt-1 text-muted-foreground">
-            We won't show you someone from a different trade. Send the request and we'll match you as pros for this service
-            come onboard.
+            {hasZip
+              ? "We only show real GPB professionals who are verified and accepting work within their own service radius — never a sample profile and never someone from another trade."
+              : "Add the ZIP code of your service address and we'll check which verified pros actually cover it."}
           </p>
         </div>
       )}
@@ -1045,39 +1053,43 @@ function AnalysisView({
       <div id="pros-list" className="scroll-mt-20">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div>
-            <h2 className="text-lg font-black">What a pro list will look like</h2>
+            <h2 className="text-lg font-black">Pros who can take this job</h2>
             <p className="text-xs text-muted-foreground">
-              Sample profiles only — no real GPB pros cover this trade in your area yet, so none of these can be
-              booked, messaged or sent a quote request.
+              Verified GPB professionals accepting work in this trade{hasZip ? " and covering your ZIP" : ""}.
             </p>
           </div>
         </div>
 
-
         <div className="grid gap-3">
           {recommended && (
             <ProCard
-              pro={recommended}
+              match={recommended}
               recommended
-              quoteMode={quoteMode}
-              selected={selected.includes(recommended.id)}
-              onToggle={() => toggleSelect(recommended.id)}
-              onBook={() => navigate({ to: "/book", search: { provider: recommended.id } })}
-              onMessage={() => setMessagingId(recommended.id)}
-              onCall={() => setCallingId(recommended.id)}
+              onBook={() =>
+                navigate({
+                  to: "/book",
+                  search: {
+                    provider: recommended.provider.user_id,
+                    ...(analysis.categorySlug ? { category: analysis.categorySlug } : {}),
+                  },
+                })
+              }
             />
           )}
           <div className="grid gap-3 md:grid-cols-2">
-            {others.map((p) => (
+            {others.map((m) => (
               <ProCard
-                key={p.id}
-                pro={p}
-                quoteMode={quoteMode}
-                selected={selected.includes(p.id)}
-                onToggle={() => toggleSelect(p.id)}
-                onBook={() => navigate({ to: "/book", search: { provider: p.id } })}
-                onMessage={() => setMessagingId(p.id)}
-                onCall={() => setCallingId(p.id)}
+                key={m.provider.user_id}
+                match={m}
+                onBook={() =>
+                  navigate({
+                    to: "/book",
+                    search: {
+                      provider: m.provider.user_id,
+                      ...(analysis.categorySlug ? { category: analysis.categorySlug } : {}),
+                    },
+                  })
+                }
               />
             ))}
           </div>
