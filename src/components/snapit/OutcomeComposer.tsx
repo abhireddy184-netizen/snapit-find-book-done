@@ -658,6 +658,34 @@ export function OutcomeComposer() {
         </p>
       )}
 
+      {autoSecs !== null && autoSecs > 0 && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-2xl border border-primary/30 bg-primary/5 px-3 py-2.5"
+        >
+          <p className="min-w-0 flex-1 text-xs font-bold text-primary">
+            Building your plan in {autoSecs}s — say more or edit to keep going.
+          </p>
+          <button
+            type="button"
+            onClick={cancelAutoSubmit}
+            className="min-h-[40px] shrink-0 rounded-full border border-border bg-background px-4 text-xs font-bold hover:bg-muted"
+          >
+            Keep editing
+          </button>
+          <button
+            type="button"
+            onClick={() => goToPlan(request)}
+            className="min-h-[40px] shrink-0 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground"
+          >
+            Build now
+          </button>
+        </div>
+      )}
+
+
+
       <div className="mt-2.5 grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
         <div className="min-w-0">
           <LocationAutocomplete
