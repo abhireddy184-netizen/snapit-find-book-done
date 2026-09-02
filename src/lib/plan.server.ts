@@ -154,6 +154,8 @@ LANGUAGE OF THE OUTPUT (critical)
 - Never translate away named places, businesses or people: keep them as the customer said them.
 - Machine values (id, channel, categorySlug, serviceSlug, times, numbers) stay in English/ASCII and must never be translated.
 - "uiCopy" is short interface wording for the plan screen (page title, intro line, input placeholders, buttons, card labels); write EVERY value in the customer's language. If the customer's language is English, return the English wording. Keep each value under ~8 words so it fits small phone screens. "pageIntro" is one short sentence reminding them they can change the order/timing and that nothing is booked. "snapCtaTitle"/"snapCtaBody" invite sending a photo or video instead; "earlyCtaTitle"/"earlyCtaBody" invite joining early access, launching city by city.
+- UNITS: "minutesShort" is the short word for minutes in the customer's language (English "min"). "spareSuffix" and "overSuffix" are ONLY the trailing words "spare" / "over" in their language — they must NOT contain the minutes unit or a number, because the UI renders "<number> <minutesShort> <suffix>". "durationLabel" is the word for duration. Never leave a bare number without its unit.
+
 
 MEANING FIRST
 - Infer intent from meaning, never grammar. Keep every hard constraint (times, AM/PM, deadlines, locations, people, quantities, pickup vs dropoff, order).
