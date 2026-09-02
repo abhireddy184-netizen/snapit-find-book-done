@@ -47,13 +47,15 @@ import {
 /** Hard ceiling for a single AI diagnosis request before we bail out. */
 const ANALYSIS_TIMEOUT_MS = 40_000;
 
-type SnapSearch = { q: string; loc: string };
+type SnapSearch = { q?: string; loc?: string };
 
 export const Route = createFileRoute("/snap")({
-  validateSearch: (search: Record<string, unknown>): SnapSearch => ({
-    q: typeof search["q"] === "string" ? search["q"] : "",
-    loc: search["loc"] == null ? "" : String(search["loc"]),
-  }),
+  validateSearch: (search: Record<string, unknown>): SnapSearch => {
+    const q = typeof search["q"] === "string" ? search["q"] : "";
+    const loc = search["loc"] == null ? "" : String(search["loc"]);
+    return { ...(q ? { q } : {}), ...(loc ? { loc } : {}) };
+  },
+
   head: () => ({
     meta: [
       { title: "Show us the problem — AI diagnosis in seconds | GPB" },
