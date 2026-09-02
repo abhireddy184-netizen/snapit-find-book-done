@@ -100,7 +100,7 @@ function SnapPage() {
   const [analysis, setAnalysis] = useState<SnapAnalysis | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [phase, setPhase] = useState<"idle" | "preparing" | "analyzing">("idle");
+  const [phase, setPhase] = useState<"idle" | "preparing" | "analyzing" | "matching">("idle");
   const [pendingPreview, setPendingPreview] = useState<string | null>(null);
   // True while a typed request that already maps to a catalogue service is
   // resolving: it never touches the visual pipeline, so we show a short
@@ -152,6 +152,8 @@ function SnapPage() {
         "The AI is taking longer than usual. Please retry or send it again.",
       );
       if (runRef.current !== token) return;
+      // Real stage change: understanding/finding is done, we now have a match.
+      setPhase("matching");
       setAnalysis(result);
       if (result.clarifyingQuestions?.length) {
         setAskedQuestions((prev) => [...new Set([...prev, ...result.clarifyingQuestions!])].slice(0, 12));
@@ -246,10 +248,7 @@ function SnapPage() {
     setTurnCount(0);
     setLoading(true);
     if (deterministicHit) {
-      setPhase("analyzing");
-      // Keep the transition perceptible without turning it into fake progress.
-      await new Promise((resolve) => setTimeout(resolve, 240));
-      if (runRef.current !== token) return;
+      // Enough information already: resolve immediately, no artificial delay.
       setAnalysis(createFastPathAnalysis(typed, deterministicHit));
       setLoading(false);
       setPhase("idle");
@@ -569,6 +568,9 @@ function SnapPage() {
   );
 }
 
+/** Three real stages, driven by the actual work — never by timers. */
+const SCAN_STEPS = ["Understanding your request", "Finding the right service", "Preparing your match"];
+
 function ScanningOverlay({
   image,
   phase,
@@ -576,38 +578,18 @@ function ScanningOverlay({
   onCancel,
 }: {
   image: string | null;
-  phase: "idle" | "preparing" | "analyzing";
+  phase: "idle" | "preparing" | "analyzing" | "matching";
   fast?: boolean;
   onCancel: () => void;
 }) {
-  const steps = fast
-    ? ["Reading your request…", "Matching the right service…", "Finding local pros…"]
-    : [
-        "Understanding what you need…",
-        "Checking the visible details…",
-        "Matching possible services…",
-        "Checking confidence…",
-        "Preparing the next step…",
-      ];
-  const [stepIndex, setStepIndex] = useState(0);
-  const [progress, setProgress] = useState(6);
+  const stepIndex = phase === "preparing" ? 0 : phase === "matching" ? 2 : 1;
   const [slow, setSlow] = useState(false);
   useEffect(() => {
-    if (phase === "preparing") return;
-    const stepTimer = setInterval(() => {
-      setStepIndex((i) => (i < steps.length - 1 ? i + 1 : i));
-    }, fast ? 380 : 1200);
-    // Cap well short of 100 so the bar never appears frozen at 94-99%.
-    const progressTimer = setInterval(() => {
-      setProgress((p) => (p < 88 ? p + Math.max(1, Math.round((90 - p) * (fast ? 0.22 : 0.08))) : p));
-    }, 180);
-    const slowTimer = setTimeout(() => setSlow(true), 9000);
-    return () => {
-      clearInterval(stepTimer);
-      clearInterval(progressTimer);
-      clearTimeout(slowTimer);
-    };
-  }, [steps.length, phase, fast]);
+    setSlow(false);
+    // Only flag a genuine backend delay, never a staged animation.
+    const slowTimer = setTimeout(() => setSlow(true), 8000);
+    return () => clearTimeout(slowTimer);
+  }, [phase]);
 
 
 
@@ -650,39 +632,26 @@ function ScanningOverlay({
           <div className="absolute right-2 top-2 h-5 w-5 rounded-tr-md border-r-2 border-t-2 border-white/70" />
           <div className="absolute bottom-2 left-2 h-5 w-5 rounded-bl-md border-b-2 border-l-2 border-white/70" />
           <div className="absolute bottom-2 right-2 h-5 w-5 rounded-br-md border-b-2 border-r-2 border-white/70" />
-          <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/45 px-3 py-1 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-white backdrop-blur">
-            <ScanLine className="h-3 w-3 animate-pulse" /> AI scanning
-          </div>
-          <div className="absolute bottom-3 right-3 rounded-full bg-white/95 px-2.5 py-1 text-xs font-black text-primary shadow">
-            {progress}%
+          <div className="absolute bottom-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-black/45 px-2.5 py-1 text-[0.625rem] font-medium uppercase tracking-[0.18em] text-white/90 backdrop-blur">
+            <ScanLine className="h-2.5 w-2.5" /> ✦ GetPros AI • Scanning
           </div>
         </div>
         <div className="mt-5">
           <div className="text-center">
-            <div className="inline-flex items-center gap-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.22em] text-white/75">
-              <Sparkles className="h-3.5 w-3.5" /> GetPros AI
-            </div>
-            <div className="mt-1.5 text-[1.0625rem] font-black leading-snug tracking-[-0.01em] text-white sm:text-lg">
-              {fast
-                ? "Matching your request"
-                : phase === "preparing"
-                  ? image
-                    ? "Preparing your media"
-                    : "Understanding your request"
-                  : image
-                    ? "Analyzing what you sent"
-                    : "Analyzing your request"}
+            <div className="text-[1.0625rem] font-semibold leading-snug tracking-[-0.01em] text-white sm:text-lg">
+              Analyzing your request
             </div>
           </div>
-          <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white/15">
+          {/* Indeterminate: real work, no fake percentage. */}
+          <div className="mt-4 h-1 w-full overflow-hidden rounded-full bg-white/15">
             <div
-              className="h-full rounded-full transition-[width] duration-200 ease-out"
-              style={{ width: `${progress}%`, background: "linear-gradient(90deg, var(--primary), var(--secondary))" }}
+              className="h-full w-1/3 rounded-full animate-[scanbar_1.4s_ease-in-out_infinite]"
+              style={{ background: "linear-gradient(90deg, transparent, var(--secondary), var(--primary), transparent)" }}
             />
           </div>
 
           <div className="mt-4 space-y-2">
-            {steps.map((s, i) => {
+            {SCAN_STEPS.map((s, i) => {
               const done = i < stepIndex;
               const active = i === stepIndex;
               return (
