@@ -393,7 +393,9 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
         <Stat
           label={plan.deadline ? c.targetLabel : c.planEndsLabel}
           value={formatClock(plan.deadline ? parseClock(plan.deadline) : end, locale)}
-          sub={showDeadlineDate ? deadlineDateLabel : null}
+          // Show the day whenever the target sits on another date, and whenever
+          // the plan itself runs past midnight — "2:01" alone is ambiguous.
+          sub={plan.deadline ? (showDeadlineDate ? deadlineDateLabel : null) : endDateLabel}
           icon={Clock}
         />
         <Stat
@@ -409,6 +411,7 @@ function PlanSummary({ plan, isDemo }: { plan: GpbPlan; isDemo: boolean }) {
           tone={slack != null && slack < 0 ? "danger" : undefined}
         />
       </dl>
+
     </section>
   );
 
