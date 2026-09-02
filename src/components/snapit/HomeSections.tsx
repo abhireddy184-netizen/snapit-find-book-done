@@ -22,7 +22,7 @@ export function AiJourneyStrip() {
         >
           <span
             className="grid h-8 w-8 shrink-0 place-items-center rounded-xl text-white"
-            style={{ background: i === 0 ? "var(--gradient-primary)" : "color-mix(in oklab, var(--secondary) 82%, var(--primary))" }}
+            style={{ background: i === 0 ? "var(--primary)" : "color-mix(in oklab, var(--secondary) 82%, var(--primary))" }}
           >
             <s.icon className="h-4 w-4" />
           </span>

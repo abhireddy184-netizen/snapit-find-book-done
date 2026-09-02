@@ -52,7 +52,7 @@ export function HowItWorks() {
             </span>
             <span
               className="grid h-11 w-11 place-items-center rounded-2xl text-white shadow-card"
-              style={{ background: i === 0 ? "var(--gradient-primary)" : "color-mix(in oklab, var(--secondary) 84%, var(--primary))" }}
+              style={{ background: i === 0 ? "var(--primary)" : "color-mix(in oklab, var(--secondary) 84%, var(--primary))" }}
             >
               <s.icon className="h-5 w-5" />
             </span>
@@ -350,7 +350,7 @@ export function SimpleFlow() {
           >
             <span
               className="grid h-12 w-12 place-items-center rounded-2xl text-white shadow-card"
-              style={{ background: i === 0 ? "var(--gradient-primary)" : "color-mix(in oklab, var(--secondary) 84%, var(--primary))" }}
+              style={{ background: i === 0 ? "var(--primary)" : "color-mix(in oklab, var(--secondary) 84%, var(--primary))" }}
             >
               <s.icon className="h-5 w-5" />
             </span>

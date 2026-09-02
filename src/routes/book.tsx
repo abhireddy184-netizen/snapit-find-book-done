@@ -357,7 +357,7 @@ function BookPage() {
     return (
       <AppShell hideBottomNav>
         <div className="mx-auto mt-16 max-w-md rounded-3xl border border-border/60 bg-card p-8 text-center shadow-elevated">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full text-white shadow-elevated" style={{ background: "var(--gradient-primary)" }}>
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full text-white shadow-elevated" style={{ background: "var(--primary)" }}>
             <Check className="h-8 w-8" strokeWidth={3} />
           </div>
           <h1 className="mt-4 text-2xl font-black">Request sent</h1>
@@ -413,7 +413,7 @@ function BookPage() {
             <span>{steps[step]}</span>
           </div>
           <div className="h-2 overflow-hidden rounded-full bg-muted">
-            <div className="h-full transition-all" style={{ width: `${((step + 1) / steps.length) * 100}%`, background: "var(--gradient-primary)" }} />
+            <div className="h-full transition-all" style={{ width: `${((step + 1) / steps.length) * 100}%`, background: "var(--primary)" }} />
           </div>
         </div>
 

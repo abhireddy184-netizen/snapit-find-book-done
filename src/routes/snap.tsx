@@ -620,7 +620,7 @@ function ScanningOverlay({
           <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-white/15">
             <div
               className="h-full rounded-full transition-[width] duration-200 ease-out"
-              style={{ width: `${progress}%`, background: "var(--gradient-primary)" }}
+              style={{ width: `${progress}%`, background: "var(--primary)" }}
             />
           </div>
           <div className="mt-4 space-y-2">
@@ -687,7 +687,7 @@ function CaptureTile({
     >
       <div
         className="grid h-14 w-14 place-items-center rounded-2xl text-white shadow-card"
-        style={{ background: "var(--gradient-primary)" }}
+        style={{ background: "var(--primary)" }}
       >
         <Icon className="h-6 w-6" />
       </div>
@@ -891,7 +891,7 @@ function AnalysisView({
             <div className="mt-1 h-2 w-full overflow-hidden rounded-full bg-muted">
               <div
                 className="h-full rounded-full transition-[width] duration-700"
-                style={{ width: `${confidencePct}%`, background: "var(--gradient-primary)" }}
+                style={{ width: `${confidencePct}%`, background: "var(--primary)" }}
               />
             </div>
           </div>
@@ -1316,7 +1316,7 @@ function TrustBadges() {
           >
             <div
               className="grid h-9 w-9 place-items-center rounded-xl text-white shadow-sm"
-              style={{ background: "var(--gradient-primary)" }}
+              style={{ background: "var(--primary)" }}
             >
               <Icon className="h-4 w-4" />
             </div>

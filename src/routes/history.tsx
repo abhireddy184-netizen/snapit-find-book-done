@@ -57,7 +57,7 @@ function HistoryPage() {
 
         {ready && entries.length === 0 && (
           <div className="mt-10 flex flex-col items-center justify-center rounded-3xl border border-dashed border-border/60 bg-card/60 p-10 text-center">
-            <div className="grid h-16 w-16 place-items-center rounded-2xl text-white shadow-elevated" style={{ background: "var(--gradient-primary)" }}>
+            <div className="grid h-16 w-16 place-items-center rounded-2xl text-white shadow-elevated" style={{ background: "var(--primary)" }}>
               <Camera className="h-7 w-7" />
             </div>
             <h2 className="mt-4 text-lg font-bold">No diagnoses yet</h2>

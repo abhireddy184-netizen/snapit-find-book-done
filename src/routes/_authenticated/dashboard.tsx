@@ -103,7 +103,7 @@ function Jobs({ userId }: { userId: string | undefined }) {
   if (jobs.length === 0) {
     return (
       <div className="rounded-3xl border border-border/60 bg-card p-10 text-center shadow-sm">
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--gradient-primary)" }}>
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--primary)" }}>
           <Camera className="h-6 w-6" />
         </div>
         <h2 className="mt-4 text-lg font-black">No jobs yet</h2>
@@ -185,7 +185,7 @@ function Bookings({ userId }: { userId: string | undefined }) {
   if (bookings.length === 0) {
     return (
       <div className="rounded-3xl border border-border/60 bg-card p-10 text-center shadow-sm">
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--gradient-primary)" }}>
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--primary)" }}>
           <Camera className="h-6 w-6" />
         </div>
         <h2 className="mt-4 text-lg font-black">No bookings yet</h2>

@@ -96,7 +96,7 @@ function TrackingPage() {
               <a href="tel:+15550100199" className="grid h-11 w-11 place-items-center rounded-full border border-border hover:bg-muted">
                 <PhoneCall className="h-4 w-4" />
               </a>
-              <button className="grid h-11 w-11 place-items-center rounded-full text-white shadow-sm" style={{ background: "var(--gradient-primary)" }}>
+              <button className="grid h-11 w-11 place-items-center rounded-full text-white shadow-sm" style={{ background: "var(--primary)" }}>
                 <MessageCircle className="h-4 w-4" />
               </button>
             </div>
@@ -113,7 +113,7 @@ function TrackingPage() {
                 <li key={s.key} className="flex items-center gap-3">
                   <span
                     className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${done ? "text-white" : "bg-muted text-muted-foreground"}`}
-                    style={done ? { background: "var(--gradient-primary)" } : undefined}
+                    style={done ? { background: "var(--primary)" } : undefined}
                   >
                     {done ? <CheckCircle2 className="h-4 w-4" /> : i + 1}
                   </span>

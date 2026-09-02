@@ -96,7 +96,7 @@ function useProviderBookings(userId: string | undefined) {
 function EmptyJobs({ title, body }: { title: string; body: string }) {
   return (
     <div className="rounded-3xl border border-border/60 bg-card p-10 text-center shadow-sm">
-      <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--gradient-primary)" }}>
+      <div className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white" style={{ background: "var(--primary)" }}>
         <Inbox className="h-6 w-6" />
       </div>
       <h2 className="mt-4 text-lg font-black">{title}</h2>
@@ -517,7 +517,7 @@ function VerificationCard({
       <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-muted">
         <div
           className="h-full rounded-full transition-all"
-          style={{ width: `${pct}%`, background: "var(--gradient-primary)" }}
+          style={{ width: `${pct}%`, background: "var(--primary)" }}
         />
       </div>
       <p className="mt-1.5 text-xs font-semibold text-muted-foreground">{completed} of {steps.length} steps complete</p>

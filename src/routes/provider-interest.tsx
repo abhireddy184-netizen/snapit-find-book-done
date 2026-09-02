@@ -86,7 +86,7 @@ function ProviderInterestPage() {
     return (
       <AppShell>
         <div className="mx-auto max-w-lg py-16 text-center">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full text-white shadow-elevated" style={{ background: "var(--gradient-primary)" }}>
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full text-white shadow-elevated" style={{ background: "var(--primary)" }}>
             <CheckCircle2 className="h-8 w-8" />
           </div>
           <h1 className="mt-6 text-3xl font-black">You’re on the list</h1>

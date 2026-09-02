@@ -86,7 +86,7 @@ function AuthNav() {
           to={dashboardTo}
           className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted"
         >
-          <span className="grid h-7 w-7 place-items-center rounded-full text-xs font-bold text-white" style={{ background: "var(--gradient-primary)" }}>
+          <span className="grid h-7 w-7 place-items-center rounded-full text-xs font-bold text-white" style={{ background: "var(--primary)" }}>
             {initials}
           </span>
           <span className="hidden md:inline">
@@ -197,7 +197,7 @@ function BottomNav() {
               >
                 <span
                   className="grid h-14 w-14 place-items-center rounded-full text-white shadow-elevated ring-4 ring-card transition-transform hover:scale-105"
-                  style={{ background: "var(--gradient-primary)", boxShadow: "0 16px 40px -12px color-mix(in oklab, var(--primary) 60%, transparent)" }}
+                  style={{ background: "var(--primary)", boxShadow: "0 16px 40px -12px color-mix(in oklab, var(--primary) 60%, transparent)" }}
                 >
                   <Icon className="h-6 w-6" />
                 </span>

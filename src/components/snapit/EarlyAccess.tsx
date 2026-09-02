@@ -116,7 +116,7 @@ export function EarlyAccessSection() {
             <div className="rounded-3xl border border-border/60 bg-background p-6 text-center">
               <div
                 className="mx-auto grid h-14 w-14 place-items-center rounded-full text-white shadow-elevated"
-                style={{ background: "var(--gradient-primary)" }}
+                style={{ background: "var(--primary)" }}
               >
                 <CheckCircle2 className="h-7 w-7" />
               </div>

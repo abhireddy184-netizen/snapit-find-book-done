@@ -179,7 +179,7 @@ function FlowStrip({ step }: { step: number }) {
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold ${
                   done ? "bg-primary/10 text-primary" : active ? "text-white" : "bg-muted text-muted-foreground"
                 }`}
-                style={active ? { background: "var(--gradient-primary)" } : undefined}
+                style={active ? { background: "var(--primary)" } : undefined}
               >
                 {done ? <CheckCircle2 className="h-3.5 w-3.5" /> : <span className="text-xs">{i + 1}</span>}
                 {label}
