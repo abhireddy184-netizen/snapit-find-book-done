@@ -4,7 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { subscribeToUpdates } from "@/lib/subscribe.functions";
 import {
   ArrowRight, Camera, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
-  Facebook, Instagram, Twitter, Youtube,
 } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
@@ -356,11 +355,3 @@ export function Footer() {
   );
 }
 
-function FooterCol({ title, links }: { title: string; links: string[] }) {
-  return (
-    <div>
-      <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">{title}</div>
-      <ul className="space-y-2">{links.map((l) => <li key={l}>{l}</li>)}</ul>
-    </div>
-  );
-}
