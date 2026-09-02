@@ -384,7 +384,15 @@ function BookPage() {
                 <Row label="Details" value={details || "—"} />
                 <Row label="Photos" value={`${photos.length} attached`} />
                 <Row label="Address" value={address || "—"} />
-                <Row label="Date & time" value={`${date} · ${time}`} />
+                <Row
+                  label="Date & time"
+                  value={
+                    dateIso && slotMinute != null && location
+                      ? `${dayLabel(dateIso, todayInZone(location.timeZone, notBefore))} · ${formatSlot(slotMinute)} (${location.city}, ${location.state})`
+                      : "Not set"
+                  }
+                />
+
                 <Row label="Estimated start" value={`$${pro.startingPrice}`} />
               </dl>
             </StepWrap>
