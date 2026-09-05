@@ -38,8 +38,8 @@ export function Wordmark({
 }
 
 /**
- * Compact monogram tile for favicons, avatars and in-app section badges.
- * "GPA" where there is room, an abstract "GP" lockup at tiny sizes.
+ * The GP monogram artwork (128x84, transparent PNG). Aspect ratio preserved:
+ * callers set the height and the width follows.
  */
 export function BrandMark({
   size = 36,
@@ -50,23 +50,17 @@ export function BrandMark({
   className?: string;
   onColor?: boolean;
 }) {
-  const initials = size >= 28 ? "GPA" : "GP";
+  void onColor;
   return (
-    <span
-      className={`brand-font relative grid shrink-0 place-items-center overflow-hidden rounded-[13px] font-extrabold ${className}`}
-      style={{
-        width: size,
-        height: size,
-        background: onColor ? "var(--card)" : "var(--brand-navy)",
-        fontSize: Math.round(size * (initials.length === 3 ? 0.34 : 0.42)),
-        letterSpacing: "-0.03em",
-      }}
-    >
-      <span style={{ color: onColor ? "var(--brand-navy)" : "#fff" }}>
-        {initials.slice(0, initials.length - 1)}
-        <span style={{ color: "var(--brand-teal)" }}>{initials.slice(-1)}</span>
-      </span>
-    </span>
+    <img
+      src="/brand/getpros-gp.png"
+      alt="GetPros"
+      width={Math.round(size * (128 / 84))}
+      height={size}
+      className={`shrink-0 select-none object-contain ${className}`}
+      style={{ height: size, width: "auto" }}
+      decoding="async"
+    />
   );
 }
 
@@ -80,24 +74,19 @@ export function Logo({
   onColor?: boolean;
   showTagline?: boolean;
 }) {
+  void compact;
   return (
-    <Link to="/" className="flex min-w-0 items-center gap-2.5" aria-label="GetPros.ai home">
-      <BrandMark size={36} onColor={onColor} className="h-9 w-9 sm:h-10 sm:w-10" />
-      {!compact && (
-        /* Below 360px the monogram alone carries the brand so the header
-           never overflows next to Log in / Sign up. */
-        <span className="hidden min-w-0 leading-none min-[360px]:block">
-          <span className="block">
-            <Wordmark size="clamp(1.05rem, 4.4vw, 1.3rem)" onColor={onColor} className="inline-block" />
-          </span>
-          {showTagline && (
-            <span className={`mt-1.5 hidden truncate text-xs font-medium sm:block ${onColor ? "text-white/80" : "text-muted-foreground"}`}>
-              Whatever you need. Consider it done.
-            </span>
-          )}
+    <Link to="/" className="flex min-w-0 items-center" aria-label="GetPros.ai home">
+      <BrandMark size={34} onColor={onColor} className="h-[30px] sm:h-[34px]" />
+      {showTagline && (
+        <span
+          className={`ml-3 hidden truncate text-xs font-medium sm:block ${onColor ? "text-white/80" : "text-muted-foreground"}`}
+        >
+          Smart service matching, powered by AI.
         </span>
       )}
     </Link>
   );
 }
+
 
