@@ -19,19 +19,22 @@ import { ServiceShowcase } from "@/components/snapit/ServiceShowcase";
 
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
 
-const SITE_URL = "https://getperfectboy.com";
+const SITE_URL = "https://getpros.ai";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "GetPros.ai — Show, say or type the service you need" },
+      { title: "GetPros.ai — Show, Say or Type the Service You Need" },
       { name: "description", content: "Show GP a photo, speak it in any language, or type it. We work out the service you need and find a local pro — home, cleaning, repairs, moving, errands and auto." },
-      { property: "og:title", content: "GetPros.ai — Show, say or type the service you need" },
+      { property: "og:title", content: "GetPros.ai — Show, Say or Type the Service You Need" },
+      { property: "og:site_name", content: "GetPros.ai" },
+      { property: "og:image", content: SITE_URL + "/brand/og-getpros.jpg?v=gp2" },
+      { name: "twitter:image", content: SITE_URL + "/brand/og-getpros.jpg?v=gp2" },
       { property: "og:description", content: "Show, say or type what you need. GetPros finds the right local pro." },
       { property: "og:type", content: "website" },
       { property: "og:url", content: SITE_URL + "/" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "GetPros.ai — Show, say or type the service you need" },
+      { name: "twitter:title", content: "GetPros.ai — Show, Say or Type the Service You Need" },
       { name: "twitter:description", content: "Show, say or type what you need. GetPros finds the right local pro." },
     ],
     links: [{ rel: "canonical", href: SITE_URL + "/" }],
