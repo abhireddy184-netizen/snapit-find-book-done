@@ -77,7 +77,7 @@ export function Logo({
   void compact;
   return (
     <Link to="/" className="flex min-w-0 items-center" aria-label="GetPros.ai home">
-      <BrandMark size={34} onColor={onColor} className="h-[30px] sm:h-[34px]" />
+      <Wordmark size={compact ? 19 : 22} onColor={onColor} className="sm:text-[24px]" />
       {showTagline && (
         <span
           className={`ml-3 hidden truncate text-xs font-medium sm:block ${onColor ? "text-white/80" : "text-muted-foreground"}`}
