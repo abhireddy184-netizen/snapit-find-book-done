@@ -74,7 +74,6 @@ export function Logo({
   onColor?: boolean;
   showTagline?: boolean;
 }) {
-  void compact;
   return (
     <Link to="/" className="flex min-w-0 items-center" aria-label="GetPros.ai home">
       <Wordmark size={compact ? 19 : 22} onColor={onColor} className="sm:text-[24px]" />
