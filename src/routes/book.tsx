@@ -534,7 +534,18 @@ function BookPage() {
                 <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
                   Sign in to see {provider.business_name}'s real openings. We'll keep this request saved.
                   <button
-                    onClick={() => { void navigate({ to: "/login", search: { redirect: "/book" } }); }}
+                    onClick={() => {
+                      if (typeof window !== "undefined") {
+                        const draft: BookingDraft = {
+                          service, details, address, date: dateIso ?? "", time: slotMinute == null ? "" : String(slotMinute),
+                          providerId: provider.user_id,
+                          ...(category ? { categorySlug: category.slug } : {}),
+                          ...(jobId ? { jobId } : {}),
+                        };
+                        window.localStorage.setItem(BOOKING_DRAFT_KEY, JSON.stringify(draft));
+                      }
+                      void navigate({ to: "/login", search: { redirect: "/book" } });
+                    }}
                     className="ml-1 font-bold text-primary underline"
                   >
                     Sign in
