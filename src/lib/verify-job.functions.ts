@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 
 const Input = z.object({
@@ -29,6 +30,7 @@ Rules:
 - observations: 2-4 short factual visual differences.`;
 
 export const verifyJobCompletion = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => Input.parse(input))
   .handler(async ({ data }): Promise<VerificationVerdict> => {
     const key = process.env.LOVABLE_API_KEY;

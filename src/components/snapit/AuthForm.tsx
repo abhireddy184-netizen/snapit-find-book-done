@@ -4,6 +4,8 @@ import { User, Briefcase, Mail, Lock, ArrowRight, Loader2, CheckCircle2, AlertCi
 import { Logo } from "./Logo";
 import { GradientButton } from "./AppShell";
 import { supabase } from "@/integrations/supabase/client";
+import { PasswordChecklist } from "./PasswordChecklist";
+import { passwordError } from "@/lib/password-policy";
 import { cn } from "@/lib/utils";
 
 type Role = "customer" | "provider";
@@ -55,8 +57,14 @@ export function AuthForm({
       setError("Please enter a valid email address.");
       return;
     }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+    if (mode === "register") {
+      const pwIssue = passwordError(password);
+      if (pwIssue) {
+        setError(pwIssue);
+        return;
+      }
+    } else if (password.length < 6) {
+      setError("Please enter your password.");
       return;
     }
 
@@ -138,6 +146,7 @@ export function AuthForm({
               onChange={setPassword}
               autoComplete={mode === "login" ? "current-password" : "new-password"}
             />
+            {mode === "register" && <PasswordChecklist value={password} />}
 
             {error && (
               <div className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-xs font-medium text-destructive">
