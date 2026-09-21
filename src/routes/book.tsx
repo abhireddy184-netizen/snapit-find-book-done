@@ -117,9 +117,10 @@ function BookPage() {
     return () => { cancelled = true; };
   }, [providerParam]);
 
-  // The pro's own weekly hours and busy ranges drive the calendar.
+  // The pro's own weekly hours and busy ranges drive the calendar. Real
+  // openings are only shared with signed-in customers.
   useEffect(() => {
-    if (!provider) { setHours(null); setBusy([]); return; }
+    if (!provider || !user) { setHours(null); setBusy([]); return; }
     let cancelled = false;
     setScheduleLoading(true);
     void Promise.all([fetchAvailability(provider.user_id), fetchBusy(provider.user_id)])
@@ -127,7 +128,7 @@ function BookPage() {
       .catch(() => { if (!cancelled) { setHours([]); setBusy([]); } })
       .finally(() => { if (!cancelled) setScheduleLoading(false); });
     return () => { cancelled = true; };
-  }, [provider]);
+  }, [provider, user]);
 
   const category = categoryFor(provider, categoryParam ?? draftCategory);
   const serviceOptions = category?.services.map((s) => s.name) ?? [];
@@ -527,6 +528,27 @@ function BookPage() {
                   We schedule in the service address's own timezone, so we need a US ZIP code first.
                   <button onClick={() => setStep(2)} className="ml-1 font-bold text-primary underline">
                     Add your address
+                  </button>
+                </div>
+              ) : !user && !authLoading ? (
+                <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                  Sign in to see {provider.business_name}'s real openings. We'll keep this request saved.
+                  <button
+                    onClick={() => {
+                      if (typeof window !== "undefined") {
+                        const draft: BookingDraft = {
+                          service, details, address, date: dateIso ?? "", time: slotMinute == null ? "" : String(slotMinute),
+                          providerId: provider.user_id,
+                          ...(category ? { categorySlug: category.slug } : {}),
+                          ...(jobId ? { jobId } : {}),
+                        };
+                        window.localStorage.setItem(BOOKING_DRAFT_KEY, JSON.stringify(draft));
+                      }
+                      void navigate({ to: "/login", search: { redirect: "/book" } });
+                    }}
+                    className="ml-1 font-bold text-primary underline"
+                  >
+                    Sign in
                   </button>
                 </div>
               ) : scheduleLoading ? (
