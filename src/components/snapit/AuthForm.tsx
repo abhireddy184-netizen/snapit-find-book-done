@@ -4,6 +4,8 @@ import { User, Briefcase, Mail, Lock, ArrowRight, Loader2, CheckCircle2, AlertCi
 import { Logo } from "./Logo";
 import { GradientButton } from "./AppShell";
 import { supabase } from "@/integrations/supabase/client";
+import { PasswordChecklist } from "./PasswordChecklist";
+import { passwordError } from "@/lib/password-policy";
 import { cn } from "@/lib/utils";
 
 type Role = "customer" | "provider";
