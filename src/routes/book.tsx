@@ -117,9 +117,10 @@ function BookPage() {
     return () => { cancelled = true; };
   }, [providerParam]);
 
-  // The pro's own weekly hours and busy ranges drive the calendar.
+  // The pro's own weekly hours and busy ranges drive the calendar. Real
+  // openings are only shared with signed-in customers.
   useEffect(() => {
-    if (!provider) { setHours(null); setBusy([]); return; }
+    if (!provider || !user) { setHours(null); setBusy([]); return; }
     let cancelled = false;
     setScheduleLoading(true);
     void Promise.all([fetchAvailability(provider.user_id), fetchBusy(provider.user_id)])
@@ -127,7 +128,7 @@ function BookPage() {
       .catch(() => { if (!cancelled) { setHours([]); setBusy([]); } })
       .finally(() => { if (!cancelled) setScheduleLoading(false); });
     return () => { cancelled = true; };
-  }, [provider]);
+  }, [provider, user]);
 
   const category = categoryFor(provider, categoryParam ?? draftCategory);
   const serviceOptions = category?.services.map((s) => s.name) ?? [];
