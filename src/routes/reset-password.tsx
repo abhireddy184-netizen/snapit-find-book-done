@@ -119,6 +119,7 @@ function ResetPasswordPage() {
             <>
               <ResetField icon={Lock} type="password" placeholder="New password" value={password} onChange={setPassword} autoComplete="new-password" />
               <ResetField icon={Lock} type="password" placeholder="Confirm new password" value={confirm} onChange={setConfirm} autoComplete="new-password" />
+              <PasswordChecklist value={password} />
             </>
           )}
 
