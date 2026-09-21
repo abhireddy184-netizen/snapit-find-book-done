@@ -4,6 +4,8 @@ import { AlertCircle, ArrowRight, CheckCircle2, Loader2, Lock, Mail } from "luci
 import { GradientButton } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";
 import { supabase } from "@/integrations/supabase/client";
+import { PasswordChecklist } from "@/components/snapit/PasswordChecklist";
+import { passwordError } from "@/lib/password-policy";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -71,8 +73,9 @@ function ResetPasswordPage() {
     e.preventDefault();
     setError(null);
     setNotice(null);
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+    const pwIssue = passwordError(password);
+    if (pwIssue) {
+      setError(pwIssue);
       return;
     }
     if (password !== confirm) {

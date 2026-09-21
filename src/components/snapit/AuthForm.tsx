@@ -57,8 +57,14 @@ export function AuthForm({
       setError("Please enter a valid email address.");
       return;
     }
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters.");
+    if (mode === "register") {
+      const pwIssue = passwordError(password);
+      if (pwIssue) {
+        setError(pwIssue);
+        return;
+      }
+    } else if (password.length < 6) {
+      setError("Please enter your password.");
       return;
     }
 
