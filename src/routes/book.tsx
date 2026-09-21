@@ -530,6 +530,16 @@ function BookPage() {
                     Add your address
                   </button>
                 </div>
+              ) : !user && !authLoading ? (
+                <div className="rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
+                  Sign in to see {provider.business_name}'s real openings. We'll keep this request saved.
+                  <button
+                    onClick={() => { void navigate({ to: "/login", search: { redirect: "/book" } }); }}
+                    className="ml-1 font-bold text-primary underline"
+                  >
+                    Sign in
+                  </button>
+                </div>
               ) : scheduleLoading ? (
                 <div className="flex items-center gap-2 rounded-2xl border border-border bg-muted/40 p-4 text-sm text-muted-foreground">
                   <Loader2 className="h-4 w-4 animate-spin" /> Loading {provider.business_name}'s real openings…
