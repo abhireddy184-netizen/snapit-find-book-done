@@ -38,6 +38,7 @@ import { fetchBookableProviders, type ProviderMatch } from "@/lib/providers";
 import { extractZip, isZipCode, lookupZip } from "@/lib/us-zip";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
 import { useAuth } from "@/lib/auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { createJobFromAnalysis } from "@/lib/jobs";
 import { prepareMediaForAnalysis, withTimeout, type PreparedMedia } from "@/lib/snap-media";
 import {
@@ -106,6 +107,10 @@ function SnapPage() {
   // resolving: it never touches the visual pipeline, so we show a short
   // transition instead of the full scanning sequence.
   const [fastPath, setFastPath] = useState(false);
+  const isMobile = useIsMobile();
+  // Mobile only: a freshly taken photo pauses here for Use photo / Retake
+  // before anything is analysed. Desktop keeps its original behaviour.
+  const [confirmPhoto, setConfirmPhoto] = useState(false);
   const analyze = useServerFn(analyzeSnap);
   const cameraRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
@@ -200,6 +205,7 @@ function SnapPage() {
     setFrames([]);
     setTextOnly(false);
     setFastPath(false);
+    setConfirmPhoto(false);
     setDescribeMode(false);
     setMediaKind(kind);
     setNote("");
@@ -230,7 +236,28 @@ function SnapPage() {
     }
     setImage(prepared.preview);
     setFrames(prepared.frames);
+    if (isMobile && kind === "photo") {
+      // Let the customer check the shot first: Use photo continues, Retake
+      // reopens the rear camera.
+      setConfirmPhoto(true);
+      setLoading(false);
+      setPhase("idle");
+      setPendingPreview(null);
+      busyRef.current = false;
+      return;
+    }
     await runDiagnosis(prepared.frames, "", token);
+  };
+
+  /** Mobile confirm step: accept the captured photo and start the diagnosis. */
+  const acceptCapturedPhoto = async () => {
+    if (busyRef.current) return;
+    setConfirmPhoto(false);
+    busyRef.current = true;
+    const token = ++runRef.current;
+    setError(null);
+    setLoading(true);
+    await runDiagnosis(frames, note, token, { latestMessage: note || undefined });
   };
 
   const runDiagnosisFresh = runDiagnosis;
@@ -346,6 +373,7 @@ function SnapPage() {
     setLoading(false);
     setPhase("idle");
     setPendingPreview(null);
+    setConfirmPhoto(false);
   };
 
 
@@ -432,6 +460,7 @@ function SnapPage() {
               icon={Upload}
               label="Upload from Gallery"
               hint="Choose an image"
+              className="hidden sm:flex"
               onClick={() => uploadRef.current?.click()}
             />
             <CaptureTile
@@ -442,6 +471,18 @@ function SnapPage() {
               onClick={() => setDescribeMode((v) => !v)}
             />
           </div>
+        )}
+
+        {/* Mobile: the photo library stays available, but as a quiet secondary
+            action so the camera remains the primary way in. */}
+        {!image && !analysis && (
+          <button
+            type="button"
+            onClick={() => uploadRef.current?.click()}
+            className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-border/60 bg-card/60 px-4 text-sm font-semibold text-muted-foreground hover:bg-muted sm:hidden"
+          >
+            <Upload className="h-4 w-4" /> Choose from photo library
+          </button>
         )}
 
         {!image && !analysis && describeMode && (
@@ -500,7 +541,44 @@ function SnapPage() {
         {!image && <TrustBadges />}
         {!image && recent.length > 0 && <RecentDiagnoses entries={recent} />}
 
-        {image && !analysis && (
+        {/* Mobile capture confirmation: check the shot, then continue. */}
+        {confirmPhoto && image && !analysis && (
+          <div className="mt-6 space-y-4 animate-fade-in">
+            <div className="relative overflow-hidden surface-card">
+              <img src={image} alt="Photo you just took" className="w-full max-h-[440px] object-contain bg-muted/30" />
+              <div className="absolute top-3 left-3 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
+                Photo
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Is the problem clearly visible? Use this photo to continue, or retake it.
+            </p>
+            <div className="grid gap-2">
+              <GradientButton onClick={() => void acceptCapturedPhoto()} className="min-h-12 justify-center">
+                <Check className="h-4 w-4" /> Use photo
+              </GradientButton>
+              <button
+                type="button"
+                onClick={() => cameraRef.current?.click()}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 text-sm font-bold hover:bg-muted"
+              >
+                <Camera className="h-4 w-4" /> Retake
+              </button>
+              <button
+                type="button"
+                onClick={() => uploadRef.current?.click()}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-semibold text-muted-foreground hover:text-primary"
+              >
+                <Upload className="h-4 w-4" /> Choose from photo library
+              </button>
+            </div>
+            {error && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>
+            )}
+          </div>
+        )}
+
+        {!confirmPhoto && image && !analysis && (
           <div className="mt-6 space-y-4">
             <div className="relative overflow-hidden surface-card">
               <img src={image} alt="Captured problem" className="w-full max-h-[420px] object-contain bg-muted/30" />
@@ -721,19 +799,21 @@ function CaptureTile({
   hint,
   onClick,
   active = false,
+  className = "",
 }: {
   icon: typeof Camera;
   label: string;
   hint: string;
   onClick: () => void;
   active?: boolean;
+  className?: string;
 }) {
   return (
     <button
       onClick={onClick}
       className={`card-lift group flex flex-col items-center justify-center gap-3 rounded-3xl border bg-card p-6 text-center shadow-sm hover:-translate-y-0.5 hover:shadow-elevated ${
         active ? "border-secondary ring-2 ring-secondary/30" : "border-border/60 hover:border-secondary/40"
-      }`}
+      } ${className}`}
     >
       <div
         className="grid h-14 w-14 place-items-center rounded-2xl text-white shadow-card"
