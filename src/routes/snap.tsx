@@ -460,6 +460,7 @@ function SnapPage() {
               icon={Upload}
               label="Upload from Gallery"
               hint="Choose an image"
+              className="hidden sm:flex"
               onClick={() => uploadRef.current?.click()}
             />
             <CaptureTile
@@ -470,6 +471,18 @@ function SnapPage() {
               onClick={() => setDescribeMode((v) => !v)}
             />
           </div>
+        )}
+
+        {/* Mobile: the photo library stays available, but as a quiet secondary
+            action so the camera remains the primary way in. */}
+        {!image && !analysis && (
+          <button
+            type="button"
+            onClick={() => uploadRef.current?.click()}
+            className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-border/60 bg-card/60 px-4 text-sm font-semibold text-muted-foreground hover:bg-muted sm:hidden"
+          >
+            <Upload className="h-4 w-4" /> Choose from photo library
+          </button>
         )}
 
         {!image && !analysis && describeMode && (
