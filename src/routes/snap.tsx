@@ -107,6 +107,10 @@ function SnapPage() {
   // resolving: it never touches the visual pipeline, so we show a short
   // transition instead of the full scanning sequence.
   const [fastPath, setFastPath] = useState(false);
+  const isMobile = useIsMobile();
+  // Mobile only: a freshly taken photo pauses here for Use photo / Retake
+  // before anything is analysed. Desktop keeps its original behaviour.
+  const [confirmPhoto, setConfirmPhoto] = useState(false);
   const analyze = useServerFn(analyzeSnap);
   const cameraRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
