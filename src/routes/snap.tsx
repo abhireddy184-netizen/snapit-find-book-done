@@ -541,7 +541,44 @@ function SnapPage() {
         {!image && <TrustBadges />}
         {!image && recent.length > 0 && <RecentDiagnoses entries={recent} />}
 
-        {image && !analysis && (
+        {/* Mobile capture confirmation: check the shot, then continue. */}
+        {confirmPhoto && image && !analysis && (
+          <div className="mt-6 space-y-4 animate-fade-in">
+            <div className="relative overflow-hidden surface-card">
+              <img src={image} alt="Photo you just took" className="w-full max-h-[440px] object-contain bg-muted/30" />
+              <div className="absolute top-3 left-3 rounded-full bg-black/60 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-white backdrop-blur">
+                Photo
+              </div>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Is the problem clearly visible? Use this photo to continue, or retake it.
+            </p>
+            <div className="grid gap-2">
+              <GradientButton onClick={() => void acceptCapturedPhoto()} className="min-h-12 justify-center">
+                <Check className="h-4 w-4" /> Use photo
+              </GradientButton>
+              <button
+                type="button"
+                onClick={() => cameraRef.current?.click()}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 text-sm font-bold hover:bg-muted"
+              >
+                <Camera className="h-4 w-4" /> Retake
+              </button>
+              <button
+                type="button"
+                onClick={() => uploadRef.current?.click()}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-semibold text-muted-foreground hover:text-primary"
+              >
+                <Upload className="h-4 w-4" /> Choose from photo library
+              </button>
+            </div>
+            {error && (
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>
+            )}
+          </div>
+        )}
+
+        {!confirmPhoto && image && !analysis && (
           <div className="mt-6 space-y-4">
             <div className="relative overflow-hidden surface-card">
               <img src={image} alt="Captured problem" className="w-full max-h-[420px] object-contain bg-muted/30" />
