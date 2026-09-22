@@ -205,6 +205,7 @@ function SnapPage() {
     setFrames([]);
     setTextOnly(false);
     setFastPath(false);
+    setConfirmPhoto(false);
     setDescribeMode(false);
     setMediaKind(kind);
     setNote("");
