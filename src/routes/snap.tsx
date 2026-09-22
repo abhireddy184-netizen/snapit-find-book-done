@@ -373,6 +373,7 @@ function SnapPage() {
     setLoading(false);
     setPhase("idle");
     setPendingPreview(null);
+    setConfirmPhoto(false);
   };
 
 
