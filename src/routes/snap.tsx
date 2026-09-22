@@ -762,19 +762,21 @@ function CaptureTile({
   hint,
   onClick,
   active = false,
+  className = "",
 }: {
   icon: typeof Camera;
   label: string;
   hint: string;
   onClick: () => void;
   active?: boolean;
+  className?: string;
 }) {
   return (
     <button
       onClick={onClick}
       className={`card-lift group flex flex-col items-center justify-center gap-3 rounded-3xl border bg-card p-6 text-center shadow-sm hover:-translate-y-0.5 hover:shadow-elevated ${
         active ? "border-secondary ring-2 ring-secondary/30" : "border-border/60 hover:border-secondary/40"
-      }`}
+      } ${className}`}
     >
       <div
         className="grid h-14 w-14 place-items-center rounded-2xl text-white shadow-card"
