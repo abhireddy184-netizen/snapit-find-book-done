@@ -235,7 +235,28 @@ function SnapPage() {
     }
     setImage(prepared.preview);
     setFrames(prepared.frames);
+    if (isMobile && kind === "photo") {
+      // Let the customer check the shot first: Use photo continues, Retake
+      // reopens the rear camera.
+      setConfirmPhoto(true);
+      setLoading(false);
+      setPhase("idle");
+      setPendingPreview(null);
+      busyRef.current = false;
+      return;
+    }
     await runDiagnosis(prepared.frames, "", token);
+  };
+
+  /** Mobile confirm step: accept the captured photo and start the diagnosis. */
+  const acceptCapturedPhoto = async () => {
+    if (busyRef.current) return;
+    setConfirmPhoto(false);
+    busyRef.current = true;
+    const token = ++runRef.current;
+    setError(null);
+    setLoading(true);
+    await runDiagnosis(frames, note, token, { latestMessage: note || undefined });
   };
 
   const runDiagnosisFresh = runDiagnosis;
