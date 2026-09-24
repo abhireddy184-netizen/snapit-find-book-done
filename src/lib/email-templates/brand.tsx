@@ -9,7 +9,7 @@ import { Column, Hr, Img, Link, Row, Section, Text } from '@react-email/componen
 
 export const SITE_URL = 'https://getperfectboy.com'
 /** Absolute HTTPS URL — served from the site's /public folder, safe for Gmail / Apple Mail / Outlook. */
-export const LOGO_URL = `${SITE_URL}/brand/gpb-mark.png`
+export const LOGO_URL = `${SITE_URL}/icon-512.png`
 export const SUPPORT_EMAIL = 'support@getperfectboy.com'
 
 export const brand = {
