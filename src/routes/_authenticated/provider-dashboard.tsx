@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { CalendarDays, User, Wrench, Check, X, Loader2, MapPin, LogOut, ShieldAlert, Inbox, ShieldCheck, Clock3, BadgeCheck } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { BrandMark } from "@/components/snapit/Logo";
+import { Wordmark } from "@/components/snapit/Logo";
 
 import { useAuth } from "@/lib/auth";
 import { fetchProviderBookings, fetchMyProviderProfile, formatBookingDate, type Booking } from "@/lib/bookings";
@@ -468,7 +468,7 @@ function BusinessProfile() {
 
 /** The real GetPros app icon, reused to badge dashboard sections. */
 function GpbMark() {
-  return <BrandMark size={36} />;
+  return <Wordmark size={20} />;
 }
 
 

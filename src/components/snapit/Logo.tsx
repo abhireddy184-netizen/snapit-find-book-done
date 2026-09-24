@@ -37,33 +37,6 @@ export function Wordmark({
   );
 }
 
-/**
- * The GP monogram artwork (128x84, transparent PNG). Aspect ratio preserved:
- * callers set the height and the width follows.
- */
-export function BrandMark({
-  size = 36,
-  className = "",
-  onColor = false,
-}: {
-  size?: number;
-  className?: string;
-  onColor?: boolean;
-}) {
-  void onColor;
-  return (
-    <img
-      src="/brand/getpros-gp.png"
-      alt="GetPros"
-      width={Math.round(size * (128 / 84))}
-      height={size}
-      className={`shrink-0 select-none object-contain ${className}`}
-      style={{ height: size, width: "auto" }}
-      decoding="async"
-    />
-  );
-}
-
 export function Logo({
   compact = false,
   onColor = false,
