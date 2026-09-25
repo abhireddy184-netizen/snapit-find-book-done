@@ -13,6 +13,7 @@ import {
   ShowGpbBand, BrowseFallback, HowGpbWorksDetails,
 } from "@/components/snapit/V2Sections";
 import { ServiceShowcase } from "@/components/snapit/ServiceShowcase";
+import { InstallAppButton } from "@/components/snapit/InstallAppButton";
 
 
 
@@ -343,7 +344,10 @@ export function Footer() {
           </p>
         </div>
       </div>
-      <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-border/60 pt-6 text-xs md:flex-row md:items-center">
+      <div className="mt-8">
+        <InstallAppButton />
+      </div>
+      <div className="mt-6 flex flex-col items-start justify-between gap-3 border-t border-border/60 pt-6 text-xs md:flex-row md:items-center">
         <span>© {new Date().getFullYear()} GetPros.ai. All rights reserved.</span>
         <div className="flex flex-wrap gap-5">
           <Link to="/legal" hash="privacy" className="hover:text-foreground">Privacy</Link>
