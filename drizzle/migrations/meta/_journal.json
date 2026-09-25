@@ -15,6 +15,13 @@
       "when": 1790294051700,
       "tag": "0001_replace_open_access_rules",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790296748319,
+      "tag": "0002_provider_approval_admin",
+      "breakpoints": true
     }
   ]
 }

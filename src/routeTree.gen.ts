@@ -33,6 +33,7 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as ServicesCategoryIndexRouteImport } from './routes/services.$category.index'
 import { Route as ServicesCategoryServiceRouteImport } from './routes/services.$category.$service'
 import { Route as AuthenticatedJobIdRouteImport } from './routes/_authenticated/job.$id'
+import { Route as AuthenticatedAdminProvidersRouteImport } from './routes/_authenticated/admin.providers'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
@@ -155,6 +156,12 @@ const AuthenticatedJobIdRoute = AuthenticatedJobIdRouteImport.update({
   path: '/job/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAdminProvidersRoute =
+  AuthenticatedAdminProvidersRouteImport.update({
+    id: '/admin/providers',
+    path: '/admin/providers',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const LovableEmailTransactionalPreviewRoute =
   LovableEmailTransactionalPreviewRouteImport.update({
     id: '/lovable/email/transactional/preview',
@@ -183,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services/': typeof ServicesIndexRoute
+  '/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category/': typeof ServicesCategoryIndexRoute
@@ -208,6 +216,7 @@ export interface FileRoutesByTo {
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services': typeof ServicesIndexRoute
+  '/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category': typeof ServicesCategoryIndexRoute
@@ -236,6 +245,7 @@ export interface FileRoutesById {
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services/': typeof ServicesIndexRoute
+  '/_authenticated/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/_authenticated/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category/': typeof ServicesCategoryIndexRoute
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
     | '/provider/$id'
     | '/tracking/$id'
     | '/services/'
+    | '/admin/providers'
     | '/job/$id'
     | '/services/$category/$service'
     | '/services/$category/'
@@ -289,6 +300,7 @@ export interface FileRouteTypes {
     | '/provider/$id'
     | '/tracking/$id'
     | '/services'
+    | '/admin/providers'
     | '/job/$id'
     | '/services/$category/$service'
     | '/services/$category'
@@ -316,6 +328,7 @@ export interface FileRouteTypes {
     | '/provider/$id'
     | '/tracking/$id'
     | '/services/'
+    | '/_authenticated/admin/providers'
     | '/_authenticated/job/$id'
     | '/services/$category/$service'
     | '/services/$category/'
@@ -514,6 +527,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedJobIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/providers': {
+      id: '/_authenticated/admin/providers'
+      path: '/admin/providers'
+      fullPath: '/admin/providers'
+      preLoaderRoute: typeof AuthenticatedAdminProvidersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/lovable/email/transactional/preview': {
       id: '/lovable/email/transactional/preview'
       path: '/lovable/email/transactional/preview'
@@ -527,12 +547,14 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProviderDashboardRoute: typeof AuthenticatedProviderDashboardRoute
+  AuthenticatedAdminProvidersRoute: typeof AuthenticatedAdminProvidersRoute
   AuthenticatedJobIdRoute: typeof AuthenticatedJobIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProviderDashboardRoute: AuthenticatedProviderDashboardRoute,
+  AuthenticatedAdminProvidersRoute: AuthenticatedAdminProvidersRoute,
   AuthenticatedJobIdRoute: AuthenticatedJobIdRoute,
 }
 
