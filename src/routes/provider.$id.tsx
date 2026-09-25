@@ -95,7 +95,7 @@ function RealProviderPage({ p }: { p: PublicProvider }) {
           {p.bio && <p className="mt-4 whitespace-pre-line text-sm text-muted-foreground">{p.bio}</p>}
           <div className="mt-5">
             {bookable ? (
-              <Link to="/book" search={{ provider: p.user_id } as never}>
+              <Link to="/book" search={{ provider: p.user_id, job: undefined, service: undefined, category: undefined }}>
                 <GradientButton className="w-full sm:w-auto"><CalendarIcon className="h-4 w-4" /> Book this pro</GradientButton>
               </Link>
             ) : (
