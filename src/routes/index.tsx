@@ -14,6 +14,7 @@ import {
 } from "@/components/snapit/V2Sections";
 import { ServiceShowcase } from "@/components/snapit/ServiceShowcase";
 import { InstallAppButton } from "@/components/snapit/InstallAppButton";
+import { InstallPromptBanner } from "@/components/snapit/InstallPromptBanner";
 
 
 
@@ -126,6 +127,7 @@ function Landing() {
       <EarlyAccessSection />
 
       <Footer />
+      <InstallPromptBanner />
     </AppShell>
   );
 }
