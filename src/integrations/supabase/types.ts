@@ -644,11 +644,56 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["staff_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["staff_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["staff_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      admin_list_providers: {
+        Args: never
+        Returns: {
+          bio: string
+          business_name: string
+          created_at: string
+          email: string
+          full_name: string
+          phone: string
+          service_area: string
+          service_category: string
+          service_zip: string
+          starting_price: number
+          user_id: string
+          verification_status: Database["public"]["Enums"]["verification_status"]
+        }[]
+      }
+      admin_set_provider_verification: {
+        Args: {
+          _status: Database["public"]["Enums"]["verification_status"]
+          _user_id: string
+        }
+        Returns: undefined
+      }
       extract_service_zip: { Args: { _address: string }; Returns: string }
       get_my_provider_profile: {
         Args: never
@@ -678,6 +723,13 @@ export type Database = {
           isOneToOne: false
           isSetofReturn: true
         }
+      }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["staff_role"]
+          _user_id: string
+        }
+        Returns: boolean
       }
       provider_busy_intervals: {
         Args: { _from: string; _provider_id: string; _to: string }
@@ -715,6 +767,7 @@ export type Database = {
         | "completed"
         | "cancelled"
       quote_status: "pending" | "accepted" | "declined" | "withdrawn"
+      staff_role: "admin"
       verification_result:
         | "not_started"
         | "pending"
@@ -874,6 +927,7 @@ export const Constants = {
         "cancelled",
       ],
       quote_status: ["pending", "accepted", "declined", "withdrawn"],
+      staff_role: ["admin"],
       verification_result: [
         "not_started",
         "pending",
