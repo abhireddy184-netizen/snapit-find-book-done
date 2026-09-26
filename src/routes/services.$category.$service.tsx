@@ -34,7 +34,7 @@ export const Route = createFileRoute("/services/$category/$service")({
       <div className="mx-auto max-w-md surface-card p-6 text-center">
         <h1 className="text-xl font-black">We don't offer that service yet</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Browse the catalogue or show us the problem and we'll work out which service you need.
+          Browse the catalog or show us the problem and we'll work out which service you need.
         </p>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
           <Link to="/services" className="inline-flex rounded-full bg-primary px-4 py-2 text-sm font-bold text-primary-foreground">

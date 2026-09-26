@@ -522,7 +522,8 @@ export function OutcomeComposer() {
     cancelAutoSubmit();
     setEmptyError(false);
     // Photo, voice and text all converge on the same service understanding flow.
-    void navigate({ to: "/snap", search: { q, loc: loc.trim() } });
+    const cleanLoc = loc.replace(/["'“”‘’]/g, "").replace(/\s+/g, " ").trim();
+    void navigate({ to: "/snap", search: { q, loc: cleanLoc } });
   };
 
 
@@ -714,16 +715,6 @@ export function OutcomeComposer() {
         </button>
       </div>
 
-      <div className="mt-3 border-t border-border/60 pt-3">
-        <Link
-          to="/snap"
-          data-analytics-id="show_gpb_cta"
-          data-analytics-location="hero_composer"
-          className="inline-flex items-center gap-2 rounded-full bg-muted/50 px-3.5 py-2 text-xs font-bold text-muted-foreground transition-colors hover:bg-muted hover:text-primary"
-        >
-          <Camera className="h-4 w-4 text-primary" /> Show GP a photo
-        </Link>
-      </div>
 
     </form>
   );

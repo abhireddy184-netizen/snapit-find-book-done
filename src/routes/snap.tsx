@@ -1,3 +1,4 @@
+import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -59,7 +60,7 @@ type SnapSearch = { q?: string; loc?: string };
 export const Route = createFileRoute("/snap")({
   validateSearch: (search: Record<string, unknown>): SnapSearch => {
     const q = typeof search["q"] === "string" ? search["q"] : "";
-    const loc = search["loc"] == null ? "" : String(search["loc"]);
+    const loc = search["loc"] == null ? "" : String(search["loc"]).replace(/["'“”‘’]/g, "").replace(/\s+/g, " ").trim();
     return { ...(q ? { q } : {}), ...(loc ? { loc } : {}) };
   },
 
@@ -870,7 +871,7 @@ function JobScopeCta({ analysis, image }: { analysis: SnapAnalysis; image: strin
       </p>
       <GradientButton onClick={go} disabled={busy} className="mt-4 w-full justify-center py-4 text-base">
         {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ClipboardList className="h-5 w-5" />}
-        {user ? "Create job scope & compare quotes" : "Sign in to create your job scope"}
+        {user ? "Create job scope & compare quotes" : "Continue — sign in to confirm"}
       </GradientButton>
       {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
     </div>
@@ -1154,7 +1155,6 @@ function AnalysisView({
         </div>
       </div>
 
-      <JobScopeCta analysis={analysis} image={image} />
 
       {prosLoading ? (
         <div className="flex items-center gap-2 rounded-3xl border border-border/60 bg-muted/40 p-5 text-sm text-muted-foreground">
@@ -1171,13 +1171,16 @@ function AnalysisView({
       ) : (
         <div className="rounded-3xl border border-border/60 bg-muted/40 p-5 text-sm">
           <div className="font-black">
-            No verified {analysis.category || "matching"} pros are covering {hasZip ? "your area" : "this trade"} yet.
+            No verified pros in your area yet — join early access and we'll notify you when pros launch near you.
           </div>
           <p className="mt-1 text-muted-foreground">
             {hasZip
-              ? "We only show real GetPros professionals who are verified and accepting work within their own service radius — never a sample profile and never someone from another trade."
-              : "Add the ZIP code of your service address and we'll check which verified pros actually cover it."}
+              ? "We only show real, verified GetPros professionals — never a sample profile."
+              : "Add your ZIP code and we'll check which verified pros actually cover it."}
           </p>
+          <div className="-mt-6">
+            <EarlyAccessSection />
+          </div>
         </div>
       )}
 
@@ -1228,6 +1231,9 @@ function AnalysisView({
         </div>
       </div>
       )}
+
+      {/* Sign-in is only asked for here, after the customer has seen the result and pros. */}
+      {matched.length > 0 && <JobScopeCta analysis={analysis} image={image} />}
 
 
       </>

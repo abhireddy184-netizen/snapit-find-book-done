@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as TrustSafetyRouteImport } from './routes/trust-safety'
 import { Route as SnapRouteImport } from './routes/snap'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SearchRouteImport } from './routes/search'
@@ -39,6 +40,11 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TrustSafetyRoute = TrustSafetyRouteImport.update({
+  id: '/trust-safety',
+  path: '/trust-safety',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SnapRoute = SnapRouteImport.update({
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/services': typeof ServicesRouteWithChildren
   '/snap': typeof SnapRoute
+  '/trust-safety': typeof TrustSafetyRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
@@ -210,6 +217,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/snap': typeof SnapRoute
+  '/trust-safety': typeof TrustSafetyRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
@@ -239,6 +247,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/services': typeof ServicesRouteWithChildren
   '/snap': typeof SnapRoute
+  '/trust-safety': typeof TrustSafetyRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
@@ -268,6 +277,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/services'
     | '/snap'
+    | '/trust-safety'
     | '/unsubscribe'
     | '/dashboard'
     | '/provider-dashboard'
@@ -294,6 +304,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/search'
     | '/snap'
+    | '/trust-safety'
     | '/unsubscribe'
     | '/dashboard'
     | '/provider-dashboard'
@@ -322,6 +333,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/services'
     | '/snap'
+    | '/trust-safety'
     | '/unsubscribe'
     | '/_authenticated/dashboard'
     | '/_authenticated/provider-dashboard'
@@ -351,6 +363,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   ServicesRoute: typeof ServicesRouteWithChildren
   SnapRoute: typeof SnapRoute
+  TrustSafetyRoute: typeof TrustSafetyRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   ProviderIdRoute: typeof ProviderIdRoute
   TrackingIdRoute: typeof TrackingIdRoute
@@ -364,6 +377,13 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/trust-safety': {
+      id: '/trust-safety'
+      path: '/trust-safety'
+      fullPath: '/trust-safety'
+      preLoaderRoute: typeof TrustSafetyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/snap': {
@@ -593,6 +613,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   ServicesRoute: ServicesRouteWithChildren,
   SnapRoute: SnapRoute,
+  TrustSafetyRoute: TrustSafetyRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   ProviderIdRoute: ProviderIdRoute,
   TrackingIdRoute: TrackingIdRoute,
