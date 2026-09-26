@@ -29,6 +29,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as TrackingIdRouteImport } from './routes/tracking.$id'
 import { Route as ProviderIdRouteImport } from './routes/provider.$id'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as AuthenticatedProviderDashboardRouteImport } from './routes/_authenticated/provider-dashboard'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as ServicesCategoryIndexRouteImport } from './routes/services.$category.index'
@@ -136,6 +137,11 @@ const ProviderIdRoute = ProviderIdRouteImport.update({
   path: '/provider/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedProviderDashboardRoute =
   AuthenticatedProviderDashboardRouteImport.update({
     id: '/provider-dashboard',
@@ -194,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services/': typeof ServicesIndexRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services': typeof ServicesIndexRoute
@@ -251,6 +259,7 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
+  '/auth/callback': typeof AuthCallbackRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services/': typeof ServicesIndexRoute
@@ -281,6 +290,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/dashboard'
     | '/provider-dashboard'
+    | '/auth/callback'
     | '/provider/$id'
     | '/tracking/$id'
     | '/services/'
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/dashboard'
     | '/provider-dashboard'
+    | '/auth/callback'
     | '/provider/$id'
     | '/tracking/$id'
     | '/services'
@@ -337,6 +348,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/_authenticated/dashboard'
     | '/_authenticated/provider-dashboard'
+    | '/auth/callback'
     | '/provider/$id'
     | '/tracking/$id'
     | '/services/'
@@ -365,6 +377,7 @@ export interface RootRouteChildren {
   SnapRoute: typeof SnapRoute
   TrustSafetyRoute: typeof TrustSafetyRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
   ProviderIdRoute: typeof ProviderIdRoute
   TrackingIdRoute: typeof TrackingIdRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -512,6 +525,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProviderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/provider-dashboard': {
       id: '/_authenticated/provider-dashboard'
       path: '/provider-dashboard'
@@ -615,6 +635,7 @@ const rootRouteChildren: RootRouteChildren = {
   SnapRoute: SnapRoute,
   TrustSafetyRoute: TrustSafetyRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
   ProviderIdRoute: ProviderIdRoute,
   TrackingIdRoute: TrackingIdRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
