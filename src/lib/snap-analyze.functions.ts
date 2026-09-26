@@ -1,25 +1,35 @@
 import { createServerFn } from "@tanstack/react-start";
-import { generateText } from "ai";
 import { z } from "zod";
-import { createLovableAiGatewayProvider } from "./ai-gateway.server";
-import { SYSTEM_PROMPT, buildUserPrompt, normalizeAnalysis } from "./snap-analyze.server";
+import {
+  SYSTEM_PROMPT,
+  buildUserPrompt,
+  createPhotoRecoveryAnalysis,
+  normalizeAnalysis,
+} from "./snap-analyze.server";
+import { runVision, type VisionError } from "./vision-providers.server";
 import { detectServiceIntentInText } from "./search-intent";
 import { createFastPathAnalysis } from "./snap-fast-path";
 
-
 export type { SnapAnalysis, ServiceOption, IssueSource, ResponseKind } from "./snap-analyze.server";
+
+// ~2.2 MB of base64 per frame keeps the whole request small even for 4 frames.
+const MAX_FRAME_CHARS = 3_000_000;
 
 export const analyzeSnap = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
     z
       .object({
-        imageDataUrl: z.string().min(10).optional(),
-        imageDataUrls: z.array(z.string().min(10)).max(4).optional(),
-        note: z.string().optional(),
-        latestMessage: z.string().optional(),
+        imageDataUrl: z.string().min(10).max(MAX_FRAME_CHARS).optional(),
+        imageDataUrls: z.array(z.string().min(10).max(MAX_FRAME_CHARS)).max(4).optional(),
+        note: z.string().max(4000).optional(),
+        latestMessage: z.string().max(4000).optional(),
         askedQuestions: z.array(z.string()).max(12).optional(),
         turnCount: z.number().int().min(0).max(10).optional(),
         forceResolve: z.boolean().optional(),
+        /** Previous attempt found no working vision provider: resolve from words only. */
+        skipVision: z.boolean().optional(),
+        /** Dev-only fault injection for testing failover; ignored in production. */
+        simulateFail: z.enum(["primary", "all"]).optional(),
       })
       .refine((v) => Boolean(v.imageDataUrl || v.imageDataUrls?.length || v.note?.trim()), {
         message: "Add a photo, a video or a description so GetPros can help.",
@@ -27,9 +37,6 @@ export const analyzeSnap = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    const key = process.env['LOVABLE_API_KEY'];
-    if (!key) throw new Error("Missing LOVABLE_API_KEY");
-    const gateway = createLovableAiGatewayProvider(key);
     const images = data.imageDataUrls?.length ? data.imageDataUrls : data.imageDataUrl ? [data.imageDataUrl] : [];
     const hasMedia = images.length > 0;
     const note = data.note?.trim();
@@ -39,42 +46,41 @@ export const analyzeSnap = createServerFn({ method: "POST" })
       turnCount: data.turnCount ?? 0,
       forceResolve: data.forceResolve ?? false,
     };
+    const simulateFail = process.env["NODE_ENV"] === "production" ? undefined : data.simulateFail;
 
-    // Fast path: a text-only request whose words already name a catalogue
-    // service (e.g. "my sink is broken") never needs the visual pipeline —
-    // resolve it locally and return in milliseconds.
+    // Fast path: a text-only request that already names a catalog service.
     const fastHit = !hasMedia && note ? detectServiceIntentInText(ctx.latestMessage || note) : null;
-    if (fastHit && note) {
-      return createFastPathAnalysis(note, fastHit);
+    if (fastHit && note) return createFastPathAnalysis(note, fastHit);
+
+    // Recovery follow-up: the photo couldn't be read, so resolve from the words
+    // locally instead of waiting on providers that just failed.
+    if (data.skipVision && note) {
+      return {
+        ...normalizeAnalysis("", true, false, note, { ...ctx, forceResolve: true }),
+        visionUnavailable: hasMedia || undefined,
+      };
     }
 
-
-    const content: ({ type: "text"; text: string } | { type: "image"; image: string })[] = [
-      { type: "text", text: buildUserPrompt(note, hasMedia, images.length, ctx) },
-    ];
-    for (const image of images) content.push({ type: "image", image });
-
-    // Hard server-side budget so a slow upstream can never hang the UI.
-    const budgetMs = hasMedia ? 28_000 : 5_500;
     try {
-      const { text } = await generateText({
-        // Fast multimodal chat model: no reasoning round-trips, so simple
-        // requests come back in a couple of seconds.
-        model: gateway("google/gemini-3.6-flash"),
-        system: SYSTEM_PROMPT,
-        messages: [{ role: "user", content }],
-        abortSignal: AbortSignal.timeout(budgetMs),
-      });
+      const { text } = await runVision(
+        { system: SYSTEM_PROMPT, text: buildUserPrompt(note, hasMedia, images.length, ctx), images },
+        { totalBudgetMs: hasMedia ? 14_000 : 5_500, simulateFail },
+      );
       return normalizeAnalysis(text, Boolean(note), hasMedia, note, ctx);
     } catch (err) {
-      // Graceful degradation: if the customer gave us words, resolve from the
-      // catalogue instead of failing — they still reach a professional.
-      if (note) return normalizeAnalysis("", true, hasMedia, note, { ...ctx, forceResolve: true });
-      throw new Error(
-        err instanceof Error && /abort|timeout/i.test(err.message)
-          ? "That took longer than usual. Please try again, or add a short description."
-          : "We couldn't analyse that just now. Please try again.",
+      const failures = Array.isArray(err) ? (err as VisionError[]) : [];
+      console.error(
+        "[analyzeSnap] all vision providers failed:",
+        failures.map((f) => `${f.provider}=${f.kind}${f.status ? `/${f.status}` : ""}`).join(", ") || String(err),
       );
+      // Words available: resolve from the catalog (never claim the photo was read).
+      if (note) {
+        return {
+          ...normalizeAnalysis("", true, false, note, { ...ctx, forceResolve: true }),
+          visionUnavailable: hasMedia || undefined,
+        };
+      }
+      // Photo only: keep it on screen and ask for one short hint.
+      return createPhotoRecoveryAnalysis();
     }
   });
-
