@@ -51,7 +51,7 @@ export function InstallPromptBanner() {
       style={{ bottom: "calc(env(safe-area-inset-bottom) + 88px)" }}
     >
       <div className="flex items-start gap-3">
-        <img src="/icon-192.png?v=gp6" alt="" className="h-11 w-11 shrink-0 rounded-xl border border-border/60" />
+        <img src="/icon-192.png?v=gp7" alt="" className="h-11 w-11 shrink-0 rounded-xl border border-border/60" />
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold">Get the GetPros app</p>
           <p className="mt-0.5 text-xs text-muted-foreground">{help ?? "Add it to your home screen or desktop in one tap."}</p>

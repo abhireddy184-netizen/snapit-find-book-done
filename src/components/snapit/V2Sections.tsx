@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import {
   ArrowRight, MessageSquareText, ListChecks, HardHat, Home, PackageCheck, Car,
-  Truck, HeartHandshake, ShieldAlert, ShieldCheck, FileText, Images, Activity,
+  Truck, Users, ShieldAlert, ShieldCheck, FileText, Images, Activity,
   Camera, Sparkles,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -182,7 +182,7 @@ const MODULES: ModuleCard[] = [
   { icon: PackageCheck, title: "Errands", body: "Pickups, drop-offs, small tasks.", category: "errands", tone: "var(--secondary)" },
   { icon: Car, title: "Auto", body: "Mobile detailing and repair.", category: "auto-mobile", tone: "var(--sky-ink)" },
   { icon: Truck, title: "Moving", body: "Packing, lifting, move-out clean.", category: "moving", tone: "var(--coral-ink)" },
-  { icon: HeartHandshake, title: "Family help", body: "Errands and household help.", category: "errands", tone: "var(--lavender)" },
+  { icon: Users, title: "Family help", body: "Errands and household help.", category: "errands", tone: "var(--lavender)" },
   { icon: ShieldAlert, title: "Emergency", body: "Burst pipe, no power, lockout.", href: "/emergency", tone: "var(--destructive)" },
 ];
 

@@ -45,7 +45,7 @@ import { prepareMediaForAnalysis, withTimeout, type PreparedMedia } from "@/lib/
 import {
   BadgeCheck,
   Lock,
-  HandHeart,
+  Images,
   Tag,
   Users,
 } from "lucide-react";
@@ -1437,7 +1437,7 @@ function TrustBadges() {
     { icon: BadgeCheck, label: "Verification when reviewed" },
     { icon: Tag, label: "Upfront Pricing" },
     { icon: Lock, label: "Private & Secure" },
-    { icon: HandHeart, label: "Before & After Proof" },
+    { icon: Images, label: "Before & After Proof" },
   ];
   return (
     <div className="mt-6 rounded-3xl border border-border/60 bg-gradient-to-br from-primary/5 via-card to-card p-4 backdrop-blur-xl">
