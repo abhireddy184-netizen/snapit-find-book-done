@@ -52,7 +52,8 @@ import {
 
 /** Hard ceiling for a single AI diagnosis request before we bail out. */
 // Text-only requests are fast (no visual pipeline); media needs more room.
-const ANALYSIS_TIMEOUT_MS = 34_000;
+// Server caps vision at ~14s across providers; this is only a network safety net.
+const ANALYSIS_TIMEOUT_MS = 20_000;
 const TEXT_ANALYSIS_TIMEOUT_MS = 6_000;
 
 type SnapSearch = { q?: string; loc?: string };
@@ -151,10 +152,12 @@ function SnapPage() {
     frames: string[],
     noteText: string,
     token: number,
-    opts?: { latestMessage?: string; asked?: string[]; turns?: number; forceResolve?: boolean },
+    opts?: { latestMessage?: string; asked?: string[]; turns?: number; forceResolve?: boolean; skipVision?: boolean },
   ) => {
     setPhase("analyzing");
     try {
+      const simulate =
+        typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("simulateVision") : null;
       const payload = {
         ...(frames.length ? { imageDataUrls: frames } : {}),
         note: noteText,
@@ -162,6 +165,8 @@ function SnapPage() {
         askedQuestions: opts?.asked ?? askedQuestions,
         turnCount: opts?.turns ?? turnCount,
         forceResolve: opts?.forceResolve ?? false,
+        ...(opts?.skipVision ? { skipVision: true } : {}),
+        ...(simulate === "primary" || simulate === "all" ? { simulateFail: simulate } : {}),
       };
       const result = await withTimeout(
         analyze({ data: payload }),
@@ -179,10 +184,32 @@ function SnapPage() {
       if (runRef.current !== token) return;
       // Text-only recovery: never leave the customer stuck — fall back to the
       // best local catalogue matches instead of a dead end.
-      const local = frames.length ? null : createLocalOptionsAnalysis(noteText, rankServices(noteText, 4));
+      const local = noteText.trim() ? createLocalOptionsAnalysis(noteText, rankServices(noteText, 4)) : null;
       if (local) {
         setPhase("matching");
-        setAnalysis(local);
+        setAnalysis(frames.length ? { ...local, visionUnavailable: true } : local);
+      } else if (frames.length) {
+        // Photo only and the request itself failed: keep the photo, ask for a hint.
+        setPhase("matching");
+        setAnalysis({
+          responseKind: "needs-info",
+          issueSource: "insufficient",
+          headline: "We couldn't read your photo just now. What needs fixing?",
+          category: "",
+          categorySlug: "",
+          confidence: 0,
+          problem: "Add a few words — for example \"leaking sink\" — and we'll find the right pro.",
+          estimatedCostLow: 0,
+          estimatedCostHigh: 0,
+          estimatedDurationMinutes: 60,
+          hasPriceEstimate: false,
+          urgency: "low",
+          urgencyReason: "Not enough information to judge urgency yet.",
+          recommendedActions: [],
+          clarifyingQuestions: ["In a few words, what needs fixing?"],
+          serviceOptions: [],
+          visionUnavailable: true,
+        });
       } else {
         setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
       }
@@ -340,7 +367,7 @@ function SnapPage() {
     setAnalysis(null);
     setError(null);
     setLoading(true);
-    await runDiagnosis(frames, merged, token, { latestMessage: text, turns });
+    await runDiagnosis(frames, merged, token, { latestMessage: text, turns, skipVision: Boolean(analysis?.visionUnavailable) });
   };
 
   /**
@@ -354,7 +381,7 @@ function SnapPage() {
     setAnalysis(null);
     setError(null);
     setLoading(true);
-    await runDiagnosis(frames, note, token, { latestMessage: note, forceResolve: true });
+    await runDiagnosis(frames, note, token, { latestMessage: note, forceResolve: true, skipVision: Boolean(analysis?.visionUnavailable) });
   };
 
   const reset = () => {

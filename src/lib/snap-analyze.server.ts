@@ -34,7 +34,34 @@ export type SnapAnalysis = {
   clarifyingQuestions?: string[];
   serviceOptions?: ServiceOption[];
   safetyNote?: string;
+  /** True when no AI could read the photo; the result came from the customer's words / a recovery prompt. */
+  visionUnavailable?: boolean;
 };
+
+/** Photo couldn't be analysed by any provider: ask for one short hint instead of a dead end. */
+export function createPhotoRecoveryAnalysis(): SnapAnalysis {
+  return {
+    responseKind: "needs-info",
+    issueSource: "insufficient",
+    headline: "We couldn't read your photo just now. What needs fixing?",
+    category: "",
+    categorySlug: "",
+    confidence: 0,
+    problem: "Add a few words — for example \"leaking sink\" or \"TV won't turn on\" — and we'll find the right pro.",
+    estimatedCostLow: 0,
+    estimatedCostHigh: 0,
+    estimatedDurationMinutes: 60,
+    hasPriceEstimate: false,
+    urgency: "low",
+    urgencyReason: "Not enough information to judge urgency yet.",
+    recommendedActions: [],
+    possibleCauses: [],
+    nextSteps: [],
+    clarifyingQuestions: ["In a few words, what needs fixing?"],
+    serviceOptions: [],
+    visionUnavailable: true,
+  };
+}
 
 function catalogSummary() {
   return catalog
