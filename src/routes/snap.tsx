@@ -367,7 +367,7 @@ function SnapPage() {
     setAnalysis(null);
     setError(null);
     setLoading(true);
-    await runDiagnosis(frames, merged, token, { latestMessage: text, turns });
+    await runDiagnosis(frames, merged, token, { latestMessage: text, turns, skipVision: Boolean(analysis?.visionUnavailable) });
   };
 
   /**
@@ -381,7 +381,7 @@ function SnapPage() {
     setAnalysis(null);
     setError(null);
     setLoading(true);
-    await runDiagnosis(frames, note, token, { latestMessage: note, forceResolve: true });
+    await runDiagnosis(frames, note, token, { latestMessage: note, forceResolve: true, skipVision: Boolean(analysis?.visionUnavailable) });
   };
 
   const reset = () => {

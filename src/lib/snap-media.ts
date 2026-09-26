@@ -9,6 +9,8 @@ export const VIDEO_FRAME_TIMEOUT_MS = 12_000;
 export const VIDEO_FRAMES_TIMEOUT_MS = 18_000;
 export const VIDEO_FRAME_COUNT = 3;
 export const IMAGE_READ_TIMEOUT_MS = 20_000;
+/** ~1.5 MB of base64 — the server rejects frames above ~3 MB. */
+export const MAX_UPLOAD_CHARS = 2_000_000;
 
 export class MediaError extends Error {}
 
@@ -82,12 +84,19 @@ export async function compressImageFile(file: File): Promise<string> {
     const out = canvas.toDataURL("image/jpeg", JPEG_QUALITY);
     // Only keep the re-encode when it actually helps and looks valid.
     if (out.startsWith("data:image/jpeg") && out.length > 1000) {
-      return out.length < original.length ? out : original.length < 4_000_000 ? original : out;
+      // Always prefer the downscaled JPEG: originals may be HEIC/PNG that the
+      // vision providers reject, and are often many megabytes.
+      if (out.length <= MAX_UPLOAD_CHARS) return out;
+      const smaller = canvas.toDataURL("image/jpeg", 0.68);
+      return smaller;
     }
-    return original;
-  } catch {
-    // A decode failure shouldn't block diagnosis — send the original bytes.
-    return original;
+    if (original.length <= MAX_UPLOAD_CHARS && /^data:image\/(jpeg|png|webp)/.test(original)) return original;
+    throw new MediaError("That photo format couldn't be prepared. Please try another photo.");
+  } catch (err) {
+    if (err instanceof MediaError && /format/.test(err.message)) throw err;
+    // A decode failure shouldn't block diagnosis when the original is small and a common format.
+    if (original.length <= MAX_UPLOAD_CHARS && /^data:image\/(jpeg|png|webp)/.test(original)) return original;
+    throw new MediaError("That photo couldn't be prepared. Please try another photo or take a new one.");
   }
 }
 
@@ -125,8 +134,9 @@ export function extractVideoFrame(file: File): Promise<string> {
       if (settled) return;
       try {
         const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
+        const vs = scaledSize(video.videoWidth || 640, video.videoHeight || 480);
+        canvas.width = vs.width;
+        canvas.height = vs.height;
         const ctx = canvas.getContext("2d");
         if (!ctx) return fail("We couldn't read a frame from that video. Try a photo instead.");
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -234,8 +244,9 @@ export function extractVideoFrames(file: File, count = VIDEO_FRAME_COUNT): Promi
       if (settled) return;
       try {
         const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth || 640;
-        canvas.height = video.videoHeight || 480;
+        const vs = scaledSize(video.videoWidth || 640, video.videoHeight || 480);
+        canvas.width = vs.width;
+        canvas.height = vs.height;
         const ctx = canvas.getContext("2d");
         if (!ctx) return fail("We couldn't read a frame from that video. Try a photo instead.");
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
