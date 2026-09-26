@@ -65,14 +65,13 @@ function Landing() {
             </p>
 
 
-            {/* Desktop keeps a photo-first button because the composer sits in
-                the second column; on phones the composer already carries it. */}
+            {/* Camera-first: primary photo CTA on every screen size. */}
             <Link
               to="/snap"
               id="hero-show-gpb-cta"
               data-analytics-id="show_gpb_cta"
               data-analytics-location="hero_primary"
-              className="mt-6 hidden items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold text-white shadow-elevated transition-transform duration-200 hover:scale-[1.01] lg:inline-flex"
+              className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-bold text-white shadow-elevated transition-transform duration-200 hover:scale-[1.01] sm:w-auto sm:text-sm"
               style={{ background: "var(--gradient-primary)" }}
             >
               <Camera className="h-5 w-5" /> Show GP a photo
@@ -298,7 +297,7 @@ export function Footer() {
           <ul className="space-y-2">
             <li><a href="/#how-it-works" className="hover:text-foreground">How it works</a></li>
             <li><Link to="/emergency" className="hover:text-foreground">Emergency services</Link></li>
-            <li><Link to="/legal" hash="terms" className="hover:text-foreground">Trust &amp; safety</Link></li>
+            <li><Link to="/trust-safety" className="hover:text-foreground">Trust &amp; safety</Link></li>
             <li><Link to="/legal" hash="privacy" className="hover:text-foreground">Privacy</Link></li>
           </ul>
         </div>

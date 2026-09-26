@@ -59,7 +59,7 @@ type SnapSearch = { q?: string; loc?: string };
 export const Route = createFileRoute("/snap")({
   validateSearch: (search: Record<string, unknown>): SnapSearch => {
     const q = typeof search["q"] === "string" ? search["q"] : "";
-    const loc = search["loc"] == null ? "" : String(search["loc"]);
+    const loc = search["loc"] == null ? "" : String(search["loc"]).replace(/["'“”‘’]/g, "").replace(/\s+/g, " ").trim();
     return { ...(q ? { q } : {}), ...(loc ? { loc } : {}) };
   },
 

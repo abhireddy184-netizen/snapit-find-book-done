@@ -522,7 +522,8 @@ export function OutcomeComposer() {
     cancelAutoSubmit();
     setEmptyError(false);
     // Photo, voice and text all converge on the same service understanding flow.
-    void navigate({ to: "/snap", search: { q, loc: loc.trim() } });
+    const cleanLoc = loc.replace(/["'“”‘’]/g, "").replace(/\s+/g, " ").trim();
+    void navigate({ to: "/snap", search: { q, loc: cleanLoc } });
   };
 
 

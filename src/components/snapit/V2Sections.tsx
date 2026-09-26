@@ -316,7 +316,7 @@ export function BrowseFallback() {
         <div className="min-w-0">
           <h2 className="text-base font-black tracking-tight sm:text-lg">Prefer to browse?</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            The full GetPros catalogue is here.
+            The full GetPros catalog is here.
           </p>
         </div>
         <Link
@@ -368,7 +368,7 @@ export function SimpleFlow() {
 export function HowGpbWorksDetails() {
   return (
     <section id="how-it-works" className="mt-8 scroll-mt-24">
-      <details className="group surface-card p-5 sm:p-6">
+      <details open className="group surface-card p-5 sm:p-6">
         <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-base font-black tracking-tight">
           How it works
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-border/60 text-muted-foreground transition-transform group-open:rotate-90">
