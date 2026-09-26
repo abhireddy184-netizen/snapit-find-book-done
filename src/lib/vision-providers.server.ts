@@ -65,7 +65,8 @@ function classifyHttp(provider: string, status: number, body: string): VisionErr
   const snippet = body.replace(/\s+/g, " ").slice(0, 240);
   const quotaHint = /credit|quota|billing|insufficient|payment/i.test(body);
   let kind: VisionFailureKind;
-  if (status === 402) kind = "quota";
+  if (/API_KEY_INVALID|API key not valid|PERMISSION_DENIED|UNAUTHENTICATED|not registered/i.test(body)) kind = "auth";
+  else if (status === 402) kind = "quota";
   else if (status === 401) kind = "auth";
   else if (status === 403) kind = quotaHint ? "quota" : "auth";
   else if (status === 429) kind = quotaHint && /quota/i.test(body) && /exceeded|exhausted/i.test(body) ? "quota" : "rate_limit";
