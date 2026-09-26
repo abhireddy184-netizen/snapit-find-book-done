@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { Download, X } from "lucide-react";
 
 type BIPEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
-const KEY = "gp-install-dismissed-at";
-const SNOOZE_MS = 7 * 24 * 60 * 60 * 1000;
+const KEY = "gp-install-dismissed";
+const SESSION_KEY = "gp-install-shown";
 
-/** Small, dismissible install card shown briefly when the site opens. */
+/** Small install card: at most once per session, never again once dismissed. */
 export function InstallPromptBanner() {
   const [show, setShow] = useState(false);
   const [deferred, setDeferred] = useState<BIPEvent | null>(null);
@@ -13,18 +13,22 @@ export function InstallPromptBanner() {
 
   useEffect(() => {
     if (window.matchMedia("(display-mode: standalone)").matches) return;
-    const last = Number(localStorage.getItem(KEY) || 0);
-    if (Date.now() - last < SNOOZE_MS) return;
+    try {
+      if (localStorage.getItem(KEY) || sessionStorage.getItem(SESSION_KEY)) return;
+    } catch { return; }
     const onPrompt = (e: Event) => { e.preventDefault(); setDeferred(e as BIPEvent); };
     window.addEventListener("beforeinstallprompt", onPrompt);
-    const t1 = setTimeout(() => setShow(true), 1500);
+    const t1 = setTimeout(() => {
+      try { sessionStorage.setItem(SESSION_KEY, "1"); } catch { /* ignore */ }
+      setShow(true);
+    }, 1500);
     const t2 = setTimeout(() => setShow(false), 20000);
     return () => { window.removeEventListener("beforeinstallprompt", onPrompt); clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
   if (!show) return null;
 
-  const dismiss = () => { localStorage.setItem(KEY, String(Date.now())); setShow(false); };
+  const dismiss = () => { try { localStorage.setItem(KEY, "1"); } catch { /* ignore */ } setShow(false); };
   const install = async () => {
     if (deferred) {
       await deferred.prompt();
