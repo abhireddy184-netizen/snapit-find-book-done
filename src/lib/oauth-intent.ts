@@ -73,16 +73,16 @@ export async function reconcileProfile(userId: string, intent: Intent | null) {
     return role;
   }
 
-  const patch: Record<string, unknown> = {};
-  if (!profile.full_name && metaName) patch["full_name"] = metaName;
+  const patch: { full_name?: string; role?: "customer" | "provider"; is_provider?: boolean; provider_since?: string } = {};
+  if (!profile.full_name && metaName) patch.full_name = metaName;
   const isNew = Date.now() - new Date(profile.created_at).getTime() < 10 * 60 * 1000;
   if (isNew && intent?.role === "provider" && profile.role === "customer") {
-    patch["role"] = "provider";
-    patch["is_provider"] = true;
-    patch["provider_since"] = new Date().toISOString();
+    patch.role = "provider";
+    patch.is_provider = true;
+    patch.provider_since = new Date().toISOString();
   }
   if (Object.keys(patch).length) {
     await supabase.from("profiles").update(patch).eq("id", userId);
   }
-  return (patch["role"] as string) ?? profile.role;
+  return patch.role ?? profile.role;
 }
