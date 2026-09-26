@@ -1041,6 +1041,7 @@ function AnalysisView({
               {analysis.safetyNote}
             </div>
           )}
+          {!analysis.visionUnavailable && (
           <div className="mt-4">
             <div className="flex items-center justify-between text-xs">
               <span className="font-semibold text-muted-foreground">AI confidence</span>
@@ -1053,6 +1054,7 @@ function AnalysisView({
               />
             </div>
           </div>
+          )}
         </div>
       </div>
 
