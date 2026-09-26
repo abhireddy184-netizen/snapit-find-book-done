@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { CalendarDays, Heart, MessageCircle, User, MapPin, Star, ShieldCheck, Camera, LogOut, Loader2, ClipboardList, ArrowRight } from "lucide-react";
+import { CalendarDays, Bookmark, MessageCircle, User, MapPin, Star, ShieldCheck, Camera, LogOut, Loader2, ClipboardList, ArrowRight } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { providers } from "@/lib/snapit-data";
 import { useAuth } from "@/lib/auth";
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
 const tabs = [
   { id: "jobs", label: "Jobs", icon: ClipboardList },
   { id: "bookings", label: "Bookings", icon: CalendarDays },
-  { id: "saved", label: "Saved", icon: Heart },
+  { id: "saved", label: "Saved", icon: Bookmark },
   { id: "messages", label: "Messages", icon: MessageCircle },
   { id: "profile", label: "Profile", icon: User },
 ];
