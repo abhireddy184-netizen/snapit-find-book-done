@@ -22,6 +22,8 @@ interface Props {
   note?: string | null
   submittedAt?: string | null
   reactivated?: boolean
+  yearsExperience?: number | null
+  attribution?: Record<string, string | null | undefined> | null
 }
 
 const TYPE_LABEL: Record<LeadType, string> = {
@@ -47,7 +49,9 @@ const InternalLeadEmail = (props: Props) => {
     ['City / State', [props.city, props.state].filter(Boolean).join(', ') || null],
     ['ZIP', props.zip],
     ['Location entered', props.location],
+    ['Years of experience', props.yearsExperience != null ? String(props.yearsExperience) : null],
     ['Source', props.source],
+    ...Object.entries(props.attribution ?? {}).map(([k, v]) => [k, v] as [string, string | null | undefined]),
     ['Note', props.note],
     ['Submitted', props.submittedAt ? new Date(props.submittedAt).toUTCString() : null],
   ]

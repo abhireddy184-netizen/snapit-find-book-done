@@ -276,11 +276,18 @@ export type Database = {
           created_at: string
           email: string
           email_normalized: string | null
+          fbclid: string | null
           full_name: string
           id: string
           note: string | null
           phone: string | null
           state: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          years_experience: number | null
           zip: string
         }
         Insert: {
@@ -291,11 +298,18 @@ export type Database = {
           created_at?: string
           email: string
           email_normalized?: string | null
+          fbclid?: string | null
           full_name: string
           id?: string
           note?: string | null
           phone?: string | null
           state?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          years_experience?: number | null
           zip: string
         }
         Update: {
@@ -306,11 +320,18 @@ export type Database = {
           created_at?: string
           email?: string
           email_normalized?: string | null
+          fbclid?: string | null
           full_name?: string
           id?: string
           note?: string | null
           phone?: string | null
           state?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          years_experience?: number | null
           zip?: string
         }
         Relationships: []

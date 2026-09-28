@@ -19,6 +19,8 @@ export type LeadNotification = {
   note?: string | null;
   submittedAt?: string | null;
   reactivated?: boolean;
+  yearsExperience?: number | null;
+  attribution?: Record<string, string | null | undefined> | null;
 };
 
 export async function notifyNewLead(lead: LeadNotification): Promise<void> {
