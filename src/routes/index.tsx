@@ -94,13 +94,14 @@ function Landing() {
                 Get early access
               </a>
               <Link
-                to="/provider-interest"
+                to="/register"
+                search={{ redirect: undefined, role: "provider" }}
                 id="hero-provider-interest-cta"
-                data-analytics-id="provider_interest_cta"
+                data-analytics-id="provider_signup_cta"
                 data-analytics-location="hero"
-                className="hover:text-foreground hover:underline"
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-full border-2 border-primary/70 bg-card px-4 py-2 text-sm font-bold text-primary shadow-sm transition-colors hover:border-primary hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
-                Join as a pro
+                <Briefcase className="h-4 w-4" /> Join as a Pro
               </Link>
             </div>
           </div>
@@ -195,7 +196,7 @@ function ProviderRecruitment() {
               search={{ redirect: undefined, role: "provider" }}
               className="text-sm font-semibold text-white/85 underline underline-offset-4 transition-colors hover:text-white"
             >
-              Create pro account
+              Join as a Pro
             </Link>
           </div>
 
