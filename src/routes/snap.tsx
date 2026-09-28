@@ -580,8 +580,8 @@ function SnapPage() {
           </div>
         )}
 
-        {!image && <TrustBadges />}
-        {!image && recent.length > 0 && <RecentDiagnoses entries={recent} />}
+        {!image && !analysis && !loading && <TrustBadges />}
+        {!image && !analysis && !loading && recent.length > 0 && <RecentDiagnoses entries={recent} />}
 
         {/* Mobile capture confirmation: check the shot, then continue. */}
         {confirmPhoto && image && !analysis && (
