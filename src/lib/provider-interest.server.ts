@@ -2,6 +2,7 @@
 // interest -> provider-account -> business-profile continuity link.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendTemplateEmail } from "@/lib/email-templates/send-email";
+import { notifyNewLead } from "@/lib/lead-notify.server";
 
 const SITE_URL = "https://getperfectboy.com";
 
@@ -67,6 +68,20 @@ export async function registerInterest(
     if (error || !data) throw new Error("We couldn’t submit that just now. Please try again.");
     rowId = data.id as string;
     status = "registered";
+    await notifyNewLead({
+      leadType: "provider",
+      leadId: rowId,
+      name: input.fullName,
+      email: input.email.trim(),
+      phone: input.phone,
+      businessName: input.businessName,
+      service: input.categoryLabel,
+      city: input.city,
+      state: input.state,
+      zip: input.zip,
+      note: input.note,
+      source: "provider_interest",
+    });
   }
 
   let emailDelivery: ProviderInterestOutcome["emailDelivery"] = "skipped";
