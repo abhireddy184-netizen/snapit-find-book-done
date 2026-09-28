@@ -42,6 +42,7 @@ import { useAuth } from "@/lib/auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { createJobFromAnalysis } from "@/lib/jobs";
 import { prepareMediaForAnalysis, withTimeout, type PreparedMedia } from "@/lib/snap-media";
+import { GuidedVideoScan, canUseGuidedScan } from "@/components/snapit/GuidedVideoScan";
 import {
   BadgeCheck,
   Lock,
@@ -113,6 +114,7 @@ function SnapPage() {
   // Mobile only: a freshly taken photo pauses here for Use photo / Retake
   // before anything is analysed. Desktop keeps its original behaviour.
   const [confirmPhoto, setConfirmPhoto] = useState(false);
+  const [scanOpen, setScanOpen] = useState(false);
   const analyze = useServerFn(analyzeSnap);
   const cameraRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLInputElement>(null);
@@ -434,14 +436,11 @@ function SnapPage() {
         )}
         <div className="pt-2">
 
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            <Sparkles className="h-3.5 w-3.5" /> One way to talk to GetPros
-          </div>
-          <h1 className="mt-3 text-3xl font-black tracking-tight md:text-4xl">Don’t know what service you need? Show us.</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Take a photo, record a video, upload an image, or simply describe the outcome you want. GetPros works out
-            what the job actually is and routes it to the right local professional. A photo is never required.
+          <h1 className="text-3xl font-black tracking-tight md:text-4xl">Show GP the problem.</h1>
+          <p className="mt-1 text-sm font-semibold text-muted-foreground">
+            Show it <span aria-hidden>→</span> AI understands <span aria-hidden>→</span> Get matched <span aria-hidden>→</span> Book
           </p>
+          <p className="mt-0.5 text-xs text-muted-foreground">No account needed to start.</p>
         </div>
 
         {/* Hidden inputs stay mounted for every state so Retake works from
@@ -471,34 +470,49 @@ function SnapPage() {
         />
 
         {!image && !analysis && (
-          <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
             <CaptureTile
               icon={Camera}
-              label="Take a photo"
-              hint="Use your camera"
+              label="Photo"
+              hint="Snap it"
               onClick={() => cameraRef.current?.click()}
             />
             <CaptureTile
               icon={Video}
-              label="Record a video"
-              hint="Show the issue"
-              onClick={() => videoRef.current?.click()}
+              label="Video scan"
+              hint="5–10 sec"
+              onClick={() => (canUseGuidedScan() ? setScanOpen(true) : videoRef.current?.click())}
             />
             <CaptureTile
               icon={Upload}
-              label="Upload from Gallery"
-              hint="Choose an image"
-              className="hidden sm:flex"
+              label="Upload"
+              hint="From gallery"
+              className="hidden lg:flex"
               onClick={() => uploadRef.current?.click()}
             />
             <CaptureTile
               icon={MessageCircle}
-              label="Describe the job"
+              label="Describe it"
               hint="No photo needed"
               active={describeMode}
+              className="col-span-2 lg:col-span-1"
               onClick={() => setDescribeMode((v) => !v)}
             />
           </div>
+        )}
+
+        {scanOpen && (
+          <GuidedVideoScan
+            onCancel={() => setScanOpen(false)}
+            onUnsupported={() => {
+              setScanOpen(false);
+              videoRef.current?.click();
+            }}
+            onDone={(file) => {
+              setScanOpen(false);
+              void handleFile(file, "video");
+            }}
+          />
         )}
 
         {/* Mobile: the photo library stays available, but as a quiet secondary
@@ -898,7 +912,7 @@ function JobScopeCta({ analysis, image }: { analysis: SnapAnalysis; image: strin
       </p>
       <GradientButton onClick={go} disabled={busy} className="mt-4 w-full justify-center py-4 text-base">
         {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ClipboardList className="h-5 w-5" />}
-        {user ? "Create job scope & compare quotes" : "Continue — sign in to confirm"}
+        {user ? "Create job scope & compare quotes" : "Save & compare quotes (free account)"}
       </GradientButton>
       {err && <p className="mt-2 text-xs text-destructive">{err}</p>}
     </div>
@@ -1058,29 +1072,45 @@ function AnalysisView({
         </div>
       </div>
 
-      {showPricing && (
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Stat
-          icon={DollarSign}
-          label="Estimated cost"
-          value={`$${analysis.estimatedCostLow}–$${analysis.estimatedCostHigh}`}
-          hint="Typical range in your area"
-        />
-        <Stat icon={Timer} label="Repair time" value={durationLabel} hint="Estimated on-site" />
-        <Stat icon={UrgencyIcon} label="Urgency" value={u.label} hint={analysis.urgencyReason} />
-        {matched.length > 0 && (
-          <Stat
-            icon={Clock}
-            label="Pros available"
-            value={String(matched.length)}
-            hint={
-              recommended?.distanceMiles != null
-                ? `Closest is ${Math.round(recommended.distanceMiles)} mi away`
-                : "Verified and accepting work"
-            }
-          />
-        )}
-      </div>
+      {showPros && (
+        <div className="rounded-3xl border border-primary/30 bg-card p-4 shadow-sm sm:p-5">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-primary">AI job summary</span>
+            <span className="text-[11px] font-semibold text-muted-foreground">Estimates</span>
+          </div>
+          <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+            <div className="min-w-0">
+              <dt className="text-xs text-muted-foreground">Service</dt>
+              <dd className="truncate font-bold">{analysis.category || category?.name}</dd>
+            </div>
+            <div className="min-w-0">
+              <dt className="text-xs text-muted-foreground">Urgency</dt>
+              <dd className="font-bold">{u.label}</dd>
+            </div>
+            <div className="col-span-2 min-w-0">
+              <dt className="text-xs text-muted-foreground">Likely issue</dt>
+              <dd className="line-clamp-2 font-semibold">{analysis.headline}</dd>
+            </div>
+            <div className="min-w-0">
+              <dt className="text-xs text-muted-foreground">Job size (est.)</dt>
+              <dd className="font-bold">
+                {duration <= 60 ? "Small" : duration <= 180 ? "Medium" : "Large"} · ~{durationLabel}
+              </dd>
+            </div>
+            <div className="min-w-0">
+              <dt className="text-xs text-muted-foreground">Rough estimate</dt>
+              <dd className="font-bold">
+                {showPricing ? `$${analysis.estimatedCostLow}–$${analysis.estimatedCostHigh}` : "Pro will quote"}
+              </dd>
+            </div>
+          </dl>
+          <GradientButton
+            onClick={() => document.getElementById("matched-pros")?.scrollIntoView({ behavior: "smooth" })}
+            className="mt-4 min-h-12 w-full justify-center"
+          >
+            See matched pros <ArrowRight className="h-4 w-4" />
+          </GradientButton>
+        </div>
       )}
 
       {(analysis.clarifyingQuestions?.length ?? 0) > 0 && (
@@ -1159,7 +1189,7 @@ function AnalysisView({
       {showPros && (
       <>
       {/* Confirmed service summary — editable before we go looking for a pro */}
-      <div className="rounded-3xl border border-primary/25 bg-card p-5 shadow-sm">
+      <div id="matched-pros" className="scroll-mt-24 rounded-3xl border border-primary/25 bg-card p-5 shadow-sm">
         <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Service we'll request</div>
         <div className="mt-1 text-base font-black">
           {analysis.category || category?.name || "Service"}
@@ -1316,7 +1346,7 @@ function ClarifyPanel({
         <Sparkles className="h-4 w-4 text-secondary" /> One quick thing
       </div>
       <ul className="mt-2 space-y-1.5 text-sm text-muted-foreground">
-        {questions.map((q) => (
+        {questions.slice(0, 2).map((q) => (
           <li key={q} className="flex gap-2">
             <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-secondary" /> {q}
           </li>
