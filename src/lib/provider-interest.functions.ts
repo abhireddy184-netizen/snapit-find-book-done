@@ -18,7 +18,7 @@ export const registerProviderInterest = createServerFn({ method: "POST" })
   }) => ({
     fullName: String(input?.fullName ?? "").trim().slice(0, 120),
     email: String(input?.email ?? "").trim().slice(0, 255),
-    phone: input?.phone ? String(input.phone).trim().slice(0, 40) : null,
+    phone: cleanPhone(input?.phone),
     zip: String(input?.zip ?? "").trim().slice(0, 5),
     city: String(input?.city ?? "").slice(0, 120),
     state: String(input?.state ?? "").slice(0, 2),
@@ -61,4 +61,10 @@ function cleanAttribution(v: unknown): Record<(typeof ATTR_KEYS)[number], string
     out[k] = val || null;
   }
   return out;
+}
+
+function cleanPhone(v: unknown): string {
+  const phone = String(v ?? "").trim().slice(0, 40);
+  if (phone.replace(/\D/g, "").length < 10) throw new Error("Please enter a valid phone number.");
+  return phone;
 }
