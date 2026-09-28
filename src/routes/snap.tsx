@@ -521,7 +521,7 @@ function SnapPage() {
           <button
             type="button"
             onClick={() => uploadRef.current?.click()}
-            className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-border/60 bg-card/60 px-4 text-sm font-semibold text-muted-foreground hover:bg-muted sm:hidden"
+            className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border border-border/60 bg-card/60 px-4 text-sm font-semibold text-muted-foreground hover:bg-muted lg:hidden"
           >
             <Upload className="h-4 w-4" /> Choose from photo library
           </button>

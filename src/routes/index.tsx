@@ -61,7 +61,7 @@ function Landing() {
               What do you <span className="text-gradient-hero">need?</span>
             </h1>
             <p className="mt-3 max-w-[36ch] text-[clamp(1rem,1.15vw,1.15rem)] leading-relaxed text-muted-foreground">
-              Type it, say it, or show it — we’ll find the right pro.
+              Show it. Get matched. Book — no account needed to start.
             </p>
 
 
@@ -74,7 +74,7 @@ function Landing() {
               className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-bold text-white shadow-elevated transition-transform duration-200 hover:scale-[1.01] sm:w-auto sm:text-sm"
               style={{ background: "var(--gradient-primary)" }}
             >
-              <Camera className="h-5 w-5" /> Show GP a photo
+              <Camera className="h-5 w-5" /> Show GP the problem
             </Link>
 
             <div className="mt-5 lg:hidden">
