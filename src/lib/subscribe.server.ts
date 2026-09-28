@@ -1,6 +1,7 @@
 // Server-only: subscription persistence + welcome email delivery.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendTemplateEmail } from "@/lib/email-templates/send-email";
+import { notifyNewLead } from "@/lib/lead-notify.server";
 
 export type SubscribeOutcome = {
   status: "subscribed" | "already_subscribed" | "resubscribed";
@@ -55,6 +56,16 @@ export async function subscribeEmail(rawEmail: string, source: string): Promise<
 
   const emailDelivery =
     status === "already_subscribed" ? "skipped" : await sendWelcomeEmail(email, existing?.id ?? email);
+
+  if (status !== "already_subscribed") {
+    await notifyNewLead({
+      leadType: "subscriber",
+      leadId: (existing?.id as string | undefined) ?? token,
+      email,
+      source,
+      reactivated: status === "resubscribed",
+    });
+  }
 
   return { status, emailDelivery };
 }

@@ -4,7 +4,8 @@ import { ArrowRight, CheckCircle2, AlertCircle, Loader2, MapPin, Camera, Sparkle
 import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
 import { GradientButton } from "@/components/snapit/AppShell";
 import { catalog } from "@/lib/catalog";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { submitEarlyAccess } from "@/lib/early-access.functions";
 import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 
 /** Show GP callout — concise, mobile-first. */
@@ -47,6 +48,7 @@ export function EarlyAccessSection() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
+  const submitEarlyAccessFn = useServerFn(submitEarlyAccess);
 
   const resolved = useResolvedLocation(loc);
   const place = resolved.kind === "zip" ? resolved.place : null;
@@ -60,27 +62,27 @@ export function EarlyAccessSection() {
     if (!interest) return setError("Please choose the service you're interested in.");
 
     setBusy(true);
-    const normalized = email.trim().toLowerCase();
     const zip = /^\d{5}$/.test(loc.trim()) ? loc.trim() : null;
     // Resolve directly so a slow first dataset load still records city/state.
     const resolvedPlace = place ?? (zip ? await lookupZip(zip) : null);
-    const { error: insertError } = await supabase.from("early_access").insert({
-      full_name: fullName.trim().slice(0, 120),
-      email: email.trim().slice(0, 255),
-      email_normalized: normalized.slice(0, 255),
-      location: loc.trim().slice(0, 160),
-      city: resolvedPlace?.city.slice(0, 120) ?? null,
-      state: resolvedPlace?.state.slice(0, 2) ?? null,
-      zip,
-      service_interest: interest.slice(0, 160),
-
-      source: "homepage_early_access",
-    });
-    setBusy(false);
-    if (insertError) {
+    try {
+      await submitEarlyAccessFn({
+        data: {
+          fullName: fullName.trim(),
+          email: email.trim(),
+          location: loc.trim(),
+          city: resolvedPlace?.city ?? null,
+          state: resolvedPlace?.state ?? null,
+          zip,
+          serviceInterest: interest,
+        },
+      });
+    } catch {
+      setBusy(false);
       setError("We couldn’t submit that just now. Please try again in a moment.");
       return;
     }
+    setBusy(false);
     setDone(true);
   }
 
