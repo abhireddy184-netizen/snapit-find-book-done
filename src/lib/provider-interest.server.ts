@@ -17,6 +17,8 @@ export type ProviderInterestInput = {
   categoryLabel: string;
   businessName: string | null;
   note: string | null;
+  yearsExperience?: number | null;
+  attribution?: Partial<Record<"utm_source" | "utm_medium" | "utm_campaign" | "utm_content" | "utm_term" | "fbclid", string | null>>;
 };
 
 export type ProviderInterestOutcome = {
@@ -62,6 +64,13 @@ export async function registerInterest(
         category_label: input.categoryLabel,
         business_name: input.businessName,
         note: input.note,
+        years_experience: input.yearsExperience ?? null,
+        utm_source: input.attribution?.utm_source ?? null,
+        utm_medium: input.attribution?.utm_medium ?? null,
+        utm_campaign: input.attribution?.utm_campaign ?? null,
+        utm_content: input.attribution?.utm_content ?? null,
+        utm_term: input.attribution?.utm_term ?? null,
+        fbclid: input.attribution?.fbclid ?? null,
       })
       .select("id")
       .single();
@@ -80,6 +89,8 @@ export async function registerInterest(
       state: input.state,
       zip: input.zip,
       note: input.note,
+      yearsExperience: input.yearsExperience ?? null,
+      attribution: input.attribution ?? null,
       source: "provider_interest",
     });
   }
