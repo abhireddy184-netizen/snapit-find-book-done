@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { User, Briefcase, Mail, Lock, ArrowRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Logo } from "./Logo";
 import { GradientButton } from "./AppShell";
@@ -28,6 +28,8 @@ export function AuthForm({
 }) {
   const navigate = useNavigate();
   const [role, setRole] = useState<Role>(initialRole);
+  // Follow in-app navigation between /register and /register?role=provider.
+  useEffect(() => setRole(initialRole), [initialRole]);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

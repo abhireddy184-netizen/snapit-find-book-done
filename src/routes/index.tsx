@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { subscribeToUpdates } from "@/lib/subscribe.functions";
 import {
-  ArrowRight, Camera, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
+  ArrowRight, Briefcase, Camera, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
 } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { Logo } from "@/components/snapit/Logo";

@@ -25,7 +25,7 @@ function RegisterPage() {
       title={role === "provider" ? "Join GetPros as a pro" : "Create your account"}
       subtitle={
         role === "provider"
-          ? "Set up your business profile and start receiving standardized job briefs."
+          ? "Create your account to grow your business — next you'll add your services, area and availability."
           : "Show it. Tell us. Get it fixed. Get started in seconds."
       }
       initialRole={role ?? "customer"}
