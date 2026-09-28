@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { User, Briefcase, Mail, Lock, ArrowRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Logo } from "./Logo";
 import { GradientButton } from "./AppShell";
@@ -28,6 +28,8 @@ export function AuthForm({
 }) {
   const navigate = useNavigate();
   const [role, setRole] = useState<Role>(initialRole);
+  // Follow in-app navigation between /register and /register?role=provider.
+  useEffect(() => setRole(initialRole), [initialRole]);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -229,12 +231,12 @@ function RoleTab({ active, onClick, icon: Icon, label }: { active: boolean; onCl
       type="button"
       onClick={onClick}
       className={cn(
-        "flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all",
+        "flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-2 py-2 text-[13px] font-semibold transition-all min-[400px]:gap-2 min-[400px]:px-3 min-[400px]:text-sm",
         active ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
       )}
     >
-      <Icon className="h-4 w-4" />
-      <span className="truncate">{label}</span>
+      <Icon className="h-4 w-4 shrink-0" />
+      <span className="text-center leading-tight">{label}</span>
     </button>
   );
 }

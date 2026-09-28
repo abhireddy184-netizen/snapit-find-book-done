@@ -236,8 +236,8 @@ function SearchPage() {
                   <Link to="/snap" className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-white shadow-card" style={{ background: "var(--gradient-primary)" }}>
                     Show us the problem <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
-                  <Link to="/provider-interest" className="inline-flex items-center rounded-full border border-border px-4 py-2 text-xs font-semibold hover:bg-muted">
-                    I’m a pro — join GetPros
+                  <Link to="/register" search={{ redirect: undefined, role: "provider" }} className="inline-flex items-center rounded-full border-2 border-primary/70 px-4 py-2 text-xs font-bold text-primary hover:bg-primary/10">
+                    Join as a Pro
                   </Link>
                 </div>
               </div>
