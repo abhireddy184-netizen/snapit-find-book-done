@@ -434,14 +434,15 @@ function SnapPage() {
             </Link>
           </div>
         )}
+        {!analysis && !loading && !image && (
         <div className="pt-2">
-
           <h1 className="text-3xl font-black tracking-tight md:text-4xl">Show GP the problem.</h1>
           <p className="mt-1 text-sm font-semibold text-muted-foreground">
             Show it <span aria-hidden>→</span> AI understands <span aria-hidden>→</span> Get matched <span aria-hidden>→</span> Book
           </p>
           <p className="mt-0.5 text-xs text-muted-foreground">No account needed to start.</p>
         </div>
+        )}
 
         {/* Hidden inputs stay mounted for every state so Retake works from
             the review, error and result screens too. */}
@@ -701,6 +702,13 @@ function SnapPage() {
             serviceLocation={incomingLoc}
           />
 
+        )}
+
+        {/* History is secondary: only after the current result. */}
+        {analysis && !loading && recent.length > 1 && (
+          <div className="mt-8">
+            <RecentDiagnoses entries={recent.slice(1)} />
+          </div>
         )}
       </div>
     </AppShell>
