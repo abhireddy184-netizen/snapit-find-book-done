@@ -36,6 +36,7 @@ export function AuthForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [exists, setExists] = useState(false);
   const [socialBusy, setSocialBusy] = useState<string | null>(null);
 
   async function handleSocial(provider: "google" | "apple") {
@@ -71,6 +72,7 @@ export function AuthForm({
     e.preventDefault();
     setError(null);
     setNotice(null);
+    setExists(false);
 
     if (mode === "register" && fullName.trim().length < 2) {
       setError("Please enter your full name.");
@@ -103,6 +105,12 @@ export function AuthForm({
           },
         });
         if (signUpError) throw signUpError;
+        // Repeat sign-up for an existing email: the auth service returns a
+        // placeholder user with no identities, no session and sends no email.
+        if (!data.session && data.user && (data.user.identities?.length ?? 0) === 0) {
+          setExists(true);
+          return;
+        }
         if (!data.session) {
           setNotice("Account created. Check your email to confirm your address, then log in.");
           return;
@@ -174,6 +182,22 @@ export function AuthForm({
             {error && (
               <div className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-xs font-medium text-destructive">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> <span>{error}</span>
+              </div>
+            )}
+            {exists && (
+              <div role="status" className="rounded-xl border border-primary/30 bg-primary/5 px-3 py-3 text-xs font-medium text-foreground">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>An account with this email already exists. Log in or reset your password.</span>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <Link to="/login" search={{ redirect: redirectTo }} className="flex min-h-11 items-center justify-center rounded-xl bg-primary px-3 text-sm font-semibold text-primary-foreground">
+                    Log in
+                  </Link>
+                  <Link to="/reset-password" className="flex min-h-11 items-center justify-center rounded-xl border border-primary/40 bg-card px-3 text-sm font-semibold text-primary">
+                    Reset password
+                  </Link>
+                </div>
               </div>
             )}
             {notice && (
