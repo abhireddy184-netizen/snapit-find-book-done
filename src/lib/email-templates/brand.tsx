@@ -7,10 +7,10 @@ import { Column, Hr, Img, Link, Row, Section, Text } from '@react-email/componen
  * so all GetPros-controlled emails share one visual identity.
  */
 
-export const SITE_URL = 'https://getperfectboy.com'
+export const SITE_URL = 'https://getpros.ai'
 /** Absolute HTTPS URL — served from the site's /public folder, safe for Gmail / Apple Mail / Outlook. */
 export const LOGO_URL = `${SITE_URL}/icon-512.png`
-export const SUPPORT_EMAIL = 'support@getperfectboy.com'
+export const SUPPORT_EMAIL = 'support@getpros.ai'
 
 export const brand = {
   ink: '#2b1030',

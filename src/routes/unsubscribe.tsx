@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/snapit/AppShell";
 import { unsubscribeFromUpdates } from "@/lib/subscribe.functions";
 
-const SITE_URL = "https://getperfectboy.com";
+const SITE_URL = "https://getpros.ai";
 
 export const Route = createFileRoute("/unsubscribe")({
   validateSearch: (search: Record<string, unknown>) => ({
