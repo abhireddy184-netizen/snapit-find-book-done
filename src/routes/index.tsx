@@ -183,20 +183,14 @@ function ProviderRecruitment() {
           </p>
           <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2.5">
             <Link
-              to="/provider-interest"
+              to="/register"
+              search={{ redirect: undefined, role: "provider" }}
               id="provider-recruitment-cta"
-              data-analytics-id="provider_interest_cta"
+              data-analytics-id="provider_signup_cta"
               data-analytics-location="homepage_provider_section"
               className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-elevated transition-transform hover:scale-[1.01]"
             >
-              Register Interest <ArrowRight className="h-4 w-4" />
-            </Link>
-            <Link
-              to="/register"
-              search={{ redirect: undefined, role: "provider" }}
-              className="text-sm font-semibold text-white/85 underline underline-offset-4 transition-colors hover:text-white"
-            >
-              Join as a Pro
+              Join as a Pro <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
@@ -280,9 +274,10 @@ export function Footer() {
             </li>
             <li>
               <Link
-                to="/provider-interest"
+                to="/register"
+                search={{ redirect: undefined, role: "provider" }}
                 id="footer-for-pros-link"
-                data-analytics-id="provider_interest_cta"
+                data-analytics-id="provider_signup_cta"
                 data-analytics-location="footer"
                 className="hover:text-foreground"
               >
