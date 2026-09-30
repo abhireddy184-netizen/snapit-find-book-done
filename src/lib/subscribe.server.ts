@@ -16,7 +16,7 @@ export function isValidEmail(email: string): boolean {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 }
 
-const SITE_URL = "https://getperfectboy.com";
+const SITE_URL = "https://getpros.ai";
 
 export async function subscribeEmail(rawEmail: string, source: string): Promise<SubscribeOutcome> {
   const email = normalizeEmail(rawEmail);

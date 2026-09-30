@@ -4,7 +4,7 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendTemplateEmail } from "@/lib/email-templates/send-email";
 import { notifyNewLead } from "@/lib/lead-notify.server";
 
-const SITE_URL = "https://getperfectboy.com";
+const SITE_URL = "https://getpros.ai";
 
 export type ProviderInterestInput = {
   fullName: string;
