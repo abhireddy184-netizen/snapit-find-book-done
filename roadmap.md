@@ -7,3 +7,4 @@
 - [x] Central brand config (src/lib/brand.ts); info@getpros.ai as contact + owner alerts; text wordmark in emails
 - [x] Owner alert for new customer/provider accounts
 - [ ] Branded GetPros sign-in emails (blocked: notify.getpros.ai must be set up first)
+- [x] Owner alert for new booking requests
