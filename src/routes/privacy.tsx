@@ -28,7 +28,7 @@ function PrivacyPage() {
           </p>
           <p>
             To request deletion of your account, email{" "}
-            <a className="font-semibold text-primary" href="mailto:privacy@getpros.ai">privacy@getpros.ai</a>.
+            <a className="font-semibold text-primary" href="mailto:info@getpros.ai">info@getpros.ai</a>.
             More detail:{" "}
             <Link to="/legal" className="font-semibold text-primary">Privacy, terms & accessibility</Link>.
           </p>

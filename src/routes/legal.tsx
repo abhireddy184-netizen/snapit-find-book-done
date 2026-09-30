@@ -54,7 +54,7 @@ function LegalPage() {
           </p>
           <p>
             You can request deletion of your account and its job records at any time by emailing{" "}
-            <a className="font-semibold text-primary" href="mailto:privacy@getpros.ai">privacy@getpros.ai</a>.
+            <a className="font-semibold text-primary" href="mailto:info@getpros.ai">info@getpros.ai</a>.
           </p>
         </Section>
 
@@ -91,7 +91,7 @@ function LegalPage() {
           </p>
           <p>
             If something is hard to use, tell us at{" "}
-            <a className="font-semibold text-primary" href="mailto:access@getpros.ai">access@getpros.ai</a>{" "}
+            <a className="font-semibold text-primary" href="mailto:info@getpros.ai">info@getpros.ai</a>{" "}
             and we will fix it and reply.
           </p>
         </Section>

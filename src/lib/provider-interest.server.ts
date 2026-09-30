@@ -1,10 +1,10 @@
+import { SITE_URL } from "@/lib/brand";
 // Server-only: provider interest persistence, confirmation email and the
 // interest -> provider-account -> business-profile continuity link.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendTemplateEmail } from "@/lib/email-templates/send-email";
 import { notifyNewLead } from "@/lib/lead-notify.server";
 
-const SITE_URL = "https://getpros.ai";
 
 export type ProviderInterestInput = {
   fullName: string;

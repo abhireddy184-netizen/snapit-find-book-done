@@ -3,9 +3,11 @@ import { Body, Container, Head, Heading, Html, Preview, Section, Text } from '@r
 import type { TemplateEntry } from './registry'
 import { EmailHeader, brand, emailStyles } from './brand'
 
-export const INTERNAL_LEAD_RECIPIENT = 'reddy.abhinav10@gmail.com'
+import { CONTACT_EMAIL } from '@/lib/brand'
 
-export type LeadType = 'provider' | 'subscriber' | 'early_access'
+export const INTERNAL_LEAD_RECIPIENT = CONTACT_EMAIL
+
+export type LeadType = 'provider' | 'subscriber' | 'early_access' | 'account'
 
 interface Props {
   leadType?: LeadType
@@ -30,6 +32,7 @@ const TYPE_LABEL: Record<LeadType, string> = {
   provider: 'Pro lead (Join as a Pro)',
   subscriber: 'Newsletter subscriber',
   early_access: 'Customer early access',
+  account: 'New account',
 }
 
 export function leadPlace(d: Props): string {
@@ -87,6 +90,7 @@ export const template = {
     const p = d as Props
     if (p.leadType === 'provider') return `New GetPros Pro lead — ${p.service ?? 'Unknown category'} — ${leadPlace(p)}`
     if (p.leadType === 'early_access') return `New GetPros early-access lead — ${p.service ?? 'Unknown service'} — ${leadPlace(p)}`
+    if (p.leadType === 'account') return `New GetPros ${p.service ?? 'account'} — ${p.email ?? 'unknown'}`
     return `New GetPros subscriber — ${p.email ?? 'unknown'}`
   },
   previewData: {

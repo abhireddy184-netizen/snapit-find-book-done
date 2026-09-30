@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PasswordChecklist } from "./PasswordChecklist";
 import { passwordError } from "@/lib/password-policy";
 import { startOAuth } from "@/lib/oauth-intent";
+import { notifyNewAccount } from "@/lib/account-notify.functions";
 import { cn } from "@/lib/utils";
 
 type Role = "customer" | "provider";
@@ -111,6 +112,7 @@ export function AuthForm({
           setExists(true);
           return;
         }
+        if (data.user) void notifyNewAccount({ data: { userId: data.user.id } }).catch(() => {});
         if (!data.session) {
           setNotice("Account created. Check your email to confirm your address, then log in.");
           return;
