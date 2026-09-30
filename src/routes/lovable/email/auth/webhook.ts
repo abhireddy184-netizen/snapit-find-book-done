@@ -9,7 +9,7 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 // Configuration
-const SITE_NAME = "Get Pros AI"
+const SITE_NAME = "GetPros"
 const SENDER_DOMAIN = "notify.getpros.ai"
 const ROOT_DOMAIN = "getpros.ai"
 const FROM_DOMAIN = "getpros.ai"
