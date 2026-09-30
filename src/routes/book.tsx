@@ -4,6 +4,8 @@ import { Check, ChevronLeft, ChevronRight, MapPin, Loader2, ShieldCheck, AlertTr
 import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { notifyNewBooking } from "@/lib/booking-notify.functions";
 import { BOOKING_DRAFT_KEY } from "@/lib/bookings";
 import { catalog, getCategoryBySlug, type MasterCategory } from "@/lib/catalog";
 import { fetchProviderByUserId, isBookable, type PublicProvider } from "@/lib/providers";
@@ -76,6 +78,7 @@ function categoryFor(provider: PublicProvider | null, slug?: string): MasterCate
 
 function BookPage() {
   const navigate = useNavigate();
+  const notifyBooking = useServerFn(notifyNewBooking);
   const { provider: providerParam, job: jobId, service: serviceParam, category: categoryParam } = Route.useSearch();
   const { user, loading: authLoading } = useAuth();
 
@@ -308,6 +311,8 @@ function BookPage() {
       insertError != null &&
       ((insertError as { code?: string }).code === "23505" ||
         /idempotency/i.test(insertError.message));
+
+    if (!insertError) void notifyBooking({ data: { requestKey } }).catch(() => {});
 
     if (insertError && !alreadySent) {
       setSubmitting(false);

@@ -7,7 +7,7 @@ import { CONTACT_EMAIL } from '@/lib/brand'
 
 export const INTERNAL_LEAD_RECIPIENT = CONTACT_EMAIL
 
-export type LeadType = 'provider' | 'subscriber' | 'early_access' | 'account'
+export type LeadType = 'provider' | 'subscriber' | 'early_access' | 'account' | 'booking'
 
 interface Props {
   leadType?: LeadType
@@ -33,6 +33,7 @@ const TYPE_LABEL: Record<LeadType, string> = {
   subscriber: 'Newsletter subscriber',
   early_access: 'Customer early access',
   account: 'New account',
+  booking: 'Booking request',
 }
 
 export function leadPlace(d: Props): string {
@@ -47,7 +48,7 @@ const InternalLeadEmail = (props: Props) => {
     ['Name', props.name],
     ['Email', props.email],
     ['Phone', props.phone],
-    ['Business', props.businessName],
+    [type === 'booking' ? 'Pro' : 'Business', props.businessName],
     ['Service / category', props.service],
     ['City / State', [props.city, props.state].filter(Boolean).join(', ') || null],
     ['ZIP', props.zip],
@@ -90,6 +91,7 @@ export const template = {
     const p = d as Props
     if (p.leadType === 'provider') return `New GetPros Pro lead — ${p.service ?? 'Unknown category'} — ${leadPlace(p)}`
     if (p.leadType === 'early_access') return `New GetPros early-access lead — ${p.service ?? 'Unknown service'} — ${leadPlace(p)}`
+    if (p.leadType === 'booking') return `New GetPros booking request — ${p.service ?? 'Service'} — ${p.email ?? 'unknown'}`
     if (p.leadType === 'account') return `New GetPros ${p.service ?? 'account'} — ${p.email ?? 'unknown'}`
     return `New GetPros subscriber — ${p.email ?? 'unknown'}`
   },
