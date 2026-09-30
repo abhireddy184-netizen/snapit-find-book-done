@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -21,7 +22,6 @@ import { InstallPromptBanner } from "@/components/snapit/InstallPromptBanner";
 
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
 
-const SITE_URL = "https://getpros.ai";
 
 export const Route = createFileRoute("/")({
   head: () => ({

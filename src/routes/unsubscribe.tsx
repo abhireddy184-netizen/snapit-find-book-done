@@ -1,10 +1,10 @@
+import { SITE_URL } from "@/lib/brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/snapit/AppShell";
 import { unsubscribeFromUpdates } from "@/lib/subscribe.functions";
 
-const SITE_URL = "https://getpros.ai";
 
 export const Route = createFileRoute("/unsubscribe")({
   validateSearch: (search: Record<string, unknown>) => ({

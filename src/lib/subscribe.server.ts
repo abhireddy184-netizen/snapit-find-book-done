@@ -1,3 +1,4 @@
+import { SITE_URL } from "@/lib/brand";
 // Server-only: subscription persistence + welcome email delivery.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { sendTemplateEmail } from "@/lib/email-templates/send-email";
@@ -16,7 +17,6 @@ export function isValidEmail(email: string): boolean {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email);
 }
 
-const SITE_URL = "https://getpros.ai";
 
 export async function subscribeEmail(rawEmail: string, source: string): Promise<SubscribeOutcome> {
   const email = normalizeEmail(rawEmail);
