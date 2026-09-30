@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { User, Briefcase, Mail, Lock, ArrowRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Logo } from "./Logo";
 import { GradientButton } from "./AppShell";
@@ -166,11 +166,12 @@ export function AuthForm({
 
           <form onSubmit={handleSubmit} className="mt-6 space-y-3">
             {mode === "register" && (
-              <Field icon={User} placeholder="Full name" value={fullName} onChange={setFullName} autoComplete="name" />
+              <Field icon={User} label="Full name" placeholder="Full name" value={fullName} onChange={setFullName} autoComplete="name" />
             )}
-            <Field icon={Mail} placeholder="Email address" type="email" value={email} onChange={setEmail} autoComplete="email" />
+            <Field icon={Mail} {...(mode === "register" ? { label: "Email address" } : {})} placeholder="Email address" type="email" value={email} onChange={setEmail} autoComplete="email" />
             <Field
               icon={Lock}
+              {...(mode === "register" ? { label: "Password" } : {})}
               placeholder="Password"
               type="password"
               value={password}
@@ -217,6 +218,13 @@ export function AuthForm({
                 </>
               )}
             </GradientButton>
+            {mode === "register" && (
+              <p className="pt-1 text-center text-xs text-muted-foreground">
+                By creating an account, you agree to our{" "}
+                <Link to="/terms" className="font-semibold text-primary hover:underline">Terms of Service</Link> and{" "}
+                <Link to="/privacy" className="font-semibold text-primary hover:underline">Privacy Policy</Link>
+              </p>
+            )}
             {mode === "login" && (
               <p className="pt-1 text-center text-xs">
                 <Link to="/reset-password" className="font-semibold text-primary hover:underline">
@@ -272,6 +280,7 @@ function Field({
   value,
   onChange,
   autoComplete,
+  label,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   placeholder: string;
@@ -279,11 +288,14 @@ function Field({
   value: string;
   onChange: (v: string) => void;
   autoComplete?: string;
+  label?: string;
 }) {
-  return (
-    <label className="flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-3">
+  const id = useId();
+  const box = (
+    <label htmlFor={id} className="flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-3">
       <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
       <input
+        id={id}
         type={type}
         required
         value={value}
@@ -293,6 +305,15 @@ function Field({
         className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
       />
     </label>
+  );
+  if (!label) return box;
+  return (
+    <div className="space-y-1.5">
+      <label htmlFor={id} className="block text-sm font-semibold text-foreground">
+        {label}
+      </label>
+      {box}
+    </div>
   );
 }
 
