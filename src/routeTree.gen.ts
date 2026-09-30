@@ -11,12 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TrustSafetyRouteImport } from './routes/trust-safety'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SnapRouteImport } from './routes/snap'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ProviderInterestRouteImport } from './routes/provider-interest'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PlanRouteImport } from './routes/plan'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LegalRouteImport } from './routes/legal'
@@ -48,6 +50,11 @@ const TrustSafetyRoute = TrustSafetyRouteImport.update({
   path: '/trust-safety',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SnapRoute = SnapRouteImport.update({
   id: '/snap',
   path: '/snap',
@@ -76,6 +83,11 @@ const RegisterRoute = RegisterRouteImport.update({
 const ProviderInterestRoute = ProviderInterestRouteImport.update({
   id: '/provider-interest',
   path: '/provider-interest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlanRoute = PlanRouteImport.update({
@@ -190,12 +202,14 @@ export interface FileRoutesByFullPath {
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/plan': typeof PlanRoute
+  '/privacy': typeof PrivacyRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRouteWithChildren
   '/snap': typeof SnapRoute
+  '/terms': typeof TermsRoute
   '/trust-safety': typeof TrustSafetyRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -219,11 +233,13 @@ export interface FileRoutesByTo {
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/plan': typeof PlanRoute
+  '/privacy': typeof PrivacyRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/snap': typeof SnapRoute
+  '/terms': typeof TermsRoute
   '/trust-safety': typeof TrustSafetyRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -249,12 +265,14 @@ export interface FileRoutesById {
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/plan': typeof PlanRoute
+  '/privacy': typeof PrivacyRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRouteWithChildren
   '/snap': typeof SnapRoute
+  '/terms': typeof TermsRoute
   '/trust-safety': typeof TrustSafetyRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -280,12 +298,14 @@ export interface FileRouteTypes {
     | '/legal'
     | '/login'
     | '/plan'
+    | '/privacy'
     | '/provider-interest'
     | '/register'
     | '/reset-password'
     | '/search'
     | '/services'
     | '/snap'
+    | '/terms'
     | '/trust-safety'
     | '/unsubscribe'
     | '/dashboard'
@@ -309,11 +329,13 @@ export interface FileRouteTypes {
     | '/legal'
     | '/login'
     | '/plan'
+    | '/privacy'
     | '/provider-interest'
     | '/register'
     | '/reset-password'
     | '/search'
     | '/snap'
+    | '/terms'
     | '/trust-safety'
     | '/unsubscribe'
     | '/dashboard'
@@ -338,12 +360,14 @@ export interface FileRouteTypes {
     | '/legal'
     | '/login'
     | '/plan'
+    | '/privacy'
     | '/provider-interest'
     | '/register'
     | '/reset-password'
     | '/search'
     | '/services'
     | '/snap'
+    | '/terms'
     | '/trust-safety'
     | '/unsubscribe'
     | '/_authenticated/dashboard'
@@ -369,12 +393,14 @@ export interface RootRouteChildren {
   LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
   PlanRoute: typeof PlanRoute
+  PrivacyRoute: typeof PrivacyRoute
   ProviderInterestRoute: typeof ProviderInterestRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   ServicesRoute: typeof ServicesRouteWithChildren
   SnapRoute: typeof SnapRoute
+  TermsRoute: typeof TermsRoute
   TrustSafetyRoute: typeof TrustSafetyRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -397,6 +423,13 @@ declare module '@tanstack/react-router' {
       path: '/trust-safety'
       fullPath: '/trust-safety'
       preLoaderRoute: typeof TrustSafetyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/snap': {
@@ -439,6 +472,13 @@ declare module '@tanstack/react-router' {
       path: '/provider-interest'
       fullPath: '/provider-interest'
       preLoaderRoute: typeof ProviderInterestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/plan': {
@@ -627,12 +667,14 @@ const rootRouteChildren: RootRouteChildren = {
   LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
   PlanRoute: PlanRoute,
+  PrivacyRoute: PrivacyRoute,
   ProviderInterestRoute: ProviderInterestRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   ServicesRoute: ServicesRouteWithChildren,
   SnapRoute: SnapRoute,
+  TermsRoute: TermsRoute,
   TrustSafetyRoute: TrustSafetyRoute,
   UnsubscribeRoute: UnsubscribeRoute,
   AuthCallbackRoute: AuthCallbackRoute,
