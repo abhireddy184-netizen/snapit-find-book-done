@@ -1,36 +1,46 @@
-# Audit: old "GetPerfectBoy" links in sign-in emails
+# GetPerfectBoy audit (read-only findings) and removal plan
 
-## Root cause (most likely)
+## Findings — every remaining reference
 
-1. **The sign-in service's main website address (Site URL) is still `https://getperfectboy.com`.** The sign-up form asks for the confirmation link to return to `<current site>/login`. When `getpros.ai` isn't on the allowed-return-address list, the sign-in service quietly uses the main address instead. That sends people to getperfectboy.com.
-2. **`getperfectboy.com` (without www) isn't connected to this project.** Only `www.getperfectboy.com`, `getpros.ai` and `www.getpros.ai` are connected. The address without www has no security certificate here, so the browser shows ERR_SSL_PROTOCOL_ERROR.
-3. **Sign-up emails use the standard built-in design.** No custom sign-in email handler exists in the code, so the project's own email files can't fix the link. The fix is the sign-in settings.
+**Code**
+- `src/lib/email-templates/brand.tsx`
+  - `SITE_URL = 'https://getperfectboy.com'` is used for the header/footer links in every email: welcome, Join as a Pro and internal lead alerts.
+  - `LOGO_URL = 'https://getperfectboy.com/icon-512.png'`
+  - `SUPPORT_EMAIL = 'support@getperfectboy.com'` appears in the email footer.
+- `src/lib/email-templates/send-email.ts`: `SENDER_DOMAIN` and `FROM_DOMAIN` are both `notify.getperfectboy.com`. So the From address is `GetPros <noreply@notify.getperfectboy.com>`.
+- `src/lib/subscribe.server.ts:19`: `SITE_URL = "https://getperfectboy.com"` supplies the welcome email link.
+- `src/lib/provider-interest.server.ts:7`: `SITE_URL = "https://getperfectboy.com"` supplies the Join as a Pro confirmation link.
+- `src/routes/unsubscribe.tsx:7`: `SITE_URL = "https://getperfectboy.com"` sets the canonical link for /unsubscribe.
+- `src/routes/privacy.tsx:31`: `privacy@getperfectboy.com`
+- `src/routes/legal.tsx:57`: `privacy@getperfectboy.com`
+- `src/routes/legal.tsx:94`: `access@getperfectboy.com`
+- `docs/auth-email-template.html`: an unused old design file. It has the GetPerfectBoy name, logo, links and support@getperfectboy.com.
+- No old-brand mentions in `public/` (icons, manifest). Canonical links on the home page and /trust-safety already use getpros.ai.
 
-I couldn't read the sign-in settings directly. Step 1 confirms them before anything changes.
+**Sign-in emails and redirects**
+- The project has no custom sign-in email design. Sign-up confirmation and password-reset emails use the built-in defaults.
+- In code, the links return to the current site: `/login` after sign-up, `/reset-password` for resets, `/auth/callback` for Google/Apple.
+- A confirmation link opening getperfectboy.com almost certainly means the sign-in service's Site URL, or its allowed return addresses, still points at getperfectboy.com. The service falls back to the Site URL when getpros.ai isn't allowed. This setting isn't visible in the code and must be confirmed in the sign-in settings.
+- The certificate error happens because `getperfectboy.com` (without www) isn't connected to this project.
 
-## What must change
+**Connected domains**
+- `getpros.ai`: active, primary.
+- `www.getpros.ai`: active, redirects to getpros.ai.
+- `www.getperfectboy.com`: active, redirects to getpros.ai.
 
-**Sign-in settings (Lovable Cloud → Users → Authentication settings)**
-- Site URL: `https://getpros.ai`
-- Allowed return addresses: `https://getpros.ai/**` and `https://www.getpros.ai/**`, plus the preview address. Remove the getperfectboy entries.
+**Email sender domain**
+- Configured and verified: `notify.getperfectboy.com`.
+- `notify.getpros.ai`: not set up. No GetPros sender domain exists yet.
+- `support@getpros.ai`, or any `@getpros.ai` address: not present anywhere in the project.
 
-**Code files that still point to the old brand/domain**
-- `src/lib/email-templates/brand.tsx`: the website address, the logo address and support@getperfectboy.com. Every email template uses these.
-- `src/lib/subscribe.server.ts`: website address in the newsletter welcome email.
-- `src/lib/provider-interest.server.ts`: website address in the Join as a Pro confirmation.
-- `src/routes/unsubscribe.tsx`: page address.
-- `src/lib/email-templates/send-email.ts`: sender domain `notify.getperfectboy.com`. Moving to `notify.getpros.ai` needs a new email domain set up and verified first. Until then, keep the old one so emails keep sending.
-- `src/routes/privacy.tsx` and `src/routes/legal.tsx`: privacy@ and access@ getperfectboy.com. These need real getpros.ai mailboxes from you.
-- `docs/auth-email-template.html`: an old unused design file. Delete or rebrand it.
+## Removal steps (after approval)
+1. Set up `notify.getpros.ai` as the email sender domain. You'll need to add the DNS records it shows at your getpros.ai domain provider.
+2. After it's verified, switch the sender to `notify.getpros.ai` and set up branded GetPros sign-in emails.
+3. Change the sign-in Site URL to `https://getpros.ai` and allow `https://getpros.ai/**` and `https://www.getpros.ai/**`.
+4. Replace every getperfectboy.com website link and logo link in the files above with `https://getpros.ai`.
+5. Replace the support@, privacy@ and access@ addresses with the getpros.ai addresses you choose. Delete the unused old design file.
+6. Optional: disconnect `www.getperfectboy.com` and remove the old sender domain once nothing uses it.
+7. Test: sign up with a new email and confirm that the email and its link both use getpros.ai.
 
-**Already correct:** sign-up, password reset and Google/Apple sign-in all use the current site address in code. The home page uses getpros.ai.
-
-## Steps once approved
-1. Read the current sign-in settings to confirm the Site URL.
-2. Update the Site URL and the allowed return addresses.
-3. Replace getperfectboy.com with getpros.ai in the code files above. Keep the sender domain until a getpros.ai email domain is verified.
-4. Optional: set up branded sign-in emails that say GetPros.
-5. Test: sign up with a new email. The confirmation link should open getpros.ai/login.
-
-## Questions for you
-- Which getpros.ai addresses should replace support@, privacy@ and access@?
+## Needs your input
+- Which getpros.ai mailboxes should be used for support, privacy and accessibility? Do they already receive mail?
