@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { createAuthEmailHandler } from '@lovable.dev/email-js'
 import { createFileRoute } from '@tanstack/react-router'
+import { EMAIL_FROM_DOMAIN, EMAIL_SENDER_DOMAIN, SENDER_NAME, SITE_URL as BRAND_SITE_URL } from '@/lib/brand'
 import { SignupEmail } from '@/lib/email-templates/signup'
 import { InviteEmail } from '@/lib/email-templates/invite'
 import { MagicLinkEmail } from '@/lib/email-templates/magic-link'
@@ -9,11 +10,11 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 // Configuration
-const SITE_NAME = "GetPros"
-const SENDER_DOMAIN = "notify.getpros.ai"
-const ROOT_DOMAIN = "getpros.ai"
-const FROM_DOMAIN = "getpros.ai"
-const SITE_URL = `https://${ROOT_DOMAIN}`
+const SITE_NAME = SENDER_NAME
+const SENDER_DOMAIN = EMAIL_SENDER_DOMAIN
+// Verified sending subdomain; never the old domain.
+const FROM_DOMAIN = EMAIL_FROM_DOMAIN
+const SITE_URL = BRAND_SITE_URL
 
 // The SDK handler owns verification, dispatch, and retry semantics; this file
 // owns only the email decisions: subjects, templates, and per-type props.
