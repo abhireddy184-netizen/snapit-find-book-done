@@ -309,6 +309,8 @@ function BookPage() {
       ((insertError as { code?: string }).code === "23505" ||
         /idempotency/i.test(insertError.message));
 
+    if (!insertError) void notifyBooking({ data: { requestKey } }).catch(() => {});
+
     if (insertError && !alreadySent) {
       setSubmitting(false);
       // Someone else may have taken the slot while this form was open.
