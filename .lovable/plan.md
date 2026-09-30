@@ -1,24 +1,50 @@
-# Findings: "confirmation email sent" but no email and no pro setup (no code changed)
+# Read-only audit: forms, data, emails (no changes made)
 
-## What actually happened in today's test
-- The email used, reddy.abhinav10@gmail.com, **already has an account** (created and confirmed 26 Aug 2026, already a Service Provider, last logged in 26 Aug).
-- Today's sign-up (01:20 UTC) was recorded by the sign-in service as a **"repeated signup"**. No new account and no new profile were created, and no email was sent.
-- Right after, two log-in attempts (01:21) failed with "Invalid login credentials", so the password typed doesn't match the one on the existing account.
-- No other accounts were created in the last day.
+## 1. FORMS
+| Form | Page |
+|---|---|
+| Sign up (Customer / Service Provider) + Google/Apple | /register |
+| Log in + Google/Apple | /login |
+| Forgot / reset password | /reset-password |
+| Join as a Pro (4-step interest form) | /provider-interest |
+| Newsletter email signup | Home page footer (/) |
+| Customer early access (shown when an area has no pros) | /search, /snap result, home |
+| Service request / booking | /book |
+| Pro business profile setup | /provider-dashboard (signed in) |
+| Show GP (photo/voice/text) request box | / and /snap - not saved as a lead; it starts AI matching |
+| Search box | /search - navigation only, saves nothing |
 
-## Root cause
-1. **Already-registered email reproduces this exactly.** For privacy, the sign-in service answers a repeat sign-up as if it worked but sends nothing, so it doesn't reveal which emails exist. Our sign-up form sees "no session yet" and shows "Account created. Check your email to confirm…". That message is wrong in this case.
-2. **The pro setup never showed** because nobody got signed in: no new account, no confirmation link, and the log-in failed. The pro setup is on the pro dashboard, which only opens after log-in.
-3. **This account still has no business profile.** It is marked as a pro but has no services, area or availability saved. So after a successful log-in (correct password, or "Forgot your password?") it would go to the pro dashboard, where that setup lives.
+## 2. DATA
+All data goes to this project's own Lovable Cloud database. No third-party form services.
+- Sign up / log in: built-in accounts + `profiles` table
+- Join as a Pro: `provider_interest`
+- Newsletter: `subscribers`
+- Early access: `early_access`
+- Booking: `bookings` and `service_requests`
+- Pro profile: `provider_profiles`, `provider_services`, `provider_availability`, `provider_time_off`
 
-## Not the cause
-- Email confirmation is working normally for new emails (this account was confirmed in August). The missing email here comes from the repeat sign-up behavior, not from broken email sending.
+All tables used: profiles, provider_interest, subscribers, early_access, bookings, service_requests, provider_quotes, job_documents, provider_profiles, provider_services, provider_availability, provider_time_off (plus role table used by admin checks).
 
-## Suggested fixes (for approval, not done yet)
-- When sign-up returns no session and the account has no identities (the sign-in service's repeat-signup signal), show "An account with this email already exists — log in or reset your password" with both links, instead of "check your email".
-- Make the pro dashboard open straight into the business setup when a pro has no business profile yet (check this in a test first).
-- Test with a brand-new email: a real confirmation email arrives → the link leads to log-in → the pro dashboard setup appears.
+## 3. USER EMAILS
+Service: Lovable's built-in email sending. Not Resend; Resend isn't used anywhere.
+From address: `GetPros <noreply@notify.getperfectboy.com>`
+- Newsletter: "welcome" email sent to a new or returning subscriber
+- Join as a Pro: "provider-interest" confirmation sent to the pro
+- Sign up: account confirmation email, and password reset email from /reset-password. These are the standard built-in account emails. There's no custom template in the project for them.
+- Early access: no email to the user
+- Booking: no email to the customer or the pro
+- Pro profile setup: no email
 
-## To test now without code changes
-- Use "Forgot your password?" for reddy.abhinav10@gmail.com, then log in. You should land on the pro dashboard with the business setup.
-- Or sign up as a Service Provider with an email that has never been used.
+## 4. OWNER NOTIFICATIONS
+Sent to exactly one address: **reddy.abhinav10@gmail.com**. Reply-To is the lead's own email.
+- Join as a Pro: yes, for new leads only (repeats are skipped)
+- Newsletter: yes, for new and returning subscribers
+- Early access: yes, the first time an email signs up for a given service
+- Sign up (new accounts): **no**
+- Bookings / service requests: **no**
+- Pro profile setup: **no**
+
+## 5. LIVE DOMAIN
+**Yes.** This project is connected to getpros.ai, www.getpros.ai and www.getperfectboy.com.
+
+No code was changed. Approving this only acknowledges the report.
