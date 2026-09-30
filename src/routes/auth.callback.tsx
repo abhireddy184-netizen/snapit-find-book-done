@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Loader2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { clearIntent, readIntent, reconcileProfile } from "@/lib/oauth-intent";
+import { notifyNewAccount } from "@/lib/account-notify.functions";
 
 export const Route = createFileRoute("/auth/callback")({
   ssr: false,
@@ -38,6 +39,7 @@ function CallbackPage() {
       try {
         const intent = readIntent();
         const role = await reconcileProfile(userId, intent);
+        void notifyNewAccount({ data: { userId } }).catch(() => {});
         clearIntent();
         if (intent?.redirect) {
           window.location.replace(intent.redirect);
