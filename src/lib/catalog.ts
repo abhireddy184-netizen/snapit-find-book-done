@@ -170,6 +170,7 @@ export const catalog: MasterCategory[] = [
       s("shower-tub-plumbing", "Shower & Tub Plumbing", "Valves, diverters, drains and pressure issues.", 150, 700, { licensed: true }),
       s("sump-pump-service", "Sump Pump Service", "Install, repair or test your sump pump.", 220, 900, { licensed: true }),
       s("water-filtration", "Water Filtration & Softeners", "Whole-home filtration and softener installs.", 350, 2500, { licensed: true }),
+      s("sewer-camera-inspection", "Sewer Line Camera Inspection", "Video inspection to find roots, clogs and breaks in the main line.", 150, 500, { licensed: true, cues: ["sewer", "main line", "backup"] }),
     ],
   },
   {
@@ -186,6 +187,8 @@ export const catalog: MasterCategory[] = [
       s("outdoor-lighting", "Outdoor & Landscape Lighting", "Path, security and accent lighting.", 250, 1500, { licensed: true }),
       s("generator-installation", "Backup Generator Setup", "Standby and portable generator wiring.", 800, 6000, { licensed: true }),
       s("electrical-safety-inspection", "Electrical Safety Inspection", "Whole-home check with a written report.", 130, 380, { licensed: true }),
+      s("whole-home-surge-protector", "Whole-Home Surge Protector Installation", "Panel-mounted surge protection for the whole house.", 250, 750, { licensed: true, cues: ["surge", "power spike"] }),
+      s("smoke-co-detector-installation", "Smoke & CO Detector Installation", "Install or replace smoke and carbon monoxide alarms.", 90, 400, { cues: ["smoke detector", "carbon monoxide", "chirping"] }),
     ],
   },
   {
@@ -200,6 +203,7 @@ export const catalog: MasterCategory[] = [
       s("duct-cleaning", "Duct Cleaning & Sealing", "Improve airflow and cut dust.", 300, 900 ),
       s("mini-split-installation", "Mini-Split Installation", "Ductless heating and cooling for any room.", 1800, 5500, { licensed: true }),
       s("air-quality", "Air Quality & Filtration", "Purifiers, humidifiers and filter upgrades.", 180, 1200 ),
+      s("heat-pump-service", "Heat Pump Repair & Service", "Heat pumps not heating, cooling or defrosting properly.", 150, 1100, { licensed: true, cues: ["heat pump"] }),
     ],
   },
   {
@@ -217,6 +221,7 @@ export const catalog: MasterCategory[] = [
       s("tv-setup", "TV Setup & Troubleshooting", "Inputs, sound bars, streaming boxes and signal problems sorted.", 90, 280, { cues: ["tv setup", "hdmi", "signal"] }),
       s("appliance-installation", "Appliance Installation", "Delivery-day hookup for any major appliance.", 90, 350, { featured: true }),
       s("appliance-diagnosis", "Appliance Diagnosis Visit", "One visit, clear answer on repair vs replace.", 79, 160 ),
+      s("ice-maker-repair", "Ice Maker Repair", "No ice, slow ice or leaking ice makers fixed.", 110, 400, { cues: ["ice maker", "ice"] }),
     ],
   },
   {
@@ -231,6 +236,7 @@ export const catalog: MasterCategory[] = [
       s("kitchen-deep-cleaning", "Kitchen Deep Cleaning", "Degrease, appliances in and out, cabinets.", 110, 320, { cues: ["kitchen"] }),
       s("post-construction-cleaning", "Post-Construction Cleaning", "Dust and debris after renovation.", 300, 900 ),
       s("recurring-cleaning", "Recurring Cleaning Plan", "Weekly, bi-weekly or monthly visits.", 90, 220, { unit: "per visit" }),
+      s("vacation-rental-cleaning", "Vacation Rental / Airbnb Cleaning", "Turnover cleans between guests, linens reset.", 90, 280, { unit: "per turnover" }),
     ],
   },
   {
@@ -256,6 +262,8 @@ export const catalog: MasterCategory[] = [
       s("weatherproofing", "Weatherstripping & Draft Sealing", "Cut drafts around doors and windows.", 90, 350 ),
       s("childproofing", "Childproofing & Safety Installs", "Gates, anchors, latches and guards.", 90, 300 ),
       s("small-repairs", "Small Repairs & Odd Jobs", "The little things you keep putting off.", 80, 250 ),
+      s("mailbox-installation", "Mailbox Installation & Repair", "New post, replacement box or a leaning mailbox fixed.", 90, 350, { cues: ["mailbox"] }),
+      s("grab-bar-installation", "Grab Bar & Accessibility Installation", "Grab bars, handrails and aging-in-place safety installs.", 100, 450, { cues: ["grab bar", "handrail"] }),
     ],
   },
   {
@@ -285,6 +293,7 @@ export const catalog: MasterCategory[] = [
       s("recliner-mechanism-repair", "Recliner Mechanism Repair", "Levers, cables and motors restored.", 120, 500 ),
       s("wood-furniture-repair", "Wood Furniture Repair", "Scratches, wobbles and broken legs.", 110, 600 ),
       s("furniture-disassembly", "Furniture Disassembly & Moving Prep", "Break down safely before a move.", 80, 320 ),
+      s("exercise-equipment-assembly", "Exercise Equipment Assembly", "Treadmills, bikes, rowers and home gyms assembled.", 100, 350, { cues: ["treadmill", "exercise bike", "home gym"] }),
     ],
   },
   {
@@ -310,6 +319,7 @@ export const catalog: MasterCategory[] = [
       s("wallpaper-installation", "Wallpaper Installation", "Feature walls and full rooms.", 300, 1800, { cues: ["wallpaper"] }),
       s("wallpaper-removal", "Wallpaper Removal", "Stripped back and wall prepped for paint.", 250, 1200 ),
       s("wall-paneling", "Paneling, Wainscoting & Trim", "Board and batten, wainscot and molding.", 400, 2500 ),
+      s("popcorn-ceiling-removal", "Popcorn Ceiling Removal", "Scrape, smooth and refinish textured ceilings.", 400, 2500, { cues: ["popcorn ceiling", "textured ceiling"] }),
     ],
   },
   {
@@ -334,6 +344,7 @@ export const catalog: MasterCategory[] = [
       s("floor-repair", "Floor Repair", "Squeaks, gaps, water damage and boards.", 180, 900, { cues: ["floor", "squeak"] }),
       s("carpet-installation", "Carpet Installation", "Rooms, stairs and padding.", 500, 3000 ),
       s("baseboard-installation", "Baseboard & Molding Installation", "Clean edges after new flooring.", 250, 1500 ),
+      s("subfloor-repair-leveling", "Subfloor Repair & Floor Leveling", "Fix soft spots, squeaks and uneven floors before new flooring.", 300, 2500, { cues: ["soft floor", "uneven floor", "squeaky floor"] }),
     ],
   },
   {
@@ -373,6 +384,7 @@ export const catalog: MasterCategory[] = [
       s("heavy-item-moving", "Heavy Item Moving", "Safes, pianos, treadmills and appliances.", 150, 700, { cues: ["piano", "safe", "appliance"] }),
       s("in-home-rearranging", "In-Home Furniture Rearranging", "Move it room to room, damage-free.", 90, 350 ),
       s("storage-runs", "Storage Unit Runs", "Load-out and drop-off at your unit.", 120, 600 ),
+      s("office-moving", "Office & Small-Business Moving", "Desks, files and equipment moved with minimal downtime.", 400, 2500 ),
     ],
   },
   {
@@ -384,6 +396,7 @@ export const catalog: MasterCategory[] = [
       s("garage-cleanout", "Garage & Basement Cleanout", "Reclaim the space you lost.", 250, 900 ),
       s("appliance-disposal", "Appliance & E-Waste Disposal", "Responsibly recycled.", 90, 300 ),
       s("yard-debris-hauling", "Yard Debris Hauling", "Branches, soil and green waste.", 120, 500 ),
+      s("construction-debris-removal", "Construction Debris Removal", "Drywall, lumber, tile and renovation waste hauled away.", 200, 900, { cues: ["debris", "renovation waste"] }),
     ],
   },
   {
@@ -399,6 +412,7 @@ export const catalog: MasterCategory[] = [
       s("irrigation-service", "Sprinkler & Irrigation Service", "Heads, valves, timers and leaks.", 120, 700, { cues: ["sprinkler"] }),
       s("tree-trimming", "Tree Trimming (small)", "Low limbs and small trees.", 150, 900 ),
       s("sod-installation", "Sod & Lawn Installation", "New lawn, properly prepped.", 500, 4000 ),
+      s("lawn-aeration-overseeding", "Lawn Aeration & Overseeding", "Core aeration and fresh seed for a thicker lawn.", 120, 450, { cues: ["thin lawn", "bare patches"] }),
     ],
   },
   {
@@ -410,6 +424,7 @@ export const catalog: MasterCategory[] = [
       s("roof-cleaning", "Roof & Moss Treatment", "Soft-wash treatment for shingles.", 300, 1200 ),
       s("window-washing", "Window Washing", "Interior and exterior glass.", 120, 450 ),
       s("deck-restoration", "Deck Cleaning & Sealing", "Wash, sand and reseal.", 300, 1500 ),
+      s("solar-panel-cleaning", "Solar Panel Cleaning", "Safe rinse and clean to restore panel output.", 120, 400, { cues: ["solar panels"] }),
     ],
   },
   {
@@ -422,6 +437,7 @@ export const catalog: MasterCategory[] = [
       s("patio-pavers", "Patio & Paver Work", "Pavers, gravel and small hardscape.", 800, 6000 ),
       s("gate-installation", "Gate Installation & Adjustment", "Hardware, hinges and alignment.", 150, 900 ),
       s("shed-assembly", "Shed Assembly", "Kit sheds built on your pad.", 300, 1600 ),
+      s("pergola-gazebo-assembly", "Pergola & Gazebo Assembly", "Kit pergolas, gazebos and canopies assembled and anchored.", 300, 1500, { cues: ["pergola", "gazebo"] }),
     ],
   },
   {
@@ -432,6 +448,7 @@ export const catalog: MasterCategory[] = [
       s("garage-opener-installation", "Garage Opener Installation", "Smart openers installed and paired.", 200, 700 ),
       s("garage-organization", "Garage Storage & Organization", "Racks, shelving and overhead storage.", 250, 1500 ),
       s("garage-floor-coating", "Garage Floor Coating", "Epoxy and polyaspartic finishes.", 800, 4000 ),
+      s("garage-door-installation", "Garage Door Installation", "New garage door supplied or fitted, old door removed.", 900, 4000, { cues: ["new garage door"] }),
     ],
   },
   {
@@ -475,6 +492,7 @@ export const catalog: MasterCategory[] = [
       s("pool-equipment-repair", "Pool Equipment Repair", "Pumps, filters and heaters.", 180, 1200, { licensed: true }),
       s("pool-opening-closing", "Pool Opening & Closing", "Seasonal service.", 200, 700, { licensed: true }),
       s("hot-tub-service", "Hot Tub & Spa Service", "Drain, clean, refill and diagnose.", 150, 700, { licensed: true }),
+      s("pool-leak-detection", "Pool Leak Detection", "Pressure and dye testing to find pool and spa leaks.", 200, 650, { licensed: true, cues: ["pool losing water"] }),
     ],
   },
   {
