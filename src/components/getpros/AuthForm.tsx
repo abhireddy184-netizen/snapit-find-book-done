@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PasswordChecklist } from "./PasswordChecklist";
 import { passwordError } from "@/lib/password-policy";
 import { usePwnedCheck, isWeakPasswordError, LEAKED_PASSWORD_MESSAGE } from "@/lib/use-pwned-check";
-import { isPasswordValid } from "@/lib/password-policy";
+import { SITE_URL } from "@/lib/brand";
 import { startOAuth } from "@/lib/oauth-intent";
 import { notifyNewAccount } from "@/lib/account-notify.functions";
 import { cn } from "@/lib/utils";
@@ -48,7 +48,6 @@ export function AuthForm({
   const [serverLeaked, setServerLeaked] = useState<string | null>(null);
   const pwnedStatus = usePwnedCheck(mode === "register" ? password : "");
   const breach = serverLeaked !== null && serverLeaked === password ? "leaked" : pwnedStatus;
-  const passwordReady = mode !== "register" || (isPasswordValid(password) && breach === "ok");
   const [conflict, setConflict] = useState<Role | null>(null);
   useEffect(() => {
     if (mode !== "register") return;
