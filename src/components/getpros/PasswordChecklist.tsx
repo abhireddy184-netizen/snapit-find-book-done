@@ -1,9 +1,11 @@
 import { Check, Circle } from "lucide-react";
 import { passwordChecklist } from "@/lib/password-policy";
+import type { BreachStatus } from "@/lib/use-pwned-check";
 
 /** Live, accessible password requirement checklist (never colour-only). */
-export function PasswordChecklist({ value }: { value: string }) {
-  const items = passwordChecklist(value);
+export function PasswordChecklist({ value, breach }: { value: string; breach?: BreachStatus }) {
+  const items = passwordChecklist(value).map(({ id, label, met }) => ({ id, label, met }));
+  if (breach) items.push({ id: "breach", label: "Not a commonly leaked password", met: breach === "ok" });
   const metCount = items.filter((i) => i.met).length;
 
   return (

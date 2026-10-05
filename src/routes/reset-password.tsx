@@ -4,6 +4,7 @@ import { AlertCircle, ArrowRight, CheckCircle2, Loader2, Lock, Mail } from "luci
 import { GradientButton } from "@/components/getpros/AppShell";
 import { Logo } from "@/components/getpros/Logo";
 import { supabase } from "@/integrations/supabase/client";
+import { usePwnedCheck, isWeakPasswordError, LEAKED_PASSWORD_MESSAGE } from "@/lib/use-pwned-check";
 import { PasswordChecklist } from "@/components/getpros/PasswordChecklist";
 import { passwordError } from "@/lib/password-policy";
 
@@ -69,6 +70,10 @@ function ResetPasswordPage() {
     }
   }
 
+  const pwnedStatus = usePwnedCheck(password);
+  const [serverLeaked, setServerLeaked] = useState<string | null>(null);
+  const breach = serverLeaked !== null && serverLeaked === password ? "leaked" : pwnedStatus;
+
   async function updatePassword(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
@@ -78,6 +83,10 @@ function ResetPasswordPage() {
       setError(pwIssue);
       return;
     }
+    if (breach !== "ok") {
+      setError(breach === "leaked" ? LEAKED_PASSWORD_MESSAGE : "Checking your password — try again in a moment.");
+      return;
+    }
     if (password !== confirm) {
       setError("Both passwords must match.");
       return;
@@ -85,7 +94,14 @@ function ResetPasswordPage() {
     setBusy(true);
     try {
       const { error: err } = await supabase.auth.updateUser({ password });
-      if (err) throw err;
+      if (err) {
+        if (isWeakPasswordError(err)) {
+          setServerLeaked(password);
+          setError(LEAKED_PASSWORD_MESSAGE);
+          return;
+        }
+        throw err;
+      }
       setNotice("Password updated. Taking you to your dashboard…");
       await navigate({ to: "/dashboard" });
     } catch (err) {
@@ -119,7 +135,7 @@ function ResetPasswordPage() {
             <>
               <ResetField icon={Lock} type="password" placeholder="New password" value={password} onChange={setPassword} autoComplete="new-password" />
               <ResetField icon={Lock} type="password" placeholder="Confirm new password" value={confirm} onChange={setConfirm} autoComplete="new-password" />
-              <PasswordChecklist value={password} />
+              <PasswordChecklist value={password} breach={breach} />
             </>
           )}
 

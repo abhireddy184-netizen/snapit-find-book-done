@@ -7,6 +7,8 @@ import { GradientButton } from "./AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordChecklist } from "./PasswordChecklist";
 import { passwordError } from "@/lib/password-policy";
+import { usePwnedCheck, isWeakPasswordError, LEAKED_PASSWORD_MESSAGE } from "@/lib/use-pwned-check";
+import { isPasswordValid } from "@/lib/password-policy";
 import { startOAuth } from "@/lib/oauth-intent";
 import { notifyNewAccount } from "@/lib/account-notify.functions";
 import { cn } from "@/lib/utils";
@@ -41,6 +43,10 @@ export function AuthForm({
   const [notice, setNotice] = useState<string | null>(null);
   const [exists, setExists] = useState(false);
   const [socialBusy, setSocialBusy] = useState<string | null>(null);
+  const [serverLeaked, setServerLeaked] = useState<string | null>(null);
+  const pwnedStatus = usePwnedCheck(mode === "register" ? password : "");
+  const breach = serverLeaked !== null && serverLeaked === password ? "leaked" : pwnedStatus;
+  const passwordReady = mode !== "register" || (isPasswordValid(password) && breach === "ok");
   const [conflict, setConflict] = useState<Role | null>(null);
   useEffect(() => {
     if (mode !== "register") return;
@@ -101,6 +107,7 @@ export function AuthForm({
         const pwIssue = passwordError(password);
         if (pwIssue) fe.password = pwIssue;
       }
+      if (!fe.password && breach === "leaked") fe.password = LEAKED_PASSWORD_MESSAGE;
       if (fe.name || fe.email || fe.password) {
         setFieldErrors(fe);
         return;
@@ -137,7 +144,14 @@ export function AuthForm({
             data: { full_name: fullName.trim(), role },
           },
         });
-        if (signUpError) throw signUpError;
+        if (signUpError) {
+          if (isWeakPasswordError(signUpError)) {
+            setServerLeaked(password);
+            setFieldErrors({ password: LEAKED_PASSWORD_MESSAGE });
+            return;
+          }
+          throw signUpError;
+        }
         // Repeat sign-up for an existing email: the auth service returns a
         // placeholder user with no identities, no session and sends no email.
         if (!data.session && data.user && (data.user.identities?.length ?? 0) === 0) {
@@ -213,7 +227,7 @@ export function AuthForm({
               autoComplete={mode === "login" ? "current-password" : "new-password"}
               error={fieldErrors.password}
             />
-            {mode === "register" && <PasswordChecklist value={password} />}
+            {mode === "register" && <PasswordChecklist value={password} breach={breach} />}
 
             {error && (
               <div className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-xs font-medium text-destructive">
@@ -262,7 +276,7 @@ export function AuthForm({
               </div>
             )}
 
-            <GradientButton type="submit" disabled={busy} className="mt-2 w-full">
+            <GradientButton type="submit" disabled={busy || !passwordReady} className="mt-2 w-full">
               {busy ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" /> {mode === "login" ? "Logging in…" : "Creating account…"}
