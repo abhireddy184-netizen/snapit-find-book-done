@@ -22,6 +22,7 @@ export function AuthForm({
   footer,
   redirectTo,
   initialRole = "customer",
+  topNotice,
 }: {
   mode: "login" | "register";
   title: string;
@@ -29,6 +30,7 @@ export function AuthForm({
   footer: ReactNode;
   redirectTo?: string | undefined;
   initialRole?: Role;
+  topNotice?: string | undefined;
 }) {
   const navigate = useNavigate();
   const [role, setRole] = useState<Role>(initialRole);
@@ -80,11 +82,17 @@ export function AuthForm({
 
 
   async function goAfterAuth(userId: string) {
-    if (redirectTo && redirectTo.startsWith("/")) {
-      window.location.assign(redirectTo);
-      return;
-    }
     const { data } = await supabase.from("profiles").select("role").eq("id", userId).maybeSingle();
+    if (redirectTo && redirectTo.startsWith("/") && !redirectTo.startsWith("//")) {
+      const path = redirectTo.split(/[?#]/)[0];
+      const mismatch =
+        (path === "/provider-dashboard" && data?.role !== "provider") ||
+        (path === "/dashboard" && data?.role === "provider");
+      if (!mismatch) {
+        window.location.assign(redirectTo);
+        return;
+      }
+    }
     const target = data?.role === "provider" ? "/provider-dashboard" : "/dashboard";
     await navigate({ to: target });
   }
@@ -103,13 +111,13 @@ export function AuthForm({
       if (!email.trim()) fe.email = "Please enter your email address.";
       else if (!/^\S+@\S+\.\S+$/.test(email)) fe.email = "Please enter a valid email address.";
       if (!password) fe.password = "Please enter a password.";
-      else {
-        const pwIssue = passwordError(password);
-        if (pwIssue) fe.password = pwIssue;
-      }
+      else if (passwordError(password)) fe.password = "Password doesn't meet all requirements yet.";
       if (!fe.password && breach === "leaked") fe.password = LEAKED_PASSWORD_MESSAGE;
+      else if (!fe.password && breach !== "ok") fe.password = "Password doesn't meet all requirements yet.";
       if (fe.name || fe.email || fe.password) {
         setFieldErrors(fe);
+        const formEl = (e.target as HTMLElement).closest("form");
+        setTimeout(() => formEl?.querySelector<HTMLInputElement>('input[aria-invalid="true"]')?.focus(), 0);
         return;
       }
     }
@@ -140,7 +148,7 @@ export function AuthForm({
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/login`,
+            emailRedirectTo: `${SITE_URL}/login?confirmed=1`,
             data: { full_name: fullName.trim(), role },
           },
         });
@@ -212,6 +220,11 @@ export function AuthForm({
             </>
           )}
 
+          {topNotice && (
+            <div className="mt-6 flex items-start gap-2 rounded-xl border border-mint/40 bg-mint/20 px-3 py-2.5 text-xs font-medium text-mint-ink">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> <span>{topNotice}</span>
+            </div>
+          )}
           <form onSubmit={handleSubmit} noValidate={mode === "register"} className="mt-6 space-y-3">
             {mode === "register" && (
               <Field icon={User} label="Full name" placeholder="Full name" value={fullName} onChange={(v) => { setFullName(v); if (fieldErrors.name) setFieldErrors((f) => ({ ...f, name: undefined })); }} autoComplete="name" error={fieldErrors.name} />
@@ -276,7 +289,7 @@ export function AuthForm({
               </div>
             )}
 
-            <GradientButton type="submit" disabled={busy || !passwordReady} className="mt-2 w-full">
+            <GradientButton type="submit" disabled={busy} className="mt-2 w-full">
               {busy ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" /> {mode === "login" ? "Logging in…" : "Creating account…"}
