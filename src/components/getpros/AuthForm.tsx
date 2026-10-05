@@ -37,6 +37,7 @@ export function AuthForm({
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<{ name?: string; email?: string; password?: string }>({});
   const [notice, setNotice] = useState<string | null>(null);
   const [exists, setExists] = useState(false);
   const [socialBusy, setSocialBusy] = useState<string | null>(null);
@@ -75,6 +76,24 @@ export function AuthForm({
     setError(null);
     setNotice(null);
     setExists(false);
+    setFieldErrors({});
+
+    if (mode === "register") {
+      const fe: { name?: string; email?: string; password?: string } = {};
+      if (!fullName.trim()) fe.name = "Please enter your full name.";
+      else if (fullName.trim().length < 2) fe.name = "Please enter your full name.";
+      if (!email.trim()) fe.email = "Please enter your email address.";
+      else if (!/^\S+@\S+\.\S+$/.test(email)) fe.email = "Please enter a valid email address.";
+      if (!password) fe.password = "Please enter a password.";
+      else {
+        const pwIssue = passwordError(password);
+        if (pwIssue) fe.password = pwIssue;
+      }
+      if (fe.name || fe.email || fe.password) {
+        setFieldErrors(fe);
+        return;
+      }
+    }
 
     if (mode === "register" && fullName.trim().length < 2) {
       setError("Please enter your full name.");
@@ -167,19 +186,20 @@ export function AuthForm({
             </>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-3">
+          <form onSubmit={handleSubmit} noValidate={mode === "register"} className="mt-6 space-y-3">
             {mode === "register" && (
-              <Field icon={User} label="Full name" placeholder="Full name" value={fullName} onChange={setFullName} autoComplete="name" />
+              <Field icon={User} label="Full name" placeholder="Full name" value={fullName} onChange={(v) => { setFullName(v); if (fieldErrors.name) setFieldErrors((f) => ({ ...f, name: undefined })); }} autoComplete="name" error={fieldErrors.name} />
             )}
-            <Field icon={Mail} {...(mode === "register" ? { label: "Email address" } : {})} placeholder="Email address" type="email" value={email} onChange={setEmail} autoComplete="email" />
+            <Field icon={Mail} {...(mode === "register" ? { label: "Email address" } : {})} placeholder="Email address" type="email" value={email} onChange={(v) => { setEmail(v); if (fieldErrors.email) setFieldErrors((f) => ({ ...f, email: undefined })); }} autoComplete="email" error={fieldErrors.email} />
             <Field
               icon={Lock}
               {...(mode === "register" ? { label: "Password" } : {})}
               placeholder="Password"
               type="password"
               value={password}
-              onChange={setPassword}
+              onChange={(v) => { setPassword(v); if (fieldErrors.password) setFieldErrors((f) => ({ ...f, password: undefined })); }}
               autoComplete={mode === "login" ? "current-password" : "new-password"}
+              error={fieldErrors.password}
             />
             {mode === "register" && <PasswordChecklist value={password} />}
 
@@ -285,6 +305,7 @@ function Field({
   onChange,
   autoComplete,
   label,
+  error,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   placeholder: string;
@@ -293,8 +314,10 @@ function Field({
   onChange: (v: string) => void;
   autoComplete?: string;
   label?: string;
+  error?: string | undefined;
 }) {
   const id = useId();
+  const errId = `${id}-err`;
   const box = (
     <label htmlFor={id} className="flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-3">
       <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -302,6 +325,8 @@ function Field({
         id={id}
         type={type}
         required
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errId : undefined}
         value={value}
         autoComplete={autoComplete}
         onChange={(e) => onChange(e.target.value)}
@@ -310,13 +335,17 @@ function Field({
       />
     </label>
   );
-  if (!label) return box;
+  const err = error ? (
+    <p id={errId} role="alert" className="text-xs font-medium text-destructive">{error}</p>
+  ) : null;
+  if (!label) return err ? <div className="space-y-1.5">{box}{err}</div> : box;
   return (
     <div className="space-y-1.5">
       <label htmlFor={id} className="block text-sm font-semibold text-foreground">
         {label}
       </label>
       {box}
+      {err}
     </div>
   );
 }
