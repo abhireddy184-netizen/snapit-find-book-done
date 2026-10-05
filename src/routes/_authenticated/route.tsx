@@ -32,15 +32,19 @@ function AuthGate() {
         const target = window.location.pathname + window.location.search;
         if (window.location.pathname === "/login") return;
         redirecting = true;
-        void navigate({ to: "/login", search: { redirect: target }, replace: true }).finally(() => {
+        void navigate({ to: "/login", search: { next: target }, replace: true }).finally(() => {
           redirecting = false;
         });
       } else {
         setState("allowed");
       }
     });
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_OUT" && active) setState("checking");
+    });
     return () => {
       active = false;
+      sub.subscription.unsubscribe();
     };
   }, [navigate]);
 

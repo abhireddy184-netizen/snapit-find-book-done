@@ -324,7 +324,7 @@ function Profile() {
         <button
           onClick={async () => {
             await signOut();
-            await navigate({ to: "/" });
+            await navigate({ to: "/", replace: true });
           }}
           className="mt-6 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold hover:bg-muted"
         >

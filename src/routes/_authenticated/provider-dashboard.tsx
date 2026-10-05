@@ -455,7 +455,7 @@ function BusinessProfile() {
         <button
           onClick={async () => {
             await signOut();
-            await navigate({ to: "/" });
+            await navigate({ to: "/", replace: true });
           }}
           className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold hover:bg-muted"
         >
