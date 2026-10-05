@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { AppShell } from "@/components/snapit/AppShell";
+import { AppShell } from "@/components/getpros/AppShell";
 import { unsubscribeFromUpdates } from "@/lib/subscribe.functions";
 
 

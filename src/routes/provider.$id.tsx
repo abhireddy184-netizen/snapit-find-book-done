@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Star, ShieldCheck, MapPin, Clock, Calendar as CalendarIcon } from "lucide-react";
-import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { getProvider, type Provider } from "@/lib/snapit-data";
+import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
+import { getProvider, type Provider } from "@/lib/demo-data";
 import { fetchProviderByUserId, isBookable, type PublicProvider } from "@/lib/providers";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

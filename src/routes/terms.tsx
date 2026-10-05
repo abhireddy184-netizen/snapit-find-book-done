@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AppShell } from "@/components/snapit/AppShell";
+import { AppShell } from "@/components/getpros/AppShell";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({

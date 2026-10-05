@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
+import { LocationAutocomplete } from "@/components/getpros/LocationAutocomplete";
 import { Star, ShieldCheck, MapPin, Clock, Search as SearchIcon, AlertCircle, Loader2, ArrowRight } from "lucide-react";
-import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { providers as demoProviders } from "@/lib/snapit-data";
+import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
+import { providers as demoProviders } from "@/lib/demo-data";
 import { catalog, searchServices } from "@/lib/catalog";
 import { matchServiceIntent, rankServices, rememberLocation, isServicePhrase } from "@/lib/search-intent";
 import { fetchPublicProviders, matchProviders, type ProviderMatch } from "@/lib/providers";

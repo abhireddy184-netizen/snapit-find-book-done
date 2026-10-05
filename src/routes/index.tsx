@@ -6,15 +6,15 @@ import { subscribeToUpdates } from "@/lib/subscribe.functions";
 import {
   ArrowRight, Briefcase, Camera, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
 } from "lucide-react";
-import { AppShell } from "@/components/snapit/AppShell";
-import { Logo } from "@/components/snapit/Logo";
-import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
-import { OutcomeComposer } from "@/components/snapit/OutcomeComposer";
+import { AppShell } from "@/components/getpros/AppShell";
+import { Logo } from "@/components/getpros/Logo";
+import { EarlyAccessSection } from "@/components/getpros/EarlyAccess";
+import { OutcomeComposer } from "@/components/getpros/OutcomeComposer";
 import {
   ShowGpbBand, BrowseFallback, HowGpbWorksDetails,
-} from "@/components/snapit/V2Sections";
-import { ServiceShowcase } from "@/components/snapit/ServiceShowcase";
-import { InstallPromptBanner } from "@/components/snapit/InstallPromptBanner";
+} from "@/components/getpros/V2Sections";
+import { ServiceShowcase } from "@/components/getpros/ServiceShowcase";
+import { InstallPromptBanner } from "@/components/getpros/InstallPromptBanner";
 
 
 
@@ -209,4 +209,4 @@ function ProviderRecruitment() {
 
 
 
-export { Footer } from "@/components/snapit/SiteFooter";
+export { Footer } from "@/components/getpros/SiteFooter";

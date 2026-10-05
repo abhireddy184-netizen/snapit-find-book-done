@@ -1,8 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, AlertCircle, Loader2, MapPin, Camera, Sparkles } from "lucide-react";
-import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
-import { GradientButton } from "@/components/snapit/AppShell";
+import { LocationAutocomplete } from "@/components/getpros/LocationAutocomplete";
+import { GradientButton } from "@/components/getpros/AppShell";
 import { catalog } from "@/lib/catalog";
 import { useServerFn } from "@tanstack/react-start";
 import { submitEarlyAccess } from "@/lib/early-access.functions";

@@ -8,7 +8,7 @@ import {
   MessageCircle, CalendarDays,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { AppShell } from "@/components/snapit/AppShell";
+import { AppShell } from "@/components/getpros/AppShell";
 import { buildPlan, type PlanResult } from "@/lib/plan.functions";
 import {
   addDays, CHANNEL_META, DEFAULT_UI_COPY, demoAirportPlan, formatClock, formatPlanDate, move, parseClock,

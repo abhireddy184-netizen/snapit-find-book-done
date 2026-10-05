@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { AlertCircle, ArrowRight, CheckCircle2, Loader2, Lock, Mail } from "lucide-react";
-import { GradientButton } from "@/components/snapit/AppShell";
-import { Logo } from "@/components/snapit/Logo";
+import { GradientButton } from "@/components/getpros/AppShell";
+import { Logo } from "@/components/getpros/Logo";
 import { supabase } from "@/integrations/supabase/client";
-import { PasswordChecklist } from "@/components/snapit/PasswordChecklist";
+import { PasswordChecklist } from "@/components/getpros/PasswordChecklist";
 import { passwordError } from "@/lib/password-policy";
 
 export const Route = createFileRoute("/reset-password")({

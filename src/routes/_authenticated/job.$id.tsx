@@ -19,9 +19,9 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { AppShell, GradientButton } from "@/components/snapit/AppShell";
+import { AppShell, GradientButton } from "@/components/getpros/AppShell";
 import { useAuth } from "@/lib/auth";
-import { providers } from "@/lib/snapit-data";
+import { providers } from "@/lib/demo-data";
 import { verifyJobCompletion } from "@/lib/verify-job.functions";
 import {
   JOB_STATUS_STYLE,

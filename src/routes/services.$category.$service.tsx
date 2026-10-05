@@ -1,11 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, Camera, CheckCircle2, ShieldCheck, Clock, Info } from "lucide-react";
-import { AppShell, GradientButton } from "@/components/snapit/AppShell";
+import { AppShell, GradientButton } from "@/components/getpros/AppShell";
 import { getService, serviceEligibility, formatPrice, providerPoolFor } from "@/lib/catalog";
 import { recallLocation } from "@/lib/search-intent";
 import { serviceScene } from "@/lib/scenes";
-import { providers } from "@/lib/snapit-data";
+import { providers } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/services/$category/$service")({
   loader: ({ params }) => {

@@ -1,4 +1,4 @@
-import { EarlyAccessSection } from "@/components/snapit/EarlyAccess";
+import { EarlyAccessSection } from "@/components/getpros/EarlyAccess";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -30,7 +30,7 @@ import {
   ClipboardList,
   CalendarClock,
 } from "lucide-react";
-import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
+import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
 import { analyzeSnap, type SnapAnalysis } from "@/lib/snap-analyze.functions";
 import { getCategoryBySlug } from "@/lib/catalog";
 import { detectServiceIntentInText, matchServiceIntent, rankServices } from "@/lib/search-intent";
@@ -42,7 +42,7 @@ import { useAuth } from "@/lib/auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { createJobFromAnalysis } from "@/lib/jobs";
 import { prepareMediaForAnalysis, withTimeout, type PreparedMedia } from "@/lib/snap-media";
-import { GuidedVideoScan, canUseGuidedScan } from "@/components/snapit/GuidedVideoScan";
+import { GuidedVideoScan, canUseGuidedScan } from "@/components/getpros/GuidedVideoScan";
 import {
   BadgeCheck,
   Lock,

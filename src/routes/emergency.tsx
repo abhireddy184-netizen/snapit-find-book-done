@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldAlert, PhoneCall, Zap, Droplet, Flame, Wind, Lock, Car, Clock, ShieldCheck, Star } from "lucide-react";
-import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { providers } from "@/lib/snapit-data";
+import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
+import { providers } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/emergency")({
   head: () => ({

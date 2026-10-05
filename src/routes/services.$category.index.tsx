@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowRight, Camera, ShieldCheck, Sparkles } from "lucide-react";
 import { Search as SearchIcon } from "lucide-react";
-import { AppShell } from "@/components/snapit/AppShell";
+import { AppShell } from "@/components/getpros/AppShell";
 import { getCategoryBySlug, serviceEligibility, formatPrice, type SubService, type MasterCategory } from "@/lib/catalog";
 import { serviceScene } from "@/lib/scenes";
 

@@ -1,8 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PhoneCall, MessageCircle, ShieldCheck, Star, MapPin, Navigation, CheckCircle2, Clock } from "lucide-react";
-import { AppShell, Avatar } from "@/components/snapit/AppShell";
-import { providers } from "@/lib/snapit-data";
+import { AppShell, Avatar } from "@/components/getpros/AppShell";
+import { providers } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/tracking/$id")({
   head: ({ params }) => ({

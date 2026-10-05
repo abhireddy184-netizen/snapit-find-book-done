@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Check, Loader2, ShieldAlert, ShieldCheck, X, Mail, Phone, MapPin } from "lucide-react";
-import { AppShell, GradientButton } from "@/components/snapit/AppShell";
+import { AppShell, GradientButton } from "@/components/getpros/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 
