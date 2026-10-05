@@ -33,7 +33,6 @@ export const Route = createFileRoute("/")({
       { name: "twitter:image", content: SITE_URL + "/brand/og-getpros.jpg?v=gp7" },
       { property: "og:description", content: "Show, say or type what you need. GetPros finds the right local pro." },
       { property: "og:type", content: "website" },
-      { property: "og:url", content: SITE_URL + "/" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "GetPros.ai — Show, Say or Type the Service You Need" },
       { name: "twitter:description", content: "Show, say or type what you need. GetPros finds the right local pro." },

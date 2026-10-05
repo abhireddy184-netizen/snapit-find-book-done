@@ -1,4 +1,3 @@
-import { SITE_URL } from "@/lib/brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
