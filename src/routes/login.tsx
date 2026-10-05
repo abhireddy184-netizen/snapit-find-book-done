@@ -5,7 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AuthForm } from "@/components/getpros/AuthForm";
 
 export const Route = createFileRoute("/login")({
-  validateSearch: (search: Record<string, unknown>) => ({
+  validateSearch: (search: Record<string, unknown>): { redirect?: string; next?: string; confirmed?: "1" } => ({
     redirect: typeof search['redirect'] === "string" ? (search['redirect'] as string) : undefined,
     next: typeof search['next'] === "string" ? (search['next'] as string) : undefined,
     confirmed: search['confirmed'] === 1 || search['confirmed'] === "1" ? ("1" as const) : undefined,
