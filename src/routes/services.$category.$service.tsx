@@ -170,7 +170,7 @@ function ServicePage() {
                   className="flex items-center justify-between rounded-2xl border border-border/60 px-3 py-2 text-sm hover:bg-muted"
                 >
                   <span className="truncate font-semibold">{p.business}</span>
-                  <span className="text-xs text-muted-foreground">★ {p.rating}</span>
+                  <span className="text-xs text-muted-foreground">Example profile</span>
                 </Link>
               ))}
             </div>

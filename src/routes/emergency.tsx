@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShieldAlert, PhoneCall, Zap, Droplet, Flame, Wind, Lock, Car, Clock, ShieldCheck, Star } from "lucide-react";
+import { ShieldAlert, PhoneCall, Zap, Droplet, Flame, Wind, Lock, Car, Clock } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
 import { providers } from "@/lib/demo-data";
 
@@ -87,15 +87,11 @@ function EmergencyPage() {
                 <div>
                   <div className="flex items-center gap-1.5">
                     <div className="text-sm font-bold">{p.name}</div>
-                    <ShieldCheck className="h-3.5 w-3.5 text-primary" />
                   </div>
                   <div className="text-xs text-muted-foreground">{p.business}</div>
                 </div>
               </div>
               <div className="flex flex-1 items-center gap-4 text-xs">
-                <span className="inline-flex items-center gap-1 font-semibold">
-                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating}
-                </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 font-bold uppercase tracking-wide text-muted-foreground">
                   Example profile
                 </span>

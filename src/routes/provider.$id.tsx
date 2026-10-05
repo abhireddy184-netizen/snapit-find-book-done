@@ -145,7 +145,7 @@ function ProviderPage({ p }: { p: Provider }) {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <span className="inline-flex items-center gap-1 font-semibold"><Star className="h-4 w-4 fill-amber-400 text-amber-400" /> {p.rating} <span className="font-normal text-muted-foreground">({p.reviews} reviews)</span></span>
+            {p.reviews > 0 && <span className="inline-flex items-center gap-1 font-semibold"><Star className="h-4 w-4 fill-amber-400 text-amber-400" /> {p.rating} <span className="font-normal text-muted-foreground">({p.reviews} reviews)</span></span>}
             <span className="inline-flex items-center gap-1 text-muted-foreground"><MapPin className="h-4 w-4" /> {p.distance} mi · {p.serviceArea}</span>
             <span className="inline-flex items-center gap-1 text-muted-foreground"><Clock className="h-4 w-4" /> {p.availability}</span>
           </div>
