@@ -108,7 +108,7 @@ function AuthNav() {
           </span>
         </Link>
         <button
-          onClick={() => void signOut()}
+          onClick={() => void signOut().then(() => { window.location.replace("/"); })}
           aria-label="Log out"
           className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-2 text-sm font-medium hover:bg-muted"
         >
