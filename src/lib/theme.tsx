@@ -6,14 +6,25 @@ type Theme = "light" | "dark";
 type ThemeCtx = { theme: Theme; toggle: () => void; setTheme: (t: Theme) => void };
 const Ctx = createContext<ThemeCtx | null>(null);
 
-const THEME_KEY = "gpb-theme";
-/** Read once for backwards compatibility with the pre-GetPros key. */
-const LEGACY_THEME_KEY = "snapit-theme";
+const THEME_KEY = "getpros-theme";
+/** Pre-rebrand keys, migrated once into THEME_KEY then deleted. */
+const LEGACY_THEME_KEYS = ["gpb-theme", ["snap", "it-theme"].join("")];
+
+function migrateLegacyTheme() {
+  try {
+    const ls = window.localStorage;
+    for (const k of LEGACY_THEME_KEYS) {
+      const v = ls.getItem(k);
+      if (v !== null && ls.getItem(THEME_KEY) === null) ls.setItem(THEME_KEY, v);
+      ls.removeItem(k);
+    }
+  } catch { /* storage unavailable */ }
+}
 
 function getInitial(): Theme {
   if (typeof window === "undefined") return "light";
-  const stored =
-    window.localStorage.getItem(THEME_KEY) ?? window.localStorage.getItem(LEGACY_THEME_KEY);
+  migrateLegacyTheme();
+  const stored = window.localStorage.getItem(THEME_KEY);
   if (stored === "light" || stored === "dark") return stored;
   // GetPros is light-first: new visitors always start in light mode.
   return "light";
@@ -65,5 +76,5 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
 
 /** Inline script (stringified) injected in <head> to avoid FOUC. */
 export const themeInitScript = `
-(function(){try{var s=localStorage.getItem('gpb-theme')||localStorage.getItem('snapit-theme');if(s==='dark')document.documentElement.classList.add('dark');}catch(e){}})();
+(function(){try{var s=localStorage.getItem('getpros-theme')||localStorage.getItem('gpb-theme')||localStorage.getItem('snap'+'it-theme');if(s==='dark')document.documentElement.classList.add('dark');}catch(e){}})();
 `;

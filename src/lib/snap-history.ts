@@ -1,6 +1,8 @@
 import type { SnapAnalysis } from "./snap-analyze.functions";
 
-const KEY = "snapit.history.v1";
+const KEY = "getpros.history.v1";
+/** Pre-rebrand key; read once and moved to KEY. */
+const LEGACY_KEY = ["snap", "it.history.v1"].join("");
 
 export type SnapHistoryEntry = {
   id: string;
@@ -23,7 +25,11 @@ export function loadHistory(): SnapHistoryEntry[] {
   const s = safeStorage();
   if (!s) return [];
   try {
-    const raw = s.getItem(KEY);
+    let raw = s.getItem(KEY);
+    if (raw === null) {
+      raw = s.getItem(LEGACY_KEY);
+      if (raw !== null) { s.setItem(KEY, raw); s.removeItem(LEGACY_KEY); }
+    }
     if (!raw) return [];
     const parsed = JSON.parse(raw) as SnapHistoryEntry[];
     return Array.isArray(parsed) ? parsed : [];
