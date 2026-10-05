@@ -1,3 +1,4 @@
+import { ORGANIZATION_JSONLD } from "@/lib/brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Search, ArrowRight, Sparkles, ShieldCheck, MapPin } from "lucide-react";
@@ -14,7 +15,10 @@ export const Route = createFileRoute("/services/")({
       { property: "og:description", content: "Every GetPros service in one place — plumbing to at-home beauty, with typical price guidance." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "All Services | GetPros.ai" },
+      { name: "twitter:description", content: `Browse ${TOTAL_SERVICES}+ home, outdoor, auto and at-home beauty services across ${catalog.length} GetPros categories. Search a job, see typical pricing and get matched with a local professional.` },
     ],
+    scripts: [ORGANIZATION_JSONLD],
   }),
   component: AllServicesPage,
 });
