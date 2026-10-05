@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldCheck, Phone, CheckCircle2, Camera } from "lucide-react";
-import { AppShell } from "@/components/snapit/AppShell";
+import { AppShell } from "@/components/getpros/AppShell";
 
 export const Route = createFileRoute("/trust-safety")({
   head: () => ({

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AuthForm } from "@/components/snapit/AuthForm";
+import { AuthForm } from "@/components/getpros/AuthForm";
 
 export const Route = createFileRoute("/register")({
   validateSearch: (search: Record<string, unknown>) => ({

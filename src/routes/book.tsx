@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, ChevronLeft, ChevronRight, MapPin, Loader2, ShieldCheck, AlertTriangle } from "lucide-react";
-import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
+import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";

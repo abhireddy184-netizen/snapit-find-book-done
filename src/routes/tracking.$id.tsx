@@ -1,8 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { PhoneCall, MessageCircle, ShieldCheck, Star, MapPin, Navigation, CheckCircle2, Clock } from "lucide-react";
-import { AppShell, Avatar } from "@/components/snapit/AppShell";
-import { providers } from "@/lib/snapit-data";
+import { AppShell, Avatar } from "@/components/getpros/AppShell";
+import { providers } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/tracking/$id")({
   head: ({ params }) => ({
@@ -88,10 +88,12 @@ function TrackingPage() {
                 {provider.verified && <ShieldCheck className="h-4 w-4 text-primary" />}
               </div>
               <div className="truncate text-xs text-muted-foreground">{provider.business}</div>
-              <div className="mt-1 inline-flex items-center gap-1 text-xs font-semibold">
-                <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {provider.rating}
-                <span className="ml-1 font-normal text-muted-foreground">· {provider.reviews} jobs</span>
-              </div>
+              {provider.reviews > 0 && (
+                <div className="mt-1 inline-flex items-center gap-1 text-xs font-semibold">
+                  <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {provider.rating}
+                  <span className="ml-1 font-normal text-muted-foreground">· {provider.reviews} jobs</span>
+                </div>
+              )}
             </div>
             <div className="flex gap-2">
               <a href="tel:+15550100199" className="grid h-11 w-11 place-items-center rounded-full border border-border hover:bg-muted">

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { AppShell } from "@/components/snapit/AppShell";
+import { AppShell } from "@/components/getpros/AppShell";
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
 
 export const Route = createFileRoute("/categories")({

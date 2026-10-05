@@ -1,10 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
+import { LocationAutocomplete } from "@/components/getpros/LocationAutocomplete";
 import { Star, ShieldCheck, MapPin, Clock, Search as SearchIcon, AlertCircle, Loader2, ArrowRight } from "lucide-react";
-import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { providers as demoProviders } from "@/lib/snapit-data";
+import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
+import { providers as demoProviders } from "@/lib/demo-data";
 import { catalog, searchServices } from "@/lib/catalog";
 import { matchServiceIntent, rankServices, rememberLocation, isServicePhrase } from "@/lib/search-intent";
 import { fetchPublicProviders, matchProviders, type ProviderMatch } from "@/lib/providers";
@@ -262,9 +262,11 @@ function SearchPage() {
                       <div className="truncate text-xs text-muted-foreground">{p.business}</div>
                       <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
                       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                        <span className="inline-flex items-center gap-1 font-semibold text-foreground">
-                          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating}
-                        </span>
+                        {p.reviews > 0 && (
+                          <span className="inline-flex items-center gap-1 font-semibold text-foreground">
+                            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating}
+                          </span>
+                        )}
                         <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {p.availability}</span>
                         <span className="font-semibold text-primary">from ${p.startingPrice}</span>
                       </div>

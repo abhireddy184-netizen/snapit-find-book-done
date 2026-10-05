@@ -1,11 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, Camera, CheckCircle2, ShieldCheck, Clock, Info } from "lucide-react";
-import { AppShell, GradientButton } from "@/components/snapit/AppShell";
+import { AppShell, GradientButton } from "@/components/getpros/AppShell";
 import { getService, serviceEligibility, formatPrice, providerPoolFor } from "@/lib/catalog";
 import { recallLocation } from "@/lib/search-intent";
 import { serviceScene } from "@/lib/scenes";
-import { providers } from "@/lib/snapit-data";
+import { providers } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/services/$category/$service")({
   loader: ({ params }) => {
@@ -170,7 +170,7 @@ function ServicePage() {
                   className="flex items-center justify-between rounded-2xl border border-border/60 px-3 py-2 text-sm hover:bg-muted"
                 >
                   <span className="truncate font-semibold">{p.business}</span>
-                  <span className="text-xs text-muted-foreground">★ {p.rating}</span>
+                  <span className="text-xs text-muted-foreground">Example profile</span>
                 </Link>
               ))}
             </div>

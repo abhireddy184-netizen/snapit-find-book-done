@@ -3,8 +3,8 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { CalendarDays, User, Wrench, Check, X, Loader2, MapPin, LogOut, ShieldAlert, Inbox, ShieldCheck, Clock3, BadgeCheck } from "lucide-react";
-import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { Wordmark } from "@/components/snapit/Logo";
+import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
+import { Wordmark } from "@/components/getpros/Logo";
 
 import { useAuth } from "@/lib/auth";
 import { fetchProviderBookings, fetchMyProviderProfile, formatBookingDate, type Booking } from "@/lib/bookings";
@@ -12,8 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { claimProviderInterest } from "@/lib/provider-interest.functions";
 import { catalog } from "@/lib/catalog";
 import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
-import { LocationAutocomplete } from "@/components/snapit/LocationAutocomplete";
-import { ProviderWorkSettings } from "@/components/snapit/ProviderWorkSettings";
+import { LocationAutocomplete } from "@/components/getpros/LocationAutocomplete";
+import { ProviderWorkSettings } from "@/components/getpros/ProviderWorkSettings";
 import { transitionBooking } from "@/lib/schedule";
 
 

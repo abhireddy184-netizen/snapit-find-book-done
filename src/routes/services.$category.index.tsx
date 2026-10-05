@@ -2,7 +2,7 @@ import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ArrowRight, Camera, ShieldCheck, Sparkles } from "lucide-react";
 import { Search as SearchIcon } from "lucide-react";
-import { AppShell } from "@/components/snapit/AppShell";
+import { AppShell } from "@/components/getpros/AppShell";
 import { getCategoryBySlug, serviceEligibility, formatPrice, type SubService, type MasterCategory } from "@/lib/catalog";
 import { serviceScene } from "@/lib/scenes";
 
@@ -111,7 +111,7 @@ function ServicePicker({ category }: { category: MasterCategory }) {
         <div>
           <h2 className="text-2xl font-black tracking-tight md:text-3xl">Choose a service</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            All {category.services.length} {category.name.toLowerCase()} services — nothing hidden.
+            All {category.services.length} {category.name.toLowerCase().replace(/\s+services?$/, "")} services — nothing hidden.
           </p>
         </div>
         {category.services.length > 8 && (
@@ -120,7 +120,7 @@ function ServicePicker({ category }: { category: MasterCategory }) {
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder={`Filter ${category.name.toLowerCase()} services`}
+              placeholder={`Filter ${category.name.toLowerCase().replace(/\s+services?$/, "")} services`}
               className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             />
           </label>

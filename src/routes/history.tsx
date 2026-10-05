@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { AppShell } from "@/components/snapit/AppShell";
+import { AppShell } from "@/components/getpros/AppShell";
 import { Camera, Trash2, Sparkles, Clock, DollarSign, ArrowRight } from "lucide-react";
 import { loadHistory, removeHistoryEntry, clearHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
-import { categories } from "@/lib/snapit-data";
+import { categories } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/history")({
   head: () => ({

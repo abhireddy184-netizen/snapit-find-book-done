@@ -41,4 +41,4 @@ export function formatBookingDate(value: string): string {
   return d.toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" });
 }
 
-export const BOOKING_DRAFT_KEY = "snapit:booking-draft";
+export const BOOKING_DRAFT_KEY = "getpros:booking-draft";

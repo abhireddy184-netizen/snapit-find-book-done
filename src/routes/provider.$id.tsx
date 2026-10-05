@@ -1,7 +1,7 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Star, ShieldCheck, MapPin, Clock, Calendar as CalendarIcon } from "lucide-react";
-import { AppShell, Avatar, GradientButton } from "@/components/snapit/AppShell";
-import { getProvider, type Provider } from "@/lib/snapit-data";
+import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
+import { getProvider, type Provider } from "@/lib/demo-data";
 import { fetchProviderByUserId, isBookable, type PublicProvider } from "@/lib/providers";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -145,7 +145,7 @@ function ProviderPage({ p }: { p: Provider }) {
           </div>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <span className="inline-flex items-center gap-1 font-semibold"><Star className="h-4 w-4 fill-amber-400 text-amber-400" /> {p.rating} <span className="font-normal text-muted-foreground">({p.reviews} reviews)</span></span>
+            {p.reviews > 0 && <span className="inline-flex items-center gap-1 font-semibold"><Star className="h-4 w-4 fill-amber-400 text-amber-400" /> {p.rating} <span className="font-normal text-muted-foreground">({p.reviews} reviews)</span></span>}
             <span className="inline-flex items-center gap-1 text-muted-foreground"><MapPin className="h-4 w-4" /> {p.distance} mi · {p.serviceArea}</span>
             <span className="inline-flex items-center gap-1 text-muted-foreground"><Clock className="h-4 w-4" /> {p.availability}</span>
           </div>
@@ -206,6 +206,7 @@ function ProviderPage({ p }: { p: Provider }) {
       </Section>
 
 
+      {p.reviewList.length > 0 && (
       <Section title={`Reviews (${p.reviews})`}>
         <div className="space-y-3">
           {p.reviewList.map((r) => (
@@ -224,6 +225,7 @@ function ProviderPage({ p }: { p: Provider }) {
           ))}
         </div>
       </Section>
+      )}
     </AppShell>
   );
 }
