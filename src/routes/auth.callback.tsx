@@ -2,7 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Loader2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { clearIntent, readIntent, reconcileProfile } from "@/lib/oauth-intent";
+import { PENDING_ROLE_KEY, clearIntent, readIntent, reconcileProfile } from "@/lib/oauth-intent";
 import { notifyNewAccount } from "@/lib/account-notify.functions";
 
 export const Route = createFileRoute("/auth/callback")({
@@ -37,8 +37,18 @@ function CallbackPage() {
       if (done) return;
       done = true;
       try {
-        const intent = readIntent();
-        const role = await reconcileProfile(userId, intent);
+        const stored = readIntent();
+        const q = new URLSearchParams(window.location.search).get("role");
+        let pending: string | null = null;
+        try { pending = localStorage.getItem(PENDING_ROLE_KEY); } catch { /* ignore */ }
+        const r = q === "customer" || q === "provider" ? q : pending === "customer" || pending === "provider" ? pending : null;
+        const intent = { role: r, redirect: stored?.redirect ?? null, at: Date.now() } as const;
+        const { role, conflict } = await reconcileProfile(userId, intent);
+        if (conflict) {
+          clearIntent();
+          window.location.replace(`/register?${r === "provider" ? "role=provider&" : ""}conflict=${role}`);
+          return;
+        }
         void notifyNewAccount({ data: { userId } }).catch(() => {});
         clearIntent();
         if (intent?.redirect) {
