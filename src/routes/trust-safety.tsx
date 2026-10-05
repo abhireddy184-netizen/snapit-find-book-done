@@ -12,7 +12,6 @@ export const Route = createFileRoute("/trust-safety")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
-    links: [{ rel: "canonical", href: "https://getpros.ai/trust-safety" }],
   }),
   component: TrustSafetyPage,
 });

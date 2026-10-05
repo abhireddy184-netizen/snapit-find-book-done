@@ -20,7 +20,6 @@ export const Route = createFileRoute("/unsubscribe")({
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: SITE_URL + "/unsubscribe" }],
   }),
   component: UnsubscribePage,
 });

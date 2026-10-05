@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { Home, Search, CalendarDays, User, Camera, ShieldAlert, LogOut, LayoutDashboard } from "lucide-react";
 import { Logo } from "./Logo";
+import { Footer } from "./SiteFooter";
 import { ThemeToggle } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ export function AppShell({ children, hideBottomNav = false }: { children: ReactN
         )}
       >
         {children}
+        <Footer />
       </main>
 
       {!hideBottomNav && <BottomNav />}
