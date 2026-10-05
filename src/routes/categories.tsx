@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { AppShell } from "@/components/snapit/AppShell";
 import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
-import { Footer } from "./index";
 
 export const Route = createFileRoute("/categories")({
   head: () => ({
@@ -44,7 +43,6 @@ function CategoriesPage() {
           );
         })}
       </div>
-      <Footer />
     </AppShell>
   );
 }

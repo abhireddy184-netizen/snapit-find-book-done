@@ -1,4 +1,3 @@
-import { SITE_URL } from "@/lib/brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
@@ -20,7 +19,6 @@ export const Route = createFileRoute("/unsubscribe")({
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: SITE_URL + "/unsubscribe" }],
   }),
   component: UnsubscribePage,
 });

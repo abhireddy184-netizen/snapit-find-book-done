@@ -6,7 +6,25 @@ import {
   useRouter,
   HeadContent,
   Scripts,
+  useRouterState,
+  type ErrorComponentProps,
 } from "@tanstack/react-router";
+import { SITE_URL } from "../lib/brand";
+
+const OG_IMAGE = `${SITE_URL}/brand/og-getpros.jpg?v=gp7`;
+
+/** Self-referencing canonical + og:url for whatever page is rendered (query/hash stripped). */
+function CanonicalTags() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const path = pathname === "/" ? "/" : pathname.replace(/\/+$/, "");
+  const href = `${SITE_URL}${path}`;
+  return (
+    <>
+      <link rel="canonical" href={href} />
+      <meta property="og:url" content={href} />
+    </>
+  );
+}
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
@@ -36,7 +54,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
   useEffect(() => {
@@ -86,6 +104,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:site_name", content: "GetPros.ai" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      // Sitewide GetPros share image (owner request) — pages may override.
+      { property: "og:image", content: OG_IMAGE },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { name: "twitter:image", content: OG_IMAGE },
       { property: "og:title", content: "GetPros.ai — Show, Say or Type the Service You Need" },
       { name: "twitter:title", content: "GetPros.ai — Show, Say or Type the Service You Need" },
       { name: "application-name", content: "GetPros.ai" },
@@ -126,6 +149,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
         <HeadContent />
+        <CanonicalTags />
       </head>
       <body>
         {children}

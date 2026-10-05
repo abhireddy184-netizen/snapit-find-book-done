@@ -43,12 +43,12 @@ function EmergencyPage() {
               Tell us what happened and we will route your urgent request to on-call pros for the most common home emergencies. Response times depend on pro availability in your area.
             </p>
           </div>
-          <a
-            href="tel:+18005550199"
+          <Link
+            to="/snap"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-6 py-4 text-base font-bold text-white shadow-elevated hover:bg-red-700"
           >
-            <PhoneCall className="h-5 w-5" /> Call dispatcher
-          </a>
+            <PhoneCall className="h-5 w-5" /> Request emergency help
+          </Link>
         </div>
       </section>
 

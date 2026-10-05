@@ -1,3 +1,4 @@
+import { Footer as SiteFooter } from "./SiteFooter";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { User, Briefcase, Mail, Lock, ArrowRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
@@ -255,6 +256,7 @@ export function AuthForm({
           </div>
         </main>
       </div>
+      <div className="gpb-shell"><SiteFooter /></div>
     </div>
   );
 }

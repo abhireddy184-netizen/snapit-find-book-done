@@ -17,7 +17,7 @@ export const Route = createFileRoute("/services/$category/$service")({
     if (!loaderData) {
       return { meta: [{ title: "Service not found — GetPros" }, { name: "robots", content: "noindex" }] };
     }
-    const title = `${loaderData.name} — ${loaderData.category} | GetPros`;
+    const title = `${loaderData.name} — ${loaderData.category} | GetPros.ai`;
     return {
       meta: [
         { title },
