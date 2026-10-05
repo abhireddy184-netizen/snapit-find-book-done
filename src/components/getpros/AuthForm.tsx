@@ -41,6 +41,18 @@ export function AuthForm({
   const [notice, setNotice] = useState<string | null>(null);
   const [exists, setExists] = useState(false);
   const [socialBusy, setSocialBusy] = useState<string | null>(null);
+  const [conflict, setConflict] = useState<Role | null>(null);
+  useEffect(() => {
+    if (mode !== "register") return;
+    const c = new URLSearchParams(window.location.search).get("conflict");
+    if (c === "customer" || c === "provider") setConflict(c);
+  }, [mode]);
+
+  async function retryWithOtherAccount() {
+    setConflict(null);
+    await supabase.auth.signOut();
+    void handleSocial("google");
+  }
 
   async function handleSocial(provider: "google" | "apple") {
     setError(null);
@@ -206,6 +218,26 @@ export function AuthForm({
             {error && (
               <div className="flex items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2.5 text-xs font-medium text-destructive">
                 <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /> <span>{error}</span>
+              </div>
+            )}
+            {conflict && (
+              <div role="status" className="rounded-xl border border-primary/30 bg-primary/5 px-3 py-3 text-xs font-medium text-foreground">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>
+                    {conflict === "provider"
+                      ? "This Google account is already registered as a Service Provider. Log in as a provider, or use a different Google account to sign up as a Customer."
+                      : "This Google account is already registered as a Customer. Log in as a customer, or use a different Google account to sign up as a Service Provider."}
+                  </span>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button type="button" onClick={() => void navigate({ to: conflict === "provider" ? "/provider-dashboard" : "/dashboard" })} className="flex min-h-11 items-center justify-center rounded-xl bg-primary px-3 text-sm font-semibold text-primary-foreground">
+                    {conflict === "provider" ? "Continue as Provider" : "Continue as Customer"}
+                  </button>
+                  <button type="button" onClick={() => void retryWithOtherAccount()} className="flex min-h-11 items-center justify-center rounded-xl border border-primary/40 bg-card px-3 text-sm font-semibold text-primary">
+                    Use a different Google account
+                  </button>
+                </div>
               </div>
             )}
             {exists && (
