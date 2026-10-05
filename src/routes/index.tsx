@@ -14,7 +14,6 @@ import {
   ShowGpbBand, BrowseFallback, HowGpbWorksDetails,
 } from "@/components/getpros/V2Sections";
 import { ServiceShowcase } from "@/components/getpros/ServiceShowcase";
-import { InstallPromptBanner } from "@/components/getpros/InstallPromptBanner";
 
 
 
@@ -123,7 +122,6 @@ function Landing() {
       <ProviderRecruitment />
       <EarlyAccessSection />
 
-      <InstallPromptBanner />
     </AppShell>
   );
 }

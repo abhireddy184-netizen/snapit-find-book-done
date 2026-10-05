@@ -3,7 +3,6 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { subscribeToUpdates } from "@/lib/subscribe.functions";
 import { Logo } from "./Logo";
-import { InstallAppButton } from "./InstallAppButton";
 
 export function Footer() {
   const [email, setEmail] = useState("");
@@ -136,7 +135,6 @@ export function Footer() {
         </div>
       </div>
       <div className="mt-8">
-        <InstallAppButton />
       </div>
       <div className="mt-6 flex flex-col items-start justify-between gap-3 border-t border-border/60 pt-6 text-xs md:flex-row md:items-center">
         <span>© {new Date().getFullYear()} GetPros.ai. All rights reserved.</span>
