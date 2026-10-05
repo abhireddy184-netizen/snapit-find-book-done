@@ -1,3 +1,4 @@
+import { ORGANIZATION_JSONLD } from "@/lib/brand";
 import { SITE_URL } from "@/lib/brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
@@ -36,6 +37,7 @@ export const Route = createFileRoute("/")({
       { name: "twitter:title", content: "GetPros.ai — Show, Say or Type the Service You Need" },
       { name: "twitter:description", content: "Show, say or type what you need. GetPros finds the right local pro." },
     ],
+    scripts: [ORGANIZATION_JSONLD],
   }),
   component: Landing,
 });

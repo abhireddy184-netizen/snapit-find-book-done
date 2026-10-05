@@ -1,3 +1,4 @@
+import { ORGANIZATION_JSONLD } from "@/lib/brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AuthForm } from "@/components/getpros/AuthForm";
 
@@ -11,7 +12,10 @@ export const Route = createFileRoute("/login")({
       { name: "description", content: "Log in to GetPros as a customer or service provider." },
       { property: "og:title", content: "Log in — GetPros" },
       { property: "og:description", content: "Log in to GetPros." },
+      { name: "twitter:title", content: "Log in — GetPros" },
+      { name: "twitter:description", content: "Log in to GetPros as a customer or service provider." },
     ],
+    scripts: [ORGANIZATION_JSONLD],
   }),
   component: LoginPage,
 });

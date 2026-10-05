@@ -1,3 +1,4 @@
+import { ORGANIZATION_JSONLD } from "@/lib/brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ShieldAlert, PhoneCall, Zap, Droplet, Flame, Wind, Lock, Car, Clock } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
@@ -10,7 +11,10 @@ export const Route = createFileRoute("/emergency")({
       { name: "description", content: "Burst pipe, no power, no heat or lockout? Tell GetPros what happened and we will route your urgent request to emergency pros." },
       { property: "og:title", content: "24/7 Emergency Services — GetPros" },
       { property: "og:description", content: "Send an urgent service request to GetPros emergency pros." },
+      { name: "twitter:title", content: "24/7 Emergency Services — GetPros" },
+      { name: "twitter:description", content: "Burst pipe, no power, no heat or lockout? Tell GetPros what happened and we will route your urgent request to emergency pros." },
     ],
+    scripts: [ORGANIZATION_JSONLD],
   }),
   component: EmergencyPage,
 });

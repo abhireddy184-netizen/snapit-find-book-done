@@ -27,3 +27,18 @@ export const BRAND_COLORS = {
 } as const;
 
 export const siteUrl = (path = "/") => `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+
+/** Organization JSON-LD script entry for route head() `scripts`. */
+export const ORGANIZATION_JSONLD = {
+  type: "application/ld+json",
+  children: JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "GetPros",
+    alternateName: "GetPros.ai",
+    url: SITE_URL,
+    logo: `${SITE_URL}/brand/og-getpros.jpg`,
+    description: "AI home-services marketplace — show, say, or type what you need and get matched with verified local professionals.",
+    email: CONTACT_EMAIL,
+  }),
+};

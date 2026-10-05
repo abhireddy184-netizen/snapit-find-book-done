@@ -87,7 +87,6 @@ export function Footer() {
             <li><a href="/#how-it-works" className="hover:text-foreground">How it works</a></li>
             <li><Link to="/emergency" className="hover:text-foreground">Emergency services</Link></li>
             <li><Link to="/trust-safety" className="hover:text-foreground">Trust &amp; safety</Link></li>
-            <li><Link to="/legal" hash="privacy" className="hover:text-foreground">Privacy</Link></li>
           </ul>
         </div>
 
