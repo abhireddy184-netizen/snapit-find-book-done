@@ -206,6 +206,7 @@ function ProviderPage({ p }: { p: Provider }) {
       </Section>
 
 
+      {p.reviewList.length > 0 && (
       <Section title={`Reviews (${p.reviews})`}>
         <div className="space-y-3">
           {p.reviewList.map((r) => (
@@ -224,6 +225,7 @@ function ProviderPage({ p }: { p: Provider }) {
           ))}
         </div>
       </Section>
+      )}
     </AppShell>
   );
 }
