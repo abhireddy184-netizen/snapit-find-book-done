@@ -236,14 +236,14 @@ export function AuthForm({
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> <span>{topNotice}</span>
             </div>
           )}
-          <form onSubmit={handleSubmit} noValidate={mode === "register"} className="mt-6 space-y-3">
+          <form ref={formRef} onSubmit={handleSubmit} noValidate={mode === "register"} className="mt-6 space-y-3">
             {mode === "register" && (
               <Field icon={User} label="Full name" placeholder="Full name" value={fullName} onChange={(v) => { setFullName(v); if (fieldErrors.name) setFieldErrors((f) => ({ ...f, name: undefined })); }} autoComplete="name" error={fieldErrors.name} />
             )}
-            <Field icon={Mail} {...(mode === "register" ? { label: "Email address" } : {})} placeholder="Email address" type="email" value={email} onChange={(v) => { setEmail(v); if (fieldErrors.email) setFieldErrors((f) => ({ ...f, email: undefined })); }} autoComplete="email" error={fieldErrors.email} />
+            <Field icon={Mail} label="Email address" placeholder="Email address" type="email" value={email} onChange={(v) => { setEmail(v); if (fieldErrors.email) setFieldErrors((f) => ({ ...f, email: undefined })); }} autoComplete="email" error={fieldErrors.email} />
             <Field
               icon={Lock}
-              {...(mode === "register" ? { label: "Password" } : {})}
+              label="Password"
               placeholder="Password"
               type="password"
               value={password}
@@ -300,8 +300,12 @@ export function AuthForm({
               </div>
             )}
 
-            <GradientButton type="submit" disabled={busy} className="mt-2 w-full">
-              {busy ? (
+            <GradientButton type="submit" disabled={busy || waitingCheck} className="mt-2 w-full">
+              {waitingCheck ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Checking password…
+                </>
+              ) : busy ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" /> {mode === "login" ? "Logging in…" : "Creating account…"}
                 </>
