@@ -1,6 +1,6 @@
 import { Footer as SiteFooter } from "./SiteFooter";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { User, Briefcase, Mail, Lock, ArrowRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Logo } from "./Logo";
 import { GradientButton } from "./AppShell";
@@ -49,6 +49,14 @@ export function AuthForm({
   const pwnedStatus = usePwnedCheck(mode === "register" ? password : "");
   const breach = serverLeaked !== null && serverLeaked === password ? "leaked" : pwnedStatus;
   const [conflict, setConflict] = useState<Role | null>(null);
+  const [waitingCheck, setWaitingCheck] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (!waitingCheck || breach === "pending") return;
+    setWaitingCheck(false);
+    if (breach === "leaked") setFieldErrors({ password: LEAKED_PASSWORD_MESSAGE });
+    else formRef.current?.requestSubmit();
+  }, [waitingCheck, breach]);
   useEffect(() => {
     if (mode !== "register") return;
     const c = new URLSearchParams(window.location.search).get("conflict");
@@ -112,11 +120,15 @@ export function AuthForm({
       if (!password) fe.password = "Please enter a password.";
       else if (passwordError(password)) fe.password = "Password doesn't meet all requirements yet.";
       if (!fe.password && breach === "leaked") fe.password = LEAKED_PASSWORD_MESSAGE;
-      else if (!fe.password && breach !== "ok") fe.password = "Password doesn't meet all requirements yet.";
       if (fe.name || fe.email || fe.password) {
         setFieldErrors(fe);
         const formEl = (e.target as HTMLElement).closest("form");
         setTimeout(() => formEl?.querySelector<HTMLInputElement>('input[aria-invalid="true"]')?.focus(), 0);
+        return;
+      }
+      if (breach === "pending") {
+        // Leaked-password check still running: wait, then auto-submit.
+        setWaitingCheck(true);
         return;
       }
     }
