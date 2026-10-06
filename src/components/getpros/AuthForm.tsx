@@ -1,6 +1,6 @@
 import { Footer as SiteFooter } from "./SiteFooter";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { User, Briefcase, Mail, Lock, ArrowRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
 import { Logo } from "./Logo";
 import { GradientButton } from "./AppShell";
@@ -49,6 +49,14 @@ export function AuthForm({
   const pwnedStatus = usePwnedCheck(mode === "register" ? password : "");
   const breach = serverLeaked !== null && serverLeaked === password ? "leaked" : pwnedStatus;
   const [conflict, setConflict] = useState<Role | null>(null);
+  const [waitingCheck, setWaitingCheck] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (!waitingCheck || breach === "pending") return;
+    setWaitingCheck(false);
+    if (breach === "leaked") setFieldErrors({ password: LEAKED_PASSWORD_MESSAGE });
+    else formRef.current?.requestSubmit();
+  }, [waitingCheck, breach]);
   useEffect(() => {
     if (mode !== "register") return;
     const c = new URLSearchParams(window.location.search).get("conflict");
@@ -112,11 +120,15 @@ export function AuthForm({
       if (!password) fe.password = "Please enter a password.";
       else if (passwordError(password)) fe.password = "Password doesn't meet all requirements yet.";
       if (!fe.password && breach === "leaked") fe.password = LEAKED_PASSWORD_MESSAGE;
-      else if (!fe.password && breach !== "ok") fe.password = "Password doesn't meet all requirements yet.";
       if (fe.name || fe.email || fe.password) {
         setFieldErrors(fe);
         const formEl = (e.target as HTMLElement).closest("form");
         setTimeout(() => formEl?.querySelector<HTMLInputElement>('input[aria-invalid="true"]')?.focus(), 0);
+        return;
+      }
+      if (breach === "pending") {
+        // Leaked-password check still running: wait, then auto-submit.
+        setWaitingCheck(true);
         return;
       }
     }
@@ -224,14 +236,14 @@ export function AuthForm({
               <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> <span>{topNotice}</span>
             </div>
           )}
-          <form onSubmit={handleSubmit} noValidate={mode === "register"} className="mt-6 space-y-3">
+          <form ref={formRef} onSubmit={handleSubmit} noValidate={mode === "register"} className="mt-6 space-y-3">
             {mode === "register" && (
               <Field icon={User} label="Full name" placeholder="Full name" value={fullName} onChange={(v) => { setFullName(v); if (fieldErrors.name) setFieldErrors((f) => ({ ...f, name: undefined })); }} autoComplete="name" error={fieldErrors.name} />
             )}
-            <Field icon={Mail} {...(mode === "register" ? { label: "Email address" } : {})} placeholder="Email address" type="email" value={email} onChange={(v) => { setEmail(v); if (fieldErrors.email) setFieldErrors((f) => ({ ...f, email: undefined })); }} autoComplete="email" error={fieldErrors.email} />
+            <Field icon={Mail} label="Email address" placeholder="Email address" type="email" value={email} onChange={(v) => { setEmail(v); if (fieldErrors.email) setFieldErrors((f) => ({ ...f, email: undefined })); }} autoComplete="email" error={fieldErrors.email} />
             <Field
               icon={Lock}
-              {...(mode === "register" ? { label: "Password" } : {})}
+              label="Password"
               placeholder="Password"
               type="password"
               value={password}
@@ -288,8 +300,12 @@ export function AuthForm({
               </div>
             )}
 
-            <GradientButton type="submit" disabled={busy} className="mt-2 w-full">
-              {busy ? (
+            <GradientButton type="submit" disabled={busy || waitingCheck} className="mt-2 w-full">
+              {waitingCheck ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Checking password…
+                </>
+              ) : busy ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" /> {mode === "login" ? "Logging in…" : "Creating account…"}
                 </>
