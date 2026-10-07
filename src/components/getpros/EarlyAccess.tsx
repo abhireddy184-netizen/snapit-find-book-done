@@ -101,7 +101,7 @@ export function EarlyAccessSection() {
             <ul className="mt-5 space-y-2 text-sm">
               {[
                 "Early invite when GetPros opens in your area",
-                "Free — no payment or membership",
+                "Free to join — you only pay when you book a job",
                 "Tell us the service you want first",
               ].map((l) => (
                 <li key={l} className="flex items-start gap-2 rounded-2xl border border-border/60 bg-background px-4 py-2.5">

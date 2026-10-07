@@ -19,6 +19,7 @@ export type Database = {
           auto_capture_at: string | null
           buffer_minutes: number
           cancelled_at: string | null
+          category_slug: string | null
           completed_at: string | null
           created_at: string
           currency: string
@@ -60,6 +61,7 @@ export type Database = {
           auto_capture_at?: string | null
           buffer_minutes?: number
           cancelled_at?: string | null
+          category_slug?: string | null
           completed_at?: string | null
           created_at?: string
           currency?: string
@@ -101,6 +103,7 @@ export type Database = {
           auto_capture_at?: string | null
           buffer_minutes?: number
           cancelled_at?: string | null
+          category_slug?: string | null
           completed_at?: string | null
           created_at?: string
           currency?: string

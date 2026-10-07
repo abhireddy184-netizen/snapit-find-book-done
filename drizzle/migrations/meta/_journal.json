@@ -64,6 +64,13 @@
       "when": 1791404981221,
       "tag": "0008_enable_cron_for_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791415590392,
+      "tag": "0009_payments_hardening",
+      "breakpoints": true
     }
   ]
 }

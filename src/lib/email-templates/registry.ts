@@ -3,6 +3,7 @@ import type { ComponentType } from 'react'
 import { template as welcomeTemplate } from './welcome'
 import { template as providerInterestTemplate } from './provider-interest'
 import { template as internalLeadTemplate } from './internal-lead'
+import { template as paymentAlertTemplate } from './payment-alert'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -21,4 +22,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   welcome: welcomeTemplate,
   'provider-interest': providerInterestTemplate,
   'internal-lead': internalLeadTemplate,
+  'payment-alert': paymentAlertTemplate,
 }

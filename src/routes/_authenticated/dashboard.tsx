@@ -256,7 +256,9 @@ function BookingCard({ booking }: { booking: Booking }) {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [setup, setSetup] = useState<{ clientSecret: string; publishableKey: string; amounts: ReturnType<typeof computeBookingAmounts> } | null>(null);
-  const needsCard = booking.status === "pending" && (booking.payment_status === "unpaid" || booking.payment_status === "failed");
+  const needsCard =
+    (booking.status === "pending" && (booking.payment_status === "unpaid" || booking.payment_status === "failed")) ||
+    (booking.status === "confirmed" && booking.payment_status === "failed");
   const canApprove = booking.status === "completed" && booking.payment_status === "authorized";
 
   return (
@@ -315,7 +317,7 @@ function BookingCard({ booking }: { booking: Booking }) {
               }}
               className="rounded-full border border-border px-4 py-2 font-semibold hover:bg-muted disabled:opacity-60"
             >
-              {busy ? "Opening…" : "Add card"}
+              {busy ? "Opening…" : booking.payment_status === "failed" ? "Update card" : "Add card"}
             </button>
           )}
         </div>

@@ -26,7 +26,7 @@ export const getBookingQuote = createServerFn({ method: "POST" })
 export const startBookingPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
-    z.object({ bookingId: z.string().uuid(), categorySlug: z.string().max(80).optional() }).parse(d),
+    z.object({ bookingId: z.string().uuid() }).parse(d),
   )
   .handler(async ({ data, context }): Promise<{ clientSecret: string; publishableKey: string; amounts: Amounts } | { error: string }> => {
     try {
@@ -34,34 +34,44 @@ export const startBookingPayment = createServerFn({ method: "POST" })
       const p = await import("./payments.server");
       const b = await p.loadBooking(supabaseAdmin, data.bookingId);
       if (!b || b.customer_id !== context.userId) return { error: "We couldn't find that booking." };
-      if (b.status !== "pending" || !["unpaid", "failed", "method_saved"].includes(b.payment_status)) {
+      if (!p.canSaveCard(b.status, b.payment_status)) {
         return { error: "This booking's payment is already set up." };
       }
       if (!b.provider_id || !(await p.getPayoutAccount(supabaseAdmin, b.provider_id))) {
         return { error: "This pro can't take paid bookings right now." };
       }
-      const price = await p.getProPriceCents(supabaseAdmin, b.provider_id, data.categorySlug);
-      if (!price) return { error: "This pro hasn't set a price yet." };
-      const amounts = computeBookingAmounts(price);
-      await supabaseAdmin
-        .from("bookings")
-        .update({
-          subtotal_cents: amounts.subtotal_cents,
-          service_fee_cents: amounts.service_fee_cents,
-          platform_fee_cents: amounts.platform_fee_cents,
-          total_cents: amounts.total_cents,
-          currency: "usd",
-        })
-        .eq("id", b.id);
+      let amounts: Amounts;
+      if (b.total_cents != null && b.payment_status !== "unpaid") {
+        // A card was saved before: keep the locked price.
+        const sub = (b.total_cents ?? 0) - (b.service_fee_cents ?? 0);
+        amounts = computeBookingAmounts(sub);
+      } else {
+        // Priced from the category stored on the booking, never from the browser.
+        const price = await p.getProPriceCents(supabaseAdmin, b.provider_id, b.category_slug);
+        if (!price) return { error: "This pro hasn't set a price yet." };
+        amounts = computeBookingAmounts(price);
+        await supabaseAdmin
+          .from("bookings")
+          .update({
+            subtotal_cents: amounts.subtotal_cents,
+            service_fee_cents: amounts.service_fee_cents,
+            platform_fee_cents: amounts.platform_fee_cents,
+            total_cents: amounts.total_cents,
+            currency: "usd",
+          })
+          .eq("id", b.id)
+          .eq("payment_status", "unpaid");
+      }
       const email = (context.claims as { email?: string } | undefined)?.email;
       const customer = await p.ensureStripeCustomer(supabaseAdmin, context.userId, email);
-      const { getStripe } = await import("./stripe.server");
+      const { getStripe, getPublishableKey } = await import("./stripe.server");
+      const publishableKey = getPublishableKey();
       const si = await getStripe().setupIntents.create({
         customer,
         usage: "off_session",
         metadata: { booking_id: b.id },
       });
-      return { clientSecret: si.client_secret!, publishableKey: process.env["STRIPE_PUBLISHABLE_KEY"] ?? "", amounts };
+      return { clientSecret: si.client_secret!, publishableKey, amounts };
     } catch (err) {
       console.error("[payments] start failed:", err instanceof Error ? err.message : err);
       return { error: "We couldn't open the card form right now. Please try again." };
@@ -80,11 +90,10 @@ export const confirmCardSaved = createServerFn({ method: "POST" })
     if (!b || b.customer_id !== context.userId || si.metadata?.["booking_id"] !== data.bookingId || si.status !== "succeeded") {
       return { ok: false };
     }
-    await supabaseAdmin
-      .from("bookings")
-      .update({ payment_method_id: String(si.payment_method), payment_status: "method_saved", payment_action_needed: false })
-      .eq("id", data.bookingId);
-    return { ok: true };
+    const pm = typeof si.payment_method === "string" ? si.payment_method : si.payment_method?.id;
+    if (!pm) return { ok: false };
+    const { recordSavedCard } = await import("./payments.server");
+    return { ok: await recordSavedCard(supabaseAdmin, data.bookingId, pm, true) };
   });
 
 /** Customer approves finished work: charge the held amount now. */

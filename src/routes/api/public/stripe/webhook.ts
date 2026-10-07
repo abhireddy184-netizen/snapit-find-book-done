@@ -31,7 +31,11 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
         const { error: dup } = await supabaseAdmin.from("stripe_events").insert({ id: event.id, type: event.type });
-        if (dup) return new Response("ok"); // already processed
+        if (dup) {
+          if ((dup as { code?: string }).code === "23505") return new Response("ok"); // already processed
+          console.error("[stripe-webhook] event log failed:", dup.message);
+          return new Response("Event log error", { status: 500 });
+        }
 
         try {
           await handleEvent(event, supabaseAdmin);
@@ -48,15 +52,27 @@ export const Route = createFileRoute("/api/public/stripe/webhook")({
 
 type Admin = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
 
+/** Order of booking payment states; updates only ever move forward. */
+const RANK: Record<string, number> = {
+  unpaid: 0, method_saved: 1, failed: 1.5, authorized: 2, canceled: 3, captured: 3, partially_refunded: 4, refunded: 5,
+};
+const PI_RANK: Record<string, number> = { requires_capture: 1, failed: 1, canceled: 2, succeeded: 2 };
+
 async function setPayment(admin: Admin, pi: Stripe.PaymentIntent, status: string, bookingStatus?: string) {
-  await admin.from("payments").update({ status, updated_at: new Date().toISOString() }).eq("payment_intent_id", pi.id);
-  const bookingId = pi.metadata?.booking_id;
-  if (bookingId && bookingStatus) {
-    await admin
-      .from("bookings")
-      .update({ payment_status: bookingStatus as never, payment_action_needed: bookingStatus === "failed" })
-      .eq("id", bookingId);
+  // Ignore payment intents we didn't create.
+  const { data: pay } = await admin.from("payments").select("id, booking_id, status").eq("payment_intent_id", pi.id).maybeSingle();
+  if (!pay) return;
+  if ((PI_RANK[status] ?? 0) > (PI_RANK[pay.status] ?? 0)) {
+    await admin.from("payments").update({ status, updated_at: new Date().toISOString() }).eq("id", pay.id);
   }
+  if (!bookingStatus) return;
+  const { data: b } = await admin.from("bookings").select("payment_status").eq("id", pay.booking_id).maybeSingle();
+  if (!b || (RANK[bookingStatus] ?? 0) <= (RANK[b.payment_status] ?? 0)) return;
+  await admin
+    .from("bookings")
+    .update({ payment_status: bookingStatus as never, payment_action_needed: bookingStatus === "failed" })
+    .eq("id", pay.booking_id)
+    .eq("payment_status", b.payment_status);
 }
 
 async function handleEvent(event: Stripe.Event, admin: Admin) {
@@ -78,10 +94,9 @@ async function handleEvent(event: Stripe.Event, admin: Admin) {
       const si = event.data.object as Stripe.SetupIntent;
       const bookingId = si.metadata?.booking_id;
       if (bookingId && typeof si.payment_method === "string") {
-        await admin
-          .from("bookings")
-          .update({ payment_method_id: si.payment_method, payment_status: "method_saved", payment_action_needed: false })
-          .eq("id", bookingId);
+        // Guarded: never overwrites an authorized, captured or refunded booking. A re-queued hold runs hourly.
+        const { recordSavedCard } = await import("@/lib/payments.server");
+        await recordSavedCard(admin, bookingId, si.payment_method, false);
       }
       break;
     }

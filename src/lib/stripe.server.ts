@@ -12,6 +12,13 @@ export function getStripe(): Stripe {
   return client;
 }
 
+/** Test-mode publishable key from STRIPE_PUBLISHABLE_KEY. Refuses anything but pk_test_. */
+export function getPublishableKey(): string {
+  const key = process.env["STRIPE_PUBLISHABLE_KEY"] ?? "";
+  if (!key.startsWith("pk_test_")) throw new Error("Only a Stripe test publishable key is allowed.");
+  return key;
+}
+
 export function siteOrigin(request?: Request | null): string {
   try {
     if (request) return new URL(request.url).origin;
