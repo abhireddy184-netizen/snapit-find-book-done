@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { Database } from "@/integrations/supabase/types";
 import type { SnapAnalysis } from "./snap-analyze.functions";
+import { createDemoQuotes } from "./booking-actions.functions";
 
 export type Job = Database["public"]["Tables"]["service_requests"]["Row"];
 export type JobStatus = Database["public"]["Enums"]["job_status"];
@@ -10,6 +11,7 @@ export type VerificationResult = Database["public"]["Enums"]["verification_resul
 
 export const JOB_STATUS_FLOW: { id: JobStatus; label: string }[] = [
   { id: "diagnosed", label: "Diagnosed" },
+  { id: "pending_match", label: "Matching a pro" },
   { id: "quotes_requested", label: "Quotes requested" },
   { id: "booked", label: "Booked" },
   { id: "in_progress", label: "In progress" },
@@ -19,6 +21,7 @@ export const JOB_STATUS_FLOW: { id: JobStatus; label: string }[] = [
 
 export const JOB_STATUS_STYLE: Record<JobStatus, string> = {
   diagnosed: "bg-primary/10 text-primary",
+  pending_match: "bg-amber-100 text-amber-700",
   quotes_requested: "bg-amber-100 text-amber-700",
   booked: "bg-mint/25 text-mint-ink",
   in_progress: "bg-sky/25 text-sky-ink",
@@ -124,8 +127,10 @@ export async function createJobFromAnalysis(params: {
   analysis: SnapAnalysis;
   imageDataUrl?: string | null;
   note?: string;
+  /** "Request a pro" details, when no verified pro covers the ZIP yet. */
+  request?: { address: string; date: string; window: string; phone: string };
 }): Promise<Job> {
-  const { customerId, analysis, imageDataUrl, note } = params;
+  const { customerId, analysis, imageDataUrl, note, request } = params;
   let beforePath: string | null = null;
   if (imageDataUrl) {
     try {
@@ -152,7 +157,16 @@ export async function createJobFromAnalysis(params: {
       ai_confidence: analysis.confidence ?? null,
       ai_diagnosis: analysis as unknown as Database["public"]["Tables"]["service_requests"]["Insert"]["ai_diagnosis"],
       before_image_path: beforePath,
-      status: "diagnosed",
+      status: request ? "pending_match" : "diagnosed",
+      ...(request
+        ? {
+            service_address: request.address,
+            preferred_date: request.date,
+            preferred_window: request.window,
+            preferred_time: request.window,
+            contact_phone: request.phone,
+          }
+        : {}),
     })
     .select("*")
     .single();
@@ -225,24 +239,7 @@ export async function acceptQuote(jobId: string, quoteId: string) {
  * flagged is_demo = true and labelled as demo data in the UI.
  */
 export async function seedDemoQuotes(job: Job, pros: { name: string; availability: string; warranty: string }[]) {
-  const low = Number(job.expected_price_low) || 100;
-  const high = Number(job.expected_price_high) || low * 2;
-  const mid = (low + high) / 2;
-  const spread = [0.92, 1.05, 1.28];
-  const rows = pros.slice(0, 3).map((p, i) => ({
-    job_id: job.id,
-    provider_id: null,
-    provider_name_snapshot: p.name,
-    price: Math.round(mid * (spread[i] ?? 1)),
-    earliest_availability: p.availability,
-    included_work: job.scope_of_work.slice(0, 4),
-    warranty: p.warranty,
-    notes: "Sample quote generated against your standardized scope.",
-    is_demo: true,
-    status: "pending" as const,
-  }));
-  const { error } = await supabase.from("provider_quotes").insert(rows);
-  if (error) throw error;
+  await createDemoQuotes({ data: { jobId: job.id, pros: pros.slice(0, 3) } });
 }
 
 export function quoteRangeVerdict(price: number, low: number, high: number) {

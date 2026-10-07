@@ -239,8 +239,6 @@ function ScopeCard({ job, onSaved }: { job: Job; onSaved: () => void }) {
   const [problem, setProblem] = useState(job.problem_statement);
   const [scope, setScope] = useState(job.scope_of_work.join("\n"));
   const [note, setNote] = useState(job.customer_note);
-  const [low, setLow] = useState(String(job.expected_price_low));
-  const [high, setHigh] = useState(String(job.expected_price_high));
   const [minutes, setMinutes] = useState(String(job.estimated_minutes));
   const [urgency, setUrgency] = useState(job.urgency);
 
@@ -251,8 +249,6 @@ function ScopeCard({ job, onSaved }: { job: Job; onSaved: () => void }) {
         problem_statement: problem,
         scope_of_work: scope.split("\n").map((s) => s.trim()).filter(Boolean),
         customer_note: note,
-        expected_price_low: Number(low) || 0,
-        expected_price_high: Number(high) || 0,
         estimated_minutes: Number(minutes) || 60,
         urgency,
       });
@@ -288,15 +284,13 @@ function ScopeCard({ job, onSaved }: { job: Job; onSaved: () => void }) {
           <Labelled label="Recommended scope of work (one per line)">
             <textarea value={scope} onChange={(e) => setScope(e.target.value)} rows={5} className="input-base" />
           </Labelled>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
             <Labelled label="Urgency">
               <select value={urgency} onChange={(e) => setUrgency(e.target.value)} className="input-base">
                 {["low", "medium", "high", "emergency"].map((u) => <option key={u} value={u}>{u}</option>)}
               </select>
             </Labelled>
             <Labelled label="Minutes"><input value={minutes} onChange={(e) => setMinutes(e.target.value)} className="input-base" /></Labelled>
-            <Labelled label="Price low"><input value={low} onChange={(e) => setLow(e.target.value)} className="input-base" /></Labelled>
-            <Labelled label="Price high"><input value={high} onChange={(e) => setHigh(e.target.value)} className="input-base" /></Labelled>
           </div>
           <Labelled label="Your note to the pro">
             <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} className="input-base" />
@@ -404,14 +398,14 @@ function QuotesCard({
     }
   };
 
-  const accept = async (quoteId: string, providerName: string) => {
+  const accept = async (quoteId: string, providerId: string) => {
     setBusy(true);
     try {
       await acceptQuote(job.id, quoteId);
       onChanged();
       await navigate({
         to: "/book",
-        search: { job: job.id, service: job.category_label, pro: providerName } as never,
+        search: { job: job.id, service: job.category_label, provider: providerId, category: job.category_slug },
       });
     } finally {
       setBusy(false);
@@ -473,9 +467,9 @@ function QuotesCard({
                   <div className="mt-auto pt-4">
                     {accepted ? (
                       <div className="inline-flex items-center gap-1.5 text-xs font-bold text-primary"><CheckCircle2 className="h-4 w-4" /> Accepted</div>
-                    ) : (
+                    ) : q.is_demo || !q.provider_id ? null : (
                       <button
-                        onClick={() => accept(q.id, q.provider_name_snapshot)}
+                        onClick={() => accept(q.id, q.provider_id!)}
                         disabled={busy || q.status === "declined"}
                         className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-border px-3 py-2 text-xs font-semibold hover:bg-muted disabled:opacity-50"
                       >
