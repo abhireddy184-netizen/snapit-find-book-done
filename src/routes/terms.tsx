@@ -26,6 +26,14 @@ function TermsPage() {
             GetPros is a marketplace: work is done by independent professionals. Prices shown before a pro confirms are
             estimates, not quotes. Do not use GetPros for emergencies that need 911.
           </p>
+          <h2 className="pt-2 text-base font-bold text-foreground">Payments (draft)</h2>
+          <ul className="list-disc space-y-1.5 pl-5">
+            <li>Payments are processed by Stripe. Pros are paid through their own Stripe account; GetPros keeps a 15% platform fee from the pro's share, and customers pay a 5% service fee shown before booking.</li>
+            <li>Your card is saved when you book but not charged. A hold for the total is placed 2 days before the job (or when the pro accepts, if the job is sooner).</li>
+            <li>After the pro marks the job complete, you can approve and pay. If you don't respond within 48 hours, the held amount is charged automatically. Contact info@getpros.ai before then if there's a problem.</li>
+            <li>Cancelling more than 24 hours before the start is free. Customer cancellations within 24 hours of an accepted job cost $25. If the pro cancels or declines, any hold is released.</li>
+            <li>Refunds are reviewed by GetPros and returned to the original card.</li>
+          </ul>
           <p>
             For a summary of how the service works today, see{" "}
             <Link to="/legal" className="font-semibold text-primary">Privacy, terms & accessibility</Link>.
