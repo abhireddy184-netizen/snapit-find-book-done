@@ -1576,7 +1576,7 @@ function RecentDiagnoses({ entries }: { entries: SnapHistoryEntry[] }) {
                   <span className="font-semibold text-foreground/80">
                     {entry.analysis.hasPriceEstimate
                       ? `$${entry.analysis.estimatedCostLow}–$${entry.analysis.estimatedCostHigh}`
-                      : "No estimate yet"}
+                      : "Pro will quote"}
                   </span>
                   <span>·</span>
                   <span>{formatRelative(entry.createdAt)}</span>

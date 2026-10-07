@@ -99,7 +99,7 @@ function HistoryPage() {
                         <DollarSign className="h-3 w-3" />{" "}
                         {entry.analysis.hasPriceEstimate
                           ? `$${entry.analysis.estimatedCostLow}–$${entry.analysis.estimatedCostHigh}`
-                          : "Needs more info"}
+                          : "Pro will quote"}
                       </span>
                       <span className="inline-flex items-center gap-1">
                         <Clock className="h-3 w-3" /> {entry.analysis.estimatedDurationMinutes} min
