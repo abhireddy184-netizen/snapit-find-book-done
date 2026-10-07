@@ -57,6 +57,13 @@
       "when": 1791401929696,
       "tag": "0007_stripe_connect_payments",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791404981221,
+      "tag": "0008_enable_cron_for_payments",
+      "breakpoints": true
     }
   ]
 }
