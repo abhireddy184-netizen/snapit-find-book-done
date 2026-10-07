@@ -5,6 +5,9 @@ import { Check, Loader2, ShieldAlert, ShieldCheck, X, Mail, Phone, MapPin } from
 import { AppShell, GradientButton } from "@/components/getpros/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { useServerFn } from "@tanstack/react-start";
+import { adminRefundBooking } from "@/lib/payments.functions";
+import { formatCents } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/admin/providers")({
   head: () => ({
@@ -79,6 +82,7 @@ function AdminProviders() {
         <h1 className="text-2xl font-black">Approve pros</h1>
         <p className="mt-1 text-sm text-muted-foreground">New pros can't be booked until you approve them here.</p>
         {error && <p className="mt-3 rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
+        <RefundBox />
         {list.isLoading && <Center><Loader2 className="h-5 w-5 animate-spin" /></Center>}
 
         <h2 className="mt-6 text-sm font-bold uppercase tracking-wider text-muted-foreground">Waiting for approval ({waiting.length})</h2>
@@ -143,4 +147,44 @@ function Row({ r, children }: { r: ProviderRow; children: React.ReactNode }) {
 
 function Center({ children }: { children: React.ReactNode }) {
   return <div className="flex flex-col items-center justify-center py-16 text-center">{children}</div>;
+}
+
+function RefundBox() {
+  const refund = useServerFn(adminRefundBooking);
+  const [bookingId, setBookingId] = useState("");
+  const [dollars, setDollars] = useState("");
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const valid = /^[0-9a-f-]{36}$/i.test(bookingId.trim());
+  return (
+    <div className="surface-card mt-6 p-4">
+      <h2 className="text-sm font-bold">Refund a booking</h2>
+      <p className="mt-1 text-xs text-muted-foreground">Leave the amount empty for a full refund. The pro's share and the GetPros fee are reversed proportionally.</p>
+      <div className="mt-3 grid gap-2 sm:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,2fr)_auto]">
+        <label className="sr-only" htmlFor="refund-id">Booking ID</label>
+        <input id="refund-id" value={bookingId} onChange={(e) => setBookingId(e.target.value)} placeholder="Booking ID" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+        <label className="sr-only" htmlFor="refund-amt">Amount (USD)</label>
+        <input id="refund-amt" value={dollars} onChange={(e) => setDollars(e.target.value)} inputMode="decimal" placeholder="Amount $" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+        <label className="sr-only" htmlFor="refund-reason">Reason</label>
+        <input id="refund-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Reason (optional)" className="rounded-xl border border-border bg-background px-3 py-2 text-sm" />
+        <button
+          type="button"
+          disabled={!valid || busy}
+          onClick={async () => {
+            setBusy(true);
+            setMsg(null);
+            const cents = dollars.trim() ? Math.round(parseFloat(dollars) * 100) : undefined;
+            const r = await refund({ data: { bookingId: bookingId.trim(), ...(cents && cents > 0 ? { amountCents: cents } : {}), ...(reason.trim() ? { reason: reason.trim() } : {}) } });
+            setBusy(false);
+            setMsg(r.ok ? `Refunded ${formatCents(r.refunded)}.` : r.message);
+          }}
+          className="rounded-full border border-border px-4 py-2 text-sm font-semibold hover:bg-muted disabled:opacity-50"
+        >
+          {busy ? "Refunding…" : "Refund"}
+        </button>
+      </div>
+      {msg && <p role="status" className="mt-2 text-xs font-medium">{msg}</p>}
+    </div>
+  );
 }
