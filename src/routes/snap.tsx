@@ -41,6 +41,7 @@ import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } 
 import { useAuth } from "@/lib/auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { createJobFromAnalysis } from "@/lib/jobs";
+import { notifyPendingMatch } from "@/lib/booking-actions.functions";
 import { prepareMediaForAnalysis, withTimeout, type PreparedMedia } from "@/lib/snap-media";
 import { GuidedVideoScan, canUseGuidedScan } from "@/components/getpros/GuidedVideoScan";
 import {
@@ -881,6 +882,104 @@ function CaptureTile({
 
 
 
+const TIME_WINDOWS = ["Morning (8 AM–12 PM)", "Afternoon (12–4 PM)", "Evening (4–8 PM)", "Any time"];
+
+/** Shown when no verified pro covers the ZIP yet: capture the job so we can match it by hand. */
+function RequestProCard({
+  analysis,
+  image,
+  defaultLocation,
+}: {
+  analysis: SnapAnalysis;
+  image: string | null;
+  defaultLocation: string;
+}) {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const notify = useServerFn(notifyPendingMatch);
+  const [address, setAddress] = useState(defaultLocation);
+  const [date, setDate] = useState("");
+  const [windowLabel, setWindowLabel] = useState(TIME_WINDOWS[0]!);
+  const [phone, setPhone] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [done, setDone] = useState(false);
+  const today = new Date().toISOString().slice(0, 10);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setErr(null);
+    if (!user) {
+      await navigate({ to: "/login", search: { redirect: "/snap" } });
+      return;
+    }
+    const zip = extractZip(address.trim()) ?? (isZipCode(address.trim()) ? address.trim() : null);
+    if (!address.trim() || !zip) return setErr("Add the service address with a 5-digit US ZIP code.");
+    if (!(await lookupZip(zip))) return setErr("That ZIP code doesn't look like a US ZIP. Please check it.");
+    if (!date || date < today) return setErr("Pick a preferred date (today or later).");
+    if (phone.replace(/\D/g, "").length < 10) return setErr("Add a contact phone number with area code.");
+    setBusy(true);
+    try {
+      const job = await createJobFromAnalysis({
+        customerId: user.id,
+        analysis,
+        imageDataUrl: image,
+        request: { address: address.trim(), date, window: windowLabel, phone: phone.trim() },
+      });
+      void notify({ data: { jobId: job.id } }).catch(() => {});
+      setDone(true);
+    } catch (e2) {
+      setErr(e2 instanceof Error ? e2.message : "We couldn't send your request. Please try again.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div className="rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/5 to-card p-5 text-center shadow-sm">
+        <CheckCircle2 className="mx-auto h-8 w-8 text-primary" />
+        <h3 className="mt-2 text-lg font-black">We're matching you with a verified pro.</h3>
+        <p className="mt-1 text-sm text-muted-foreground">Nothing is booked or charged yet.</p>
+      </div>
+    );
+  }
+
+  return (
+    <form onSubmit={submit} noValidate className="rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/5 to-card p-5 shadow-sm">
+      <h3 className="text-lg font-black">Request a pro</h3>
+      <p className="mt-1 text-sm text-muted-foreground">
+        No verified {analysis.category || "service"} pro covers this area yet. Send your request and we'll find one for you.
+      </p>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <label className="block sm:col-span-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Service address (with ZIP)</span>
+          <input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="123 Main St, Katy, TX 77494" autoComplete="street-address" className="mt-1 w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-primary" />
+        </label>
+        <label className="block">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Preferred date</span>
+          <input type="date" min={today} value={date} onChange={(e) => setDate(e.target.value)} className="mt-1 w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-primary" />
+        </label>
+        <label className="block">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Time window</span>
+          <select value={windowLabel} onChange={(e) => setWindowLabel(e.target.value)} className="mt-1 w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-primary">
+            {TIME_WINDOWS.map((w) => <option key={w} value={w}>{w}</option>)}
+          </select>
+        </label>
+        <label className="block sm:col-span-2">
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Contact phone</span>
+          <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(555) 123-4567" autoComplete="tel" className="mt-1 w-full rounded-xl border border-border bg-card px-3 py-2.5 text-sm outline-none focus:border-primary" />
+        </label>
+      </div>
+      {err && <p role="alert" className="mt-3 text-xs font-medium text-destructive">{err}</p>}
+      <GradientButton type="submit" disabled={busy} className="mt-4 w-full justify-center py-4 text-base">
+        {busy ? <Loader2 className="h-5 w-5 animate-spin" /> : <ArrowRight className="h-5 w-5" />}
+        {user ? "Request a pro" : "Sign in to request a pro"}
+      </GradientButton>
+    </form>
+  );
+}
+
 function JobScopeCta({ analysis, image }: { analysis: SnapAnalysis; image: string | null }) {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -944,6 +1043,28 @@ function AnalysisView({
   serviceLocation?: string;
 }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  // One job brief per analysis, reused by every "Book" tap so the booking is
+  // linked to this brief and its price estimate.
+  const jobIdRef = useRef<Promise<string | null> | null>(null);
+  const ensureJobId = () => {
+    if (!user) return Promise.resolve(null);
+    jobIdRef.current ??= createJobFromAnalysis({ customerId: user.id, analysis, imageDataUrl: image })
+      .then((j) => j.id)
+      .catch(() => { jobIdRef.current = null; return null; });
+    return jobIdRef.current;
+  };
+  const bookWith = async (providerId: string) => {
+    const jobId = await ensureJobId();
+    await navigate({
+      to: "/book",
+      search: {
+        provider: providerId,
+        ...(analysis.categorySlug ? { category: analysis.categorySlug } : {}),
+        ...(jobId ? { job: jobId } : {}),
+      },
+    });
+  };
   const u = urgencyStyles[analysis.urgency] ?? urgencyStyles.medium;
   const UrgencyIcon = u.icon;
   const category = getCategoryBySlug(analysis.categorySlug);
@@ -1236,17 +1357,16 @@ function AnalysisView({
           <ShieldCheck className="h-5 w-5" /> Browse {matched.length} available {matched.length === 1 ? "pro" : "pros"}
         </GradientButton>
       ) : (
-        <div className="rounded-3xl border border-border/60 bg-muted/40 p-5 text-sm">
-          <div className="font-black">
-            No verified pros in your area yet — join early access and we'll notify you when pros launch near you.
-          </div>
-          <p className="mt-1 text-muted-foreground">
-            {hasZip
-              ? "We only show real, verified GetPros professionals — never a sample profile."
-              : "Add your ZIP code and we'll check which verified pros actually cover it."}
-          </p>
-          <div className="-mt-6">
-            <EarlyAccessSection />
+        <div className="space-y-4">
+          <RequestProCard analysis={analysis} image={image} defaultLocation={locText} />
+          <div className="rounded-3xl border border-border/60 bg-muted/40 p-5 text-sm">
+            <div className="font-black">Prefer to wait? Join early access.</div>
+            <p className="mt-1 text-muted-foreground">
+              We only show real, verified GetPros professionals — never a sample profile.
+            </p>
+            <div className="-mt-6">
+              <EarlyAccessSection />
+            </div>
           </div>
         </div>
       )}
@@ -1267,15 +1387,7 @@ function AnalysisView({
             <ProCard
               match={recommended}
               recommended
-              onBook={() =>
-                navigate({
-                  to: "/book",
-                  search: {
-                    provider: recommended.provider.user_id,
-                    ...(analysis.categorySlug ? { category: analysis.categorySlug } : {}),
-                  },
-                })
-              }
+              onBook={() => void bookWith(recommended.provider.user_id)}
             />
           )}
           <div className="grid gap-3 md:grid-cols-2">
@@ -1283,15 +1395,7 @@ function AnalysisView({
               <ProCard
                 key={m.provider.user_id}
                 match={m}
-                onBook={() =>
-                  navigate({
-                    to: "/book",
-                    search: {
-                      provider: m.provider.user_id,
-                      ...(analysis.categorySlug ? { category: analysis.categorySlug } : {}),
-                    },
-                  })
-                }
+                onBook={() => void bookWith(m.provider.user_id)}
               />
             ))}
           </div>
