@@ -324,6 +324,7 @@ function BookPage() {
       duration_minutes: durationMinutes,
       buffer_minutes: bufferMinutes,
       service_timezone: location.timeZone,
+      category_slug: category?.slug ?? null,
       status: "pending",
       // A retry of the same request can never become a second booking.
       idempotency_key: requestKey,
@@ -376,7 +377,7 @@ function BookPage() {
       setError("We couldn't find your request. Open your dashboard to check it.");
       return;
     }
-    const pay = await startPayment({ data: { bookingId, ...(category ? { categorySlug: category.slug } : {}) } });
+    const pay = await startPayment({ data: { bookingId } });
     setSubmitting(false);
     if ("error" in pay) {
       setError(pay.error);

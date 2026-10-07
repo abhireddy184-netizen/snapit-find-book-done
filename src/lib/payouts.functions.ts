@@ -26,15 +26,25 @@ export const startPayoutOnboarding = createServerFn({ method: "POST" })
       let accountId = existing?.stripe_account_id;
       if (!accountId) {
         const email = (context.claims as { email?: string } | undefined)?.email;
-        const account = await stripe.accounts.create({
-          type: "express",
-          country: "US",
-          email,
-          capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
-          metadata: { provider_id: context.userId },
-        });
-        accountId = account.id;
-        await supabaseAdmin.from("provider_payout_accounts").insert({ provider_id: context.userId, stripe_account_id: accountId });
+        const account = await stripe.accounts.create(
+          {
+            type: "express",
+            country: "US",
+            email,
+            capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
+            metadata: { provider_id: context.userId },
+          },
+          { idempotencyKey: `payout-acct-${context.userId}` },
+        );
+        await supabaseAdmin
+          .from("provider_payout_accounts")
+          .upsert({ provider_id: context.userId, stripe_account_id: account.id }, { onConflict: "provider_id", ignoreDuplicates: true });
+        const { data: row } = await supabaseAdmin
+          .from("provider_payout_accounts")
+          .select("stripe_account_id")
+          .eq("provider_id", context.userId)
+          .maybeSingle();
+        accountId = row?.stripe_account_id ?? account.id;
       }
       const origin = siteOrigin(getRequest());
       const link = await stripe.accountLinks.create({

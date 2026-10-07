@@ -348,7 +348,7 @@ function ProviderInterestPage() {
           </div>
           {step === 3 && (
             <p className="mt-3 text-center text-xs font-semibold text-muted-foreground">
-              Free to join • No listing fee • You choose your prices and availability
+              Free to join • No listing fee — GetPros keeps 15% of each paid job • You choose your prices and availability
             </p>
           )}
         </form>
