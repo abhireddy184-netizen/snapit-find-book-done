@@ -24,11 +24,19 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<false/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>GetPros uses the camera so you can photograph or record the problem you want a pro to look at.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>GetPros uses the microphone so you can describe a job by voice, and so a video of the problem can include sound.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>GetPros uses your photo library so you can choose an existing photo or video of the problem.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

@@ -36,9 +36,11 @@ const config: CapacitorConfig = {
       "accounts.google.com",
       "*.google.com",
       "*.googleusercontent.com",
-      // Sign in with Apple (appleid.apple.com plus idmsa / CDN hosts).
+      // Sign in with Apple. Capacitor wildcards match one host label,
+      // so cdn-apple.com is listed separately from apple.com.
       "appleid.apple.com",
       "*.apple.com",
+      "*.cdn-apple.com",
       // @lovable.dev/cloud-auth-js supportedOAuthOrigins.
       "oauth.lovable.app",
       "lovable.dev",
