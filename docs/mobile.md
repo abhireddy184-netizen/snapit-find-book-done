@@ -3,7 +3,8 @@
 The iOS and Android projects in this repo are a native shell around the live website. They do not bundle the TanStack / Vite build. Publishing in Lovable updates what the app shows, without a new App Store or Play release, as long as the native shell itself does not change.
 
 App id (iOS bundle id and Android application id): `ai.getpros.app`  
-Display name: `GetPros`  
+On-device name (`CFBundleDisplayName`): `GetPros`  
+App Store listing name: not `GetPros`. That name is already taken by another developer. The App Store Connect record will use a different listing name, still to be chosen. The name under the icon on the phone stays GetPros.  
 Apple Team ID (existing App ID): `96DB94MY2K`  
 Live content: `https://getpros.ai`  
 Capacitor: 8.5.2 (`@capacitor/core`, `@capacitor/cli`, `@capacitor/android`, `@capacitor/ios`)
@@ -114,7 +115,7 @@ Then open the run. The simulator job should be green. The TestFlight job should 
 
 ### Internal testers
 
-1. App Store Connect → **Apps** → GetPros (`ai.getpros.app`). If the app record does not exist yet, create it with that bundle id, name GetPros, and SKU of your choice. The workflow cannot create the app record.
+1. App Store Connect → **Apps**. If the record does not exist yet, create it with bundle id `ai.getpros.app` and a listing name other than `GetPros` (that name is taken; the owner will choose the listing name). The name on the home screen stays GetPros. Pick any SKU. The workflow cannot create the app record.
 2. Open the build that just finished processing (processing often takes 5–15 minutes after the upload).
 3. **TestFlight → Internal Testing**. Add the build to the internal group.
 4. Users and Access → the tester’s Apple ID must be a user on the team (Account Holder, Admin, App Manager, Developer, or Marketing). Internal testers do not need a Beta App Review.
