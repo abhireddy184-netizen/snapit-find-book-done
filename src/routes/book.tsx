@@ -148,6 +148,17 @@ function BookPage() {
   const category = categoryFor(provider, categoryParam ?? draftCategory);
   const serviceOptions = category?.services.map((s) => s.name) ?? [];
 
+  // Price and payout readiness come from the server; bookings are blocked until the pro can be paid.
+  const categorySlug = category?.slug;
+  useEffect(() => {
+    if (!provider || !user) { setQuote(null); return; }
+    let cancelled = false;
+    void fetchQuote({ data: { providerId: provider.user_id, ...(categorySlug ? { categorySlug } : {}) } })
+      .then((q) => { if (!cancelled) setQuote(q); })
+      .catch(() => { if (!cancelled) setQuote(null); });
+    return () => { cancelled = true; };
+  }, [provider, user, categorySlug, fetchQuote]);
+
   // Restore a draft saved when a guest was sent to sign in. We keep the pro,
   // the service and the job, and re-validate the slot below.
   useEffect(() => {
