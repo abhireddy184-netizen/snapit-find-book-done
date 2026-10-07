@@ -1,3 +1,4 @@
+import { changeBookingStatus } from "./booking-actions.functions";
 /**
  * Data access for provider work settings and real availability.
  * Every mutation is scoped by row-level security to the signed-in provider;
@@ -129,18 +130,12 @@ export async function transitionBooking(
 ): Promise<{ ok: true } | { ok: false; message: string }> {
   if (!canTransition(from, to)) return { ok: false, message: `A ${from.replace("_", " ")} job can't be moved to ${to.replace("_", " ")}.` };
 
-  const patch: Database["public"]["Tables"]["bookings"]["Update"] = { status: to };
-  if (extra.declineReason) patch.decline_reason = extra.declineReason;
-
-  const { data, error } = await supabase
-    .from("bookings")
-    .update(patch)
-    .eq("id", id)
-    .eq("status", from)
-    .select("id,status")
-    .maybeSingle();
-
-  if (error) return { ok: false, message: error.message };
-  if (!data) return { ok: false, message: "This job was already updated somewhere else. Refresh to see the latest status." };
-  return { ok: true };
+  // Status changes run server-side, where the caller's role is checked.
+  try {
+    return await changeBookingStatus({
+      data: { id, from, to, ...(extra.declineReason ? { declineReason: extra.declineReason } : {}) },
+    });
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "We couldn't update this job. Please try again." };
+  }
 }

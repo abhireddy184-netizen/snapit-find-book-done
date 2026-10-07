@@ -291,6 +291,7 @@ function BookPage() {
       provider_id: provider.user_id,
       provider_name_snapshot: provider.business_name,
       job_id: jobId ?? null,
+      service_request_id: jobId ?? null,
       service,
       details: details || null,
       service_address: address.trim(),
