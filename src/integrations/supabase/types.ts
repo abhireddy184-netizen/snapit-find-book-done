@@ -36,6 +36,7 @@ export type Database = {
           scheduled_time: string
           service: string
           service_address: string
+          service_request_id: string | null
           service_timezone: string | null
           service_zip: string | null
           start_at: string | null
@@ -64,6 +65,7 @@ export type Database = {
           scheduled_time: string
           service: string
           service_address: string
+          service_request_id?: string | null
           service_timezone?: string | null
           service_zip?: string | null
           start_at?: string | null
@@ -92,6 +94,7 @@ export type Database = {
           scheduled_time?: string
           service?: string
           service_address?: string
+          service_request_id?: string | null
           service_timezone?: string | null
           service_zip?: string | null
           start_at?: string | null
@@ -103,6 +106,13 @@ export type Database = {
           {
             foreignKeyName: "bookings_job_id_fkey"
             columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_service_request_id_fkey"
+            columns: ["service_request_id"]
             isOneToOne: false
             referencedRelation: "service_requests"
             referencedColumns: ["id"]
@@ -528,6 +538,7 @@ export type Database = {
           category_label: string
           category_slug: string
           completed_at: string | null
+          contact_phone: string | null
           created_at: string
           currency: string
           customer_id: string
@@ -538,11 +549,15 @@ export type Database = {
           id: string
           preferred_date: string | null
           preferred_time: string | null
+          preferred_window: string | null
           problem_statement: string
           safety_steps: string[]
           scope_of_work: string[]
           service_address: string
           status: Database["public"]["Enums"]["job_status"]
+          status_before_booking:
+            | Database["public"]["Enums"]["job_status"]
+            | null
           updated_at: string
           urgency: string
           verification_note: string | null
@@ -559,6 +574,7 @@ export type Database = {
           category_label?: string
           category_slug?: string
           completed_at?: string | null
+          contact_phone?: string | null
           created_at?: string
           currency?: string
           customer_id: string
@@ -569,11 +585,15 @@ export type Database = {
           id?: string
           preferred_date?: string | null
           preferred_time?: string | null
+          preferred_window?: string | null
           problem_statement?: string
           safety_steps?: string[]
           scope_of_work?: string[]
           service_address?: string
           status?: Database["public"]["Enums"]["job_status"]
+          status_before_booking?:
+            | Database["public"]["Enums"]["job_status"]
+            | null
           updated_at?: string
           urgency?: string
           verification_note?: string | null
@@ -590,6 +610,7 @@ export type Database = {
           category_label?: string
           category_slug?: string
           completed_at?: string | null
+          contact_phone?: string | null
           created_at?: string
           currency?: string
           customer_id?: string
@@ -600,11 +621,15 @@ export type Database = {
           id?: string
           preferred_date?: string | null
           preferred_time?: string | null
+          preferred_window?: string | null
           problem_statement?: string
           safety_steps?: string[]
           scope_of_work?: string[]
           service_address?: string
           status?: Database["public"]["Enums"]["job_status"]
+          status_before_booking?:
+            | Database["public"]["Enums"]["job_status"]
+            | null
           updated_at?: string
           urgency?: string
           verification_note?: string | null
