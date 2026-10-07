@@ -4,7 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { approveAndPay, confirmCardSaved, startBookingPayment, syncMyPayments } from "@/lib/payments.functions";
 import { computeBookingAmounts, formatCents } from "@/lib/pricing";
 import { CardStep } from "@/components/getpros/CardStep";
-import { BRAND } from "@/lib/brand";
+import { CONTACT_EMAIL } from "@/lib/brand";
 import { useState } from "react";
 import { CalendarDays, Bookmark, MessageCircle, User, MapPin, Star, ShieldCheck, Camera, LogOut, Loader2, ClipboardList, ArrowRight } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
@@ -323,7 +323,7 @@ function BookingCard({ booking }: { booking: Booking }) {
       {canApprove && booking.auto_capture_at && (
         <p className="mt-2 text-xs text-muted-foreground">
           If you don't approve, we'll charge automatically on {new Date(booking.auto_capture_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}.
-          Problem with the work? Email {BRAND.contactEmail} before then.
+          Problem with the work? Email {CONTACT_EMAIL} before then.
         </p>
       )}
       {setup && (
