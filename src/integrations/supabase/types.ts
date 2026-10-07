@@ -787,6 +787,7 @@ export type Database = {
         | "needs_verification"
         | "completed"
         | "cancelled"
+        | "pending_match"
       quote_status: "pending" | "accepted" | "declined" | "withdrawn"
       staff_role: "admin"
       verification_result:
@@ -946,6 +947,7 @@ export const Constants = {
         "needs_verification",
         "completed",
         "cancelled",
+        "pending_match",
       ],
       quote_status: ["pending", "accepted", "declined", "withdrawn"],
       staff_role: ["admin"],
