@@ -301,6 +301,7 @@ function BusinessProfile() {
     service_zip: "",
     service_radius_miles: "",
     starting_price: "",
+    fixed_price: "",
     availability: "",
     phone: "",
     bio: "",
@@ -320,6 +321,7 @@ function BusinessProfile() {
       service_zip: data.service_zip ?? "",
       service_radius_miles: data.service_radius_miles != null ? String(data.service_radius_miles) : "",
       starting_price: data.starting_price != null ? String(data.starting_price) : "",
+      fixed_price: "",
       availability: data.availability ?? "",
       phone: data.phone ?? "",
       bio: data.bio ?? "",
@@ -368,6 +370,20 @@ function BusinessProfile() {
     if (upsertError) {
       setError(upsertError.message);
       return;
+    }
+    const cat = catalog.find((c) => c.name === form.service_category);
+    const fixed = form.fixed_price ? Math.round(Number(form.fixed_price) * 100) : null;
+    if (cat && fixed != null && fixed > 0) {
+      const { error: svcError } = await supabase
+        .from("provider_services")
+        .upsert(
+          { user_id: user.id, category_slug: cat.slug, category_label: cat.name, is_primary: true, price_cents: fixed },
+          { onConflict: "user_id,category_slug" },
+        );
+      if (svcError) {
+        setError(svcError.message);
+        return;
+      }
     }
     setMessage("Business profile saved.");
     await queryClient.invalidateQueries({ queryKey: ["provider-profile", user.id] });
@@ -427,6 +443,7 @@ function BusinessProfile() {
           />
           <Input label="Service area (description)" value={form.service_area} onChange={(v) => setForm({ ...form, service_area: v })} placeholder="Frisco, Plano & north Dallas" />
           <Input label="Starting price ($)" value={form.starting_price} onChange={(v) => setForm({ ...form, starting_price: v.replace(/[^0-9.]/g, "") })} placeholder="89" />
+          <Input label="Fixed job price ($)" value={form.fixed_price} onChange={(v) => setForm({ ...form, fixed_price: v.replace(/[^0-9.]/g, "") })} placeholder="120" />
           <Input label="Availability" value={form.availability} onChange={(v) => setForm({ ...form, availability: v })} placeholder="Mon–Fri, 8am–6pm" />
           <Input label="Contact phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v.slice(0, 40) })} placeholder="(214) 555-0142" />
         </div>
