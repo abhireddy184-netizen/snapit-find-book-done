@@ -8,3 +8,5 @@
 - [x] Owner alert for new customer/provider accounts
 - [ ] Branded GetPros sign-in emails (blocked: notify.getpros.ai must be set up first)
 - [x] Owner alert for new booking requests
+- [x] Payments part 1: payment tables + money-field protection, Stripe test client, pro "Set up payouts" onboarding, webhook at /api/public/stripe/webhook
+- [ ] Payments part 2: Payment step on /book (save card), hold on pro confirm (2-day rule), approve/auto-capture after 48h, cancellation fees/refunds, admin refund, block bookings until payouts active, fixed prices on services, terms/legal copy (blocked: webhook signing secrets from owner)

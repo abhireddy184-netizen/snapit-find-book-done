@@ -16,90 +16,126 @@ export type Database = {
     Tables: {
       bookings: {
         Row: {
+          auto_capture_at: string | null
           buffer_minutes: number
           cancelled_at: string | null
           completed_at: string | null
           created_at: string
+          currency: string
+          customer_approved_at: string | null
           customer_id: string
           decline_reason: string | null
           details: string | null
           duration_minutes: number
           end_at: string | null
+          hold_scheduled_at: string | null
           id: string
           idempotency_key: string | null
           job_id: string | null
           occupied_end_at: string | null
           overran_window: boolean
+          payment_action_needed: boolean
+          payment_method_id: string | null
+          payment_status: Database["public"]["Enums"]["payment_status"]
+          platform_fee_cents: number | null
           provider_id: string | null
           provider_name_snapshot: string | null
+          quote_id: string | null
           scheduled_date: string
           scheduled_time: string
           service: string
           service_address: string
+          service_fee_cents: number | null
           service_request_id: string | null
           service_timezone: string | null
           service_zip: string | null
           start_at: string | null
           started_at: string | null
           status: Database["public"]["Enums"]["booking_status"]
+          subtotal_cents: number | null
+          total_cents: number | null
           updated_at: string
         }
         Insert: {
+          auto_capture_at?: string | null
           buffer_minutes?: number
           cancelled_at?: string | null
           completed_at?: string | null
           created_at?: string
+          currency?: string
+          customer_approved_at?: string | null
           customer_id: string
           decline_reason?: string | null
           details?: string | null
           duration_minutes?: number
           end_at?: string | null
+          hold_scheduled_at?: string | null
           id?: string
           idempotency_key?: string | null
           job_id?: string | null
           occupied_end_at?: string | null
           overran_window?: boolean
+          payment_action_needed?: boolean
+          payment_method_id?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          platform_fee_cents?: number | null
           provider_id?: string | null
           provider_name_snapshot?: string | null
+          quote_id?: string | null
           scheduled_date: string
           scheduled_time: string
           service: string
           service_address: string
+          service_fee_cents?: number | null
           service_request_id?: string | null
           service_timezone?: string | null
           service_zip?: string | null
           start_at?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
+          subtotal_cents?: number | null
+          total_cents?: number | null
           updated_at?: string
         }
         Update: {
+          auto_capture_at?: string | null
           buffer_minutes?: number
           cancelled_at?: string | null
           completed_at?: string | null
           created_at?: string
+          currency?: string
+          customer_approved_at?: string | null
           customer_id?: string
           decline_reason?: string | null
           details?: string | null
           duration_minutes?: number
           end_at?: string | null
+          hold_scheduled_at?: string | null
           id?: string
           idempotency_key?: string | null
           job_id?: string | null
           occupied_end_at?: string | null
           overran_window?: boolean
+          payment_action_needed?: boolean
+          payment_method_id?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"]
+          platform_fee_cents?: number | null
           provider_id?: string | null
           provider_name_snapshot?: string | null
+          quote_id?: string | null
           scheduled_date?: string
           scheduled_time?: string
           service?: string
           service_address?: string
+          service_fee_cents?: number | null
           service_request_id?: string | null
           service_timezone?: string | null
           service_zip?: string | null
           start_at?: string | null
           started_at?: string | null
           status?: Database["public"]["Enums"]["booking_status"]
+          subtotal_cents?: number | null
+          total_cents?: number | null
           updated_at?: string
         }
         Relationships: [
@@ -111,6 +147,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "bookings_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "provider_quotes"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "bookings_service_request_id_fkey"
             columns: ["service_request_id"]
             isOneToOne: false
@@ -118,6 +161,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      customer_billing: {
+        Row: {
+          created_at: string
+          stripe_customer_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          stripe_customer_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          stripe_customer_id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       early_access: {
         Row: {
@@ -207,6 +268,53 @@ export type Database = {
             columns: ["job_id"]
             isOneToOne: false
             referencedRelation: "service_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount_cents: number
+          booking_id: string
+          created_at: string
+          fee_cents: number
+          id: string
+          kind: string
+          payment_intent_id: string | null
+          status: string
+          transfer_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          amount_cents: number
+          booking_id: string
+          created_at?: string
+          fee_cents?: number
+          id?: string
+          kind?: string
+          payment_intent_id?: string | null
+          status: string
+          transfer_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          amount_cents?: number
+          booking_id?: string
+          created_at?: string
+          fee_cents?: number
+          id?: string
+          kind?: string
+          payment_intent_id?: string | null
+          status?: string
+          transfer_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
             referencedColumns: ["id"]
           },
         ]
@@ -346,6 +454,36 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_payout_accounts: {
+        Row: {
+          charges_enabled: boolean
+          created_at: string
+          details_submitted: boolean
+          payouts_enabled: boolean
+          provider_id: string
+          stripe_account_id: string
+          updated_at: string
+        }
+        Insert: {
+          charges_enabled?: boolean
+          created_at?: string
+          details_submitted?: boolean
+          payouts_enabled?: boolean
+          provider_id: string
+          stripe_account_id: string
+          updated_at?: string
+        }
+        Update: {
+          charges_enabled?: boolean
+          created_at?: string
+          details_submitted?: boolean
+          payouts_enabled?: boolean
+          provider_id?: string
+          stripe_account_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       provider_profiles: {
         Row: {
           accepting_bookings: boolean
@@ -475,6 +613,7 @@ export type Database = {
           created_at: string
           id: string
           is_primary: boolean
+          price_cents: number | null
           updated_at: string
           user_id: string
         }
@@ -484,6 +623,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_primary?: boolean
+          price_cents?: number | null
           updated_at?: string
           user_id: string
         }
@@ -493,6 +633,7 @@ export type Database = {
           created_at?: string
           id?: string
           is_primary?: boolean
+          price_cents?: number | null
           updated_at?: string
           user_id?: string
         }
@@ -527,6 +668,57 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      refunds: {
+        Row: {
+          amount_cents: number
+          booking_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          payment_id: string | null
+          reason: string | null
+          status: string
+          stripe_refund_id: string | null
+        }
+        Insert: {
+          amount_cents: number
+          booking_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          payment_id?: string | null
+          reason?: string | null
+          status: string
+          stripe_refund_id?: string | null
+        }
+        Update: {
+          amount_cents?: number
+          booking_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          payment_id?: string | null
+          reason?: string | null
+          status?: string
+          stripe_refund_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "refunds_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "refunds_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_requests: {
         Row: {
@@ -636,6 +828,24 @@ export type Database = {
           verification_status?: Database["public"]["Enums"]["verification_result"]
           verified_at?: string | null
           warranty_notes?: string | null
+        }
+        Relationships: []
+      }
+      stripe_events: {
+        Row: {
+          id: string
+          received_at: string
+          type: string
+        }
+        Insert: {
+          id: string
+          received_at?: string
+          type: string
+        }
+        Update: {
+          id?: string
+          received_at?: string
+          type?: string
         }
         Relationships: []
       }
@@ -813,6 +1023,15 @@ export type Database = {
         | "completed"
         | "cancelled"
         | "pending_match"
+      payment_status:
+        | "unpaid"
+        | "method_saved"
+        | "authorized"
+        | "captured"
+        | "partially_refunded"
+        | "refunded"
+        | "failed"
+        | "canceled"
       quote_status: "pending" | "accepted" | "declined" | "withdrawn"
       staff_role: "admin"
       verification_result:
@@ -973,6 +1192,16 @@ export const Constants = {
         "completed",
         "cancelled",
         "pending_match",
+      ],
+      payment_status: [
+        "unpaid",
+        "method_saved",
+        "authorized",
+        "captured",
+        "partially_refunded",
+        "refunded",
+        "failed",
+        "canceled",
       ],
       quote_status: ["pending", "accepted", "declined", "withdrawn"],
       staff_role: ["admin"],

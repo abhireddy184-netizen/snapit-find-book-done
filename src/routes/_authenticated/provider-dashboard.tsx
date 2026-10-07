@@ -15,6 +15,7 @@ import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 import { LocationAutocomplete } from "@/components/getpros/LocationAutocomplete";
 import { ProviderWorkSettings } from "@/components/getpros/ProviderWorkSettings";
 import { transitionBooking } from "@/lib/schedule";
+import { startPayoutOnboarding, refreshPayoutStatus } from "@/lib/payouts.functions";
 
 
 export const Route = createFileRoute("/_authenticated/provider-dashboard")({
@@ -450,6 +451,7 @@ function BusinessProfile() {
           verified={verified}
           profileComplete={Boolean(data?.business_name && data?.service_category && data?.service_zip)}
         />
+        <PayoutSetup />
 
 
         <button
@@ -469,6 +471,69 @@ function BusinessProfile() {
 /** The real GetPros app icon, reused to badge dashboard sections. */
 function GpbMark() {
   return <Wordmark size={20} />;
+}
+
+function PayoutSetup() {
+  const { user } = useAuth();
+  const start = useServerFn(startPayoutOnboarding);
+  const refresh = useServerFn(refreshPayoutStatus);
+  const qc = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { data: acct } = useQuery({
+    queryKey: ["payout-account", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("provider_payout_accounts")
+        .select("charges_enabled, payouts_enabled, details_submitted")
+        .eq("provider_id", user!.id)
+        .maybeSingle();
+      return data;
+    },
+  });
+  useEffect(() => {
+    if (typeof window === "undefined" || !new URLSearchParams(window.location.search).get("payouts")) return;
+    void refresh().then(() => qc.invalidateQueries({ queryKey: ["payout-account"] }));
+  }, [refresh, qc]);
+  const ready = Boolean(acct?.charges_enabled && acct?.payouts_enabled);
+
+  return (
+    <div className="surface-card p-5">
+      <div className="flex items-center gap-2 text-sm font-bold">
+        {ready ? <BadgeCheck className="h-4 w-4 text-mint-ink" /> : <Clock3 className="h-4 w-4 text-muted-foreground" />}
+        Set up payouts
+      </div>
+      <p className="mt-1 text-xs text-muted-foreground">
+        {ready
+          ? "Payouts are active. Customer payments reach your bank on Stripe's normal schedule."
+          : acct?.details_submitted
+            ? "Stripe is reviewing your details. You can take new bookings once payouts are active."
+            : "Connect a bank account with Stripe so you can get paid. New bookings open once payouts are active."}
+      </p>
+      {!ready && (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            setError(null);
+            const r = await start();
+            if ("url" in r) window.location.href = r.url;
+            else {
+              setError(r.error);
+              setBusy(false);
+            }
+          }}
+          className="mt-3 inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold hover:bg-muted disabled:opacity-60"
+        >
+          {busy && <Loader2 className="h-4 w-4 animate-spin" />}
+          {acct ? "Continue payout setup" : "Set up payouts"}
+        </button>
+      )}
+      {error && <p className="mt-2 text-xs text-destructive">{error}</p>}
+    </div>
+  );
 }
 
 
