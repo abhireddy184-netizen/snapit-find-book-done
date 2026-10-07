@@ -163,7 +163,7 @@ export async function recordSavedCard(admin: Admin, bookingId: string, paymentMe
       ...(requeue ? { hold_scheduled_at: new Date().toISOString() } : {}),
     })
     .eq("id", bookingId)
-    .eq("status", b.status)
+    .eq("status", b.status as never)
     .eq("payment_status", b.payment_status as never)
     .select(BOOKING_COLS)
     .maybeSingle();
