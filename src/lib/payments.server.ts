@@ -78,7 +78,7 @@ export async function placeHold(admin: Admin, b: BookingRow): Promise<boolean> {
         transfer_data: { destination: dest },
         metadata: { booking_id: b.id, kind: "full" },
       },
-      { idempotencyKey: `hold-${b.id}` },
+      { idempotencyKey: `hold-${b.id}-${b.payment_method_id}` },
     );
     await admin.from("payments").upsert(
       { booking_id: b.id, kind: "full", payment_intent_id: pi.id, amount_cents: b.total_cents, fee_cents: fee, status: pi.status },
@@ -89,12 +89,87 @@ export async function placeHold(admin: Admin, b: BookingRow): Promise<boolean> {
       .from("bookings")
       .update({ payment_status: ok ? "authorized" : "failed", payment_action_needed: !ok, hold_scheduled_at: null })
       .eq("id", b.id);
+    if (!ok) await notifyHoldFailed(admin, b.id);
     return ok;
   } catch (err) {
     console.error("[payments] hold failed", b.id, err instanceof Error ? err.message : err);
-    await admin.from("bookings").update({ payment_status: "failed", payment_action_needed: true }).eq("id", b.id);
+    await admin.from("bookings").update({ payment_status: "failed", payment_action_needed: true, hold_scheduled_at: null }).eq("id", b.id);
+    await notifyHoldFailed(admin, b.id);
     return false;
   }
+}
+
+/** Emails the pro and the owner that a card hold failed. Never throws. */
+async function notifyHoldFailed(admin: Admin, bookingId: string) {
+  try {
+    const { data: b } = await admin
+      .from("bookings")
+      .select("id, provider_id, service, service_address, service_zip, scheduled_date, scheduled_time, provider_name_snapshot")
+      .eq("id", bookingId)
+      .maybeSingle();
+    if (!b) return;
+    const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+    const when = `${b.scheduled_date} ${b.scheduled_time}`;
+    await sendTemplateEmail("internal-lead", "", {
+      templateData: {
+        leadType: "booking",
+        service: b.service,
+        businessName: `Card hold FAILED — ${b.provider_name_snapshot ?? "pro"}`,
+        location: b.service_address,
+        zip: b.service_zip,
+        note: `${when} — customer asked to update their card`,
+        source: "payments (card hold failed)",
+        submittedAt: new Date().toISOString(),
+      },
+      idempotencyKey: `hold-failed-owner-${b.id}-${Date.now()}`,
+    }).catch((e) => console.error("[payments] owner alert failed", e instanceof Error ? e.message : e));
+    if (b.provider_id) {
+      const { data: u } = await admin.auth.admin.getUserById(b.provider_id);
+      const email = u?.user?.email;
+      if (email) {
+        await sendTemplateEmail("payment-alert", email, {
+          templateData: { service: b.service, when },
+          idempotencyKey: `hold-failed-pro-${b.id}-${Date.now()}`,
+        }).catch((e) => console.error("[payments] pro alert failed", e instanceof Error ? e.message : e));
+      }
+    }
+  } catch (err) {
+    console.error("[payments] hold-failed alert error", err instanceof Error ? err.message : err);
+  }
+}
+
+/** A card can be (re)saved while the booking is pending, or after a failed hold on a confirmed booking. */
+export function canSaveCard(status: string, paymentStatus: string) {
+  return (
+    (status === "pending" && ["unpaid", "failed", "method_saved"].includes(paymentStatus)) ||
+    (status === "confirmed" && paymentStatus === "failed")
+  );
+}
+
+/**
+ * Records a saved card, guarded so it never overwrites an authorized, captured or refunded booking.
+ * For a confirmed booking whose hold failed, the hold is re-queued; pass retry=true to place it now.
+ */
+export async function recordSavedCard(admin: Admin, bookingId: string, paymentMethodId: string, retry: boolean) {
+  const b = await loadBooking(admin, bookingId);
+  if (!b || !canSaveCard(b.status, b.payment_status)) return false;
+  const requeue = b.status === "confirmed";
+  const { data: row } = await admin
+    .from("bookings")
+    .update({
+      payment_method_id: paymentMethodId,
+      payment_status: "method_saved",
+      payment_action_needed: false,
+      ...(requeue ? { hold_scheduled_at: new Date().toISOString() } : {}),
+    })
+    .eq("id", bookingId)
+    .eq("status", b.status)
+    .eq("payment_status", b.payment_status as never)
+    .select(BOOKING_COLS)
+    .maybeSingle();
+  if (!row) return false;
+  if (requeue && retry) await placeHold(admin, row as BookingRow);
+  return true;
 }
 
 async function heldPayment(admin: Admin, bookingId: string) {
@@ -125,6 +200,8 @@ export async function captureBooking(admin: Admin, bookingId: string, approved: 
     return { ok: true as const };
   } catch (err) {
     console.error("[payments] capture failed", bookingId, err instanceof Error ? err.message : err);
+    // Flag for review; the hourly run skips flagged bookings so it doesn't retry forever.
+    await admin.from("bookings").update({ payment_action_needed: true }).eq("id", bookingId);
     return { ok: false as const, message: "We couldn't complete the payment. Please try again shortly." };
   }
 }
@@ -171,6 +248,7 @@ export async function processDuePayments(admin: Admin, opts: { userId?: string }
     .select("id")
     .eq("status", "completed")
     .eq("payment_status", "authorized")
+    .eq("payment_action_needed", false)
     .lte("auto_capture_at", now)
     .limit(25);
   if (opts.userId) {
@@ -181,12 +259,34 @@ export async function processDuePayments(admin: Admin, opts: { userId?: string }
   const [{ data: h }, { data: c }] = await Promise.all([holds, captures]);
   for (const b of h ?? []) await placeHold(admin, b as BookingRow);
   for (const b of c ?? []) await captureBooking(admin, b.id, false);
+  await flagStaleHolds(admin);
   return { holds: h?.length ?? 0, captures: c?.length ?? 0 };
 }
 
+/** Card holds expire after ~7 days: flag bookings whose hold is over 6 days old and the job isn't done. */
+export const STALE_HOLD_MS = 6 * 24 * 60 * 60 * 1000;
+async function flagStaleHolds(admin: Admin) {
+  const cutoff = new Date(Date.now() - STALE_HOLD_MS).toISOString();
+  const { data: old } = await admin
+    .from("payments")
+    .select("booking_id")
+    .eq("kind", "full")
+    .eq("status", "requires_capture")
+    .lt("created_at", cutoff)
+    .limit(100);
+  const ids = [...new Set((old ?? []).map((p) => p.booking_id))];
+  if (!ids.length) return;
+  await admin
+    .from("bookings")
+    .update({ payment_action_needed: true })
+    .in("id", ids)
+    .in("status", ["confirmed", "in_progress"])
+    .eq("payment_action_needed", false);
+}
+
 export async function loadBooking(admin: Admin, id: string) {
-  const { data } = await admin.from("bookings").select(`${BOOKING_COLS}, status, start_at`).eq("id", id).maybeSingle();
-  return data as (BookingRow & { status: string; start_at: string | null }) | null;
+  const { data } = await admin.from("bookings").select(`${BOOKING_COLS}, status, start_at, category_slug`).eq("id", id).maybeSingle();
+  return data as (BookingRow & { status: string; start_at: string | null; category_slug: string | null }) | null;
 }
 
 export { computeBookingAmounts };
