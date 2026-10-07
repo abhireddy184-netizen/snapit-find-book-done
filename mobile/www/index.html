@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="robots" content="noindex" />
+    <title>GetPros</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --navy: #0f2b4c;
+        --teal: #0fa3b1;
+        --slate: #64748b;
+        --surface: #f1f8f9;
+        --line: #e2e8f0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        min-height: 100%;
+      }
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        background: var(--surface);
+        color: var(--navy);
+        display: grid;
+        place-items: center;
+        padding: max(1.5rem, env(safe-area-inset-top)) 1.5rem
+          max(1.5rem, env(safe-area-inset-bottom));
+      }
+      main {
+        width: min(100%, 24rem);
+        text-align: center;
+      }
+      .mark {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0;
+        font-weight: 800;
+        font-size: 1.75rem;
+        letter-spacing: -0.03em;
+      }
+      .mark span:last-child {
+        color: var(--slate);
+        font-weight: 700;
+      }
+      h1 {
+        margin: 1.5rem 0 0.5rem;
+        font-size: 1.35rem;
+        line-height: 1.25;
+      }
+      p {
+        margin: 0;
+        color: var(--slate);
+        line-height: 1.5;
+      }
+      button {
+        margin-top: 1.5rem;
+        appearance: none;
+        border: 0;
+        border-radius: 999px;
+        background: var(--teal);
+        color: white;
+        font: inherit;
+        font-weight: 700;
+        min-height: 3rem;
+        padding: 0.75rem 1.5rem;
+        cursor: pointer;
+      }
+      button:focus-visible {
+        outline: 3px solid var(--navy);
+        outline-offset: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="mark">GetPros<span>.ai</span></div>
+      <h1>Can’t reach GetPros</h1>
+      <p>
+        The app loads from getpros.ai and needs an internet connection. Check your connection, then
+        try again.
+      </p>
+      <button type="button" id="retry">Try again</button>
+    </main>
+    <script>
+      document.getElementById("retry").addEventListener("click", function () {
+        window.location.replace("https://getpros.ai");
+      });
+    </script>
+  </body>
+</html>

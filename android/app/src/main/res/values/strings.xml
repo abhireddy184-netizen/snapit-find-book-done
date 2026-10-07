@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">GetPros</string>
+    <string name="title_activity_main">GetPros</string>
+    <string name="package_name">ai.getpros.app</string>
+    <string name="custom_url_scheme">ai.getpros.app</string>
+</resources>
