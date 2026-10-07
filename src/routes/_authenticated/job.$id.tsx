@@ -284,7 +284,7 @@ function ScopeCard({ job, onSaved }: { job: Job; onSaved: () => void }) {
           <Labelled label="Recommended scope of work (one per line)">
             <textarea value={scope} onChange={(e) => setScope(e.target.value)} rows={5} className="input-base" />
           </Labelled>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-2">
             <Labelled label="Urgency">
               <select value={urgency} onChange={(e) => setUrgency(e.target.value)} className="input-base">
                 {["low", "medium", "high", "emergency"].map((u) => <option key={u} value={u}>{u}</option>)}
