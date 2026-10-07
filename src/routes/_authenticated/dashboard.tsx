@@ -1,5 +1,10 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { approveAndPay, confirmCardSaved, startBookingPayment, syncMyPayments } from "@/lib/payments.functions";
+import { computeBookingAmounts, formatCents } from "@/lib/pricing";
+import { CardStep } from "@/components/getpros/CardStep";
+import { CONTACT_EMAIL } from "@/lib/brand";
 import { useState } from "react";
 import { CalendarDays, Bookmark, MessageCircle, User, MapPin, Star, ShieldCheck, Camera, LogOut, Loader2, ClipboardList, ArrowRight } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
@@ -164,9 +169,13 @@ function JobCard({ job }: { job: Job }) {
 }
 
 function Bookings({ userId }: { userId: string | undefined }) {
+  const sync = useServerFn(syncMyPayments);
   const { data, isLoading, error } = useQuery({
     queryKey: ["bookings", "customer", userId],
-    queryFn: () => fetchCustomerBookings(userId as string),
+    queryFn: async () => {
+      await sync().catch(() => null);
+      return fetchCustomerBookings(userId as string);
+    },
     enabled: Boolean(userId),
   });
 
@@ -226,9 +235,30 @@ const statusStyle: Record<string, string> = {
   cancelled: "bg-muted text-muted-foreground",
 };
 
+const PAYMENT_LABEL: Record<string, string> = {
+  unpaid: "Card needed",
+  method_saved: "Card saved · not charged",
+  authorized: "Card hold placed · not charged yet",
+  captured: "Paid",
+  partially_refunded: "Partly refunded",
+  refunded: "Refunded",
+  failed: "Payment problem — update your card",
+  canceled: "Hold released · not charged",
+};
+
 function BookingCard({ booking }: { booking: Booking }) {
   const name = booking.provider_name_snapshot || "Pro to be assigned";
   const initials = name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+  const qc = useQueryClient();
+  const approve = useServerFn(approveAndPay);
+  const startPay = useServerFn(startBookingPayment);
+  const confirmCard = useServerFn(confirmCardSaved);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [setup, setSetup] = useState<{ clientSecret: string; publishableKey: string; amounts: ReturnType<typeof computeBookingAmounts> } | null>(null);
+  const needsCard = booking.status === "pending" && (booking.payment_status === "unpaid" || booking.payment_status === "failed");
+  const canApprove = booking.status === "completed" && booking.payment_status === "authorized";
+
   return (
     <div className="surface-card p-4">
       <div className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3">
@@ -248,6 +278,69 @@ function BookingCard({ booking }: { booking: Booking }) {
         <MapPin className="h-3.5 w-3.5 shrink-0 text-primary" />
         <span className="truncate">{booking.service_address}</span>
       </div>
+      {(booking.total_cents != null || needsCard) && (
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3 text-xs">
+          <span className="text-muted-foreground">
+            {booking.total_cents != null && <strong className="text-foreground">{formatCents(booking.total_cents)}</strong>}
+            {booking.total_cents != null && " · "}
+            {PAYMENT_LABEL[booking.payment_status] ?? booking.payment_status}
+          </span>
+          {canApprove && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                const r = await approve({ data: { bookingId: booking.id } });
+                setBusy(false);
+                setMsg(r.ok ? "Thanks — payment complete." : r.message);
+                void qc.invalidateQueries({ queryKey: ["bookings"] });
+              }}
+              className="rounded-full px-4 py-2 font-bold text-primary-foreground disabled:opacity-60"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              {busy ? "Charging…" : "Approve & pay"}
+            </button>
+          )}
+          {needsCard && !setup && (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                const r = await startPay({ data: { bookingId: booking.id } });
+                setBusy(false);
+                if ("error" in r) setMsg(r.error);
+                else setSetup(r);
+              }}
+              className="rounded-full border border-border px-4 py-2 font-semibold hover:bg-muted disabled:opacity-60"
+            >
+              {busy ? "Opening…" : "Add card"}
+            </button>
+          )}
+        </div>
+      )}
+      {canApprove && booking.auto_capture_at && (
+        <p className="mt-2 text-xs text-muted-foreground">
+          If you don't approve, we'll charge automatically on {new Date(booking.auto_capture_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}.
+          Problem with the work? Email {CONTACT_EMAIL} before then.
+        </p>
+      )}
+      {setup && (
+        <div className="mt-4">
+          <CardStep
+            {...setup}
+            proName={name}
+            onSaved={async (setupIntentId) => {
+              await confirmCard({ data: { bookingId: booking.id, setupIntentId } }).catch(() => null);
+              setSetup(null);
+              setMsg("Card saved. You won't be charged until the job is done.");
+              void qc.invalidateQueries({ queryKey: ["bookings"] });
+            }}
+          />
+        </div>
+      )}
+      {msg && <p role="status" className="mt-2 text-xs font-medium text-foreground">{msg}</p>}
     </div>
   );
 }

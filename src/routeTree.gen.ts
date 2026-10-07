@@ -38,6 +38,7 @@ import { Route as AuthenticatedAdminProvidersRouteImport } from './routes/_authe
 import { Route as AuthenticatedJobIdRouteImport } from './routes/_authenticated/job.$id'
 import { Route as ServicesCategoryIndexRouteImport } from './routes/services.$category.index'
 import { Route as ServicesCategoryServiceRouteImport } from './routes/services.$category.$service'
+import { Route as ApiPublicPaymentsRunDueRouteImport } from './routes/api/public/payments/run-due'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -189,6 +190,11 @@ const ServicesCategoryServiceRoute = ServicesCategoryServiceRouteImport.update({
   path: '/$category/$service',
   getParentRoute: () => ServicesRoute,
 } as any)
+const ApiPublicPaymentsRunDueRoute = ApiPublicPaymentsRunDueRouteImport.update({
+  id: '/api/public/payments/run-due',
+  path: '/api/public/payments/run-due',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   id: '/api/public/stripe/webhook',
   path: '/api/public/stripe/webhook',
@@ -240,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category/': typeof ServicesCategoryIndexRoute
+  '/api/public/payments/run-due': typeof ApiPublicPaymentsRunDueRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -273,6 +280,7 @@ export interface FileRoutesByTo {
   '/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category': typeof ServicesCategoryIndexRoute
+  '/api/public/payments/run-due': typeof ApiPublicPaymentsRunDueRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -309,6 +317,7 @@ export interface FileRoutesById {
   '/_authenticated/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category/': typeof ServicesCategoryIndexRoute
+  '/api/public/payments/run-due': typeof ApiPublicPaymentsRunDueRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -345,6 +354,7 @@ export interface FileRouteTypes {
     | '/job/$id'
     | '/services/$category/$service'
     | '/services/$category/'
+    | '/api/public/payments/run-due'
     | '/api/public/stripe/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -378,6 +388,7 @@ export interface FileRouteTypes {
     | '/job/$id'
     | '/services/$category/$service'
     | '/services/$category'
+    | '/api/public/payments/run-due'
     | '/api/public/stripe/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -413,6 +424,7 @@ export interface FileRouteTypes {
     | '/_authenticated/job/$id'
     | '/services/$category/$service'
     | '/services/$category/'
+    | '/api/public/payments/run-due'
     | '/api/public/stripe/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -442,6 +454,7 @@ export interface RootRouteChildren {
   AuthCallbackRoute: typeof AuthCallbackRoute
   ProviderIdRoute: typeof ProviderIdRoute
   TrackingIdRoute: typeof TrackingIdRoute
+  ApiPublicPaymentsRunDueRoute: typeof ApiPublicPaymentsRunDueRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -653,6 +666,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesCategoryServiceRouteImport
       parentRoute: typeof ServicesRoute
     }
+    '/api/public/payments/run-due': {
+      id: '/api/public/payments/run-due'
+      path: '/api/public/payments/run-due'
+      fullPath: '/api/public/payments/run-due'
+      preLoaderRoute: typeof ApiPublicPaymentsRunDueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/stripe/webhook': {
       id: '/api/public/stripe/webhook'
       path: '/api/public/stripe/webhook'
@@ -740,6 +760,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthCallbackRoute: AuthCallbackRoute,
   ProviderIdRoute: ProviderIdRoute,
   TrackingIdRoute: TrackingIdRoute,
+  ApiPublicPaymentsRunDueRoute: ApiPublicPaymentsRunDueRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,

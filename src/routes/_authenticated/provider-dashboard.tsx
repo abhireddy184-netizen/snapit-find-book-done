@@ -16,6 +16,8 @@ import { LocationAutocomplete } from "@/components/getpros/LocationAutocomplete"
 import { ProviderWorkSettings } from "@/components/getpros/ProviderWorkSettings";
 import { transitionBooking } from "@/lib/schedule";
 import { startPayoutOnboarding, refreshPayoutStatus } from "@/lib/payouts.functions";
+import { syncMyPayments } from "@/lib/payments.functions";
+import { formatCents } from "@/lib/pricing";
 
 
 export const Route = createFileRoute("/_authenticated/provider-dashboard")({
@@ -87,9 +89,13 @@ function ProviderDashboard() {
 }
 
 function useProviderBookings(userId: string | undefined) {
+  const syncPayments = useServerFn(syncMyPayments);
   return useQuery({
     queryKey: ["bookings", "provider", userId],
-    queryFn: () => fetchProviderBookings(userId as string),
+    queryFn: async () => {
+      await syncPayments().catch(() => null);
+      return fetchProviderBookings(userId as string);
+    },
     enabled: Boolean(userId),
   });
 }
@@ -141,6 +147,11 @@ function Requests({ userId }: { userId: string | undefined }) {
       {bookings.map((b) => (
         <div key={b.id} className="surface-card p-4">
           <JobRow booking={b} />
+          <p className="mt-2 text-xs text-muted-foreground">
+            {b.payment_method_id
+              ? `Card saved${b.subtotal_cents != null ? ` · job price ${formatCents(b.subtotal_cents)}` : ""}. Accepting places a hold 2 days before the job.`
+              : "Waiting for the customer to add a card. You can accept once they do."}
+          </p>
           <div className="mt-3 flex gap-2">
             <button
               disabled={busyId === b.id}

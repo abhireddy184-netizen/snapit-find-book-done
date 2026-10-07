@@ -7,6 +7,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { notifyNewBooking } from "@/lib/booking-notify.functions";
 import { BOOKING_DRAFT_KEY } from "@/lib/bookings";
+import { confirmCardSaved, getBookingQuote, startBookingPayment } from "@/lib/payments.functions";
+import { computeBookingAmounts, formatCents } from "@/lib/pricing";
+import { CardStep } from "@/components/getpros/CardStep";
 import { catalog, getCategoryBySlug, type MasterCategory } from "@/lib/catalog";
 import { fetchProviderByUserId, isBookable, type PublicProvider } from "@/lib/providers";
 import { fetchAvailability, fetchBusy } from "@/lib/schedule";
@@ -103,6 +106,15 @@ function BookPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [draftCategory, setDraftCategory] = useState<string | undefined>(undefined);
+  const startPayment = useServerFn(startBookingPayment);
+  const confirmCard = useServerFn(confirmCardSaved);
+  const fetchQuote = useServerFn(getBookingQuote);
+  const [cardSetup, setCardSetup] = useState<
+    { bookingId: string; clientSecret: string; publishableKey: string; amounts: ReturnType<typeof computeBookingAmounts> } | null
+  >(null);
+  const [quote, setQuote] = useState<
+    { ok: true; amounts: ReturnType<typeof computeBookingAmounts> } | { ok: false; message: string } | null
+  >(null);
 
   // Load the real pro this booking will be assigned to. There is no fallback:
   // a booking must name an actual GetPros professional's account.
@@ -135,6 +147,17 @@ function BookPage() {
 
   const category = categoryFor(provider, categoryParam ?? draftCategory);
   const serviceOptions = category?.services.map((s) => s.name) ?? [];
+
+  // Price and payout readiness come from the server; bookings are blocked until the pro can be paid.
+  const categorySlug = category?.slug;
+  useEffect(() => {
+    if (!provider || !user) { setQuote(null); return; }
+    let cancelled = false;
+    void fetchQuote({ data: { providerId: provider.user_id, ...(categorySlug ? { categorySlug } : {}) } })
+      .then((q) => { if (!cancelled) setQuote(q); })
+      .catch(() => { if (!cancelled) setQuote(null); });
+    return () => { cancelled = true; };
+  }, [provider, user, categorySlug, fetchQuote]);
 
   // Restore a draft saved when a guest was sent to sign in. We keep the pro,
   // the service and the job, and re-validate the slot below.
@@ -286,7 +309,7 @@ function BookPage() {
     const timeLabel = formatSlot(slotMinute);
 
     setSubmitting(true);
-    const { error: insertError } = await supabase.from("bookings").insert({
+    const { data: inserted, error: insertError } = await supabase.from("bookings").insert({
       customer_id: user.id,
       provider_id: provider.user_id,
       provider_name_snapshot: provider.business_name,
@@ -304,7 +327,7 @@ function BookPage() {
       status: "pending",
       // A retry of the same request can never become a second booking.
       idempotency_key: requestKey,
-    });
+    }).select("id").single();
 
     // 23505 on the idempotency index means this exact request already landed —
     // a double tap or a retried network call, not a new booking.
@@ -312,8 +335,6 @@ function BookPage() {
       insertError != null &&
       ((insertError as { code?: string }).code === "23505" ||
         /idempotency/i.test(insertError.message));
-
-    if (!insertError) void notifyBooking({ data: { requestKey } }).catch(() => {});
 
     if (insertError && !alreadySent) {
       setSubmitting(false);
@@ -332,10 +353,13 @@ function BookPage() {
       return;
     }
 
+    let bookingId = inserted?.id;
+    if (!bookingId) {
+      const { data: existing } = await supabase.from("bookings").select("id").eq("idempotency_key", requestKey).maybeSingle();
+      bookingId = existing?.id;
+    }
+
     if (jobId) {
-      // The booking is only PENDING until the pro accepts, so the job stays in
-      // "quotes requested" — it flips to booked from the pro's acceptance, not
-      // from sending the request. A failure here is surfaced, never swallowed.
       const { error: jobError } = await supabase
         .from("service_requests")
         .update({
@@ -344,21 +368,49 @@ function BookPage() {
           preferred_time: timeLabel,
         })
         .eq("id", jobId);
-      if (jobError) {
-        setSubmitting(false);
-        setError(
-          "Your request was sent, but we couldn't update the job record. Open the job to check its details.",
-        );
-      }
+      if (jobError) console.error("[book] job record update failed:", jobError.message);
     }
 
+    if (!bookingId) {
+      setSubmitting(false);
+      setError("We couldn't find your request. Open your dashboard to check it.");
+      return;
+    }
+    const pay = await startPayment({ data: { bookingId, ...(category ? { categorySlug: category.slug } : {}) } });
     setSubmitting(false);
+    if ("error" in pay) {
+      setError(pay.error);
+      return;
+    }
+    setCardSetup({ bookingId, ...pay });
+  };
+
+  const onCardSaved = async (setupIntentId: string) => {
+    if (!cardSetup) return;
+    await confirmCard({ data: { bookingId: cardSetup.bookingId, setupIntentId } }).catch(() => null);
+    void notifyBooking({ data: { requestKey } }).catch(() => {});
     setConfirmed(true);
     setTimeout(() => {
       if (jobId) void navigate({ to: "/job/$id", params: { id: jobId } });
       else void navigate({ to: "/dashboard" });
     }, 1600);
   };
+
+  if (cardSetup && !confirmed && provider) {
+    return (
+      <AppShell hideBottomNav>
+        <div className="mx-auto max-w-md pt-6">
+          <CardStep
+            clientSecret={cardSetup.clientSecret}
+            publishableKey={cardSetup.publishableKey}
+            amounts={cardSetup.amounts}
+            proName={provider.business_name}
+            onSaved={onCardSaved}
+          />
+        </div>
+      </AppShell>
+    );
+  }
 
   if (confirmed) {
     return (
@@ -619,11 +671,22 @@ function BookPage() {
                   }
                 />
                 <Row label="Held" value={`${durationMinutes} min job${bufferMinutes > 0 ? ` + ${bufferMinutes} min travel` : ""}`} />
+                {quote?.ok && (
+                  <>
+                    <Row label="Job price" value={formatCents(quote.amounts.subtotal_cents)} />
+                    <Row label="Service fee" value={formatCents(quote.amounts.service_fee_cents)} />
+                    <Row label="Total" value={formatCents(quote.amounts.total_cents)} />
+                  </>
+                )}
               </dl>
-              <p className="mt-4 text-xs text-muted-foreground">
-                Sending this creates a <strong>pending</strong> request. It becomes a confirmed job only when
-                {" "}{provider.business_name} accepts it.
-              </p>
+              {quote && !quote.ok ? (
+                <p role="alert" className="mt-4 text-sm font-medium text-destructive">{quote.message}</p>
+              ) : (
+                <p className="mt-4 text-xs text-muted-foreground">
+                  Next you'll add a card — nothing is charged now. The request stays <strong>pending</strong> until
+                  {" "}{provider.business_name} accepts it.
+                </p>
+              )}
             </StepWrap>
           )}
 
@@ -649,7 +712,7 @@ function BookPage() {
                 Continue <ChevronRight className="h-4 w-4" />
               </GradientButton>
             ) : (
-              <GradientButton onClick={() => void submit()} disabled={submitting || authLoading}>
+              <GradientButton onClick={() => void submit()} disabled={submitting || authLoading || (quote != null && !quote.ok)}>
                 {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending…</> : <>Confirm request <Check className="h-4 w-4" /></>}
               </GradientButton>
             )}

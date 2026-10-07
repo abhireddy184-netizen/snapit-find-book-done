@@ -35,7 +35,7 @@ export const changeBookingStatus = createServerFn({ method: "POST" })
     // Read as the caller (RLS) — they must be able to see the booking.
     const { data: b } = await context.supabase
       .from("bookings")
-      .select("id, customer_id, provider_id, status")
+      .select("id, customer_id, provider_id, status, start_at, payment_method_id")
       .eq("id", data.id)
       .maybeSingle();
     if (!b) return { ok: false, message: "We couldn't find that booking." };
@@ -48,13 +48,24 @@ export const changeBookingStatus = createServerFn({ method: "POST" })
     if (data.declineReason && !isPro) {
       return { ok: false, message: "Only the assigned pro can add a decline reason." };
     }
+    if (data.to === "confirmed" && !b.payment_method_id) {
+      return { ok: false, message: "The customer hasn't added a card yet. You can accept once they do." };
+    }
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const patch: { status: z.infer<typeof STATUS>; decline_reason?: string } = { status: data.to };
-    if (data.declineReason) patch.decline_reason = data.declineReason;
+    const pay = await import("./payments.server");
+    const startMs = b.start_at ? new Date(b.start_at).getTime() : null;
+    const patch: Record<string, unknown> = { status: data.to };
+    if (data.declineReason) patch["decline_reason"] = data.declineReason;
+    if (data.to === "confirmed" && startMs) {
+      patch["hold_scheduled_at"] = new Date(Math.max(Date.now(), startMs - pay.HOLD_LEAD_MS)).toISOString();
+    }
+    if (data.to === "completed") {
+      patch["auto_capture_at"] = new Date(Date.now() + pay.AUTO_CAPTURE_MS).toISOString();
+    }
     const { data: row, error } = await supabaseAdmin
       .from("bookings")
-      .update(patch)
+      .update(patch as never)
       .eq("id", data.id)
       .eq("status", data.from)
       .select("id")
@@ -64,6 +75,15 @@ export const changeBookingStatus = createServerFn({ method: "POST" })
       return { ok: false, message: error.message };
     }
     if (!row) return { ok: false, message: "This job was already updated somewhere else. Refresh to see the latest status." };
+
+    // Money follows the status change. Failures are recorded on the booking, never block the transition.
+    if (data.to === "confirmed") {
+      await pay.processDuePayments(supabaseAdmin, { userId: context.userId }).catch(() => {});
+    } else if (data.to === "cancelled") {
+      const late =
+        isCustomer && data.from === "confirmed" && startMs != null && startMs - Date.now() < pay.LATE_CANCEL_MS;
+      await pay.settleCancellation(supabaseAdmin, data.id, late);
+    }
     return { ok: true };
   });
 
