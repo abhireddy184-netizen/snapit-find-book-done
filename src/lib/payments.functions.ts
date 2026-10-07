@@ -59,7 +59,6 @@ export const startBookingPayment = createServerFn({ method: "POST" })
       const si = await getStripe().setupIntents.create({
         customer,
         usage: "off_session",
-        payment_method_types: ["card"],
         metadata: { booking_id: b.id },
       });
       return { clientSecret: si.client_secret!, publishableKey: process.env["STRIPE_PUBLISHABLE_KEY"] ?? "", amounts };
