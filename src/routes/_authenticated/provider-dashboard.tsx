@@ -353,7 +353,6 @@ function BusinessProfile() {
     }
     setSaving(true);
     const payload = {
-      user_id: user.id,
       business_name: form.business_name.trim(),
       service_category: form.service_category || null,
       service_area: form.service_area || null,
@@ -365,7 +364,9 @@ function BusinessProfile() {
       bio: form.bio || null,
     };
 
-    const { error: upsertError } = await supabase.from("provider_profiles").upsert(payload, { onConflict: "user_id" });
+    const { error: upsertError } = await saveProviderProfile({ data: payload }).catch((e: unknown) => ({
+      error: e instanceof Error ? e.message : "We couldn't save your business profile.",
+    }));
     setSaving(false);
     if (upsertError) {
       setError(upsertError.message);

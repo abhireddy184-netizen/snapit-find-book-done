@@ -25,26 +25,41 @@ export const startPayoutOnboarding = createServerFn({ method: "POST" })
         .maybeSingle();
       let accountId = existing?.stripe_account_id;
       if (!accountId) {
+        // Reuse an account created on an earlier attempt whose DB save failed.
+        for await (const acct of stripe.accounts.list({ limit: 100 })) {
+          if (acct.metadata?.["provider_id"] === context.userId) { accountId = acct.id; break; }
+        }
+      }
+      if (!accountId) {
         const email = (context.claims as { email?: string } | undefined)?.email;
-        const account = await stripe.accounts.create(
+        // This platform uses Stripe-managed risk (losses collected by Stripe), which
+        // Stripe only allows via Accounts v2 with a full Stripe dashboard.
+        const account = await stripe.v2.core.accounts.create(
           {
-            type: "express",
-            country: "US",
-            email,
-            capabilities: { card_payments: { requested: true }, transfers: { requested: true } },
+            contact_email: email,
+            dashboard: "full",
+            identity: { country: "us" },
+            configuration: {
+              merchant: { capabilities: { card_payments: { requested: true } } },
+              recipient: { capabilities: { stripe_balance: { stripe_transfers: { requested: true } } } },
+            },
+            defaults: { responsibilities: { losses_collector: "stripe", fees_collector: "stripe" } },
             metadata: { provider_id: context.userId },
           },
           { idempotencyKey: `payout-acct-${context.userId}` },
         );
+        accountId = account.id;
+      }
+      if (!existing?.stripe_account_id) {
         await supabaseAdmin
           .from("provider_payout_accounts")
-          .upsert({ provider_id: context.userId, stripe_account_id: account.id }, { onConflict: "provider_id", ignoreDuplicates: true });
+          .upsert({ provider_id: context.userId, stripe_account_id: accountId }, { onConflict: "provider_id", ignoreDuplicates: true });
         const { data: row } = await supabaseAdmin
           .from("provider_payout_accounts")
           .select("stripe_account_id")
           .eq("provider_id", context.userId)
           .maybeSingle();
-        accountId = row?.stripe_account_id ?? account.id;
+        accountId = row?.stripe_account_id ?? accountId;
       }
       const origin = siteOrigin(getRequest());
       const link = await stripe.accountLinks.create({
