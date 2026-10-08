@@ -1,3 +1,4 @@
+import { saveProviderProfile } from "@/lib/provider-profile.functions";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -369,7 +370,7 @@ function BusinessProfile() {
     }));
     setSaving(false);
     if (upsertError) {
-      setError(upsertError.message);
+      setError(upsertError);
       return;
     }
     const cat = catalog.find((c) => c.name === form.service_category);
