@@ -138,12 +138,12 @@ export const adminRefundBooking = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data, context }): Promise<{ ok: true; refunded: number } | { ok: false; message: string }> => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    const { data: isAdmin } = await context.supabase.rpc("is_admin");
     if (!isAdmin) return { ok: false, message: "Admins only." };
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: pay } = await supabaseAdmin
       .from("payments")
-      .select("id, payment_intent_id, amount_cents")
+      .select("id, payment_intent_id, amount_cents, connected_account_id")
       .eq("booking_id", data.bookingId)
       .eq("status", "succeeded")
       .order("created_at", { ascending: false })
@@ -153,13 +153,15 @@ export const adminRefundBooking = createServerFn({ method: "POST" })
     const amount = Math.min(data.amountCents ?? pay.amount_cents, pay.amount_cents);
     try {
       const { getStripe } = await import("./stripe.server");
-      const r = await getStripe().refunds.create({
-        payment_intent: pay.payment_intent_id,
-        amount,
-        reverse_transfer: true,
-        refund_application_fee: true,
-        metadata: { booking_id: data.bookingId },
-      });
+      const r = await getStripe().refunds.create(
+        {
+          payment_intent: pay.payment_intent_id,
+          amount,
+          refund_application_fee: true,
+          metadata: { booking_id: data.bookingId },
+        },
+        pay.connected_account_id ? { stripeAccount: pay.connected_account_id } : undefined,
+      );
       await supabaseAdmin.from("refunds").insert({
         payment_id: pay.id,
         booking_id: data.bookingId,

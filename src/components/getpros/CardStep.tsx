@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { loadStripe } from "@stripe/stripe-js";
+import { useEffect, useState } from "react";
+import type { Stripe } from "@stripe/stripe-js";
 import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { Loader2, Lock } from "lucide-react";
 import { formatCents } from "@/lib/pricing";
@@ -13,9 +13,16 @@ export function CardStep(props: {
   proName: string;
   onSaved: (setupIntentId: string) => Promise<void>;
 }) {
-  const stripePromise = useMemo(() => loadStripe(props.publishableKey), [props.publishableKey]);
+  const [stripeInstance, setStripeInstance] = useState<Stripe | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    void import("@stripe/stripe-js").then((m) => m.loadStripe(props.publishableKey)).then((s) => {
+      if (!cancelled) setStripeInstance(s);
+    });
+    return () => { cancelled = true; };
+  }, [props.publishableKey]);
   return (
-    <Elements stripe={stripePromise} options={{ clientSecret: props.clientSecret, appearance: { theme: "stripe" } }}>
+    <Elements stripe={stripeInstance} options={{ clientSecret: props.clientSecret, appearance: { theme: "stripe" } }}>
       <CardForm {...props} />
     </Elements>
   );

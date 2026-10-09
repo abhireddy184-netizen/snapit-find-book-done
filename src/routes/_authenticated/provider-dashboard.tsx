@@ -742,7 +742,7 @@ function VerificationCard({
             ? "Add your business name, service category and service ZIP so GetPros can review your listing. Nothing has been submitted yet."
             : inReview
               ? "Your details are with the GetPros team. No badge is shown to customers until the review completes."
-              : "Your profile is complete. Manual GetPros review isn’t open yet — we’ll contact you when it starts, and no badge is shown to customers until then."}
+              : "Submitted — GetPros reviews new pros within 2 business days."}
       </p>
       <p className="mt-1 text-xs text-muted-foreground">Status: <span className="capitalize">{status.replace(/_/g, " ")}</span></p>
     </div>

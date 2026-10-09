@@ -1,17 +1,32 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Home, Search, CalendarDays, User, Camera, ShieldAlert, LogOut, LayoutDashboard } from "lucide-react";
+import { Home, Search, CalendarDays, User, Camera, ShieldAlert, LogOut, LayoutDashboard, Menu, Wrench } from "lucide-react";
 import { Logo } from "./Logo";
 import { Footer } from "./SiteFooter";
 import { ThemeToggle } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children, hideBottomNav = false }: { children: ReactNode; hideBottomNav?: boolean }) {
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-full focus:bg-foreground focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-background"
+      >
+        Skip to content
+      </a>
       <TopBar />
       <main
+        id="main"
         className={cn(
           "gpb-shell pt-4 md:pt-6",
           hideBottomNav ? "pb-10 md:pb-16" : "pb-[calc(7.5rem+env(safe-area-inset-bottom))] md:pb-16"
@@ -48,7 +63,7 @@ function TopBar() {
         <div className="min-w-0">
           <Logo />
         </div>
-        <nav className="hidden items-center justify-center gap-1 text-sm font-medium text-muted-foreground lg:flex xl:gap-2 [&>a]:whitespace-nowrap">
+        <nav aria-label="Main" className="hidden items-center justify-center gap-1 text-sm font-medium text-muted-foreground lg:flex xl:gap-2 [&>a]:whitespace-nowrap">
           {/* One emphasis per row: Sign up is the only filled CTA. Secondary
               destinations (How it works, For Pros, Early Access) live in the
               footer so the header stays calm. */}
@@ -75,6 +90,7 @@ function TopBar() {
         <div className="flex shrink-0 items-center gap-1.5 justify-self-end sm:gap-2">
           <ThemeToggle />
           <AuthNav />
+          <MobileMenu />
         </div>
       </div>
     </header>
@@ -142,6 +158,59 @@ function AuthNav() {
   );
 }
 
+function MobileMenu() {
+  const { user, profile } = useAuth();
+  const dashboardTo = profile?.role === "provider" ? "/provider-dashboard" : "/dashboard";
+  return (
+    <Sheet>
+      <SheetTrigger asChild>
+        <button
+          type="button"
+          aria-label="Open menu"
+          className="inline-flex items-center justify-center rounded-full p-2 text-foreground hover:bg-muted md:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      </SheetTrigger>
+      <SheetContent side="right" className="flex flex-col md:hidden">
+        <SheetHeader>
+          <SheetTitle>Menu</SheetTitle>
+        </SheetHeader>
+        <nav aria-label="Mobile menu" className="mt-4 flex flex-col gap-1 text-sm font-semibold">
+          <SheetClose asChild>
+            <Link to="/services" className="rounded-xl px-3 py-2.5 hover:bg-muted">Services</Link>
+          </SheetClose>
+          <SheetClose asChild>
+            <Link to="/emergency" className="inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-destructive hover:bg-destructive/10">
+              <ShieldAlert className="h-4 w-4" /> Emergency
+            </Link>
+          </SheetClose>
+          <SheetClose asChild>
+            <a href="/#how-it-works" className="rounded-xl px-3 py-2.5 hover:bg-muted">How it works</a>
+          </SheetClose>
+          <SheetClose asChild>
+            <Link to="/provider-interest" className="rounded-xl px-3 py-2.5 hover:bg-muted">For Pros</Link>
+          </SheetClose>
+          <SheetClose asChild>
+            <Link to="/trust-safety" className="rounded-xl px-3 py-2.5 hover:bg-muted">Trust &amp; safety</Link>
+          </SheetClose>
+          {user ? (
+            <SheetClose asChild>
+              <Link to={dashboardTo} className="rounded-xl px-3 py-2.5 hover:bg-muted">Dashboard</Link>
+            </SheetClose>
+          ) : (
+            <SheetClose asChild>
+              <Link to="/login" search={{ redirect: undefined }} className="rounded-xl px-3 py-2.5 hover:bg-muted">
+                Log in / Sign up
+              </Link>
+            </SheetClose>
+          )}
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
 /**
  * True while a text field has focus — used to drop the floating bottom nav so
  * the on-screen keyboard never covers the composer's actions on mobile.
@@ -169,7 +238,7 @@ function BottomNav() {
   const { user } = useAuth();
   const items: Array<{
     key: string;
-    to: "/" | "/search" | "/snap" | "/dashboard" | "/login";
+    to: "/" | "/search" | "/snap" | "/dashboard" | "/login" | "/services";
     label: string;
     icon: typeof Home;
     highlight?: boolean;
@@ -178,13 +247,15 @@ function BottomNav() {
     { key: "search", to: "/search", label: "Search", icon: Search },
     { key: "snap", to: "/snap", label: "Show GP", icon: Camera, highlight: true },
     { key: "bookings", to: "/dashboard", label: "Bookings", icon: CalendarDays },
-    // Signed-out visitors get a real entry point instead of a silent redirect.
+    // The header already has a visible Log in / Sign up link — the bottom bar
+    // instead surfaces Services so it doesn't duplicate that entry point.
     user
       ? { key: "profile", to: "/dashboard", label: "Profile", icon: User }
-      : { key: "profile", to: "/login", label: "Log in", icon: User },
+      : { key: "services", to: "/services", label: "Services", icon: Wrench },
   ];
   return (
     <nav
+      aria-label="Mobile"
       aria-hidden={keyboardOpen}
       className={cn(
         "fixed inset-x-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md px-4 transition-all duration-200 md:hidden",

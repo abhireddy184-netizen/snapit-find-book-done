@@ -1,18 +1,18 @@
 import { ORGANIZATION_JSONLD } from "@/lib/brand";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ShieldAlert, PhoneCall, Zap, Droplet, Flame, Wind, Lock, Car, Clock } from "lucide-react";
+import { ShieldAlert, ArrowRight, Zap, Droplet, Flame, Wind, Lock, Car, Clock } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
 import { providers } from "@/lib/demo-data";
 
 export const Route = createFileRoute("/emergency")({
   head: () => ({
     meta: [
-      { title: "24/7 Emergency Services — GetPros" },
-      { name: "description", content: "Burst pipe, no power, no heat or lockout? Tell GetPros what happened and we will route your urgent request to emergency pros." },
-      { property: "og:title", content: "24/7 Emergency Services — GetPros" },
-      { property: "og:description", content: "Send an urgent service request to GetPros emergency pros." },
-      { name: "twitter:title", content: "24/7 Emergency Services — GetPros" },
-      { name: "twitter:description", content: "Burst pipe, no power, no heat or lockout? Tell GetPros what happened and we will route your urgent request to emergency pros." },
+      { title: "Urgent home repairs — GetPros.ai" },
+      { name: "description", content: "Burst pipe, no power, no heat or lockout? Tell GetPros what happened and we will route your urgent request to pros." },
+      { property: "og:title", content: "Urgent home repairs — GetPros.ai" },
+      { property: "og:description", content: "Send an urgent service request to GetPros pros." },
+      { name: "twitter:title", content: "Urgent home repairs — GetPros.ai" },
+      { name: "twitter:description", content: "Burst pipe, no power, no heat or lockout? Tell GetPros what happened and we will route your urgent request to pros." },
     ],
     scripts: [ORGANIZATION_JSONLD],
   }),
@@ -24,7 +24,6 @@ const emergencyTypes = [
   { slug: "electrical", label: "Power outage / sparks", icon: Zap, color: "from-amber-500 to-orange-500" },
   { slug: "hvac", label: "No heat / no AC", icon: Wind, color: "from-[#2FA8C0] to-[#4C86C6]" },
   { slug: "handyman", label: "Broken lock / door", icon: Lock, color: "from-rose-500 to-red-500" },
-  { slug: "appliance-repair", label: "Gas leak / smoke", icon: Flame, color: "from-red-500 to-orange-600" },
   { slug: "auto-services", label: "Roadside / breakdown", icon: Car, color: "from-[#4C86C6] to-[#2F4E96]" },
 ];
 
@@ -37,21 +36,21 @@ function EmergencyPage() {
         <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-red-600 px-3 py-1 text-xs font-bold text-white">
-              <ShieldAlert className="h-3.5 w-3.5" /> 24/7 Emergency dispatch
+              <ShieldAlert className="h-3.5 w-3.5" /> Urgent home repairs
             </div>
             <h1 className="mt-3 text-3xl font-black tracking-tight md:text-4xl">
               Something urgent?{" "}
-              <span className="text-red-600">We're on it.</span>
+              <span className="text-red-600">We can help.</span>
             </h1>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground md:text-base">
-              Tell us what happened and we will route your urgent request to on-call pros for the most common home emergencies. Response times depend on pro availability in your area.
+              Tell us what happened and we will route your urgent request to pros for the most common home emergencies. Response times depend on pro availability in your area.
             </p>
           </div>
           <Link
             to="/snap"
             className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-6 py-4 text-base font-bold text-white shadow-elevated hover:bg-red-700"
           >
-            <PhoneCall className="h-5 w-5" /> Request emergency help
+            Request urgent help <ArrowRight className="h-5 w-5" />
           </Link>
         </div>
       </section>
@@ -77,6 +76,17 @@ function EmergencyPage() {
               <span className="text-xs font-semibold text-red-600 opacity-0 transition-opacity group-hover:opacity-100">Start →</span>
             </Link>
           ))}
+          <div className="flex items-start gap-3 rounded-2xl border border-destructive/40 bg-destructive/10 p-4 text-destructive">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-destructive text-destructive-foreground shadow-card">
+              <Flame className="h-5 w-5" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-bold">Gas leak / smoke</div>
+              <p className="mt-0.5 text-xs font-medium leading-relaxed">
+                Leave the building and call 911 or your gas utility now. This is not something GetPros can dispatch for — do not start a job here.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

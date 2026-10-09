@@ -43,6 +43,23 @@ export async function ensureStripeCustomer(admin: Admin, userId: string, email?:
   return c.id;
 }
 
+/** Makes sure the customer has a Customer object on the connected account too (for direct charges). */
+export async function ensureConnectedCustomer(admin: Admin, userId: string, platformCustomer: string, stripeAccount: string) {
+  const { data } = await admin
+    .from("connected_customers")
+    .select("stripe_customer_id")
+    .eq("user_id", userId)
+    .eq("stripe_account_id", stripeAccount)
+    .maybeSingle();
+  if (data) return data.stripe_customer_id;
+  const c = await getStripe().customers.create(
+    { metadata: { user_id: userId } },
+    { stripeAccount, idempotencyKey: `conn-cus-${userId}-${stripeAccount}` },
+  );
+  await admin.from("connected_customers").insert({ user_id: userId, stripe_account_id: stripeAccount, stripe_customer_id: c.id });
+  return c.id;
+}
+
 type BookingRow = {
   id: string;
   customer_id: string;
@@ -61,27 +78,41 @@ const BOOKING_COLS =
 export async function placeHold(admin: Admin, b: BookingRow): Promise<boolean> {
   try {
     if (!b.provider_id || !b.payment_method_id || !b.total_cents) throw new Error("Booking is missing payment details");
-    const dest = await getPayoutAccount(admin, b.provider_id);
-    if (!dest) throw new Error("Pro payouts are not active");
-    const customer = await ensureStripeCustomer(admin, b.customer_id);
+    const acct = await getPayoutAccount(admin, b.provider_id);
+    if (!acct) throw new Error("Pro payouts are not active");
+    const stripe = getStripe();
+    const platformCustomer = await ensureStripeCustomer(admin, b.customer_id);
+    const connCus = await ensureConnectedCustomer(admin, b.customer_id, platformCustomer, acct);
+    const cloned = await stripe.paymentMethods.create(
+      { customer: platformCustomer, payment_method: b.payment_method_id },
+      { stripeAccount: acct },
+    );
+    await stripe.paymentMethods.attach(cloned.id, { customer: connCus }, { stripeAccount: acct });
     const fee = (b.platform_fee_cents ?? 0) + (b.service_fee_cents ?? 0);
-    const pi = await getStripe().paymentIntents.create(
+    const pi = await stripe.paymentIntents.create(
       {
         amount: b.total_cents,
         currency: "usd",
-        customer,
-        payment_method: b.payment_method_id,
+        customer: connCus,
+        payment_method: cloned.id,
         capture_method: "manual",
         off_session: true,
         confirm: true,
         application_fee_amount: fee,
-        transfer_data: { destination: dest },
         metadata: { booking_id: b.id, kind: "full" },
       },
-      { idempotencyKey: `hold-${b.id}-${b.payment_method_id}` },
+      { stripeAccount: acct, idempotencyKey: `hold-${b.id}-${b.payment_method_id}` },
     );
     await admin.from("payments").upsert(
-      { booking_id: b.id, kind: "full", payment_intent_id: pi.id, amount_cents: b.total_cents, fee_cents: fee, status: pi.status },
+      {
+        booking_id: b.id,
+        kind: "full",
+        payment_intent_id: pi.id,
+        amount_cents: b.total_cents,
+        fee_cents: fee,
+        status: pi.status,
+        connected_account_id: acct,
+      },
       { onConflict: "payment_intent_id" },
     );
     const ok = pi.status === "requires_capture";
@@ -175,7 +206,7 @@ export async function recordSavedCard(admin: Admin, bookingId: string, paymentMe
 async function heldPayment(admin: Admin, bookingId: string) {
   const { data } = await admin
     .from("payments")
-    .select("id, payment_intent_id, amount_cents")
+    .select("id, payment_intent_id, amount_cents, connected_account_id")
     .eq("booking_id", bookingId)
     .eq("kind", "full")
     .eq("status", "requires_capture")
@@ -187,7 +218,11 @@ export async function captureBooking(admin: Admin, bookingId: string, approved: 
   const p = await heldPayment(admin, bookingId);
   if (!p?.payment_intent_id) return { ok: false as const, message: "There's no card hold to charge for this job." };
   try {
-    const pi = await getStripe().paymentIntents.capture(p.payment_intent_id, {}, { idempotencyKey: `capture-${bookingId}` });
+    const pi = await getStripe().paymentIntents.capture(
+      p.payment_intent_id,
+      {},
+      { idempotencyKey: `capture-${bookingId}`, ...(p.connected_account_id ? { stripeAccount: p.connected_account_id } : {}) },
+    );
     await admin.from("payments").update({ status: pi.status, updated_at: new Date().toISOString() }).eq("id", p.id);
     await admin
       .from("bookings")
@@ -215,16 +250,18 @@ export async function settleCancellation(admin: Admin, bookingId: string, charge
       await admin.from("bookings").update({ payment_status: "canceled", payment_action_needed: false, hold_scheduled_at: null }).eq("id", bookingId);
       return;
     }
+    const opts = p.connected_account_id ? { stripeAccount: p.connected_account_id } : undefined;
     if (chargeLateFee) {
       const amount = Math.min(LATE_CANCEL_FEE_CENTS, p.amount_cents);
-      const pi = await stripe.paymentIntents.capture(p.payment_intent_id, {
-        amount_to_capture: amount,
-        application_fee_amount: Math.round((amount * PLATFORM_FEE_PERCENT) / 100),
-      });
+      const pi = await stripe.paymentIntents.capture(
+        p.payment_intent_id,
+        { amount_to_capture: amount, application_fee_amount: Math.round((amount * PLATFORM_FEE_PERCENT) / 100) },
+        opts,
+      );
       await admin.from("payments").update({ kind: "cancellation_fee", amount_cents: amount, status: pi.status }).eq("id", p.id);
       await admin.from("bookings").update({ payment_status: "captured", hold_scheduled_at: null }).eq("id", bookingId);
     } else {
-      const pi = await stripe.paymentIntents.cancel(p.payment_intent_id);
+      const pi = await stripe.paymentIntents.cancel(p.payment_intent_id, undefined, opts);
       await admin.from("payments").update({ status: pi.status }).eq("id", p.id);
       await admin.from("bookings").update({ payment_status: "canceled", hold_scheduled_at: null }).eq("id", bookingId);
     }
