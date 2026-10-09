@@ -80,7 +80,7 @@ export const refreshPayoutStatus = createServerFn({ method: "POST" })
       .eq("provider_id", context.userId)
       .maybeSingle();
     if (!row) return { ok: false };
-    const { syncPayoutAccount } = await import("./payout-sync.server");
+    const { syncPayoutAccount } = await import("@/lib/payout-sync.server");
     await syncPayoutAccount(supabaseAdmin, row.stripe_account_id);
     return { ok: true };
   });
