@@ -1,46 +1,42 @@
-# GetPerfectBoy audit (read-only findings) and removal plan
+# Launch-readiness audit (read-only, nothing changed)
 
-## Findings — every remaining reference
+## VERIFIED FROM CODE
+- **Connect webhook route** `/api/public/stripe/connect-webhook` exists and is in the route table. It checks the signature with `STRIPE_CONNECT_WEBHOOK_SECRET` (raw body + `constructEventAsync`), rejects missing/bad signatures with 400, skips repeat events, and returns 500 so Stripe retries on errors.
+- **BLOCKER: the connect route has no `account.updated` handling.** It only handles payment and refund events. `account.updated` reaches its `default:` branch, gets logged as processed, and nothing happens. Pro payout readiness (`charges_enabled` / `payouts_enabled`) is updated by `account.updated` only in the *other* route, `/api/public/stripe/webhook`. That route also accepts the Connect secret.
+- Bookings are refused unless the pro has a payout account with charges and payouts enabled (database trigger). So if `account.updated` is never saved, no pro can be booked.
+- **Social sign-in:** the code supports only Google and Apple. **There is no GitHub sign-in.** Apple uses the same callback page (`/auth/callback`) as Google.
+- **Owner emails** all go to info@getpros.ai, sent from noreply@notify.getpros.ai, with Reply-To set to the person who signed up:
+  - Join-as-a-Pro interest form: one email per new email + trade. A repeat for the same trade sends no email.
+  - **Every new account (customer or pro):** one "new account" alert, sent from the sign-up form and the Google/Apple callback. It is limited to one per account and only goes out within 30 minutes of account creation. The pro also gets a confirmation email.
+  - Newsletter and early-access emails also go to the owner.
+  - So the owner gets **all pro sign-ups and all interest submissions as separate emails**. A pro who fills in the interest form and then signs up produces 2 owner emails. That is expected, not a duplicate.
+  - Bookings and pro profile setup send no owner email.
+- **Missed emails:** sending never blocks a sign-up. A failed send is only written to the server log and is not retried. A new-account alert is lost if the browser closes before the call fires.
 
-**Code**
-- `src/lib/email-templates/brand.tsx`
-  - `SITE_URL = 'https://getperfectboy.com'` is used for the header/footer links in every email: welcome, Join as a Pro and internal lead alerts.
-  - `LOGO_URL = 'https://getperfectboy.com/icon-512.png'`
-  - `SUPPORT_EMAIL = 'support@getperfectboy.com'` appears in the email footer.
-- `src/lib/email-templates/send-email.ts`: `SENDER_DOMAIN` and `FROM_DOMAIN` are both `notify.getperfectboy.com`. So the From address is `GetPros <noreply@notify.getperfectboy.com>`.
-- `src/lib/subscribe.server.ts:19`: `SITE_URL = "https://getperfectboy.com"` supplies the welcome email link.
-- `src/lib/provider-interest.server.ts:7`: `SITE_URL = "https://getperfectboy.com"` supplies the Join as a Pro confirmation link.
-- `src/routes/unsubscribe.tsx:7`: `SITE_URL = "https://getperfectboy.com"` sets the canonical link for /unsubscribe.
-- `src/routes/privacy.tsx:31`: `privacy@getperfectboy.com`
-- `src/routes/legal.tsx:57`: `privacy@getperfectboy.com`
-- `src/routes/legal.tsx:94`: `access@getperfectboy.com`
-- `docs/auth-email-template.html`: an unused old design file. It has the GetPerfectBoy name, logo, links and support@getperfectboy.com.
-- No old-brand mentions in `public/` (icons, manifest). Canonical links on the home page and /trust-safety already use getpros.ai.
+## VERIFIED LIVE (safe, no data sent)
+- `POST https://getpros.ai/api/public/stripe/connect-webhook` with no signature returns 400 "Missing signature". `GET` returns 405. The route is deployed and reachable.
+- `https://www.getpros.ai/...` redirects (302/307) to `getpros.ai`. **Stripe does not follow redirects**, so the destination URL must be the apex `getpros.ai`, which is what the owner says they entered.
+- Database counts: **0 Stripe events ever recorded** (none of any kind). 1 payout account, **0 ready** (charges and payouts enabled). 5 pro accounts, 1 pro business profile, 5 interest submissions. 1 hourly scheduled job active.
+- So no signed Stripe event has ever been processed by either route. **Do not treat "Active" as proof that events are delivered.**
 
-**Sign-in emails and redirects**
-- The project has no custom sign-in email design. Sign-up confirmation and password-reset emails use the built-in defaults.
-- In code, the links return to the current site: `/login` after sign-up, `/reset-password` for resets, `/auth/callback` for Google/Apple.
-- A confirmation link opening getperfectboy.com almost certainly means the sign-in service's Site URL, or its allowed return addresses, still points at getperfectboy.com. The service falls back to the Site URL when getpros.ai isn't allowed. This setting isn't visible in the code and must be confirmed in the sign-in settings.
-- The certificate error happens because `getperfectboy.com` (without www) isn't connected to this project.
+## NOT TESTED
+- Real Stripe delivery to either route, and whether the saved secret matches the new destination's signing secret.
+- Whether the live site runs the latest code (the ~34 fixes may not be published).
+- Apple sign-in end-to-end. Apple provider settings on the backend were not read.
+- Real inbox delivery to Outlook (spam/junk, and whether info@getpros.ai receives mail at all).
+- Signup email-confirmation setting. It was not read from the backend. The code expects confirmation (redirect to `/login?confirmed=1` and an "already exists" message), so **confirmation is presumed ON but unverified**.
+- Full pro onboarding through Stripe as a signed-in pro.
 
-**Connected domains**
-- `getpros.ai`: active, primary.
-- `www.getpros.ai`: active, redirects to getpros.ai.
-- `www.getperfectboy.com`: active, redirects to getpros.ai.
+## BLOCKERS
+1. `account.updated` sent to the connect destination is silently ignored, so pros never become bookable.
+2. Zero events ever received. The destination config is unproven: it may be the wrong event types, the wrong mode, or the snapshot type may not include connected-account events the way it should.
+3. GitHub login does not exist, if it is a launch requirement.
+4. 0 of 1 payout accounts are ready, so currently no pro can be booked.
 
-**Email sender domain**
-- Configured and verified: `notify.getperfectboy.com`.
-- `notify.getpros.ai`: not set up. No GetPros sender domain exists yet.
-- `support@getpros.ai`, or any `@getpros.ai` address: not present anywhere in the project.
-
-## Removal steps (after approval)
-1. Set up `notify.getpros.ai` as the email sender domain. You'll need to add the DNS records it shows at your getpros.ai domain provider.
-2. After it's verified, switch the sender to `notify.getpros.ai` and set up branded GetPros sign-in emails.
-3. Change the sign-in Site URL to `https://getpros.ai` and allow `https://getpros.ai/**` and `https://www.getpros.ai/**`.
-4. Replace every getperfectboy.com website link and logo link in the files above with `https://getpros.ai`.
-5. Replace the support@, privacy@ and access@ addresses with the getpros.ai addresses you choose. Delete the unused old design file.
-6. Optional: disconnect `www.getperfectboy.com` and remove the old sender domain once nothing uses it.
-7. Test: sign up with a new email and confirm that the email and its link both use getpros.ai.
-
-## Needs your input
-- Which getpros.ai mailboxes should be used for support, privacy and accessibility? Do they already receive mail?
+## Minimal actions (for a later build turn)
+1. Add the same `account.updated` update (matched by `stripe_account_id`) to the connect route, or point the Connect destination at `/api/public/stripe/webhook`, which already handles it and accepts the Connect secret. Only one destination should handle it.
+2. In Stripe (test mode): make sure the destination listens to "Connected accounts" events and includes `account.updated` plus the payment_intent/charge events. Use "Send test event", or complete a test pro's onboarding. Then check that a row appears in `stripe_events` and that the response in Stripe's delivery log is 200 (not 400 Invalid signature).
+3. If Stripe shows 400 Invalid signature, re-copy the signing secret into `STRIPE_CONNECT_WEBHOOK_SECRET`.
+4. Publish, so that live matches preview.
+5. Confirm the email-confirmation and Apple settings on the backend. Send one real interest form and one sign-up, and check that the Outlook inbox gets exactly 1 email each (check Junk too).
+6. Decide on GitHub sign-in: add it or drop it from the launch list.
