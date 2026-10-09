@@ -19,7 +19,14 @@ export const Route = createFileRoute("/api/public/payments/run-due")({
           const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
           const { processDuePayments } = await import("@/lib/payments.server");
           const r = await processDuePayments(supabaseAdmin);
-          return Response.json(r);
+          let alerts: unknown = null;
+          try {
+            const { processOwnerAlerts } = await import("@/lib/owner-notify.server");
+            alerts = await processOwnerAlerts(supabaseAdmin);
+          } catch (err) {
+            console.error("[run-due] owner alerts failed:", err instanceof Error ? err.message : err);
+          }
+          return Response.json({ ...r, alerts });
         } catch (err) {
           console.error("[run-due] failed:", err instanceof Error ? err.message : err);
           return Response.json({ error: "run failed" }, { status: 500 });

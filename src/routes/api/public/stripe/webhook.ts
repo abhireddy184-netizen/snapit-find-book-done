@@ -80,15 +80,9 @@ async function handleEvent(event: Stripe.Event, admin: Admin) {
   switch (event.type) {
     case "account.updated": {
       const a = event.data.object as Stripe.Account;
-      await admin
-        .from("provider_payout_accounts")
-        .update({
-          charges_enabled: a.charges_enabled,
-          payouts_enabled: a.payouts_enabled,
-          details_submitted: a.details_submitted,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("stripe_account_id", a.id);
+      const { syncPayoutAccount } = await import("@/lib/payout-sync.server");
+      const r = await syncPayoutAccount(admin, event.account ?? a.id);
+      console.log("[stripe-webhook] account.updated", event.id, r);
       break;
     }
     case "setup_intent.succeeded": {
