@@ -71,6 +71,13 @@
       "when": 1791415590392,
       "tag": "0009_payments_hardening",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791527487544,
+      "tag": "0010_direct_charges_admin_deletion",
+      "breakpoints": true
     }
   ]
 }

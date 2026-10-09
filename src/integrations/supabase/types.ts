@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_deletion_requests: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           auto_capture_at: string | null
@@ -165,6 +189,27 @@ export type Database = {
           },
         ]
       }
+      connected_customers: {
+        Row: {
+          created_at: string
+          stripe_account_id: string
+          stripe_customer_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          stripe_account_id: string
+          stripe_customer_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          stripe_account_id?: string
+          stripe_customer_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       customer_billing: {
         Row: {
           created_at: string
@@ -279,6 +324,7 @@ export type Database = {
         Row: {
           amount_cents: number
           booking_id: string
+          connected_account_id: string | null
           created_at: string
           fee_cents: number
           id: string
@@ -291,6 +337,7 @@ export type Database = {
         Insert: {
           amount_cents: number
           booking_id: string
+          connected_account_id?: string | null
           created_at?: string
           fee_cents?: number
           id?: string
@@ -303,6 +350,7 @@ export type Database = {
         Update: {
           amount_cents?: number
           booking_id?: string
+          connected_account_id?: string | null
           created_at?: string
           fee_cents?: number
           id?: string
@@ -990,6 +1038,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin: { Args: never; Returns: boolean }
       provider_busy_intervals: {
         Args: { _from: string; _provider_id: string; _to: string }
         Returns: {
