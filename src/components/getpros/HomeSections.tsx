@@ -133,6 +133,7 @@ export function ServiceRow({ title, seeAll, items }: { title: string; seeAll: st
                     alt={service.name}
                     loading="lazy"
                     decoding="async"
+                    sizes="(min-width:1024px) 25vw, 50vw"
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                   />
                 ) : (

@@ -151,6 +151,7 @@ function ServicePicker({ category }: { category: MasterCategory }) {
                   alt={`${sv.name} — ${category.name}`}
                   loading="lazy"
                   decoding="async"
+                  sizes="(min-width:1024px) 25vw, 50vw"
                   width={768}
                   height={512}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"

@@ -91,6 +91,7 @@ function AllServicesPage() {
                       alt={`${cat.name} professional at work`}
                       loading="lazy"
                       decoding="async"
+                      sizes="(min-width:1024px) 25vw, 50vw"
                       width={768}
                       height={512}
                       className="h-full w-full object-cover"

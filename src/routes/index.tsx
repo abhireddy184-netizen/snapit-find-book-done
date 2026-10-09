@@ -59,7 +59,7 @@ function Landing() {
               What do you <span className="text-gradient-hero">need?</span>
             </h1>
             <p className="mt-3 max-w-[36ch] text-[clamp(1rem,1.15vw,1.15rem)] leading-relaxed text-muted-foreground">
-              Show it. Get matched. Book — no account needed to start.
+              Show it. Get matched. Start without an account — sign in when you book.
             </p>
 
 
@@ -142,11 +142,11 @@ function EmergencyStrip() {
       <div className="grid gap-4 md:grid-cols-[1fr_1.1fr] md:items-center">
         <div className="min-w-0">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive px-2.5 py-1 text-xs font-black text-destructive-foreground">
-            <ShieldAlert className="h-3.5 w-3.5" /> 24/7 Emergency
+            <ShieldAlert className="h-3.5 w-3.5" /> Emergency
           </span>
           <h2 className="mt-2 text-lg font-black tracking-tight sm:text-xl">Can’t wait? Get help now.</h2>
           <Link to="/emergency" className="mt-3 inline-flex items-center gap-2 rounded-full bg-destructive px-5 py-2.5 text-sm font-bold text-destructive-foreground transition-transform hover:scale-[1.01]">
-            Get emergency help <ArrowRight className="h-4 w-4" />
+            Request urgent help <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-2">
