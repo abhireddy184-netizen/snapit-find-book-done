@@ -22,7 +22,7 @@ const STEPS: { icon: LucideIcon; title: string; body: string }[] = [
   {
     icon: HardHat,
     title: "A pro handles it",
-    body: "Matched to a verified local pro near you.",
+    body: "Matched to a reviewed local pro near you.",
   },
 ];
 
@@ -273,7 +273,7 @@ export function ShowGpbBand() {
 
 const TRUST: { icon: LucideIcon; title: string; body: string }[] = [
   { icon: FileText, title: "Clear scope", body: "A written brief both sides can see." },
-  { icon: ShieldCheck, title: "Verified pros", body: "Pros register service area and coverage first." },
+  { icon: ShieldCheck, title: "Reviewed pros", body: "Pros register service area and coverage first." },
   { icon: Images, title: "Proof of work", body: "Before & after images kept with the job." },
   { icon: Activity, title: "Track status", body: "Follow the job from brief to done." },
 ];

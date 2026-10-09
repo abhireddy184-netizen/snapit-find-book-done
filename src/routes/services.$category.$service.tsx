@@ -88,7 +88,9 @@ function ServicePage() {
                 alt={`${service.name} being carried out by a professional`}
                 width={768}
                 height={512}
+                loading="lazy"
                 decoding="async"
+                sizes="(min-width:1024px) 25vw, 50vw"
                 className="h-full w-full object-cover"
               />
               <div className={`pointer-events-none absolute inset-0 bg-gradient-to-tr ${category.gradient} opacity-20`} />

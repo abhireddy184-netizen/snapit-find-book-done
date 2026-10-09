@@ -1,16 +1,26 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
-import plumbing from "@/assets/scenes/plumbing.jpg";
-import electrical from "@/assets/scenes/electrical.jpg";
-import cleaning from "@/assets/scenes/cleaning.jpg";
-import hvac from "@/assets/scenes/hvac.jpg";
-import handyman from "@/assets/scenes/handyman.jpg";
-import appliances from "@/assets/scenes/appliances.jpg";
-import beauty from "@/assets/scenes/hair.jpg";
-import auto from "@/assets/scenes/auto-mobile.jpg";
+import plumbingAsset from "@/assets/scenes/plumbing.webp.asset.json";
+import electricalAsset from "@/assets/scenes/electrical.webp.asset.json";
+import cleaningAsset from "@/assets/scenes/cleaning.webp.asset.json";
+import hvacAsset from "@/assets/scenes/hvac.webp.asset.json";
+import handymanAsset from "@/assets/scenes/handyman.webp.asset.json";
+import appliancesAsset from "@/assets/scenes/appliances.webp.asset.json";
+import beautyAsset from "@/assets/scenes/hair.webp.asset.json";
+import autoAsset from "@/assets/scenes/auto-mobile.webp.asset.json";
 import moving from "@/assets/scenes/moving.jpg";
-import lawn from "@/assets/scenes/lawn.jpg";
+import lawnAsset from "@/assets/scenes/lawn.webp.asset.json";
+
+const plumbing = plumbingAsset.url;
+const electrical = electricalAsset.url;
+const cleaning = cleaningAsset.url;
+const hvac = hvacAsset.url;
+const handyman = handymanAsset.url;
+const appliances = appliancesAsset.url;
+const beauty = beautyAsset.url;
+const auto = autoAsset.url;
+const lawn = lawnAsset.url;
 
 type Tile = { slug: string; name: string; line: string; img: string };
 
@@ -40,6 +50,7 @@ function Card({ tile }: { tile: Tile }) {
           alt={`${tile.name} professional at work`}
           loading="lazy"
           decoding="async"
+          sizes="(min-width:1024px) 25vw, 50vw"
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
         />
         <span className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/40 to-transparent" />

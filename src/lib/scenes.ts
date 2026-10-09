@@ -1,13 +1,13 @@
 /** Real service photography supplied by GetPros. Unmapped services use an icon fallback. */
-import applianceAsset from "@/assets/uploaded-services/appliance-repair.png.asset.json";
-import autoAsset from "@/assets/uploaded-services/auto-detailing.png.asset.json";
-import cleaningAsset from "@/assets/uploaded-services/home-cleaning.png.asset.json";
-import electricalAsset from "@/assets/uploaded-services/electrical-service.png.asset.json";
-import furnitureAsset from "@/assets/uploaded-services/furniture-repair.png.asset.json";
-import hvacAsset from "@/assets/uploaded-services/hvac-service.png.asset.json";
-import pedicureAsset from "@/assets/uploaded-services/mobile-pedicure.png.asset.json";
-import plumbingAsset from "@/assets/uploaded-services/plumbing-service.png.asset.json";
-import tvMountingAsset from "@/assets/uploaded-services/tv-mounting.png.asset.json";
+import applianceAsset from "@/assets/uploaded-services/appliance-repair.webp.asset.json";
+import autoAsset from "@/assets/uploaded-services/auto-detailing.webp.asset.json";
+import cleaningAsset from "@/assets/uploaded-services/home-cleaning.webp.asset.json";
+import electricalAsset from "@/assets/uploaded-services/electrical-service.webp.asset.json";
+import furnitureAsset from "@/assets/uploaded-services/furniture-repair.webp.asset.json";
+import hvacAsset from "@/assets/uploaded-services/hvac-service.webp.asset.json";
+import pedicureAsset from "@/assets/uploaded-services/mobile-pedicure.webp.asset.json";
+import plumbingAsset from "@/assets/uploaded-services/plumbing-service.webp.asset.json";
+import tvMountingAsset from "@/assets/uploaded-services/tv-mounting.webp.asset.json";
 
 const appliances = applianceAsset.url;
 const auto = autoAsset.url;
