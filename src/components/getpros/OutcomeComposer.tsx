@@ -1,10 +1,12 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Camera, Loader2, Mic, Square } from "lucide-react";
 import { LocationAutocomplete } from "@/components/getpros/LocationAutocomplete";
 import { transcribeVoice } from "@/lib/transcribe-voice.functions";
 import { startVoiceActivityMonitor, type VoiceActivityMonitor } from "@/lib/voice-activity";
 import { StableTranscript } from "@/lib/stable-transcript";
+import { setPendingPhoto } from "@/lib/pending-photo";
+import { isZipCode } from "@/lib/us-zip";
 
 
 const EXAMPLE = "My kitchen sink is leaking under the cabinet.";
@@ -128,12 +130,14 @@ const VOICE_MESSAGES: Record<Exclude<VoiceStatus, "idle" | "listening" | "transc
  */
 export function OutcomeComposer() {
   const navigate = useNavigate();
+  const outcomeId = useId();
   const [request, setRequest] = useState("");
   const [loc, setLoc] = useState("");
   /** Set when someone submits an empty request — nothing to understand yet. */
   const [emptyError, setEmptyError] = useState(false);
   const paused = useRef(false);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   /**
    * Someone can start typing into the server-rendered textarea before React
@@ -490,6 +494,20 @@ export function OutcomeComposer() {
 
   /* ---------- shared toggle ---------- */
 
+
+  /** Camera button next to the mic: hands the photo to /snap's diagnosis flow. */
+  const onPhotoSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setPendingPhoto(file);
+    const typedZip = loc.trim();
+    void navigate({
+      to: "/snap",
+      search: isZipCode(typedZip) ? { loc: typedZip } : {},
+    });
+  };
+
   const toggleVoice = () => {
     if (transcribing) return;
     // Any new mic interaction supersedes a pending auto-submit.
@@ -547,7 +565,7 @@ export function OutcomeComposer() {
     if (!q) {
       cancelAutoSubmit();
       setEmptyError(true);
-      document.getElementById("gpb-outcome")?.focus();
+      document.getElementById(outcomeId)?.focus();
       return;
     }
     goToService(q);
@@ -580,7 +598,7 @@ export function OutcomeComposer() {
       data-analytics-id="outcome_composer"
       className="surface-card p-3 shadow-[var(--shadow-elevated)] ring-1 ring-primary/[0.06] sm:p-4"
     >
-      <label htmlFor="gpb-outcome" className="sr-only">
+      <label htmlFor={outcomeId} className="sr-only">
         Describe what you need
       </label>
       {/* Direction follows what the person actually typed: any RTL script
@@ -605,6 +623,7 @@ export function OutcomeComposer() {
           rows={2}
           aria-invalid={emptyError}
           aria-describedby={emptyError ? "gpb-outcome-error" : undefined}
+          aria-label="Tell us what you need"
           /* While the mic is active the rotating examples stop competing with
              what the person is actually saying. */
           placeholder={voiceActive ? "" : "Tell us what you need"}
@@ -646,6 +665,23 @@ export function OutcomeComposer() {
           ) : (
             <Mic className="h-4 w-4" />
           )}
+        </button>
+        <input
+          ref={photoInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="sr-only"
+          onChange={onPhotoSelected}
+        />
+        <button
+          type="button"
+          onClick={() => photoInputRef.current?.click()}
+          aria-label="Take or upload a photo of the problem"
+          title="Take or upload a photo"
+          className="absolute end-[3.75rem] top-2 grid h-12 w-12 shrink-0 place-items-center rounded-full border border-border/70 bg-background text-muted-foreground transition-all hover:text-primary sm:end-[4.25rem] sm:top-2.5"
+        >
+          <Camera className="h-4 w-4" />
         </button>
       </div>
 

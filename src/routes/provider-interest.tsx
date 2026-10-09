@@ -11,12 +11,14 @@ import { lookupZip, useResolvedLocation } from "@/lib/us-zip";
 export const Route = createFileRoute("/provider-interest")({
   head: () => ({
     meta: [
-      { title: "Grow your business with GetPros — Join as a Pro" },
+      { title: "Grow your business with GetPros — GetPros.ai" },
       { name: "description", content: "Join GetPros as a Pro in 30 seconds. Free to join, set your own prices and choose when you work." },
-      { property: "og:title", content: "Grow your business with GetPros — Join as a Pro" },
-      { property: "og:description", content: "Free to join. Clear job requests, your own prices, your own schedule." },
+      { property: "og:title", content: "Grow your business with GetPros — GetPros.ai" },
+      { property: "og:description", content: "Join GetPros as a Pro in 30 seconds. Free to join, set your own prices and choose when you work." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Grow your business with GetPros — GetPros.ai" },
+      { name: "twitter:description", content: "Join GetPros as a Pro in 30 seconds. Free to join, set your own prices and choose when you work." },
     ],
   }),
   component: ProviderInterestPage,

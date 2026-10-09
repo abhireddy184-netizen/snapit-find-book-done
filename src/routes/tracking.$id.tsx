@@ -7,10 +7,14 @@ import { providers } from "@/lib/demo-data";
 export const Route = createFileRoute("/tracking/$id")({
   head: ({ params }) => ({
     meta: [
-      { title: `Tracking preview ${params.id} — GetPros` },
+      { title: `Tracking preview ${params.id} — GetPros.ai` },
       { name: "description", content: "Preview of the GetPros job tracking screen using example data." },
-      { property: "og:title", content: "Job tracking preview — GetPros" },
-      { property: "og:description", content: "Example tracking screen — not live provider data." },
+      { property: "og:title", content: `Tracking preview ${params.id} — GetPros.ai` },
+      { property: "og:description", content: "Preview of the GetPros job tracking screen using example data." },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: `Tracking preview ${params.id} — GetPros.ai` },
+      { name: "twitter:description", content: "Preview of the GetPros job tracking screen using example data." },
+      { name: "robots", content: "noindex" },
     ],
   }),
   loader: ({ params }) => {

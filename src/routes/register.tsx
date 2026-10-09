@@ -8,10 +8,13 @@ export const Route = createFileRoute("/register")({
   }),
   head: () => ({
     meta: [
-      { title: "Sign up — GetPros" },
+      { title: "Sign up — GetPros.ai" },
       { name: "description", content: "Create your GetPros account as a customer or service provider." },
-      { property: "og:title", content: "Sign up — GetPros" },
-      { property: "og:description", content: "Create a GetPros account in seconds." },
+      { property: "og:title", content: "Sign up — GetPros.ai" },
+      { property: "og:description", content: "Create your GetPros account as a customer or service provider." },
+      { name: "twitter:title", content: "Sign up — GetPros.ai" },
+      { name: "twitter:description", content: "Create your GetPros account as a customer or service provider." },
+      { name: "robots", content: "noindex" },
     ],
   }),
   component: RegisterPage,

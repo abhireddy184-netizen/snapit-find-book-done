@@ -13,6 +13,8 @@ export const Route = createFileRoute("/auth/callback")({
       { name: "description", content: "Finishing sign-in to GetPros.ai." },
       { property: "og:title", content: "Signing you in — GetPros.ai" },
       { property: "og:description", content: "Finishing sign-in to GetPros.ai." },
+      { name: "twitter:title", content: "Signing you in — GetPros.ai" },
+      { name: "twitter:description", content: "Finishing sign-in to GetPros.ai." },
       { name: "robots", content: "noindex" },
     ],
   }),

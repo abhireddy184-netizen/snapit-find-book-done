@@ -43,6 +43,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { createJobFromAnalysis } from "@/lib/jobs";
 import { notifyPendingMatch } from "@/lib/booking-actions.functions";
 import { prepareMediaForAnalysis, withTimeout, type PreparedMedia } from "@/lib/snap-media";
+import { takePendingPhoto } from "@/lib/pending-photo";
 import { GuidedVideoScan, canUseGuidedScan } from "@/components/getpros/GuidedVideoScan";
 import {
   BadgeCheck,
@@ -132,6 +133,13 @@ function SnapPage() {
   useEffect(() => {
     setRecent(loadHistory().slice(0, 4));
   }, [analysis]);
+  // A photo handed over from the home composer's camera button runs through
+  // the exact same diagnosis flow as a photo captured here.
+  useEffect(() => {
+    const file = takePendingPhoto();
+    if (file) void handleFile(file, "photo");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => () => {
     // Invalidate any in-flight run when the page unmounts.
     runRef.current += 1;

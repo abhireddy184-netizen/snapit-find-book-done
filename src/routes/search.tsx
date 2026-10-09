@@ -2,12 +2,13 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { LocationAutocomplete } from "@/components/getpros/LocationAutocomplete";
-import { Star, ShieldCheck, MapPin, Clock, Search as SearchIcon, AlertCircle, Loader2, ArrowRight } from "lucide-react";
+import { Star, ShieldCheck, MapPin, Clock, Search as SearchIcon, AlertCircle, Loader2, ArrowRight, CalendarClock } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
-import { providers as demoProviders } from "@/lib/demo-data";
-import { catalog, searchServices } from "@/lib/catalog";
+import { demoProvidersForCategory } from "@/lib/demo-data";
+import { catalog, getCategoryBySlug, searchServices } from "@/lib/catalog";
 import { matchServiceIntent, rankServices, rememberLocation, isServicePhrase } from "@/lib/search-intent";
-import { fetchPublicProviders, matchProviders, type ProviderMatch } from "@/lib/providers";
+import { matchTradeWord, tradeHeadline, topServicesForTrade } from "@/lib/trade-mapping";
+import { fetchPublicProviders, matchProviders, isFullyBookable, type ProviderMatch } from "@/lib/providers";
 import { useResolvedLocation } from "@/lib/us-zip";
 
 type SearchParams = { q: string; loc: string; pros?: number };
@@ -31,16 +32,32 @@ export const Route = createFileRoute("/search")({
     loc: toSearchString(search['loc']),
     ...(search['pros'] ? { pros: 1 } : {}),
   }),
-  head: () => ({
-    meta: [
-      { title: "Find a pro near you — GetPros.ai" },
-      { name: "description", content: "Search local service professionals by ZIP code or city. GetPros matches your job to pros who actually cover your area." },
-      { property: "og:title", content: "Find a pro near you — GetPros.ai" },
-      { property: "og:description", content: "Search local service professionals by ZIP code or city on GetPros." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
+  loaderDeps: ({ search }) => ({ q: search.q, loc: search.loc }),
+  loader: ({ deps }) => deps,
+  head: ({ loaderData }) => {
+    const q = (loaderData?.q ?? "").trim();
+    const loc = (loaderData?.loc ?? "").trim();
+    const hasQuery = Boolean(q || loc);
+    const title = hasQuery
+      ? `${q || "Pros"} near ${loc || "you"} — GetPros.ai`
+      : "Find a pro near you — GetPros.ai";
+    const description = hasQuery
+      ? `See GetPros professionals and example profiles for ${q || "your service"}${loc ? ` near ${loc}` : ""}.`
+      : "Search local service professionals by ZIP code or city. GetPros matches your job to pros who actually cover your area.";
+    return {
+      meta: [
+        { title },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        ...(hasQuery ? [{ name: "robots", content: "noindex" }] : []),
+      ],
+    };
+  },
   component: SearchPage,
 });
 
@@ -65,7 +82,15 @@ function SearchPage() {
   const intentHit = q.trim() && !browseMode ? matchServiceIntent(q) : null;
   const exactHit = q.trim() ? matchServiceIntent(q) : null;
   const serviceMatches = q.trim() ? (rankServices(q, 6).length ? rankServices(q, 6) : searchServices(q, 6)) : [];
-  const matchedCategoryName = serviceMatches[0]?.category.name;
+
+  // A broad trade word ("plumber", "electrician", "house cleaning", ...) maps to a
+  // whole catalog category, never to one narrow sub-service like "Drain Clearing".
+  const tradeMatch = q.trim() ? matchTradeWord(q) : null;
+  const tradeCategory = tradeMatch ? getCategoryBySlug(tradeMatch.categorySlug) : null;
+  const tradeServices = tradeMatch ? topServicesForTrade(tradeMatch.categorySlug, 6) : [];
+
+  const matchedCategoryName = tradeCategory?.name ?? serviceMatches[0]?.category.name;
+  const effectiveCategorySlug = tradeMatch?.categorySlug ?? serviceMatches[0]?.category.slug ?? null;
 
   // High-confidence exact sub-service intent: skip the browse step entirely.
   useEffect(() => {
@@ -91,16 +116,25 @@ function SearchPage() {
 
   const serving = matched?.serving ?? [];
 
-  const serviceLabel = exactHit?.service.name ?? q.trim();
+  // Demo/example profiles only ever show for the category that was actually
+  // searched — never an unrelated trade, and none at all when browsing with
+  // no matched category.
+  const demoListing = demoProvidersForCategory(effectiveCategorySlug);
+
   const placeLabel =
     resolved.kind === "zip" || resolved.kind === "text" ? resolved.label : "";
-  const heading = serviceLabel
-    ? placeLabel
-      ? `${serviceLabel} pros near ${placeLabel}`
-      : `${serviceLabel} pros`
-    : placeLabel
-      ? `Find a pro near ${placeLabel}`
-      : "Find a pro";
+
+  const tradeHeading = tradeMatch ? tradeHeadline(q, placeLabel) : null;
+  const serviceLabel = exactHit?.service.name ?? q.trim();
+  const heading = tradeHeading
+    ? tradeHeading
+    : serviceLabel
+      ? placeLabel
+        ? `${serviceLabel} pros near ${placeLabel}`
+        : `${serviceLabel} pros`
+      : placeLabel
+        ? `Find a pro near ${placeLabel}`
+        : "Find a pro";
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -172,7 +206,29 @@ function SearchPage() {
         </p>
       )}
 
-      {serviceMatches.length > 0 && (
+      {tradeMatch && tradeServices.length > 0 ? (
+        <section className="mt-6">
+          <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+            Top {tradeCategory?.name ?? "GetPros"} services
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {tradeServices.map((svc, i) => (
+              <Link
+                key={`${tradeMatch.categorySlug}/${svc.slug}`}
+                to="/services/$category/$service"
+                params={{ category: tradeMatch.categorySlug, service: svc.slug }}
+                className={
+                  i === 0
+                    ? "rounded-full border border-primary bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary"
+                    : "rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold hover:border-primary hover:text-primary"
+                }
+              >
+                {svc.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : serviceMatches.length > 0 ? (
         <section className="mt-6">
           <div className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Matching GetPros services</div>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -192,7 +248,7 @@ function SearchPage() {
             ))}
           </div>
         </section>
-      )}
+      ) : null}
 
       <div className="mt-8 grid gap-8 md:grid-cols-[240px_minmax(0,1fr)] xl:gap-10">
         <aside className="h-fit surface-card p-5 md:sticky md:top-20">
@@ -244,41 +300,43 @@ function SearchPage() {
             )}
           </section>
 
-          <section>
-            <h2 className="text-lg font-black">Example profiles</h2>
-            <p className="mt-1 text-xs font-medium text-muted-foreground">
-              Sample listings that show how GetPros profiles look. These are demo profiles — they are not local providers and are not available to book in your area.
-            </p>
-            <div className="mt-3 space-y-3">
-              {demoProviders.slice(0, 4).map((p) => (
-                <div key={p.id} className="surface-card p-5">
-                  <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
-                    <Avatar initials={p.initials} gradient={p.gradient} size={56} />
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <div className="truncate text-base font-bold">{p.name}</div>
-                        <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">Demo profile</span>
+          {demoListing.length > 0 && (
+            <section>
+              <h2 className="text-lg font-black">Example profiles</h2>
+              <p className="mt-1 text-xs font-medium text-muted-foreground">
+                Sample listings that show how GetPros profiles look. These are demo profiles — they are not local providers and are not available to book in your area.
+              </p>
+              <div className="mt-3 space-y-3">
+                {demoListing.map((p) => (
+                  <div key={p.id} className="surface-card p-5">
+                    <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
+                      <Avatar initials={p.initials} gradient={p.gradient} size={56} />
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <div className="truncate text-base font-bold">{p.name}</div>
+                          <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-semibold text-muted-foreground">Demo profile</span>
+                        </div>
+                        <div className="truncate text-xs text-muted-foreground">{p.business}</div>
+                        <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
+                        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                          {p.reviews > 0 && (
+                            <span className="inline-flex items-center gap-1 font-semibold text-foreground">
+                              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating}
+                            </span>
+                          )}
+                          <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {p.availability}</span>
+                          <span className="font-semibold text-primary">AI estimate — your pro confirms the final price (from ${p.startingPrice})</span>
+                        </div>
+                        <Link to="/provider/$id" params={{ id: p.id }} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
+                          View example profile <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
                       </div>
-                      <div className="truncate text-xs text-muted-foreground">{p.business}</div>
-                      <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{p.description}</p>
-                      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                        {p.reviews > 0 && (
-                          <span className="inline-flex items-center gap-1 font-semibold text-foreground">
-                            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> {p.rating}
-                          </span>
-                        )}
-                        <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {p.availability}</span>
-                        <span className="font-semibold text-primary">from ${p.startingPrice}</span>
-                      </div>
-                      <Link to="/provider/$id" params={{ id: p.id }} className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
-                        View example profile <ArrowRight className="h-3.5 w-3.5" />
-                      </Link>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </div>
     </AppShell>
@@ -288,6 +346,7 @@ function SearchPage() {
 function RealProviderCard({ match }: { match: ProviderMatch }) {
   const { provider, distanceMiles, place } = match;
   const initials = (provider.business_name || "GetPros").slice(0, 2).toUpperCase();
+  const bookable = isFullyBookable(provider);
   return (
     <div className="surface-card p-5">
       <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-4">
@@ -311,7 +370,26 @@ function RealProviderCard({ match }: { match: ProviderMatch }) {
               </span>
             )}
             {provider.availability && <span className="inline-flex items-center gap-1"><Clock className="h-3.5 w-3.5" /> {provider.availability}</span>}
-            {provider.starting_price != null && <span className="font-semibold text-primary">from ${provider.starting_price}</span>}
+            {provider.starting_price != null && (
+              <span className="font-semibold text-primary">
+                AI estimate — your pro confirms the final price (from ${provider.starting_price})
+              </span>
+            )}
+          </div>
+          <div className="mt-3">
+            {bookable ? (
+              <Link to="/book" search={{ provider: provider.user_id, job: undefined, service: undefined, category: undefined }}>
+                <GradientButton className="min-h-10 px-4 text-xs"><CalendarClock className="h-3.5 w-3.5" /> Book this pro</GradientButton>
+              </Link>
+            ) : (
+              <Link
+                to="/provider/$id"
+                params={{ id: provider.id }}
+                className="inline-flex items-center gap-1 rounded-full border border-primary/70 px-4 py-2 text-xs font-bold text-primary hover:bg-primary/10"
+              >
+                Request this pro <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            )}
           </div>
         </div>
       </div>

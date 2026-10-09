@@ -11,6 +11,8 @@ export const Route = createFileRoute("/trust-safety")({
       { property: "og:description", content: "Verified pros, nothing booked until you confirm, and proof of finished work." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Trust & Safety — GetPros.ai" },
+      { name: "twitter:description", content: "Verified pros, nothing booked until you confirm, and proof of finished work." },
     ],
   }),
   component: TrustSafetyPage,
