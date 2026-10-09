@@ -85,7 +85,10 @@ export async function accountAlertPayload(db: Admin, userId: string) {
 export async function processOwnerAlerts(db: Admin) {
   let retried = 0;
   let backfilled = 0;
-  const since = new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString();
+  // Only backfill accounts created after durable alerts went in, so accounts already
+  // alerted by the previous (unrecorded) path are never alerted twice.
+  const cutoff = Date.parse("2026-10-09T17:00:00Z");
+  const since = new Date(Math.max(cutoff, Date.now() - 3 * 24 * 3600 * 1000)).toISOString();
   const { data: recent } = await db.from("profiles").select("id").gte("created_at", since).limit(500);
   if (recent?.length) {
     const keys = recent.map((p) => `internal-account-${p.id}`);
