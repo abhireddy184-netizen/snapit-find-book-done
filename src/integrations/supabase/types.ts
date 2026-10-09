@@ -320,6 +320,42 @@ export type Database = {
           },
         ]
       }
+      owner_notifications: {
+        Row: {
+          attempts: number
+          created_at: string
+          key: string
+          kind: string
+          last_error: string | null
+          payload: Json
+          reply_to: string | null
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          key: string
+          kind: string
+          last_error?: string | null
+          payload?: Json
+          reply_to?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          key?: string
+          kind?: string
+          last_error?: string | null
+          payload?: Json
+          reply_to?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount_cents: number
