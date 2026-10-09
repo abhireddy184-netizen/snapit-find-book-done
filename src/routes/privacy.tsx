@@ -10,6 +10,8 @@ export const Route = createFileRoute("/privacy")({
       { property: "og:description", content: "How GetPros.ai collects, uses and protects your information." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Privacy Policy — GetPros.ai" },
+      { name: "twitter:description", content: "How GetPros.ai collects, uses and protects your information." },
     ],
   }),
   component: PrivacyPage,
@@ -21,7 +23,7 @@ function PrivacyPage() {
       <div className="mx-auto max-w-3xl">
         <h1 className="text-3xl font-black tracking-tight md:text-4xl">Privacy Policy</h1>
         <div className="mt-6 surface-card space-y-3 p-5 text-sm leading-relaxed text-muted-foreground md:p-7">
-          <p>Our full Privacy Policy is being prepared and will be published here soon.</p>
+          <p className="text-xs font-semibold text-foreground/70">Last updated October 9, 2026</p>
           <p>
             We collect only what the service needs — your account details, job details and any photos, video or voice you
             submit — and we never sell your data.

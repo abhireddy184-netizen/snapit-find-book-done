@@ -45,10 +45,13 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/_authenticated/job/$id")({
   head: () => ({
     meta: [
-      { title: "Job passport — GetPros" },
+      { title: "Job passport — GetPros.ai" },
       { name: "description", content: "Your permanent record for this job: diagnosis, standardized scope, quotes, booking, verification and proof." },
-      { property: "og:title", content: "Job passport — GetPros" },
+      { name: "robots", content: "noindex" },
+      { property: "og:title", content: "Job passport — GetPros.ai" },
       { property: "og:description", content: "Diagnosis, scope, quotes, booking and before/after proof in one record." },
+      { name: "twitter:title", content: "Job passport — GetPros.ai" },
+      { name: "twitter:description", content: "Diagnosis, scope, quotes, booking and before/after proof in one record." },
     ],
   }),
   component: JobPassport,

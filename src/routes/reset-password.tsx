@@ -11,10 +11,12 @@ import { passwordError } from "@/lib/password-policy";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Reset your password — GetPros" },
+      { title: "Reset your password — GetPros.ai" },
       { name: "description", content: "Send yourself a secure GetPros password reset link, then choose a new password." },
-      { property: "og:title", content: "Reset your password — GetPros" },
-      { property: "og:description", content: "Recover access to your GetPros.ai account." },
+      { property: "og:title", content: "Reset your password — GetPros.ai" },
+      { property: "og:description", content: "Send yourself a secure GetPros password reset link, then choose a new password." },
+      { name: "twitter:title", content: "Reset your password — GetPros.ai" },
+      { name: "twitter:description", content: "Send yourself a secure GetPros password reset link, then choose a new password." },
       { name: "robots", content: "noindex" },
     ],
   }),

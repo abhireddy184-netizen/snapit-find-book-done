@@ -12,12 +12,13 @@ export const Route = createFileRoute("/login")({
   }),
   head: () => ({
     meta: [
-      { title: "Log in — GetPros" },
+      { title: "Log in — GetPros.ai" },
       { name: "description", content: "Log in to GetPros as a customer or service provider." },
-      { property: "og:title", content: "Log in — GetPros" },
-      { property: "og:description", content: "Log in to GetPros." },
-      { name: "twitter:title", content: "Log in — GetPros" },
+      { property: "og:title", content: "Log in — GetPros.ai" },
+      { property: "og:description", content: "Log in to GetPros as a customer or service provider." },
+      { name: "twitter:title", content: "Log in — GetPros.ai" },
       { name: "twitter:description", content: "Log in to GetPros as a customer or service provider." },
+      { name: "robots", content: "noindex" },
     ],
     scripts: [ORGANIZATION_JSONLD],
   }),

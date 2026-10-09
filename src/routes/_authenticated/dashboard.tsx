@@ -2,11 +2,24 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { approveAndPay, confirmCardSaved, startBookingPayment, syncMyPayments } from "@/lib/payments.functions";
+import { deleteMyAccount } from "@/lib/account.functions";
 import { computeBookingAmounts, formatCents } from "@/lib/pricing";
 import { CardStep } from "@/components/getpros/CardStep";
 import { CONTACT_EMAIL } from "@/lib/brand";
 import { useState } from "react";
-import { CalendarDays, Bookmark, MessageCircle, User, MapPin, Star, ShieldCheck, Camera, LogOut, Loader2, ClipboardList, ArrowRight } from "lucide-react";
+import { CalendarDays, Bookmark, MessageCircle, User, MapPin, Star, ShieldCheck, Camera, LogOut, Loader2, ClipboardList, ArrowRight, Trash2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
 import { providers } from "@/lib/demo-data";
 import { useAuth } from "@/lib/auth";
@@ -16,10 +29,13 @@ import { JOB_STATUS_FLOW, JOB_STATUS_STYLE, fetchJobs, jobStatusLabel, money, ty
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
-      { title: "Your dashboard — GetPros" },
+      { title: "Your dashboard — GetPros.ai" },
       { name: "description", content: "Manage your bookings, messages and saved pros on GetPros." },
-      { property: "og:title", content: "Your dashboard — GetPros" },
+      { name: "robots", content: "noindex" },
+      { property: "og:title", content: "Your dashboard — GetPros.ai" },
       { property: "og:description", content: "Bookings, messages and saved pros — all in one place." },
+      { name: "twitter:title", content: "Your dashboard — GetPros.ai" },
+      { name: "twitter:description", content: "Bookings, messages and saved pros — all in one place." },
     ],
   }),
   component: Dashboard,
@@ -397,6 +413,66 @@ function Messages() {
   );
 }
 
+function DeleteAccountButton() {
+  const navigate = useNavigate();
+  const deleteAccount = useServerFn(deleteMyAccount);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleDelete() {
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await deleteAccount();
+      if (!result.ok) {
+        setError("We couldn't fully delete your account automatically, so our team has been notified to finish it manually.");
+      }
+      await supabase.auth.signOut();
+      await navigate({ to: "/", replace: true });
+    } catch {
+      setError("Something went wrong deleting your account. Please try again.");
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="mt-6">
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <button
+            type="button"
+            className="inline-flex items-center gap-2 rounded-full border border-destructive/40 px-4 py-2 text-sm font-semibold text-destructive hover:bg-destructive/10"
+          >
+            <Trash2 className="h-4 w-4" /> Delete my account
+          </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently deletes your GetPros account and data. This can't be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {error && <p className="text-xs font-medium text-destructive">{error}</p>}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={busy}
+              onClick={(e) => {
+                e.preventDefault();
+                void handleDelete();
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {busy ? "Deleting…" : "Delete account"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  );
+}
+
 function Profile() {
   const { profile, user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -425,6 +501,7 @@ function Profile() {
         >
           <LogOut className="h-4 w-4" /> Log out
         </button>
+        <DeleteAccountButton />
       </div>
       <div className="surface-card p-6">
         <div className="text-sm font-bold">Saved addresses</div>

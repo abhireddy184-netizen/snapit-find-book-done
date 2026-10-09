@@ -63,6 +63,7 @@ const SAMPLE_DATA: Record<string, object> = {
 export const Route = createFileRoute("/lovable/email/auth/preview")({
   server: {
     handlers: {
+      GET: () => new Response("Method Not Allowed", { status: 405, headers: { Allow: "POST" } }),
       POST: async ({ request }) => {
         const apiKey = process.env['LOVABLE_API_KEY']
 

@@ -14,10 +14,17 @@ export const Route = createFileRoute("/services/$category/")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Service not found — GetPros" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [
+          { title: "Service not found — GetPros.ai" },
+          { property: "og:title", content: "Service not found — GetPros.ai" },
+          { name: "twitter:title", content: "Service not found — GetPros.ai" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
     }
     const base = loaderData.name.replace(/\s+Services?$/i, "");
-    const title = `${base} Services | GetPros.ai`;
+    const title = `${base} Services — GetPros.ai`;
     return {
       meta: [
         { title },
@@ -26,6 +33,8 @@ export const Route = createFileRoute("/services/$category/")({
         { property: "og:description", content: loaderData.tagline },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: loaderData.tagline },
       ],
     };
   },
@@ -53,7 +62,7 @@ function CategoryPage() {
 
   return (
     <AppShell>
-      <nav className="pt-4 text-xs text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="pt-4 text-xs text-muted-foreground">
         <Link to="/services" className="hover:text-foreground">All services</Link> <span className="px-1">/</span>
         <span className="font-semibold text-foreground">{category.name}</span>
       </nav>

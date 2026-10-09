@@ -4,16 +4,18 @@ import { AppShell } from "@/components/getpros/AppShell";
 export const Route = createFileRoute("/legal")({
   head: () => ({
     meta: [
-      { title: "Privacy, Terms & Accessibility — GetPros" },
+      { title: "Privacy, Terms & Accessibility — GetPros.ai" },
       {
         name: "description",
         content:
           "How GetPros.ai handles your data, what our terms of use cover, how we use cookies, and our accessibility commitment.",
       },
-      { property: "og:title", content: "Privacy, Terms & Accessibility — GetPros" },
+      { property: "og:title", content: "Privacy, Terms & Accessibility — GetPros.ai" },
       { property: "og:description", content: "GetPros privacy, terms, cookies and accessibility information." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Privacy, Terms & Accessibility — GetPros.ai" },
+      { name: "twitter:description", content: "GetPros privacy, terms, cookies and accessibility information." },
     ],
   }),
   component: LegalPage,
@@ -25,9 +27,9 @@ function LegalPage() {
       <div className="mx-auto max-w-3xl">
         <h1 className="text-3xl font-black tracking-tight md:text-4xl">Privacy, terms & accessibility</h1>
         <p className="mt-3 text-sm text-muted-foreground">
-          GetPros.ai is in active build-out. The summaries below describe how the product behaves today. Full legal
-          documents are being prepared with counsel — until they are published here, these summaries are what applies.
+          GetPros.ai is in active build-out. The summaries below describe how the product behaves today.
         </p>
+        <p className="mt-1 text-xs font-semibold text-foreground/70">Last updated October 9, 2026</p>
 
         <nav aria-label="Sections" className="mt-6 flex flex-wrap gap-2 text-xs font-semibold">
           {[
@@ -78,7 +80,7 @@ function LegalPage() {
             <li>Your card is saved when you book but not charged. A hold for the total is placed 2 days before the job (or when the pro accepts, if the job is sooner).</li>
             <li>After the pro marks the job complete, you can approve and pay. If you don't respond within 48 hours, the held amount is charged automatically. Contact info@getpros.ai before then if there's a problem.</li>
             <li>Cancelling more than 24 hours before the start is free. Customer cancellations within 24 hours of an accepted job cost $25. If the pro cancels or declines, any hold is released.</li>
-            <li>Refunds are reviewed by GetPros and returned to the original card.</li>
+            <li>Refunds and disputes are handled by your pro through their Stripe account and go back to the original card. If you can't resolve an issue with your pro, contact info@getpros.ai.</li>
           </ul>
         </Section>
 

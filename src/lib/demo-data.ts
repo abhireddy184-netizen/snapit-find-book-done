@@ -385,6 +385,37 @@ export const providers: Provider[] = [
   },
 ];
 
+/**
+ * Maps a GetPros service-catalog category slug (e.g. "plumbing", "cleaning")
+ * to the demo-data category slug used by the sample profiles below. Used so
+ * /search only ever shows demo cards whose trade actually matches what was
+ * searched — never an unrelated trade.
+ */
+export const CATALOG_TO_DEMO_CATEGORY: Record<string, string> = {
+  plumbing: "plumbing",
+  electrical: "electrical",
+  hvac: "hvac",
+  cleaning: "house-cleaning",
+  handyman: "handyman",
+  "lawn-outdoor": "lawn-care",
+  appliances: "appliance-repair",
+  "beauty-at-home": "beauty-spa",
+  moving: "moving-help",
+  "auto-mobile": "auto-services",
+};
+
+/**
+ * Demo/example profiles for a searched catalog category. Returns an empty
+ * list when the category has no demo profiles (or none was matched) — demo
+ * cards must never be shown for an unrelated trade.
+ */
+export function demoProvidersForCategory(catalogCategorySlug: string | null, limit = 4): Provider[] {
+  if (!catalogCategorySlug) return [];
+  const demoSlug = CATALOG_TO_DEMO_CATEGORY[catalogCategorySlug];
+  if (!demoSlug) return [];
+  return providers.filter((p) => p.category === demoSlug).slice(0, limit);
+}
+
 export function getProvider(id: string) {
   return providers.find((p) => p.id === id);
 }

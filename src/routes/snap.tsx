@@ -43,6 +43,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { createJobFromAnalysis } from "@/lib/jobs";
 import { notifyPendingMatch } from "@/lib/booking-actions.functions";
 import { prepareMediaForAnalysis, withTimeout, type PreparedMedia } from "@/lib/snap-media";
+import { takePendingPhoto } from "@/lib/pending-photo";
 import { GuidedVideoScan, canUseGuidedScan } from "@/components/getpros/GuidedVideoScan";
 import {
   BadgeCheck,
@@ -69,10 +70,12 @@ export const Route = createFileRoute("/snap")({
 
   head: () => ({
     meta: [
-      { title: "Show us the problem — AI diagnosis in seconds | GetPros" },
+      { title: "Snap a photo — GetPros.ai" },
       { name: "description", content: "Snap a photo or video of any problem. GetPros's AI explains what it likely needs, builds a standardized job scope and helps you compare quotes from service pros." },
-      { property: "og:title", content: "Snap a Problem — AI diagnosis | GetPros" },
+      { property: "og:title", content: "Snap a photo — GetPros.ai" },
       { property: "og:description", content: "Point your camera. Get an instant diagnosis, estimate and matched pros." },
+      { name: "twitter:title", content: "Snap a photo — GetPros.ai" },
+      { name: "twitter:description", content: "Point your camera. Get an instant diagnosis, estimate and matched pros." },
     ],
   }),
   component: SnapPage,
@@ -130,6 +133,13 @@ function SnapPage() {
   useEffect(() => {
     setRecent(loadHistory().slice(0, 4));
   }, [analysis]);
+  // A photo handed over from the home composer's camera button runs through
+  // the exact same diagnosis flow as a photo captured here.
+  useEffect(() => {
+    const file = takePendingPhoto();
+    if (file) void handleFile(file, "photo");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => () => {
     // Invalidate any in-flight run when the page unmounts.
     runRef.current += 1;
@@ -419,7 +429,7 @@ function SnapPage() {
     <AppShell>
       <div className="mx-auto max-w-3xl">
         {(image || analysis) && (
-          <div className="sticky top-14 z-20 -mx-1 mb-1 flex items-center justify-between gap-2 bg-background/85 px-1 py-2 backdrop-blur md:top-16">
+          <div className="sticky top-14 z-20 -mx-1 mb-1 flex items-center justify-between gap-2 border-b bg-background/95 px-1 py-2 backdrop-blur md:top-16">
             <button
               type="button"
               onClick={reset}
@@ -760,7 +770,7 @@ function ScanningOverlay({
       <div className="pointer-events-auto relative mx-4 w-full max-w-md rounded-2xl border border-white/15 bg-white/10 p-5 shadow-elevated backdrop-blur-2xl animate-scale-in sm:p-6">
         <div className="relative overflow-hidden rounded-2xl border border-white/20">
           {image ? (
-            <img src={image} alt="Analyzing" className={fast ? "h-40 w-full object-cover" : "h-64 w-full object-cover"} />
+            <img src={image} alt="Analyzing" className={fast ? "h-40 w-full bg-muted/30 object-contain" : "h-64 w-full bg-muted/30 object-contain"} />
           ) : (
             <div
               className={`grid w-full place-items-center ${fast ? "h-40" : "h-64"}`}
@@ -1089,23 +1099,28 @@ function AnalysisView({
   const [matched, setMatched] = useState<ProviderMatch[]>([]);
   const [prosLoading, setProsLoading] = useState(false);
   const locText = (serviceLocation ?? "").trim();
+  // Inline fallback when the home composer never handed over a ZIP: we must
+  // know where the job is before we can tell the customer whether a pro
+  // covers it, so this asks for just a ZIP rather than the full address form.
+  const [manualZip, setManualZip] = useState("");
+  const [manualZipErr, setManualZipErr] = useState<string | null>(null);
+  const knownZip = isZipCode(locText) ? locText : extractZip(locText) ?? (isZipCode(manualZip) ? manualZip : null);
+  const hasZip = Boolean(knownZip);
 
   useEffect(() => {
-    if (!showPros || !analysis.categorySlug) { setMatched([]); return; }
+    if (!showPros || !analysis.categorySlug || !knownZip) { setMatched([]); return; }
     let cancelled = false;
     setProsLoading(true);
-    const zip = isZipCode(locText) ? locText : extractZip(locText);
     void (async () => {
-      const place = zip ? await lookupZip(zip) : null;
+      const place = await lookupZip(knownZip);
       const list = await fetchBookableProviders(analysis.categorySlug, place).catch(() => []);
       if (!cancelled) { setMatched(list.slice(0, 5)); setProsLoading(false); }
     })();
     return () => { cancelled = true; };
-  }, [showPros, analysis.categorySlug, locText]);
+  }, [showPros, analysis.categorySlug, knownZip]);
 
   const recommended = matched[0];
   const others = matched.slice(1);
-  const hasZip = Boolean(isZipCode(locText) || extractZip(locText));
 
   // Save to history exactly once per analysis
   const savedRef = useRef(false);
@@ -1144,7 +1159,7 @@ function AnalysisView({
       <div className={`grid gap-4 ${image ? "md:grid-cols-[240px_1fr]" : ""}`}>
         {image && (
           <div className="overflow-hidden surface-card">
-            <img src={image} alt="Diagnosed" className="h-full max-h-[240px] w-full object-cover" />
+            <img src={image} alt="Diagnosed" className="h-full max-h-[240px] w-full bg-muted/30 object-contain" />
           </div>
         )}
         <div className="surface-card p-5">
@@ -1226,15 +1241,28 @@ function AnalysisView({
                 {duration <= 60 ? "Small" : duration <= 180 ? "Medium" : "Large"} · ~{durationLabel}
               </dd>
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 col-span-2">
               <dt className="text-xs text-muted-foreground">Rough estimate</dt>
               <dd className="font-bold">
                 {showPricing ? `$${analysis.estimatedCostLow}–$${analysis.estimatedCostHigh}` : "Pro will quote"}
               </dd>
+              {showPricing && (
+                <p className="mt-0.5 text-[11px] font-medium text-muted-foreground">
+                  AI estimate — your pro confirms the final price
+                </p>
+              )}
             </div>
           </dl>
           <GradientButton
-            onClick={() => document.getElementById("matched-pros")?.scrollIntoView({ behavior: "smooth" })}
+            onClick={() =>
+              void navigate({
+                to: "/search",
+                search: {
+                  q: analysis.category || category?.name || analysis.headline || "",
+                  loc: knownZip || "",
+                },
+              })
+            }
             className="mt-4 min-h-12 w-full justify-center"
           >
             See matched pros <ArrowRight className="h-4 w-4" />
@@ -1344,10 +1372,39 @@ function AnalysisView({
       </div>
 
 
-      {prosLoading ? (
+      {!hasZip ? (
+        <div className="rounded-3xl border border-primary/30 bg-card p-5 shadow-sm">
+          <div className="text-sm font-black">What's your ZIP code?</div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            We need a service ZIP before we can tell you who's available nearby.
+          </p>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const trimmed = manualZip.trim();
+              if (!isZipCode(trimmed)) { setManualZipErr("Enter a 5-digit US ZIP code."); return; }
+              setManualZipErr(null);
+              setManualZip(trimmed);
+            }}
+            className="mt-3 flex gap-2"
+          >
+            <input
+              value={manualZip}
+              onChange={(e) => setManualZip(e.target.value)}
+              inputMode="numeric"
+              maxLength={5}
+              placeholder="e.g. 77494"
+              className="w-32 rounded-xl border border-border bg-background px-3 py-2.5 text-sm outline-none focus:border-primary"
+            />
+            <GradientButton type="submit" className="py-2.5">
+              Find pros
+            </GradientButton>
+          </form>
+          {manualZipErr && <p role="alert" className="mt-2 text-xs font-medium text-destructive">{manualZipErr}</p>}
+        </div>
+      ) : prosLoading ? (
         <div className="flex items-center gap-2 rounded-3xl border border-border/60 bg-muted/40 p-5 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" /> Looking for verified {analysis.category || "service"} pros
-          {hasZip ? " near your service address" : ""}…
+          <Loader2 className="h-4 w-4 animate-spin" /> Looking for verified {analysis.category || "service"} pros near your service address…
         </div>
       ) : matched.length > 0 ? (
         <GradientButton
@@ -1358,7 +1415,7 @@ function AnalysisView({
         </GradientButton>
       ) : (
         <div className="space-y-4">
-          <RequestProCard analysis={analysis} image={image} defaultLocation={locText} />
+          <RequestProCard analysis={analysis} image={image} defaultLocation={locText || knownZip || ""} />
           <div className="rounded-3xl border border-border/60 bg-muted/40 p-5 text-sm">
             <div className="font-black">Prefer to wait? Join early access.</div>
             <p className="mt-1 text-muted-foreground">
@@ -1677,9 +1734,12 @@ function RecentDiagnoses({ entries }: { entries: SnapHistoryEntry[] }) {
               <div className="min-w-0 flex-1">
                 <div className="line-clamp-1 text-sm font-semibold">{entry.analysis.problem}</div>
                 <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
-                  <span className="font-semibold text-foreground/80">
+                  <span
+                    className="font-semibold text-foreground/80"
+                    title={entry.analysis.hasPriceEstimate ? "AI estimate — your pro confirms the final price" : undefined}
+                  >
                     {entry.analysis.hasPriceEstimate
-                      ? `$${entry.analysis.estimatedCostLow}–$${entry.analysis.estimatedCostHigh}`
+                      ? `$${entry.analysis.estimatedCostLow}–$${entry.analysis.estimatedCostHigh} (AI est.)`
                       : "Pro will quote"}
                   </span>
                   <span>·</span>

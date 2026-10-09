@@ -15,9 +15,16 @@ export const Route = createFileRoute("/services/$category/$service")({
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
-      return { meta: [{ title: "Service not found — GetPros" }, { name: "robots", content: "noindex" }] };
+      return {
+        meta: [
+          { title: "Service not found — GetPros.ai" },
+          { property: "og:title", content: "Service not found — GetPros.ai" },
+          { name: "twitter:title", content: "Service not found — GetPros.ai" },
+          { name: "robots", content: "noindex" },
+        ],
+      };
     }
-    const title = `${loaderData.name} — ${loaderData.category} | GetPros.ai`;
+    const title = `${loaderData.name} — ${loaderData.category} — GetPros.ai`;
     return {
       meta: [
         { title },
@@ -26,6 +33,8 @@ export const Route = createFileRoute("/services/$category/$service")({
         { property: "og:description", content: loaderData.blurb },
         { property: "og:type", content: "website" },
         { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: loaderData.blurb },
       ],
     };
   },
@@ -63,7 +72,7 @@ function ServicePage() {
 
   return (
     <AppShell>
-      <nav className="pt-4 text-xs text-muted-foreground">
+      <nav aria-label="Breadcrumb" className="pt-4 text-xs text-muted-foreground">
         <Link to="/services" className="hover:text-foreground">All services</Link> <span className="px-1">/</span>
         <Link to="/services/$category" params={{ category: category.slug }} className="hover:text-foreground">{category.name}</Link>
         <span className="px-1">/</span>
@@ -124,7 +133,7 @@ function ServicePage() {
           </div>
         </div>
 
-        <aside className="space-y-4">
+        <aside aria-label="Pricing and providers" className="space-y-4">
           <div className="surface-card p-5">
             <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Typical price guidance</div>
             <div className="mt-1 text-3xl font-black text-primary">{formatPrice(service.priceLow, service.priceHigh)}</div>

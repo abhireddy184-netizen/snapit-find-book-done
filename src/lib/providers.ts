@@ -112,6 +112,13 @@ export function isBookable(provider: PublicProvider): boolean {
 }
 
 /**
+ * Alias of `isBookable` with an explicit name for call sites (e.g. /search)
+ * that want to read as "this pro can be fully booked online right now" versus
+ * falling back to a request/early-access form.
+ */
+export const isFullyBookable = isBookable;
+
+/**
  * Real, bookable providers for a category slug near a customer ZIP.
  * Returns an empty list when nobody qualifies — we never fall back to samples.
  */

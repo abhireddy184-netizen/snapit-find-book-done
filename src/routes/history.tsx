@@ -8,10 +8,13 @@ import { categories } from "@/lib/demo-data";
 export const Route = createFileRoute("/history")({
   head: () => ({
     meta: [
-      { title: "Diagnosis history — GetPros" },
+      { title: "Diagnosis history — GetPros.ai" },
       { name: "description", content: "Every GetPros AI diagnosis you've saved, with cost estimates, urgency and matched pros." },
-      { property: "og:title", content: "Your GetPros diagnosis history" },
-      { property: "og:description", content: "Revisit past AI diagnoses and rebook the pros you loved." },
+      { property: "og:title", content: "Diagnosis history — GetPros.ai" },
+      { property: "og:description", content: "Every GetPros AI diagnosis you've saved, with cost estimates, urgency and matched pros." },
+      { name: "twitter:title", content: "Diagnosis history — GetPros.ai" },
+      { name: "twitter:description", content: "Every GetPros AI diagnosis you've saved, with cost estimates, urgency and matched pros." },
+      { name: "robots", content: "noindex" },
     ],
   }),
   component: HistoryPage,

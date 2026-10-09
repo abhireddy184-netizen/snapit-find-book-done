@@ -6,10 +6,13 @@ import { catalog, TOTAL_SERVICES } from "@/lib/catalog";
 export const Route = createFileRoute("/categories")({
   head: () => ({
     meta: [
-      { title: "Browse services — GetPros" },
+      { title: "Browse services — GetPros.ai" },
       { name: "description", content: "Browse every service category on GetPros, from plumbing to beauty and spa." },
-      { property: "og:title", content: "Browse services — GetPros" },
-      { property: "og:description", content: "Every GetPros service in one place." },
+      { property: "og:title", content: "Browse services — GetPros.ai" },
+      { property: "og:description", content: "Browse every service category on GetPros, from plumbing to beauty and spa." },
+      { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Browse services — GetPros.ai" },
+      { name: "twitter:description", content: "Browse every service category on GetPros, from plumbing to beauty and spa." },
     ],
   }),
   component: CategoriesPage,
@@ -30,12 +33,12 @@ function CategoriesPage() {
               <div className={`grid h-12 w-12 place-items-center rounded-xl bg-gradient-to-br ${cat.gradient} text-white shadow-card`}>
                 <Icon className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 text-lg font-bold">{cat.name}</h3>
+              <h2 className="mt-4 text-lg font-bold">{cat.name}</h2>
               <p className="mt-1 text-sm text-muted-foreground">{cat.tagline}</p>
               <Link
                 to="/services/$category"
                 params={{ category: cat.slug }}
-                className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary hover:underline"
+                className="mt-4 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-primary hover:underline sm:min-h-0"
               >
                 View {cat.services.length} services <ArrowRight className="h-4 w-4" />
               </Link>

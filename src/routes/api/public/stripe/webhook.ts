@@ -9,6 +9,7 @@ import type Stripe from "stripe";
 export const Route = createFileRoute("/api/public/stripe/webhook")({
   server: {
     handlers: {
+      GET: () => new Response("Method Not Allowed", { status: 405, headers: { Allow: "POST" } }),
       POST: async ({ request }) => {
         const sig = request.headers.get("stripe-signature");
         const body = await request.text();
