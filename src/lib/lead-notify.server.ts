@@ -1,6 +1,6 @@
 // Server-only: internal "new lead" notification. Never throws — a failed
-// notification must never affect a stored lead.
-import { sendTemplateEmail } from "@/lib/email-templates/send-email";
+// notification must never affect a stored lead. Durable + retried via owner_notifications.
+import { sendOwnerAlert } from "@/lib/owner-notify.server";
 import type { LeadType } from "@/lib/email-templates/internal-lead";
 
 export type LeadNotification = {
@@ -24,14 +24,11 @@ export type LeadNotification = {
 };
 
 export async function notifyNewLead(lead: LeadNotification): Promise<void> {
-  try {
-    const { leadId, ...templateData } = lead;
-    await sendTemplateEmail("internal-lead", "", {
-      templateData: { ...templateData, submittedAt: lead.submittedAt ?? new Date().toISOString() },
-      idempotencyKey: `internal-lead-${lead.leadType}-${leadId}${lead.reactivated ? `-r${Date.now()}` : ""}`,
-      replyTo: lead.email || undefined,
-    });
-  } catch (error) {
-    console.error(`[lead-notify] Internal ${lead.leadType} notification failed:`, error);
-  }
+  const { leadId, ...templateData } = lead;
+  await sendOwnerAlert(
+    `internal-lead-${lead.leadType}-${leadId}${lead.reactivated ? `-r${Date.now()}` : ""}`,
+    lead.leadType,
+    { ...templateData, submittedAt: lead.submittedAt ?? new Date().toISOString() },
+    lead.email || null,
+  );
 }
