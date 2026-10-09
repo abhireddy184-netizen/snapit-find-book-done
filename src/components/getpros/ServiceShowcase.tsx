@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 
-import plumbingAsset from "@/assets/scenes/plumbing.webp.asset.json";
+import plumbing from "@/assets/scenes/plumbing.jpg";
 import electricalAsset from "@/assets/scenes/electrical.webp.asset.json";
 import cleaningAsset from "@/assets/scenes/cleaning.webp.asset.json";
 import hvacAsset from "@/assets/scenes/hvac.webp.asset.json";
@@ -12,7 +12,6 @@ import autoAsset from "@/assets/scenes/auto-mobile.webp.asset.json";
 import moving from "@/assets/scenes/moving.jpg";
 import lawnAsset from "@/assets/scenes/lawn.webp.asset.json";
 
-const plumbing = plumbingAsset.url;
 const electrical = electricalAsset.url;
 const cleaning = cleaningAsset.url;
 const hvac = hvacAsset.url;
