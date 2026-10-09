@@ -9,6 +9,7 @@ import { TEMPLATES } from '@/lib/email-templates/registry'
 export const Route = createFileRoute("/lovable/email/transactional/preview")({
   server: {
     handlers: {
+      GET: () => new Response("Method Not Allowed", { status: 405, headers: { Allow: "POST" } }),
       POST: async ({ request }) => {
         const apiKey = process.env['LOVABLE_API_KEY']
         if (!apiKey) {

@@ -21,6 +21,7 @@ const SITE_URL = BRAND_SITE_URL
 export const Route = createFileRoute("/lovable/email/auth/webhook")({
   server: {
     handlers: {
+      GET: () => new Response("Method Not Allowed", { status: 405, headers: { Allow: "POST" } }),
       POST: ({ request }) => {
         const handler = createAuthEmailHandler({
           apiKey: process.env['LOVABLE_API_KEY']!,

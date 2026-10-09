@@ -7,6 +7,7 @@ import { createFileRoute } from "@tanstack/react-router";
 export const Route = createFileRoute("/api/public/payments/run-due")({
   server: {
     handlers: {
+      GET: () => new Response("Method Not Allowed", { status: 405, headers: { Allow: "POST" } }),
       POST: async ({ request }) => {
         const expected = process.env["CRON_SECRET"];
         const got = request.headers.get("x-cron-secret");
