@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { CalendarDays, User, Wrench, Check, X, Loader2, MapPin, LogOut, ShieldAlert, Inbox, ShieldCheck, Clock3, BadgeCheck } from "lucide-react";
+import { CalendarDays, User, Wrench, Check, X, Loader2, MapPin, LogOut, ShieldAlert, Inbox, ShieldCheck, Clock3, BadgeCheck, Trash2 } from "lucide-react";
 import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
 import { Wordmark } from "@/components/getpros/Logo";
 
@@ -18,16 +18,31 @@ import { ProviderWorkSettings } from "@/components/getpros/ProviderWorkSettings"
 import { transitionBooking } from "@/lib/schedule";
 import { startPayoutOnboarding, refreshPayoutStatus } from "@/lib/payouts.functions";
 import { syncMyPayments } from "@/lib/payments.functions";
+import { deleteMyAccount } from "@/lib/account.functions";
 import { formatCents } from "@/lib/pricing";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 
 export const Route = createFileRoute("/_authenticated/provider-dashboard")({
   head: () => ({
     meta: [
-      { title: "Provider dashboard — GetPros" },
+      { title: "Provider dashboard — GetPros.ai" },
       { name: "description", content: "Manage jobs, appointments, availability and your provider profile on GetPros." },
-      { property: "og:title", content: "Provider dashboard — GetPros" },
+      { name: "robots", content: "noindex" },
+      { property: "og:title", content: "Provider dashboard — GetPros.ai" },
       { property: "og:description", content: "Manage your GetPros business in one place." },
+      { name: "twitter:title", content: "Provider dashboard — GetPros.ai" },
+      { name: "twitter:description", content: "Manage your GetPros business in one place." },
     ],
   }),
   component: ProviderDashboard,
@@ -290,10 +305,25 @@ function BusinessProfile() {
       } catch {
         /* continuity is best-effort — never block the profile */
       }
-      return fetchMyProviderProfile(user?.id as string);
+      const profile = await fetchMyProviderProfile(user?.id as string);
+      let priceCents: number | null = null;
+      if (profile?.service_category && user?.id) {
+        const cat = catalog.find((c) => c.name === profile.service_category);
+        if (cat) {
+          const { data: svc } = await supabase
+            .from("provider_services")
+            .select("price_cents")
+            .eq("user_id", user.id)
+            .eq("category_slug", cat.slug)
+            .maybeSingle();
+          priceCents = svc?.price_cents ?? null;
+        }
+      }
+      return { profile, priceCents };
     },
     enabled: Boolean(user?.id),
   });
+  const profileData = data?.profile ?? null;
 
   const [form, setForm] = useState({
     business_name: "",
@@ -313,21 +343,24 @@ function BusinessProfile() {
   const zipResolved = useResolvedLocation(form.service_zip);
   const zipPlace = zipResolved.kind === "zip" ? zipResolved.place : null;
 
+  const [fixedPriceEdited, setFixedPriceEdited] = useState(false);
+
   useEffect(() => {
-    if (!data) return;
+    if (!profileData) return;
+    setFixedPriceEdited(false);
     setForm({
-      business_name: data.business_name ?? "",
-      service_category: data.service_category ?? "",
-      service_area: data.service_area ?? "",
-      service_zip: data.service_zip ?? "",
-      service_radius_miles: data.service_radius_miles != null ? String(data.service_radius_miles) : "",
-      starting_price: data.starting_price != null ? String(data.starting_price) : "",
-      fixed_price: "",
-      availability: data.availability ?? "",
-      phone: data.phone ?? "",
-      bio: data.bio ?? "",
+      business_name: profileData.business_name ?? "",
+      service_category: profileData.service_category ?? "",
+      service_area: profileData.service_area ?? "",
+      service_zip: profileData.service_zip ?? "",
+      service_radius_miles: profileData.service_radius_miles != null ? String(profileData.service_radius_miles) : "",
+      starting_price: profileData.starting_price != null ? String(profileData.starting_price) : "",
+      fixed_price: data?.priceCents != null ? String(data.priceCents / 100) : "",
+      availability: profileData.availability ?? "",
+      phone: profileData.phone ?? "",
+      bio: profileData.bio ?? "",
     });
-  }, [data]);
+  }, [data, profileData]);
 
 
   async function save(e: React.FormEvent) {
@@ -374,24 +407,26 @@ function BusinessProfile() {
       return;
     }
     const cat = catalog.find((c) => c.name === form.service_category);
-    const fixed = form.fixed_price ? Math.round(Number(form.fixed_price) * 100) : null;
-    if (cat && fixed != null && fixed > 0) {
-      const { error: svcError } = await supabase
-        .from("provider_services")
-        .upsert(
-          { user_id: user.id, category_slug: cat.slug, category_label: cat.name, is_primary: true, price_cents: fixed },
-          { onConflict: "user_id,category_slug" },
-        );
-      if (svcError) {
-        setError(svcError.message);
-        return;
+    if (cat && fixedPriceEdited) {
+      const fixed = form.fixed_price ? Math.round(Number(form.fixed_price) * 100) : null;
+      if (fixed != null && fixed > 0) {
+        const { error: svcError } = await supabase
+          .from("provider_services")
+          .upsert(
+            { user_id: user.id, category_slug: cat.slug, category_label: cat.name, is_primary: true, price_cents: fixed },
+            { onConflict: "user_id,category_slug" },
+          );
+        if (svcError) {
+          setError(svcError.message);
+          return;
+        }
       }
     }
     setMessage("Business profile saved.");
     await queryClient.invalidateQueries({ queryKey: ["provider-profile", user.id] });
   }
 
-  const status = data?.verification_status ?? "unverified";
+  const status = profileData?.verification_status ?? "unverified";
   const verified = status === "verified";
   if (isLoading) return <Loading />;
 
@@ -445,7 +480,15 @@ function BusinessProfile() {
           />
           <Input label="Service area (description)" value={form.service_area} onChange={(v) => setForm({ ...form, service_area: v })} placeholder="Frisco, Plano & north Dallas" />
           <Input label="Starting price ($)" value={form.starting_price} onChange={(v) => setForm({ ...form, starting_price: v.replace(/[^0-9.]/g, "") })} placeholder="89" />
-          <Input label="Fixed job price ($)" value={form.fixed_price} onChange={(v) => setForm({ ...form, fixed_price: v.replace(/[^0-9.]/g, "") })} placeholder="120" />
+          <Input
+            label="Fixed job price ($)"
+            value={form.fixed_price}
+            onChange={(v) => {
+              setFixedPriceEdited(true);
+              setForm({ ...form, fixed_price: v.replace(/[^0-9.]/g, "") });
+            }}
+            placeholder="120"
+          />
           <Input label="Availability" value={form.availability} onChange={(v) => setForm({ ...form, availability: v })} placeholder="Mon–Fri, 8am–6pm" />
           <Input label="Contact phone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v.slice(0, 40) })} placeholder="(214) 555-0142" />
         </div>
@@ -479,22 +522,83 @@ function BusinessProfile() {
         <VerificationCard
           status={status}
           verified={verified}
-          profileComplete={Boolean(data?.business_name && data?.service_category && data?.service_zip)}
+          profileComplete={Boolean(profileData?.business_name && profileData?.service_category && profileData?.service_zip)}
         />
         <PayoutSetup />
 
 
-        <button
-          onClick={async () => {
-            await signOut();
-            await navigate({ to: "/", replace: true });
-          }}
-          className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold hover:bg-muted"
-        >
-          <LogOut className="h-4 w-4" /> Log out
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={async () => {
+              await signOut();
+              await navigate({ to: "/", replace: true });
+            }}
+            className="inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-semibold hover:bg-muted"
+          >
+            <LogOut className="h-4 w-4" /> Log out
+          </button>
+          <DeleteProviderAccountButton />
+        </div>
       </div>
     </div>
+  );
+}
+
+function DeleteProviderAccountButton() {
+  const navigate = useNavigate();
+  const deleteAccount = useServerFn(deleteMyAccount);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleDelete() {
+    setBusy(true);
+    setError(null);
+    try {
+      const result = await deleteAccount();
+      if (!result.ok) {
+        setError("We couldn't fully delete your account automatically, so our team has been notified to finish it manually.");
+      }
+      await supabase.auth.signOut();
+      await navigate({ to: "/", replace: true });
+    } catch {
+      setError("Something went wrong deleting your account. Please try again.");
+      setBusy(false);
+    }
+  }
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button
+          type="button"
+          className="inline-flex items-center gap-2 rounded-full border border-destructive/40 px-4 py-2 text-sm font-semibold text-destructive hover:bg-destructive/10"
+        >
+          <Trash2 className="h-4 w-4" /> Delete my account
+        </button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This permanently deletes your GetPros account and business profile. This can't be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        {error && <p className="text-xs font-medium text-destructive">{error}</p>}
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={busy}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            disabled={busy}
+            onClick={(e) => {
+              e.preventDefault();
+              void handleDelete();
+            }}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            {busy ? "Deleting…" : "Delete account"}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
@@ -523,8 +627,9 @@ function PayoutSetup() {
     },
   });
   useEffect(() => {
-    if (typeof window === "undefined" || !new URLSearchParams(window.location.search).get("payouts")) return;
-    void refresh().then(() => qc.invalidateQueries({ queryKey: ["payout-account"] }));
+    void refresh()
+      .then(() => qc.invalidateQueries({ queryKey: ["payout-account"] }))
+      .catch(() => null);
   }, [refresh, qc]);
   const ready = Boolean(acct?.charges_enabled && acct?.payouts_enabled);
 
