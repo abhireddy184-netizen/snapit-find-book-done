@@ -13,11 +13,15 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as CategoriesRouteImport } from './routes/categories'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as EmergencyRouteImport } from './routes/emergency'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as HistoryRouteImport } from './routes/history'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
 import { Route as LegalRouteImport } from './routes/legal'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as PlanRouteImport } from './routes/plan'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ProviderInterestRouteImport } from './routes/provider-interest'
 import { Route as RegisterRouteImport } from './routes/register'
@@ -65,14 +69,29 @@ const CategoriesRoute = CategoriesRouteImport.update({
   path: '/categories',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmergencyRoute = EmergencyRouteImport.update({
   id: '/emergency',
   path: '/emergency',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HistoryRoute = HistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LegalRoute = LegalRouteImport.update({
@@ -88,6 +107,11 @@ const LoginRoute = LoginRouteImport.update({
 const PlanRoute = PlanRouteImport.update({
   id: '/plan',
   path: '/plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -234,11 +258,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
   '/emergency': typeof EmergencyRoute
+  '/faq': typeof FaqRoute
   '/history': typeof HistoryRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/plan': typeof PlanRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
@@ -271,11 +299,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
   '/emergency': typeof EmergencyRoute
+  '/faq': typeof FaqRoute
   '/history': typeof HistoryRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/plan': typeof PlanRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
@@ -309,11 +341,15 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/book': typeof BookRoute
   '/categories': typeof CategoriesRoute
+  '/contact': typeof ContactRoute
   '/emergency': typeof EmergencyRoute
+  '/faq': typeof FaqRoute
   '/history': typeof HistoryRoute
+  '/how-it-works': typeof HowItWorksRoute
   '/legal': typeof LegalRoute
   '/login': typeof LoginRoute
   '/plan': typeof PlanRoute
+  '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/provider-interest': typeof ProviderInterestRoute
   '/register': typeof RegisterRoute
@@ -348,11 +384,15 @@ export interface FileRouteTypes {
     | '/'
     | '/book'
     | '/categories'
+    | '/contact'
     | '/emergency'
+    | '/faq'
     | '/history'
+    | '/how-it-works'
     | '/legal'
     | '/login'
     | '/plan'
+    | '/pricing'
     | '/privacy'
     | '/provider-interest'
     | '/register'
@@ -385,11 +425,15 @@ export interface FileRouteTypes {
     | '/'
     | '/book'
     | '/categories'
+    | '/contact'
     | '/emergency'
+    | '/faq'
     | '/history'
+    | '/how-it-works'
     | '/legal'
     | '/login'
     | '/plan'
+    | '/pricing'
     | '/privacy'
     | '/provider-interest'
     | '/register'
@@ -422,11 +466,15 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/book'
     | '/categories'
+    | '/contact'
     | '/emergency'
+    | '/faq'
     | '/history'
+    | '/how-it-works'
     | '/legal'
     | '/login'
     | '/plan'
+    | '/pricing'
     | '/privacy'
     | '/provider-interest'
     | '/register'
@@ -461,11 +509,15 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   BookRoute: typeof BookRoute
   CategoriesRoute: typeof CategoriesRoute
+  ContactRoute: typeof ContactRoute
   EmergencyRoute: typeof EmergencyRoute
+  FaqRoute: typeof FaqRoute
   HistoryRoute: typeof HistoryRoute
+  HowItWorksRoute: typeof HowItWorksRoute
   LegalRoute: typeof LegalRoute
   LoginRoute: typeof LoginRoute
   PlanRoute: typeof PlanRoute
+  PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   ProviderInterestRoute: typeof ProviderInterestRoute
   RegisterRoute: typeof RegisterRoute
@@ -517,6 +569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CategoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/emergency': {
       id: '/emergency'
       path: '/emergency'
@@ -524,11 +583,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmergencyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/history': {
       id: '/history'
       path: '/history'
       fullPath: '/history'
       preLoaderRoute: typeof HistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/legal': {
@@ -550,6 +623,13 @@ declare module '@tanstack/react-router' {
       path: '/plan'
       fullPath: '/plan'
       preLoaderRoute: typeof PlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -793,11 +873,15 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   BookRoute: BookRoute,
   CategoriesRoute: CategoriesRoute,
+  ContactRoute: ContactRoute,
   EmergencyRoute: EmergencyRoute,
+  FaqRoute: FaqRoute,
   HistoryRoute: HistoryRoute,
+  HowItWorksRoute: HowItWorksRoute,
   LegalRoute: LegalRoute,
   LoginRoute: LoginRoute,
   PlanRoute: PlanRoute,
+  PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   ProviderInterestRoute: ProviderInterestRoute,
   RegisterRoute: RegisterRoute,
