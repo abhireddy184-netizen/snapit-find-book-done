@@ -78,6 +78,13 @@
       "when": 1791527487544,
       "tag": "0010_direct_charges_admin_deletion",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791564961955,
+      "tag": "0011_owner_notifications",
+      "breakpoints": true
     }
   ]
 }

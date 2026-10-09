@@ -80,16 +80,7 @@ export const refreshPayoutStatus = createServerFn({ method: "POST" })
       .eq("provider_id", context.userId)
       .maybeSingle();
     if (!row) return { ok: false };
-    const { getStripe } = await import("./stripe.server");
-    const a = await getStripe().accounts.retrieve(row.stripe_account_id);
-    await supabaseAdmin
-      .from("provider_payout_accounts")
-      .update({
-        charges_enabled: a.charges_enabled,
-        payouts_enabled: a.payouts_enabled,
-        details_submitted: a.details_submitted,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("provider_id", context.userId);
+    const { syncPayoutAccount } = await import("@/lib/payout-sync.server");
+    await syncPayoutAccount(supabaseAdmin, row.stripe_account_id);
     return { ok: true };
   });

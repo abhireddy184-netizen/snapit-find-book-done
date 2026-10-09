@@ -82,6 +82,15 @@ async function setPayment(admin: Admin, pi: Stripe.PaymentIntent, account: strin
 }
 
 async function handleEvent(event: Stripe.Event, admin: Admin) {
+  if (event.type === "account.updated") {
+    // Connected-account context: event.account is the pro's account; the object is
+    // that same Account. Readiness is re-read from Stripe in the shared helper.
+    const obj = event.data.object as Stripe.Account;
+    const { syncPayoutAccount } = await import("@/lib/payout-sync.server");
+    const r = await syncPayoutAccount(admin, event.account ?? obj.id);
+    console.log("[stripe-connect-webhook] account.updated", event.id, r);
+    return;
+  }
   const account = event.account;
   if (!account) return; // not a connect event, nothing to do here
 
