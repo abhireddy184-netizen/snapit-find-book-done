@@ -176,7 +176,7 @@ function MobileMenu() {
         <SheetHeader>
           <SheetTitle>Menu</SheetTitle>
         </SheetHeader>
-        <nav aria-label="Mobile" className="mt-4 flex flex-col gap-1 text-sm font-semibold">
+        <nav aria-label="Mobile menu" className="mt-4 flex flex-col gap-1 text-sm font-semibold">
           <SheetClose asChild>
             <Link to="/services" className="rounded-xl px-3 py-2.5 hover:bg-muted">Services</Link>
           </SheetClose>
@@ -238,7 +238,7 @@ function BottomNav() {
   const { user } = useAuth();
   const items: Array<{
     key: string;
-    to: "/" | "/search" | "/snap" | "/dashboard" | "/login";
+    to: "/" | "/search" | "/snap" | "/dashboard" | "/login" | "/services";
     label: string;
     icon: typeof Home;
     highlight?: boolean;
@@ -247,13 +247,15 @@ function BottomNav() {
     { key: "search", to: "/search", label: "Search", icon: Search },
     { key: "snap", to: "/snap", label: "Show GP", icon: Camera, highlight: true },
     { key: "bookings", to: "/dashboard", label: "Bookings", icon: CalendarDays },
-    // Signed-out visitors get a real entry point instead of a silent redirect.
+    // The header already has a visible Log in / Sign up link — the bottom bar
+    // instead surfaces Services so it doesn't duplicate that entry point.
     user
       ? { key: "profile", to: "/dashboard", label: "Profile", icon: User }
-      : { key: "profile", to: "/login", label: "Log in", icon: User },
+      : { key: "services", to: "/services", label: "Services", icon: Wrench },
   ];
   return (
     <nav
+      aria-label="Mobile"
       aria-hidden={keyboardOpen}
       className={cn(
         "fixed inset-x-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-40 mx-auto max-w-md px-4 transition-all duration-200 md:hidden",

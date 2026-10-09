@@ -45,7 +45,9 @@ export function Footer() {
     <footer className="mt-12 border-t border-border/60 pt-10 pb-6 text-sm text-muted-foreground">
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.4fr]">
         <div className="min-w-0">
-          <Logo showTagline />
+          <Link to="/" aria-label="GetPros.ai home" className="inline-flex">
+            <Logo showTagline />
+          </Link>
           <p className="mt-3 max-w-xs text-xs leading-relaxed">
             Type, say, or show what you need. We find the right local pro.
           </p>
@@ -60,7 +62,7 @@ export function Footer() {
                 id="footer-early-access-link"
                 data-analytics-id="early_access_cta"
                 data-analytics-location="footer"
-                className="font-semibold text-primary hover:underline"
+                className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline sm:min-h-0"
               >
                 Early Access
               </a>
@@ -72,21 +74,21 @@ export function Footer() {
                 id="footer-for-pros-link"
                 data-analytics-id="provider_signup_cta"
                 data-analytics-location="footer"
-                className="hover:text-foreground"
+                className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0"
               >
                 For Pros
               </Link>
             </li>
-            <li><Link to="/snap" data-analytics-id="show_gpb_cta" data-analytics-location="footer" className="hover:text-foreground">Show GP</Link></li>
-            <li><Link to="/services" className="hover:text-foreground">All services</Link></li>
+            <li><Link to="/snap" data-analytics-id="show_gpb_cta" data-analytics-location="footer" className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0">Show GP</Link></li>
+            <li><Link to="/services" className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0">All services</Link></li>
           </ul>
         </div>
         <div>
           <div className="mb-3 text-xs font-bold uppercase tracking-wider text-foreground">Company</div>
           <ul className="space-y-2">
-            <li><a href="/#how-it-works" className="hover:text-foreground">How it works</a></li>
-            <li><Link to="/emergency" className="hover:text-foreground">Emergency services</Link></li>
-            <li><Link to="/trust-safety" className="hover:text-foreground">Trust &amp; safety</Link></li>
+            <li><a href="/#how-it-works" className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0">How it works</a></li>
+            <li><Link to="/emergency" className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0">Emergency services</Link></li>
+            <li><Link to="/trust-safety" className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0">Trust &amp; safety</Link></li>
           </ul>
         </div>
 
@@ -138,11 +140,11 @@ export function Footer() {
       <div className="mt-6 flex flex-col items-start justify-between gap-3 border-t border-border/60 pt-6 text-xs md:flex-row md:items-center">
         <span>© {new Date().getFullYear()} GetPros.ai. All rights reserved.</span>
         <div className="flex flex-wrap gap-5">
-          <Link to="/legal" hash="privacy" className="hover:text-foreground">Privacy</Link>
-          <Link to="/legal" hash="terms" className="hover:text-foreground">Terms</Link>
-          <Link to="/legal" hash="cookies" className="hover:text-foreground">Cookies</Link>
-          <Link to="/legal" hash="accessibility" className="hover:text-foreground">Accessibility</Link>
-          <Link to="/categories" className="hover:text-foreground">All categories</Link>
+          <Link to="/legal" hash="privacy" className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0">Privacy</Link>
+          <Link to="/legal" hash="terms" className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0">Terms</Link>
+          <Link to="/legal" hash="cookies" className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0">Cookies</Link>
+          <Link to="/legal" hash="accessibility" className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0">Accessibility</Link>
+          <Link to="/categories" className="inline-flex min-h-11 items-center hover:text-foreground sm:min-h-0">All categories</Link>
         </div>
       </div>
     </footer>
