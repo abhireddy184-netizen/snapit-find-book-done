@@ -10,6 +10,8 @@ export const Route = createFileRoute("/privacy")({
       { property: "og:description", content: "How GetPros.ai collects, uses and protects your information." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Privacy Policy — GetPros.ai" },
+      { name: "twitter:description", content: "How GetPros.ai collects, uses and protects your information." },
     ],
   }),
   component: PrivacyPage,

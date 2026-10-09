@@ -10,6 +10,8 @@ export const Route = createFileRoute("/terms")({
       { property: "og:description", content: "The terms that apply when you use GetPros.ai." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
+      { name: "twitter:title", content: "Terms of Service — GetPros.ai" },
+      { name: "twitter:description", content: "The terms that apply when you use GetPros.ai." },
     ],
   }),
   component: TermsPage,
