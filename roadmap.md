@@ -12,3 +12,7 @@
 - [x] Payments part 2: card step on /book, 2-day hold, approve/auto-capture after 48h, late-cancel fee, admin refund, bookings blocked until pro payouts + price, draft payment terms
 - [ ] Payments: end-to-end test with a real test pro (blocked: needs a verified pro with active Stripe payouts and a price)
 - [ ] Payments: hourly scheduler calling /api/public/payments/run-due (blocked: no scheduler enabled; dashboards run due work on load meanwhile)
+- [x] Connect webhook handles account.updated (re-reads Stripe; shared helper)
+- [x] Durable owner alerts (recorded, hourly retry, missed-signup backfill)
+- [ ] Stripe Connected-accounts destination in the same test-mode account as the app's key (blocked: owner, Stripe dashboard)
+- [ ] Publish + real signed event + Outlook inbox check (blocked: owner approval to publish)
