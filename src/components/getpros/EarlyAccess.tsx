@@ -91,7 +91,7 @@ export function EarlyAccessSection() {
       <div className="overflow-hidden surface-card p-5 sm:p-8">
         <div className="grid gap-7 lg:grid-cols-[1fr_1fr] lg:items-start">
           <div className="min-w-0">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/15 px-3 py-1 text-xs font-black text-secondary">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-secondary/15 px-3 py-1 text-xs font-black text-secondary-strong">
               <MapPin className="h-3.5 w-3.5" /> Launching city by city
             </span>
             <h2 className="mt-3 text-2xl font-black tracking-tight sm:text-3xl">GetPros is launching city by city</h2>

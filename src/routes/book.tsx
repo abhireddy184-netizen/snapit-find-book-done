@@ -55,10 +55,13 @@ export const Route = createFileRoute("/book")({
   }),
   head: () => ({
     meta: [
-      { title: "Book a service — GetPros" },
+      { title: "Book a service — GetPros.ai" },
       { name: "description", content: "Book a trusted local pro in a few taps." },
-      { property: "og:title", content: "Book a service — GetPros" },
+      { property: "og:title", content: "Book a service — GetPros.ai" },
       { property: "og:description", content: "Book a trusted local pro in a few taps." },
+      { name: "twitter:title", content: "Book a service — GetPros.ai" },
+      { name: "twitter:description", content: "Book a trusted local pro in a few taps." },
+      { name: "robots", content: "noindex" },
     ],
   }),
   component: BookPage,
@@ -119,7 +122,10 @@ function BookPage() {
   // Load the real pro this booking will be assigned to. There is no fallback:
   // a booking must name an actual GetPros professional's account.
   useEffect(() => {
-    if (!providerParam) { setProviderState("missing"); return; }
+    if (!providerParam || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(providerParam)) {
+      setProviderState("missing");
+      return;
+    }
     let cancelled = false;
     setProviderState("loading");
     void fetchProviderByUserId(providerParam)

@@ -25,12 +25,6 @@ export const startPayoutOnboarding = createServerFn({ method: "POST" })
         .maybeSingle();
       let accountId = existing?.stripe_account_id;
       if (!accountId) {
-        // Reuse an account created on an earlier attempt whose DB save failed.
-        for await (const acct of stripe.accounts.list({ limit: 100 })) {
-          if (acct.metadata?.["provider_id"] === context.userId) { accountId = acct.id; break; }
-        }
-      }
-      if (!accountId) {
         const email = (context.claims as { email?: string } | undefined)?.email;
         // This platform uses Stripe-managed risk (losses collected by Stripe), which
         // Stripe only allows via Accounts v2 with a full Stripe dashboard.
