@@ -28,6 +28,7 @@ import { Route as SnapRouteImport } from './routes/snap'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as TrustSafetyRouteImport } from './routes/trust-safety'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedProviderDashboardRouteImport } from './routes/_authenticated/provider-dashboard'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
@@ -39,6 +40,7 @@ import { Route as AuthenticatedJobIdRouteImport } from './routes/_authenticated/
 import { Route as ServicesCategoryIndexRouteImport } from './routes/services.$category.index'
 import { Route as ServicesCategoryServiceRouteImport } from './routes/services.$category.$service'
 import { Route as ApiPublicPaymentsRunDueRouteImport } from './routes/api/public/payments/run-due'
+import { Route as ApiPublicStripeConnectWebhookRouteImport } from './routes/api/public/stripe/connect-webhook'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
@@ -138,6 +140,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
   path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -171,9 +178,9 @@ const TrackingIdRoute = TrackingIdRouteImport.update({
 } as any)
 const AuthenticatedAdminProvidersRoute =
   AuthenticatedAdminProvidersRouteImport.update({
-    id: '/admin/providers',
-    path: '/admin/providers',
-    getParentRoute: () => AuthenticatedRouteRoute,
+    id: '/providers',
+    path: '/providers',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedJobIdRoute = AuthenticatedJobIdRouteImport.update({
   id: '/job/$id',
@@ -195,6 +202,12 @@ const ApiPublicPaymentsRunDueRoute = ApiPublicPaymentsRunDueRouteImport.update({
   path: '/api/public/payments/run-due',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicStripeConnectWebhookRoute =
+  ApiPublicStripeConnectWebhookRouteImport.update({
+    id: '/api/public/stripe/connect-webhook',
+    path: '/api/public/stripe/connect-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicStripeWebhookRoute = ApiPublicStripeWebhookRouteImport.update({
   id: '/api/public/stripe/webhook',
   path: '/api/public/stripe/webhook',
@@ -236,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/trust-safety': typeof TrustSafetyRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -247,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category/': typeof ServicesCategoryIndexRoute
   '/api/public/payments/run-due': typeof ApiPublicPaymentsRunDueRoute
+  '/api/public/stripe/connect-webhook': typeof ApiPublicStripeConnectWebhookRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -270,6 +285,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/trust-safety': typeof TrustSafetyRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -281,6 +297,7 @@ export interface FileRoutesByTo {
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category': typeof ServicesCategoryIndexRoute
   '/api/public/payments/run-due': typeof ApiPublicPaymentsRunDueRoute
+  '/api/public/stripe/connect-webhook': typeof ApiPublicStripeConnectWebhookRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -307,6 +324,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/trust-safety': typeof TrustSafetyRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
   '/auth/callback': typeof AuthCallbackRoute
@@ -318,6 +336,7 @@ export interface FileRoutesById {
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/services/$category/': typeof ServicesCategoryIndexRoute
   '/api/public/payments/run-due': typeof ApiPublicPaymentsRunDueRoute
+  '/api/public/stripe/connect-webhook': typeof ApiPublicStripeConnectWebhookRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -344,6 +363,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/trust-safety'
     | '/unsubscribe'
+    | '/admin'
     | '/dashboard'
     | '/provider-dashboard'
     | '/auth/callback'
@@ -355,6 +375,7 @@ export interface FileRouteTypes {
     | '/services/$category/$service'
     | '/services/$category/'
     | '/api/public/payments/run-due'
+    | '/api/public/stripe/connect-webhook'
     | '/api/public/stripe/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -378,6 +399,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/trust-safety'
     | '/unsubscribe'
+    | '/admin'
     | '/dashboard'
     | '/provider-dashboard'
     | '/auth/callback'
@@ -389,6 +411,7 @@ export interface FileRouteTypes {
     | '/services/$category/$service'
     | '/services/$category'
     | '/api/public/payments/run-due'
+    | '/api/public/stripe/connect-webhook'
     | '/api/public/stripe/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -414,6 +437,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/trust-safety'
     | '/unsubscribe'
+    | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/provider-dashboard'
     | '/auth/callback'
@@ -425,6 +449,7 @@ export interface FileRouteTypes {
     | '/services/$category/$service'
     | '/services/$category/'
     | '/api/public/payments/run-due'
+    | '/api/public/stripe/connect-webhook'
     | '/api/public/stripe/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -455,6 +480,7 @@ export interface RootRouteChildren {
   ProviderIdRoute: typeof ProviderIdRoute
   TrackingIdRoute: typeof TrackingIdRoute
   ApiPublicPaymentsRunDueRoute: typeof ApiPublicPaymentsRunDueRoute
+  ApiPublicStripeConnectWebhookRoute: typeof ApiPublicStripeConnectWebhookRoute
   ApiPublicStripeWebhookRoute: typeof ApiPublicStripeWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -596,6 +622,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -640,10 +673,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/admin/providers': {
       id: '/_authenticated/admin/providers'
-      path: '/admin/providers'
+      path: '/providers'
       fullPath: '/admin/providers'
       preLoaderRoute: typeof AuthenticatedAdminProvidersRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+      parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/job/$id': {
       id: '/_authenticated/job/$id'
@@ -671,6 +704,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/payments/run-due'
       fullPath: '/api/public/payments/run-due'
       preLoaderRoute: typeof ApiPublicPaymentsRunDueRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/stripe/connect-webhook': {
+      id: '/api/public/stripe/connect-webhook'
+      path: '/api/public/stripe/connect-webhook'
+      fullPath: '/api/public/stripe/connect-webhook'
+      preLoaderRoute: typeof ApiPublicStripeConnectWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/stripe/webhook': {
@@ -704,17 +744,28 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminProvidersRoute: typeof AuthenticatedAdminProvidersRoute
+}
+
+const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminProvidersRoute: AuthenticatedAdminProvidersRoute,
+}
+
+const AuthenticatedAdminRouteWithChildren =
+  AuthenticatedAdminRoute._addFileChildren(AuthenticatedAdminRouteChildren)
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProviderDashboardRoute: typeof AuthenticatedProviderDashboardRoute
-  AuthenticatedAdminProvidersRoute: typeof AuthenticatedAdminProvidersRoute
   AuthenticatedJobIdRoute: typeof AuthenticatedJobIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProviderDashboardRoute: AuthenticatedProviderDashboardRoute,
-  AuthenticatedAdminProvidersRoute: AuthenticatedAdminProvidersRoute,
   AuthenticatedJobIdRoute: AuthenticatedJobIdRoute,
 }
 
@@ -761,6 +812,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProviderIdRoute: ProviderIdRoute,
   TrackingIdRoute: TrackingIdRoute,
   ApiPublicPaymentsRunDueRoute: ApiPublicPaymentsRunDueRoute,
+  ApiPublicStripeConnectWebhookRoute: ApiPublicStripeConnectWebhookRoute,
   ApiPublicStripeWebhookRoute: ApiPublicStripeWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
