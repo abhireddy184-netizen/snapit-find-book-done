@@ -1,4 +1,4 @@
-import { saveProviderProfile } from "@/lib/provider-profile.functions";
+import { saveProviderProfile, ensureProviderOnboardingEmail } from "@/lib/provider-profile.functions";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -45,8 +45,13 @@ export const Route = createFileRoute("/_authenticated/provider-dashboard")({
       { name: "twitter:description", content: "Manage your GetPros business in one place." },
     ],
   }),
+  validateSearch: (search: Record<string, unknown>): { tab?: string } => ({
+    tab: typeof search["tab"] === "string" && TAB_IDS.includes(search["tab"] as string) ? (search["tab"] as string) : undefined,
+  }),
   component: ProviderDashboard,
 });
+
+const TAB_IDS = ["requests", "schedule", "work", "profile"];
 
 const tabs = [
   { id: "requests", label: "Requests", icon: Wrench },
@@ -56,8 +61,14 @@ const tabs = [
 ];
 
 function ProviderDashboard() {
-  const [tab, setTab] = useState("requests");
+  const { tab: initialTab } = Route.useSearch();
+  const [tab, setTab] = useState(initialTab ?? "requests");
   const { user, profile } = useAuth();
+  const ensureOnboarding = useServerFn(ensureProviderOnboardingEmail);
+  useEffect(() => {
+    // Verified pro with an incomplete profile gets one "complete your profile" email (server dedupes).
+    if (user?.id) void ensureOnboarding({ data: undefined }).catch(() => {});
+  }, [user?.id, ensureOnboarding]);
   return (
     <AppShell>
       <div className="pt-4">

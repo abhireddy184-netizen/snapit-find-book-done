@@ -7,7 +7,7 @@ import { CONTACT_EMAIL } from '@/lib/brand'
 
 export const INTERNAL_LEAD_RECIPIENT = CONTACT_EMAIL
 
-export type LeadType = 'provider' | 'subscriber' | 'early_access' | 'account' | 'booking'
+export type LeadType = 'provider' | 'subscriber' | 'early_access' | 'account' | 'booking' | 'profile_complete'
 
 interface Props {
   leadType?: LeadType
@@ -26,6 +26,7 @@ interface Props {
   reactivated?: boolean
   yearsExperience?: number | null
   attribution?: Record<string, string | null | undefined> | null
+  adminUrl?: string | null
 }
 
 const TYPE_LABEL: Record<LeadType, string> = {
@@ -34,6 +35,7 @@ const TYPE_LABEL: Record<LeadType, string> = {
   early_access: 'Customer early access',
   account: 'New account',
   booking: 'Booking request',
+  profile_complete: 'Pro business profile completed — needs manual review',
 }
 
 export function leadPlace(d: Props): string {
@@ -57,6 +59,7 @@ const InternalLeadEmail = (props: Props) => {
     ['Source', props.source],
     ...Object.entries(props.attribution ?? {}).map(([k, v]) => [k, v] as [string, string | null | undefined]),
     ['Note', props.note],
+    ['Admin review (sign-in required)', props.adminUrl],
     ['Submitted', props.submittedAt ? new Date(props.submittedAt).toUTCString() : null],
   ]
   return (
@@ -92,6 +95,7 @@ export const template = {
     if (p.leadType === 'provider') return `New GetPros Pro lead — ${p.service ?? 'Unknown category'} — ${leadPlace(p)}`
     if (p.leadType === 'early_access') return `New GetPros early-access lead — ${p.service ?? 'Unknown service'} — ${leadPlace(p)}`
     if (p.leadType === 'booking') return `New GetPros booking request — ${p.service ?? 'Service'} — ${p.email ?? 'unknown'}`
+    if (p.leadType === 'profile_complete') return `GetPros Pro profile ready for review — ${p.businessName ?? 'Pro'} — ${p.service ?? ''} ${p.zip ?? ''}`.trim()
     if (p.leadType === 'account') return `New GetPros ${p.service ?? 'account'} — ${p.email ?? 'unknown'}`
     return `New GetPros subscriber — ${p.email ?? 'unknown'}`
   },

@@ -26,7 +26,14 @@ export const Route = createFileRoute("/api/public/payments/run-due")({
           } catch (err) {
             console.error("[run-due] owner alerts failed:", err instanceof Error ? err.message : err);
           }
-          return Response.json({ ...r, alerts });
+          let onboarding: unknown = null;
+          try {
+            const { processProviderOnboarding } = await import("@/lib/provider-onboarding.server");
+            onboarding = await processProviderOnboarding(supabaseAdmin);
+          } catch (err) {
+            console.error("[run-due] provider onboarding failed:", err instanceof Error ? err.message : err);
+          }
+          return Response.json({ ...r, alerts, onboarding });
         } catch (err) {
           console.error("[run-due] failed:", err instanceof Error ? err.message : err);
           return Response.json({ error: "run failed" }, { status: 500 });
