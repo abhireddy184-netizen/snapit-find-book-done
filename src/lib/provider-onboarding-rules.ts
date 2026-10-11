@@ -2,7 +2,8 @@
 
 /** Only accounts created after onboarding automation went live — never retroactive. */
 export const ONBOARDING_CUTOFF = Date.parse("2026-10-11T02:00:00Z");
-export const REMINDER_DELAY_MS = 48 * 3600 * 1000;
+export const REMINDER_24H_MS = 24 * 3600 * 1000;
+export const REMINDER_48H_MS = 48 * 3600 * 1000;
 
 export type ProfileFields = {
   business_name?: string | null;
@@ -21,7 +22,11 @@ export function isOnboardingEligible(u: { created_at?: string | null; email_conf
   return Date.parse(u.created_at) >= ONBOARDING_CUTOFF;
 }
 
-/** 48-hour reminder is due once 48h passed since email verification. */
-export function isReminderDue(emailConfirmedAt: string, now = Date.now()): boolean {
-  return now - Date.parse(emailConfirmedAt) >= REMINDER_DELAY_MS;
+/** Reminders due for an incomplete profile, measured from signup (account creation). */
+export function dueReminders(signupAt: string, now = Date.now()): Array<"reminder_24h" | "reminder_48h"> {
+  const age = now - Date.parse(signupAt);
+  const out: Array<"reminder_24h" | "reminder_48h"> = [];
+  if (age >= REMINDER_24H_MS) out.push("reminder_24h");
+  if (age >= REMINDER_48H_MS) out.push("reminder_48h");
+  return out;
 }

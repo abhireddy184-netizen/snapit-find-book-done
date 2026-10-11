@@ -10,4 +10,4 @@
 <!-- LOVABLE:END -->
 - Pro payout readiness is only written by src/lib/payout-sync.server.ts, which re-reads the account from Stripe; why: never trust event payloads, one source of truth for both webhooks.
 - Owner alerts go through src/lib/owner-notify.server.ts (owner_notifications table, stable keys, hourly retry/backfill in run-due); why: no lost or duplicate alerts.
-- Provider onboarding emails (welcome + one 48h reminder) go through src/lib/provider-onboarding.server.ts, recorded in provider_onboarding_emails before sending and run hourly by run-due; why: one send per pro, never retroactive, retry without duplicates.
+- Provider onboarding emails (welcome + reminders at 24h and 48h after signup) go through src/lib/provider-onboarding.server.ts, recorded in provider_onboarding_emails before sending and run hourly by run-due; why: one send per pro, never retroactive, retry without duplicates.

@@ -1,13 +1,13 @@
-// Server-only: provider onboarding emails (welcome once verified, one 48h reminder)
-// and the one-time "profile completed" owner alert. Every provider email is
+// Server-only: provider onboarding emails (welcome once verified, reminders at 24h and 48h after signup)
+// and the two reminders (24h, 48h after signup) and the one-time "profile completed" owner alert. Every provider email is
 // recorded in provider_onboarding_emails (PK user_id+kind) before sending, so it
 // is sent at most once; failures are retried hourly by run-due. Never throws.
 import { sendTemplateEmail } from "@/lib/email-templates/send-email";
 import { SITE_URL } from "@/lib/brand";
-import { isOnboardingEligible, isProfileComplete, isReminderDue, ONBOARDING_CUTOFF } from "./provider-onboarding-rules";
+import { isOnboardingEligible, isProfileComplete, dueReminders, ONBOARDING_CUTOFF } from "./provider-onboarding-rules";
 
 type Admin = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
-type Kind = "welcome" | "reminder_48h";
+type Kind = "welcome" | "reminder_24h" | "reminder_48h";
 const MAX_ATTEMPTS = 6;
 
 async function loadState(db: Admin, userId: string) {
@@ -28,6 +28,7 @@ async function loadState(db: Admin, userId: string) {
   return {
     email: user.email,
     confirmedAt: user.email_confirmed_at ?? null,
+    signupAt: user.created_at,
     firstName: (profile.full_name || "").trim().split(/\s+/)[0] || undefined,
     eligible,
     complete: isProfileComplete(pp),
@@ -74,7 +75,7 @@ export async function ensureProviderWelcome(db: Admin, userId: string) {
   }
 }
 
-/** Hourly: welcome backfill, the single 48h reminder, and retries. */
+/** Hourly: welcome backfill, 24h/48h reminders (incomplete profiles only), retries. */
 export async function processProviderOnboarding(db: Admin) {
   let checked = 0;
   const { data: rows } = await db
@@ -88,7 +89,11 @@ export async function processProviderOnboarding(db: Admin) {
       if (!s || !s.eligible || s.complete || !s.confirmedAt) continue;
       checked++;
       await sendOnce(db, r.id, "welcome", s.email, s.firstName);
-      if (isReminderDue(s.confirmedAt)) await sendOnce(db, r.id, "reminder_48h", s.email, s.firstName);
+      // At most one reminder per run, so a late-detected account never gets both at once.
+      const { data: sentRows } = await db.from("provider_onboarding_emails").select("kind").eq("user_id", r.id);
+      const have = new Set((sentRows ?? []).map((x) => x.kind));
+      const next = dueReminders(s.signupAt).find((k) => !have.has(k));
+      if (next) await sendOnce(db, r.id, next, s.email, s.firstName);
     } catch (err) {
       console.error("[provider-onboarding] process:", err instanceof Error ? err.message : err);
     }
