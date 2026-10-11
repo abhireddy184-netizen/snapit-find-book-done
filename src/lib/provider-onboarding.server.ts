@@ -93,8 +93,7 @@ export async function processProviderOnboarding(db: Admin) {
       const { data: sentRows } = await db.from("provider_onboarding_emails").select("kind").eq("user_id", r.id);
       const have = new Set((sentRows ?? []).map((x) => x.kind));
       const next = dueReminders(s.signupAt).find((k) => !have.has(k));
-      if (next && !(next === "reminder_48h" && !have.has("reminder_24h"))) await sendOnce(db, r.id, next, s.email, s.firstName);
-      else if (next === "reminder_48h") await sendOnce(db, r.id, "reminder_24h", s.email, s.firstName);
+      if (next) await sendOnce(db, r.id, next, s.email, s.firstName);
     } catch (err) {
       console.error("[provider-onboarding] process:", err instanceof Error ? err.message : err);
     }
