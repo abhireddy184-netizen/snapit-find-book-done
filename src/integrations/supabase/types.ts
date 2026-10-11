@@ -541,6 +541,36 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_onboarding_emails: {
+        Row: {
+          attempts: number
+          created_at: string
+          kind: string
+          last_error: string | null
+          sent_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          kind: string
+          last_error?: string | null
+          sent_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          kind?: string
+          last_error?: string | null
+          sent_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       provider_payout_accounts: {
         Row: {
           charges_enabled: boolean
