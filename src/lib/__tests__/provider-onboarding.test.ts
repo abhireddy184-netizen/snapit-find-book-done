@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isOnboardingEligible, isProfileComplete, isReminderDue } from "../provider-onboarding-rules";
+import { isOnboardingEligible, isProfileComplete, dueReminders } from "../provider-onboarding-rules";
 
 describe("provider onboarding rules", () => {
   it("profile is complete only with business name, category and 5-digit ZIP", () => {
@@ -15,9 +15,10 @@ describe("provider onboarding rules", () => {
     expect(isOnboardingEligible({ ...ok, deleted: true })).toBe(false);
     expect(isOnboardingEligible({ ...ok, created_at: "2026-10-01T00:00:00Z" })).toBe(false);
   });
-  it("reminder is due 48 hours after verification, not before", () => {
+  it("reminders are due at 24h and 48h after signup", () => {
     const t = Date.parse("2026-10-12T00:00:00Z");
-    expect(isReminderDue("2026-10-12T00:00:00Z", t + 47 * 3600e3)).toBe(false);
-    expect(isReminderDue("2026-10-12T00:00:00Z", t + 48 * 3600e3)).toBe(true);
+    expect(dueReminders("2026-10-12T00:00:00Z", t + 23 * 3600e3)).toEqual([]);
+    expect(dueReminders("2026-10-12T00:00:00Z", t + 24 * 3600e3)).toEqual(["reminder_24h"]);
+    expect(dueReminders("2026-10-12T00:00:00Z", t + 48 * 3600e3)).toEqual(["reminder_24h", "reminder_48h"]);
   });
 });
