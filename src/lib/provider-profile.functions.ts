@@ -35,5 +35,22 @@ export const saveProviderProfile = createServerFn({ method: "POST" })
       console.error("[provider-profile] save failed:", error.message);
       return { error: "We couldn't save your business profile. Please try again." };
     }
+    // One owner alert, only once the required fields are complete (stable key dedupes later edits).
+    try {
+      const { notifyProfileCompleted } = await import("@/lib/provider-onboarding.server");
+      await notifyProfileCompleted(context.userId, data);
+    } catch (err) {
+      console.error("[provider-profile] completion alert failed:", err instanceof Error ? err.message : err);
+    }
     return { error: null };
+  });
+
+/** Sends the one-time "complete your profile" email to a verified pro with an incomplete profile. */
+export const ensureProviderOnboardingEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { ensureProviderWelcome } = await import("@/lib/provider-onboarding.server");
+    await ensureProviderWelcome(supabaseAdmin, context.userId);
+    return { ok: true };
   });
