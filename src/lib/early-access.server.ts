@@ -12,9 +12,12 @@ export async function saveEarlyAccess(input: {
   state: string | null;
   zip: string | null;
   serviceInterest: string;
+  /** "search_area_waitlist" = Notify Me on the no-pro-yet search state (name optional). */
+  source?: string;
 }): Promise<{ ok: true }> {
+  const source = input.source === "search_area_waitlist" ? input.source : SOURCE;
   const normalized = input.email.toLowerCase();
-  if (input.fullName.length < 2) throw new Error("Please enter your full name.");
+  if (source === SOURCE && input.fullName.length < 2) throw new Error("Please enter your full name.");
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(normalized)) throw new Error("Please enter a valid email address.");
   if (input.location.length < 2) throw new Error("Please enter your city or ZIP code.");
   if (!input.serviceInterest) throw new Error("Please choose the service you're interested in.");
@@ -25,7 +28,10 @@ export async function saveEarlyAccess(input: {
     .select("id")
     .eq("email_normalized", normalized)
     .eq("service_interest", input.serviceInterest)
+    .eq("location", input.location)
     .limit(1);
+  // Exact repeat (same email, service and area): nothing new to store.
+  if (prior && prior.length > 0 && source !== SOURCE) return { ok: true };
   const isNew = !prior || prior.length === 0;
 
   const { data, error } = await supabaseAdmin
@@ -39,7 +45,7 @@ export async function saveEarlyAccess(input: {
       state: input.state,
       zip: input.zip,
       service_interest: input.serviceInterest,
-      source: SOURCE,
+      source,
     })
     .select("id, created_at")
     .single();
@@ -59,7 +65,7 @@ export async function saveEarlyAccess(input: {
       state: input.state,
       zip: input.zip,
       location: input.location,
-      source: SOURCE,
+      source,
       submittedAt: data.created_at as string,
     });
   }

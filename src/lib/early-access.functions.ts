@@ -9,6 +9,7 @@ export const submitEarlyAccess = createServerFn({ method: "POST" })
     state?: string | null;
     zip?: string | null;
     serviceInterest: string;
+    source?: string;
   }) => ({
     fullName: String(input?.fullName ?? "").trim().slice(0, 120),
     email: String(input?.email ?? "").trim().slice(0, 255),
@@ -17,6 +18,7 @@ export const submitEarlyAccess = createServerFn({ method: "POST" })
     state: input?.state ? String(input.state).slice(0, 2) : null,
     zip: input?.zip && /^\d{5}$/.test(String(input.zip)) ? String(input.zip) : null,
     serviceInterest: String(input?.serviceInterest ?? "").slice(0, 160),
+    source: input?.source === "search_area_waitlist" ? "search_area_waitlist" : undefined,
   }))
   .handler(async ({ data }) => {
     const { saveEarlyAccess } = await import("./early-access.server");
