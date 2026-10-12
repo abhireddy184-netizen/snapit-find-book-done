@@ -16,3 +16,4 @@
 - [x] Durable owner alerts (recorded, hourly retry, missed-signup backfill)
 - [ ] Stripe Connected-accounts destination in the same test-mode account as the app's key (blocked: owner, Stripe dashboard)
 - [ ] Publish + real signed event + Outlook inbox check (blocked: owner approval to publish)
+- [x] Search: friendly "coming to your area" message + Notify Me signup when no pro serves the area

@@ -436,7 +436,7 @@ function ComingSoonNotify({ service, location, place }: {
       </div>
       {done ? (
         <p className="mt-4 inline-flex items-start gap-2 rounded-xl bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">
-          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> You’re on the list. We’ll email {email.trim()} when {service || "services"} become available{location ? ` near ${location}` : ""}. No booking was made and you haven’t been charged.
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> You’re on the list. We’ll email {email.trim()} when {service ? `${service} services are` : "services are"} available{location ? ` near ${location}` : ""}. No booking was made and you haven’t been charged.
         </p>
       ) : (
         <form onSubmit={onSubmit} noValidate className="mt-4 space-y-3">
@@ -451,7 +451,7 @@ function ComingSoonNotify({ service, location, place }: {
           </div>
           <label className="flex items-start gap-2 text-xs text-muted-foreground">
             <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-primary" />
-            <span>Email me when {service || "services"} become available{location ? ` near ${location}` : ""}. See our <Link to="/privacy" className="underline">Privacy Policy</Link>.</span>
+            <span>Email me when {service ? `${service} services are` : "services are"} available{location ? ` near ${location}` : ""}. See our <Link to="/privacy" className="underline">Privacy Policy</Link>.</span>
           </label>
           {error && <p role="alert" className="text-xs font-medium text-destructive">{error}</p>}
         </form>
