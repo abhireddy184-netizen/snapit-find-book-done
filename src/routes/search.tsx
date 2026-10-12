@@ -10,6 +10,10 @@ import { matchServiceIntent, rankServices, rememberLocation, isServicePhrase } f
 import { matchTradeWord, tradeHeadline, topServicesForTrade } from "@/lib/trade-mapping";
 import { fetchPublicProviders, matchProviders, isFullyBookable, type ProviderMatch } from "@/lib/providers";
 import { useResolvedLocation } from "@/lib/us-zip";
+import { useServerFn } from "@tanstack/react-start";
+import { submitEarlyAccess } from "@/lib/early-access.functions";
+import { useAuth } from "@/lib/auth";
+import { Bell, CheckCircle2 } from "lucide-react";
 
 type SearchParams = { q: string; loc: string; pros?: number };
 
@@ -279,24 +283,11 @@ function SearchPage() {
                 {serving.map((m) => <RealProviderCard key={m.provider.id} match={m} />)}
               </div>
             ) : (
-              <div className="mt-3 rounded-3xl border border-dashed border-border p-6">
-                <p className="text-sm font-semibold">
-                  {place
-                    ? `No GetPros professional covers ${place.city}, ${place.state} yet.`
-                    : "No GetPros professional has been matched to this search yet."}
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  We’re onboarding pros across the USA. Show us the job and we’ll notify you as coverage opens in your area.
-                </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Link to="/snap" className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-white shadow-card" style={{ background: "var(--gradient-primary)" }}>
-                    Show us the problem <ArrowRight className="h-3.5 w-3.5" />
-                  </Link>
-                  <Link to="/register" search={{ redirect: undefined, role: "provider" }} className="inline-flex items-center rounded-full border-2 border-primary/70 px-4 py-2 text-xs font-bold text-primary hover:bg-primary/10">
-                    Join as a Pro
-                  </Link>
-                </div>
-              </div>
+              <ComingSoonNotify
+                service={matchedCategoryName ?? q.trim()}
+                location={place ? `${place.city}, ${place.state}` : placeLabel || loc}
+                place={place}
+              />
             )}
           </section>
 
@@ -392,6 +383,83 @@ function RealProviderCard({ match }: { match: ProviderMatch }) {
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/** No pro serves this search yet: friendly message + real email signup (stored in the waitlist). */
+function ComingSoonNotify({ service, location, place }: {
+  service: string;
+  location: string;
+  place: { zip: string; city: string; state: string } | null;
+}) {
+  const { user, profile } = useAuth();
+  const submit = useServerFn(submitEarlyAccess);
+  const [email, setEmail] = useState("");
+  const [consent, setConsent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => { if (user?.email) setEmail((e) => e || user.email!); }, [user?.email]);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    const value = email.trim();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value) || value.length > 255) return setError("Please enter a valid email address.");
+    if (!location.trim()) return setError("Add your ZIP code or city in the search above so we know where you are.");
+    if (!consent) return setError("Please agree to receive this email update.");
+    setBusy(true);
+    try {
+      await submit({ data: {
+        fullName: profile?.full_name ?? "", email: value, location: location.trim(),
+        city: place?.city ?? null, state: place?.state ?? null, zip: place?.zip ?? null,
+        serviceInterest: service || "Any service", source: "search_area_waitlist",
+      } });
+      setDone(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally { setBusy(false); }
+  }
+
+  return (
+    <div className="mt-3 surface-card p-5 sm:p-6">
+      <div className="flex items-start gap-3">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary"><Bell className="h-5 w-5" /></span>
+        <div className="min-w-0">
+          <p className="text-base font-black sm:text-lg">Great services are coming to your area!</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            We’re currently welcoming trusted local professionals to GetPros so we can bring you the best service. As soon as services become available in your area, we’ll let you know by email.
+          </p>
+        </div>
+      </div>
+      {done ? (
+        <p className="mt-4 inline-flex items-start gap-2 rounded-xl bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">
+          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> You’re on the list. We’ll email {email.trim()} when {service || "services"} become available{location ? ` near ${location}` : ""}. No booking was made and you haven’t been charged.
+        </p>
+      ) : (
+        <form onSubmit={onSubmit} noValidate className="mt-4 space-y-3">
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <label className="sr-only" htmlFor="notify-email">Email</label>
+            <input id="notify-email" type="email" inputMode="email" autoComplete="email" maxLength={255} required
+              value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com"
+              className="min-h-11 min-w-0 flex-1 rounded-xl border border-border bg-background px-4 text-sm outline-none focus:border-primary" />
+            <GradientButton type="submit" disabled={busy} className="min-h-11 w-full sm:w-auto">
+              {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />} Notify Me
+            </GradientButton>
+          </div>
+          <label className="flex items-start gap-2 text-xs text-muted-foreground">
+            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-primary" />
+            <span>Email me when {service || "services"} become available{location ? ` near ${location}` : ""}. See our <Link to="/privacy" className="underline">Privacy Policy</Link>.</span>
+          </label>
+          {error && <p role="alert" className="text-xs font-medium text-destructive">{error}</p>}
+        </form>
+      )}
+      <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4 text-xs">
+        <Link to="/snap" className="inline-flex items-center gap-1 font-bold text-primary hover:underline">Show us the problem <ArrowRight className="h-3.5 w-3.5" /></Link>
+        <span className="text-muted-foreground">·</span>
+        <Link to="/register" search={{ redirect: undefined, role: "provider" }} className="font-bold text-primary hover:underline">Are you a pro? Join GetPros</Link>
       </div>
     </div>
   );
