@@ -424,18 +424,33 @@ function ComingSoonNotify({ service, location, place }: {
   }
 
   return (
-    <div className="mt-3 surface-card p-5 sm:p-6">
-      <div className="flex items-start gap-3">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-primary"><Bell className="h-5 w-5" /></span>
-        <div className="min-w-0">
-          <p className="text-base font-black sm:text-lg">Great services are coming to your area!</p>
-          <p className="mt-1 text-sm text-muted-foreground">
-            We’re currently welcoming trusted local professionals to GetPros so we can bring you the best service. As soon as services become available in your area, we’ll let you know by email.
-          </p>
-        </div>
+    <div
+      className="relative mt-3 overflow-hidden rounded-[28px] border border-primary/15 p-6 text-center sm:p-8"
+      style={{ background: "var(--gradient-waitlist)", boxShadow: "var(--shadow-glow)" }}
+    >
+      <div aria-hidden className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full opacity-30 blur-3xl" style={{ background: "var(--gradient-accent)" }} />
+      <div aria-hidden className="relative mx-auto grid h-20 w-20 place-items-center">
+        <span className="absolute inset-0 animate-pulse rounded-full opacity-25 blur-md" style={{ background: "var(--gradient-primary)" }} />
+        <span className="relative grid h-16 w-16 place-items-center rounded-full text-primary-foreground shadow-elegant" style={{ background: "var(--gradient-primary)" }}>
+          <MapPin className="h-7 w-7" />
+        </span>
+        <span className="absolute -right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-card text-accent shadow-card"><Bell className="h-3.5 w-3.5" /></span>
       </div>
+      <h3 className="relative mx-auto mt-4 max-w-md text-xl font-black leading-tight sm:text-2xl">
+        Great services are coming to{" "}
+        <span className="bg-clip-text text-transparent" style={{ backgroundImage: "var(--gradient-primary)" }}>your area!</span>
+      </h3>
+      <p className="relative mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
+        We’re bringing trusted local professionals to your neighborhood. Get notified by email when GetPros services become available near you.
+      </p>
+      {location && (
+        <p className="relative mt-3 inline-flex max-w-full items-center gap-1.5 rounded-full bg-card/80 px-3 py-1 text-xs font-semibold text-foreground shadow-card">
+          <MapPin className="h-3.5 w-3.5 shrink-0 text-accent" /> <span className="truncate">{service ? `${service} · ` : ""}{location}</span>
+        </p>
+      )}
+      <div className="relative mx-auto mt-5 max-w-md text-left">
       {done ? (
-        <p className="mt-4 inline-flex items-start gap-2 rounded-xl bg-primary/10 px-3 py-2 text-sm font-semibold text-primary">
+        <p className="mt-4 inline-flex items-start gap-2 rounded-2xl bg-card/90 px-4 py-3 text-sm font-semibold text-primary shadow-card">
           <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0" /> You’re on the list. We’ll email {email.trim()} when {service ? `${service} services are` : "services are"} available{location ? ` near ${location}` : ""}. No booking was made and you haven’t been charged.
         </p>
       ) : (
@@ -444,8 +459,8 @@ function ComingSoonNotify({ service, location, place }: {
             <label className="sr-only" htmlFor="notify-email">Email</label>
             <input id="notify-email" type="email" inputMode="email" autoComplete="email" maxLength={255} required
               value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com"
-              className="min-h-11 min-w-0 flex-1 rounded-xl border border-border bg-background px-4 text-sm outline-none focus:border-primary" />
-            <GradientButton type="submit" disabled={busy} className="min-h-11 w-full sm:w-auto">
+              className="min-h-12 min-w-0 flex-1 rounded-full border border-border bg-card px-5 shadow-card text-sm outline-none focus:border-primary" />
+            <GradientButton type="submit" disabled={busy} className="min-h-12 w-full px-6 text-base sm:w-auto">
               {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bell className="h-4 w-4" />} Notify Me
             </GradientButton>
           </div>
@@ -456,7 +471,8 @@ function ComingSoonNotify({ service, location, place }: {
           {error && <p role="alert" className="text-xs font-medium text-destructive">{error}</p>}
         </form>
       )}
-      <div className="mt-4 flex flex-wrap gap-2 border-t border-border pt-4 text-xs">
+      </div>
+      <div className="relative mt-5 flex flex-wrap justify-center gap-2 border-t border-primary/10 pt-4 text-xs">
         <Link to="/snap" className="inline-flex items-center gap-1 font-bold text-primary hover:underline">Show us the problem <ArrowRight className="h-3.5 w-3.5" /></Link>
         <span className="text-muted-foreground">·</span>
         <Link to="/register" search={{ redirect: undefined, role: "provider" }} className="font-bold text-primary hover:underline">Are you a pro? Join GetPros</Link>
