@@ -3,6 +3,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Home, Search, CalendarDays, User, Camera, ShieldAlert, LogOut, LayoutDashboard, Menu, Wrench } from "lucide-react";
 import { Logo } from "./Logo";
 import { Footer } from "./SiteFooter";
+import { SupportChat } from "./SupportChat";
 import { ThemeToggle } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
 import {
@@ -37,6 +38,8 @@ export function AppShell({ children, hideBottomNav = false }: { children: ReactN
       </main>
 
       {!hideBottomNav && <BottomNav />}
+      <SupportChat />
+
     </div>
   );
 }
