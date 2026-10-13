@@ -208,7 +208,7 @@ export function SupportChat() {
                 </div>
               ) : (
                 <AssistantRow key={i}>
-                  <p className="whitespace-pre-wrap text-foreground">{m.content}</p>
+                  <RichText text={m.content} />
                   {m.source === "faq" && (
                     <p className="mt-2 inline-flex rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                       Standard answer — AI assistant unavailable
@@ -244,7 +244,7 @@ export function SupportChat() {
                   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void send(input); }
                 }}
                 placeholder={busy ? "GetPros AI is replying…" : "Ask anything about GetPros…"}
-                className="max-h-28 min-h-9 flex-1 resize-none bg-transparent py-1.5 text-base leading-6 outline-none placeholder:text-muted-foreground sm:text-[15px]"
+                className="max-h-28 min-h-9 flex-1 resize-none border-0 bg-transparent py-1.5 shadow-none ring-0 focus:outline-none focus:ring-0 focus-visible:ring-0 text-base leading-6 outline-none placeholder:text-muted-foreground sm:text-[15px]"
               />
               <button
                 type="submit"
@@ -319,6 +319,34 @@ function AssistantRow({ children }: { children: React.ReactNode }) {
       <div className="max-w-[85%] rounded-[1.25rem] rounded-bl-md border border-border/60 bg-card px-4 py-3 text-[15px] leading-relaxed shadow-sm">
         {children}
       </div>
+    </div>
+  );
+}
+
+/** Minimal safe formatter for AI replies: **bold**, bullet and numbered lines. No HTML injection. */
+function inline(t: string) {
+  return t.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.startsWith("**") && part.endsWith("**") ? <strong key={i} className="font-semibold">{part.slice(2, -2)}</strong> : part,
+  );
+}
+function RichText({ text }: { text: string }) {
+  const lines = text.split(/\n+/).map((l) => l.trim()).filter(Boolean);
+  return (
+    <div className="space-y-1.5 text-foreground">
+      {lines.map((l, i) => {
+        const bullet = /^[-*•]\s+/.exec(l);
+        const num = /^(\d+)[.)]\s+/.exec(l);
+        if (bullet || num) {
+          const body = l.slice((bullet ?? num)![0].length);
+          return (
+            <div key={i} className="flex gap-2">
+              <span className="mt-0.5 shrink-0 font-semibold text-brand-teal">{num ? `${num[1]}.` : "•"}</span>
+              <span>{inline(body)}</span>
+            </div>
+          );
+        }
+        return <p key={i}>{inline(l)}</p>;
+      })}
     </div>
   );
 }
