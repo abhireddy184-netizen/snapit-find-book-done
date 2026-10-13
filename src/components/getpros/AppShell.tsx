@@ -62,7 +62,7 @@ function TopBar() {
           : "border-transparent bg-background/60"
       )}
     >
-      <div className="gpb-shell grid h-14 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 md:h-16 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-6">
+      <div className="gpb-shell grid h-[60px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 md:h-16 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:gap-6">
         <div className="min-w-0">
           <Logo />
         </div>
@@ -91,7 +91,7 @@ function TopBar() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-1.5 justify-self-end sm:gap-2">
-          <ThemeToggle />
+          <div className="hidden md:block"><ThemeToggle /></div>
           <AuthNav />
           <MobileMenu />
         </div>
@@ -117,7 +117,8 @@ function AuthNav() {
       <>
         <Link
           to={dashboardTo}
-          className="inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted"
+          aria-label="Your dashboard"
+          className="inline-flex min-h-11 items-center gap-2 rounded-full px-1.5 md:px-3 py-2 text-sm font-semibold text-foreground hover:bg-muted"
         >
           <span className="grid h-7 w-7 place-items-center rounded-full text-xs font-bold text-white" style={{ background: "var(--primary)" }}>
             {initials}
@@ -129,7 +130,7 @@ function AuthNav() {
         <button
           onClick={() => void signOut().then(() => { window.location.replace("/"); })}
           aria-label="Log out"
-          className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-2 text-sm font-medium hover:bg-muted"
+          className="hidden items-center md:inline-flex gap-1.5 rounded-full border border-border px-3 py-2 text-sm font-medium hover:bg-muted"
         >
           <LogOut className="h-4 w-4" />
           <span className="hidden md:inline">Log out</span>
@@ -145,14 +146,14 @@ function AuthNav() {
       <Link
         to="/login"
         search={{ redirect: undefined }}
-        className="inline-flex shrink-0 items-center rounded-full px-2.5 py-2 text-sm font-semibold text-foreground hover:bg-muted sm:px-4"
+        className="hidden shrink-0 items-center rounded-full px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted md:inline-flex"
       >
         Log in
       </Link>
       <Link
         to="/register"
         search={{ redirect: undefined, role: undefined }}
-        className="inline-flex shrink-0 items-center rounded-full px-3.5 py-2 text-sm font-semibold text-white shadow-card transition-all hover:scale-[1.01] hover:shadow-elevated sm:px-4"
+        className="inline-flex min-h-10 shrink-0 items-center rounded-full px-4 py-2 text-sm font-bold text-white shadow-card transition-all hover:scale-[1.01] hover:shadow-elevated sm:px-4"
         style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px color-mix(in oklab, var(--primary) 55%, transparent)" }}
       >
         Sign up
@@ -162,7 +163,7 @@ function AuthNav() {
 }
 
 function MobileMenu() {
-  const { user, profile } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const dashboardTo = profile?.role === "provider" ? "/provider-dashboard" : "/dashboard";
   return (
     <Sheet>
@@ -170,45 +171,78 @@ function MobileMenu() {
         <button
           type="button"
           aria-label="Open menu"
-          className="inline-flex items-center justify-center rounded-full p-2 text-foreground hover:bg-muted md:hidden"
+          className="-mr-1.5 inline-flex h-11 w-11 items-center justify-center rounded-full text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary md:hidden"
         >
-          <Menu className="h-5 w-5" />
+          <Menu className="h-6 w-6" />
         </button>
       </SheetTrigger>
       <SheetContent side="right" className="flex flex-col md:hidden">
         <SheetHeader>
           <SheetTitle>Menu</SheetTitle>
         </SheetHeader>
-        <nav aria-label="Mobile menu" className="mt-4 flex flex-col gap-1 text-sm font-semibold">
+        <nav aria-label="Mobile menu" className="mt-2 flex flex-col gap-0.5 text-[15px] font-semibold">
           <SheetClose asChild>
-            <Link to="/services" className="rounded-xl px-3 py-2.5 hover:bg-muted">Services</Link>
+            <Link to="/snap" className="flex min-h-11 items-center gap-3 rounded-xl px-3 hover:bg-muted"><Camera className="h-4 w-4 text-primary" /> Show GP</Link>
           </SheetClose>
           <SheetClose asChild>
-            <Link to="/emergency" className="inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-destructive hover:bg-destructive/10">
+            <Link to="/services" className="flex min-h-11 items-center gap-3 rounded-xl px-3 hover:bg-muted"><Wrench className="h-4 w-4 text-primary" /> Services</Link>
+          </SheetClose>
+          <SheetClose asChild>
+            <Link to="/emergency" className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-destructive hover:bg-destructive/10">
               <ShieldAlert className="h-4 w-4" /> Emergency
             </Link>
           </SheetClose>
           <SheetClose asChild>
-            <a href="/#how-it-works" className="rounded-xl px-3 py-2.5 hover:bg-muted">How it works</a>
+            <a href="/#how-it-works" className="flex min-h-11 items-center gap-3 rounded-xl px-3 hover:bg-muted">How it works</a>
           </SheetClose>
           <SheetClose asChild>
-            <Link to="/provider-interest" className="rounded-xl px-3 py-2.5 hover:bg-muted">For Pros</Link>
+            <Link to="/provider-interest" className="flex min-h-11 items-center gap-3 rounded-xl px-3 hover:bg-muted">For Pros</Link>
           </SheetClose>
           <SheetClose asChild>
-            <Link to="/trust-safety" className="rounded-xl px-3 py-2.5 hover:bg-muted">Trust &amp; safety</Link>
+            <Link to="/trust-safety" className="flex min-h-11 items-center gap-3 rounded-xl px-3 hover:bg-muted">Trust &amp; safety</Link>
           </SheetClose>
-          {user ? (
-            <SheetClose asChild>
-              <Link to={dashboardTo} className="rounded-xl px-3 py-2.5 hover:bg-muted">Dashboard</Link>
-            </SheetClose>
-          ) : (
-            <SheetClose asChild>
-              <Link to="/login" search={{ redirect: undefined }} className="rounded-xl px-3 py-2.5 hover:bg-muted">
-                Log in / Sign up
-              </Link>
-            </SheetClose>
-          )}
         </nav>
+
+        <div className="mt-auto space-y-3 border-t border-border pb-[env(safe-area-inset-bottom)] pt-4">
+          <div className="flex min-h-11 items-center justify-between rounded-xl bg-muted/60 px-3">
+            <span className="text-sm font-semibold">Appearance</span>
+            <ThemeToggle />
+          </div>
+          {user ? (
+            <div className="grid gap-2">
+              <SheetClose asChild>
+                <Link to={dashboardTo} className="flex min-h-11 items-center justify-center gap-2 rounded-full border border-border text-sm font-semibold hover:bg-muted">
+                  <LayoutDashboard className="h-4 w-4" /> Dashboard
+                </Link>
+              </SheetClose>
+              <button
+                type="button"
+                onClick={() => void signOut().then(() => { window.location.replace("/"); })}
+                className="flex min-h-11 items-center justify-center gap-2 rounded-full text-sm font-semibold text-muted-foreground hover:bg-muted"
+              >
+                <LogOut className="h-4 w-4" /> Log out
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-2">
+              <SheetClose asChild>
+                <Link to="/login" search={{ redirect: undefined }} className="flex min-h-11 items-center justify-center rounded-full border border-border text-sm font-semibold hover:bg-muted">
+                  Log in
+                </Link>
+              </SheetClose>
+              <SheetClose asChild>
+                <Link
+                  to="/register"
+                  search={{ redirect: undefined, role: undefined }}
+                  className="flex min-h-11 items-center justify-center rounded-full text-sm font-bold text-primary-foreground"
+                  style={{ background: "var(--gradient-primary)" }}
+                >
+                  Sign up
+                </Link>
+              </SheetClose>
+            </div>
+          )}
+        </div>
       </SheetContent>
     </Sheet>
   );
