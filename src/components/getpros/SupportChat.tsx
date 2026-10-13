@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowUp, ChevronDown, X, Briefcase, MapPin, LifeBuoy, Sparkle, Mail, ShieldCheck } from "lucide-react";
+import { ArrowUp, ChevronDown, X, Briefcase, MapPin, LifeBuoy, Sparkle, ShieldCheck } from "lucide-react";
 import { askSupport } from "@/lib/support-chat.functions";
 import { CONTACT_EMAIL } from "@/lib/brand";
 import { cn } from "@/lib/utils";
@@ -308,9 +308,6 @@ export function SupportChat() {
           <span className="absolute right-0.5 top-0.5 h-3 w-3 rounded-full bg-brand-teal ring-2 ring-card" aria-hidden="true" />
         </button>
       )}
-      <span className="sr-only">
-        <Mail aria-hidden="true" />
-      </span>
     </div>
   );
 }
