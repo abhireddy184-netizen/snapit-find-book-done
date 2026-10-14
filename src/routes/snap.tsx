@@ -38,6 +38,7 @@ import { createFastPathAnalysis, createLocalOptionsAnalysis } from "@/lib/snap-f
 import { fetchBookableProviders, type ProviderMatch } from "@/lib/providers";
 import { extractZip, isZipCode, lookupZip } from "@/lib/us-zip";
 import { saveHistoryEntry, loadHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
+import { useHistoryScope } from "@/lib/use-history-scope";
 import { useAuth } from "@/lib/auth";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { createJobFromAnalysis } from "@/lib/jobs";
@@ -130,9 +131,10 @@ function SnapPage() {
   const [askedQuestions, setAskedQuestions] = useState<string[]>([]);
   const [turnCount, setTurnCount] = useState(0);
   const [recent, setRecent] = useState<SnapHistoryEntry[]>([]);
+  const historyScope = useHistoryScope();
   useEffect(() => {
-    setRecent(loadHistory().slice(0, 4));
-  }, [analysis]);
+    setRecent(loadHistory(historyScope).slice(0, 4));
+  }, [analysis, historyScope]);
   // A photo handed over from the home composer's camera button runs through
   // the exact same diagnosis flow as a photo captured here.
   useEffect(() => {
@@ -1124,15 +1126,16 @@ function AnalysisView({
 
   // Save to history exactly once per analysis
   const savedRef = useRef(false);
+  const historyScope = useHistoryScope();
   useEffect(() => {
-    if (savedRef.current) return;
+    if (savedRef.current || !historyScope) return;
     savedRef.current = true;
     try {
-      saveHistoryEntry({ thumbnail: image ?? "", analysis });
+      saveHistoryEntry(historyScope, { thumbnail: image ?? "", analysis });
     } catch {
       /* ignore */
     }
-  }, [analysis, image]);
+  }, [analysis, image, historyScope]);
 
   const [quoteMode, setQuoteMode] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);

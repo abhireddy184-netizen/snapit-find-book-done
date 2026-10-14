@@ -4,6 +4,7 @@ import { AppShell } from "@/components/getpros/AppShell";
 import { Camera, Trash2, Sparkles, Clock, DollarSign, ArrowRight } from "lucide-react";
 import { loadHistory, removeHistoryEntry, clearHistory, formatRelative, type SnapHistoryEntry } from "@/lib/snap-history";
 import { categories } from "@/lib/demo-data";
+import { useHistoryScope } from "@/lib/use-history-scope";
 
 export const Route = createFileRoute("/history")({
   head: () => ({
@@ -23,20 +24,21 @@ export const Route = createFileRoute("/history")({
 function HistoryPage() {
   const [entries, setEntries] = useState<SnapHistoryEntry[]>([]);
   const [ready, setReady] = useState(false);
+  const scope = useHistoryScope();
 
   useEffect(() => {
-    setEntries(loadHistory());
-    setReady(true);
-  }, []);
+    setEntries(loadHistory(scope));
+    setReady(scope !== null);
+  }, [scope]);
 
   const remove = (id: string) => {
-    removeHistoryEntry(id);
+    removeHistoryEntry(scope, id);
     setEntries((e) => e.filter((x) => x.id !== id));
   };
 
   const wipe = () => {
     if (typeof window !== "undefined" && !window.confirm("Clear all diagnosis history?")) return;
-    clearHistory();
+    clearHistory(scope);
     setEntries([]);
   };
 
