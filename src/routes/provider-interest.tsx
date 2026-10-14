@@ -191,6 +191,9 @@ function ProviderInterestPage() {
           <p className="mt-3 max-w-lg text-sm text-muted-foreground sm:text-base">
             Join local professionals across {TOTAL_SERVICES}+ services. Get clear job requests, set your own prices, and choose when you work.
           </p>
+          <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-bold text-primary">
+            <ShieldCheck className="h-4 w-4 shrink-0" /> No lead fees. Keep 85% of every job.
+          </p>
           <ul className="mt-4 grid grid-cols-2 gap-2 text-sm">
             {BENEFITS.map((l) => (
               <li key={l} className="flex items-start gap-2 surface-card px-3 py-2.5 text-xs font-semibold sm:text-sm">
