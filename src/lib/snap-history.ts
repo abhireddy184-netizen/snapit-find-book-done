@@ -1,8 +1,17 @@
 import type { SnapAnalysis } from "./snap-analyze.functions";
 
-const KEY = "getpros.history.v1";
-/** Pre-rebrand key; read once and moved to KEY. */
-const LEGACY_KEY = ["snap", "it.history.v1"].join("");
+/**
+ * Personal AI diagnosis history, always scoped to one identity:
+ *  - signed-in: localStorage key containing the auth user id
+ *  - guest: sessionStorage (this tab's browser session only)
+ *  - unknown (auth still loading) or storage unavailable: empty, no writes.
+ * Unscoped legacy keys are deleted, never migrated to any identity.
+ */
+const USER_PREFIX = "getpros.history.v2.user.";
+const GUEST_KEY = "getpros.history.v2.guest";
+export const LEGACY_KEYS = ["getpros.history.v1", ["snap", "it.history.v1"].join("")];
+
+export type HistoryScope = { kind: "user"; userId: string } | { kind: "guest" } | null;
 
 export type SnapHistoryEntry = {
   id: string;
@@ -12,24 +21,46 @@ export type SnapHistoryEntry = {
   analysis: SnapAnalysis;
 };
 
-function safeStorage(): Storage | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return window.localStorage;
-  } catch {
-    return null;
+type Stores = { local: Storage | null; session: Storage | null };
+
+function defaultStores(): Stores {
+  if (typeof window === "undefined") return { local: null, session: null };
+  let local: Storage | null = null;
+  let session: Storage | null = null;
+  try { local = window.localStorage; } catch { /* blocked */ }
+  try { session = window.sessionStorage; } catch { /* blocked */ }
+  return { local, session };
+}
+
+let storesOverride: Stores | null = null;
+/** Test hook. */
+export function __setStoresForTest(s: Stores | null) { storesOverride = s; }
+const stores = () => storesOverride ?? defaultStores();
+
+function purgeLegacy() {
+  const { local } = stores();
+  if (!local) return;
+  for (const k of LEGACY_KEYS) {
+    try { local.removeItem(k); } catch { /* ignore */ }
   }
 }
 
-export function loadHistory(): SnapHistoryEntry[] {
-  const s = safeStorage();
-  if (!s) return [];
+function target(scope: HistoryScope): { store: Storage; key: string } | null {
+  if (!scope) return null;
+  const { local, session } = stores();
+  if (scope.kind === "user") {
+    if (!scope.userId || !local) return null;
+    return { store: local, key: USER_PREFIX + scope.userId };
+  }
+  return session ? { store: session, key: GUEST_KEY } : null;
+}
+
+export function loadHistory(scope: HistoryScope): SnapHistoryEntry[] {
+  purgeLegacy();
+  const t = target(scope);
+  if (!t) return [];
   try {
-    let raw = s.getItem(KEY);
-    if (raw === null) {
-      raw = s.getItem(LEGACY_KEY);
-      if (raw !== null) { s.setItem(KEY, raw); s.removeItem(LEGACY_KEY); }
-    }
+    const raw = t.store.getItem(t.key);
     if (!raw) return [];
     const parsed = JSON.parse(raw) as SnapHistoryEntry[];
     return Array.isArray(parsed) ? parsed : [];
@@ -38,34 +69,38 @@ export function loadHistory(): SnapHistoryEntry[] {
   }
 }
 
-export function saveHistoryEntry(entry: Omit<SnapHistoryEntry, "id" | "createdAt">): SnapHistoryEntry {
-  const s = safeStorage();
+export function saveHistoryEntry(
+  scope: HistoryScope,
+  entry: Omit<SnapHistoryEntry, "id" | "createdAt">,
+): SnapHistoryEntry {
   const full: SnapHistoryEntry = {
     ...entry,
     id: `snap_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`,
     createdAt: Date.now(),
   };
-  if (!s) return full;
-  const list = [full, ...loadHistory()].slice(0, 50);
-  try {
-    s.setItem(KEY, JSON.stringify(list));
-  } catch {
-    /* quota */
-  }
+  const t = target(scope);
+  if (!t) return full;
+  const list = [full, ...loadHistory(scope)].slice(0, 50);
+  try { t.store.setItem(t.key, JSON.stringify(list)); } catch { /* quota */ }
   return full;
 }
 
-export function removeHistoryEntry(id: string) {
-  const s = safeStorage();
-  if (!s) return;
-  const list = loadHistory().filter((e) => e.id !== id);
-  s.setItem(KEY, JSON.stringify(list));
+export function removeHistoryEntry(scope: HistoryScope, id: string) {
+  const t = target(scope);
+  if (!t) return;
+  const list = loadHistory(scope).filter((e) => e.id !== id);
+  try { t.store.setItem(t.key, JSON.stringify(list)); } catch { /* ignore */ }
 }
 
-export function clearHistory() {
-  const s = safeStorage();
-  if (!s) return;
-  s.removeItem(KEY);
+export function clearHistory(scope: HistoryScope) {
+  const t = target(scope);
+  if (!t) return;
+  try { t.store.removeItem(t.key); } catch { /* ignore */ }
+}
+
+/** Called when a user signs in so a previous guest's tab history can't linger. */
+export function clearGuestHistory() {
+  clearHistory({ kind: "guest" });
 }
 
 export function formatRelative(ts: number) {
