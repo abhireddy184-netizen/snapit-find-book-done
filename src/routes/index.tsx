@@ -61,6 +61,12 @@ function Landing() {
             <p className="mt-3 max-w-[36ch] text-[clamp(1rem,1.15vw,1.15rem)] leading-relaxed text-muted-foreground">
               Show it. Get matched. Start without an account — sign in when you book.
             </p>
+            <Link
+              to="/provider-interest"
+              className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary hover:bg-primary/15"
+            >
+              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> For pros: No lead fees. Keep 85% of every job.
+            </Link>
 
 
             {/* Camera-first: primary photo CTA on every screen size. */}
