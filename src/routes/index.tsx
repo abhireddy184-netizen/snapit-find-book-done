@@ -107,9 +107,6 @@ function Landing() {
               >
                 <Briefcase className="h-4 w-4" /> Join as a Pro
               </Link>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary">
-                <CheckCircle2 className="h-3.5 w-3.5" /> Pros: No lead fees. Keep 85% of every job.
-              </span>
             </div>
           </div>
 
