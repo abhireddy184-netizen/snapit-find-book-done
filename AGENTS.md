@@ -12,3 +12,4 @@
 - Owner alerts go through src/lib/owner-notify.server.ts (owner_notifications table, stable keys, hourly retry/backfill in run-due); why: no lost or duplicate alerts.
 - Provider onboarding emails (welcome + reminders at 24h and 48h after signup) go through src/lib/provider-onboarding.server.ts, recorded in provider_onboarding_emails before sending and run hourly by run-due; why: one send per pro, never retroactive, retry without duplicates.
 - Public support chat answers come from src/lib/support-chat.functions.ts (grounding prompt + rate limit in support-chat.server.ts, FAQ fallback labelled as such); why: one guarded place for public AI answers, never account data.
+- Provider "profile submitted" confirmation is sent once per pro from provider-onboarding.server.ts (ledger kind profile_submitted) and only when server env PROVIDER_SUBMITTED_EMAIL_ENABLED is exactly "true"; why: owner must approve before live providers get it.
