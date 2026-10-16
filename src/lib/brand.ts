@@ -42,3 +42,9 @@ export const ORGANIZATION_JSONLD = {
     email: CONTACT_EMAIL,
   }),
 };
+
+/**
+ * Provider onboarding tutorial video. Leave empty until the real video is published —
+ * emails hide the video block while this is empty. Never put a placeholder URL here.
+ */
+export const PROVIDER_TUTORIAL_VIDEO_URL = "";

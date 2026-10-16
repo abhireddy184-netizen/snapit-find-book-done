@@ -48,3 +48,39 @@ export function shouldSendSubmittedConfirmation(flag: string | undefined | null,
 export function shouldSendApprovedEmail(flag: string | undefined | null, previous: string | null | undefined, next: string): boolean {
   return flag === "true" && next === "verified" && previous !== "verified";
 }
+
+// ---- Document checklist automation (added 2026-10-16) ----
+
+/** Only pros who sign up after document automation went live; existing pros are never emailed by it. */
+export const DOCS_AUTOMATION_CUTOFF = Date.parse("2026-10-16T17:00:00Z");
+/** Delay between the "profile received" email and the document checklist, so they don't land at once. */
+export const DOCS_REQUEST_DELAY_MS = 15 * 60 * 1000;
+/** Always requested. Trade licenses depend on the services offered, so they are asked for but not required. */
+export const REQUIRED_DOC_TYPES = ["business_registration", "liability_insurance"] as const;
+
+export function isDocsEmailEnabled(flag: string | undefined | null): boolean {
+  return flag === "true";
+}
+
+export function isDocsAutomationEligible(signupAt: string | null | undefined): boolean {
+  return Boolean(signupAt) && Date.parse(signupAt as string) >= DOCS_AUTOMATION_CUTOFF;
+}
+
+/** The meaningful set: every required type has at least one file that wasn't rejected. */
+export function hasRequiredDocs(docs: Array<{ doc_type: string; status: string }>): boolean {
+  return REQUIRED_DOC_TYPES.every((t) => docs.some((d) => d.doc_type === t && d.status !== "rejected"));
+}
+
+/** Queue the automatic checklist only for new pros with a complete profile and no earlier (manual) request. */
+export function shouldQueueDocumentsRequest(o: { signupAt: string | null | undefined; complete: boolean; priorManualRequests: number }): boolean {
+  return o.complete && o.priorManualRequests === 0 && isDocsAutomationEligible(o.signupAt);
+}
+
+/** Document reminders, measured from when the checklist email was sent. */
+export function dueDocReminders(sentAt: string, now = Date.now()): Array<"documents_reminder_24h" | "documents_reminder_48h"> {
+  const age = now - Date.parse(sentAt);
+  const out: Array<"documents_reminder_24h" | "documents_reminder_48h"> = [];
+  if (age >= REMINDER_24H_MS) out.push("documents_reminder_24h");
+  if (age >= REMINDER_48H_MS) out.push("documents_reminder_48h");
+  return out;
+}
