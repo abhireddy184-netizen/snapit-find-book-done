@@ -301,7 +301,7 @@ export async function processDocumentEmails(db: Admin) {
   const rules = await import("./provider-onboarding-rules");
   const enabled = rules.isDocsEmailEnabled(process.env["PROVIDER_DOCUMENTS_EMAIL_ENABLED"]);
   let sent = 0;
-  const done = (userId: string, kind: DocKind, patch: Record<string, unknown>) =>
+  const done = (userId: string, kind: DocKind, patch: { status: string }) =>
     db.from("provider_onboarding_emails").update(patch).eq("user_id", userId).eq("kind", kind);
 
   // 1) Queued checklist emails.
