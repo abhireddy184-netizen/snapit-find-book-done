@@ -5,6 +5,7 @@ import { template as providerInterestTemplate } from './provider-interest'
 import { template as internalLeadTemplate } from './internal-lead'
 import { template as paymentAlertTemplate } from './payment-alert'
 import { template as providerProfileReminderTemplate } from './provider-profile-reminder'
+import { template as providerProfileSubmittedTemplate } from './provider-profile-submitted'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -25,4 +26,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'internal-lead': internalLeadTemplate,
   'payment-alert': paymentAlertTemplate,
   'provider-profile-reminder': providerProfileReminderTemplate,
+  'provider-profile-submitted': providerProfileSubmittedTemplate,
 }

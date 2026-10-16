@@ -30,3 +30,16 @@ export function dueReminders(signupAt: string, now = Date.now()): Array<"reminde
   if (age >= REMINDER_48H_MS) out.push("reminder_48h");
   return out;
 }
+
+/**
+ * Live provider "profile submitted" confirmation is OFF unless the server flag is exactly "true".
+ * Kept off until the owner approves the sample email.
+ */
+export function isSubmittedEmailEnabled(flag: string | undefined | null): boolean {
+  return flag === "true";
+}
+
+/** Send the submitted confirmation only when the switch is on and the required fields are complete. */
+export function shouldSendSubmittedConfirmation(flag: string | undefined | null, p: ProfileFields): boolean {
+  return isSubmittedEmailEnabled(flag) && isProfileComplete(p);
+}
