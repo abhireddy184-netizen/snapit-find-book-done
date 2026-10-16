@@ -472,6 +472,87 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_document_requests: {
+        Row: {
+          attempts: number
+          created_at: string
+          id: string
+          last_error: string | null
+          request_day: string
+          requested_by: string
+          sent_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          request_day?: string
+          requested_by: string
+          sent_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          request_day?: string
+          requested_by?: string
+          sent_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      provider_documents: {
+        Row: {
+          admin_note: string | null
+          created_at: string
+          doc_type: string
+          file_name: string
+          id: string
+          mime_type: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          size_bytes: number
+          status: string
+          storage_path: string
+          user_id: string
+        }
+        Insert: {
+          admin_note?: string | null
+          created_at?: string
+          doc_type: string
+          file_name: string
+          id?: string
+          mime_type: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size_bytes: number
+          status?: string
+          storage_path: string
+          user_id?: string
+        }
+        Update: {
+          admin_note?: string | null
+          created_at?: string
+          doc_type?: string
+          file_name?: string
+          id?: string
+          mime_type?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          size_bytes?: number
+          status?: string
+          storage_path?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       provider_interest: {
         Row: {
           business_name: string | null
@@ -1043,6 +1124,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_get_provider_preview: {
+        Args: { _user_id: string }
+        Returns: {
+          bio: string
+          business_name: string
+          default_duration_minutes: number
+          service_area: string
+          service_category: string
+          service_radius_miles: number
+          service_zip: string
+          starting_price: number
+          user_id: string
+          verification_status: Database["public"]["Enums"]["verification_status"]
+        }[]
+      }
       admin_list_providers: {
         Args: never
         Returns: {
@@ -1059,6 +1155,10 @@ export type Database = {
           user_id: string
           verification_status: Database["public"]["Enums"]["verification_status"]
         }[]
+      }
+      admin_review_provider_document: {
+        Args: { _id: string; _note: string; _status: string }
+        Returns: undefined
       }
       admin_set_provider_verification: {
         Args: {
