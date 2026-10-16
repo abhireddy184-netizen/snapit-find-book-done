@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isOnboardingEligible, isProfileComplete, dueReminders } from "../provider-onboarding-rules";
+import { isOnboardingEligible, isProfileComplete, dueReminders, shouldSendSubmittedConfirmation } from "../provider-onboarding-rules";
 
 describe("provider onboarding rules", () => {
   it("profile is complete only with business name, category and 5-digit ZIP", () => {
@@ -20,5 +20,12 @@ describe("provider onboarding rules", () => {
     expect(dueReminders("2026-10-12T00:00:00Z", t + 23 * 3600e3)).toEqual([]);
     expect(dueReminders("2026-10-12T00:00:00Z", t + 24 * 3600e3)).toEqual(["reminder_24h"]);
     expect(dueReminders("2026-10-12T00:00:00Z", t + 48 * 3600e3)).toEqual(["reminder_24h", "reminder_48h"]);
+  });
+  it("profile-submitted email to live providers is off unless the flag is exactly 'true'", () => {
+    const full = { business_name: "KYNGSTON SERVICES", service_category: "Handyman", service_zip: "75034" };
+    expect(shouldSendSubmittedConfirmation(undefined, full)).toBe(false);
+    expect(shouldSendSubmittedConfirmation("1", full)).toBe(false);
+    expect(shouldSendSubmittedConfirmation("true", full)).toBe(true);
+    expect(shouldSendSubmittedConfirmation("true", { ...full, service_zip: null })).toBe(false);
   });
 });
