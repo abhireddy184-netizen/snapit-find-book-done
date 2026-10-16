@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useServerFn } from "@tanstack/react-start";
 import { adminRefundBooking } from "@/lib/payments.functions";
+import { adminSetProviderVerification } from "@/lib/provider-verification.functions";
 import { formatCents } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/admin/providers")({
@@ -31,6 +32,7 @@ function AdminProviders() {
   const qc = useQueryClient();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const setVerification = useServerFn(adminSetProviderVerification);
 
   const isAdmin = useQuery({
     queryKey: ["is-admin", user?.id],
@@ -54,9 +56,14 @@ function AdminProviders() {
   async function setStatus(userId: string, status: Status) {
     setBusy(userId);
     setError(null);
-    const { error } = await supabase.rpc("admin_set_provider_verification", { _user_id: userId, _status: status });
+    let error: string | null = null;
+    try {
+      ({ error } = await setVerification({ data: { userId, status } }));
+    } catch (e) {
+      error = e instanceof Error ? e.message : "Could not update verification.";
+    }
     setBusy(null);
-    if (error) return setError(error.message);
+    if (error) return setError(error);
     await qc.invalidateQueries({ queryKey: ["admin-providers"] });
   }
 

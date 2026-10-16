@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isOnboardingEligible, isProfileComplete, dueReminders, shouldSendSubmittedConfirmation } from "../provider-onboarding-rules";
+import { isOnboardingEligible, isProfileComplete, dueReminders, shouldSendSubmittedConfirmation, shouldSendApprovedEmail } from "../provider-onboarding-rules";
 
 describe("provider onboarding rules", () => {
   it("profile is complete only with business name, category and 5-digit ZIP", () => {
@@ -27,5 +27,13 @@ describe("provider onboarding rules", () => {
     expect(shouldSendSubmittedConfirmation("1", full)).toBe(false);
     expect(shouldSendSubmittedConfirmation("true", full)).toBe(true);
     expect(shouldSendSubmittedConfirmation("true", { ...full, service_zip: null })).toBe(false);
+  });
+  it("approval email only on a real change to verified, and only when switched on", () => {
+    expect(shouldSendApprovedEmail(undefined, "pending", "verified")).toBe(false);
+    expect(shouldSendApprovedEmail("true", "pending", "verified")).toBe(true);
+    expect(shouldSendApprovedEmail("true", "unverified", "verified")).toBe(true);
+    expect(shouldSendApprovedEmail("true", "verified", "verified")).toBe(false);
+    expect(shouldSendApprovedEmail("true", "unverified", "pending")).toBe(false);
+    expect(shouldSendApprovedEmail("true", "verified", "unverified")).toBe(false);
   });
 });
