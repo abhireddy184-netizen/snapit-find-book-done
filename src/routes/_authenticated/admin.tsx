@@ -1,8 +1,6 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
-/** /admin has nothing of its own yet — send admins straight to the pro approval queue. */
+/** Layout for admin pages. Exact /admin redirects via admin.index.tsx. */
 export const Route = createFileRoute("/_authenticated/admin")({
-  beforeLoad: () => {
-    throw redirect({ to: "/admin/providers" });
-  },
+  component: () => <Outlet />,
 });
