@@ -43,3 +43,8 @@ export function isSubmittedEmailEnabled(flag: string | undefined | null): boolea
 export function shouldSendSubmittedConfirmation(flag: string | undefined | null, p: ProfileFields): boolean {
   return isSubmittedEmailEnabled(flag) && isProfileComplete(p);
 }
+
+/** Approval email only on a genuine change to 'verified' while the live switch is exactly "true". */
+export function shouldSendApprovedEmail(flag: string | undefined | null, previous: string | null | undefined, next: string): boolean {
+  return flag === "true" && next === "verified" && previous !== "verified";
+}
