@@ -47,3 +47,13 @@ export const adminRequestProviderDocuments = createServerFn({ method: "POST" })
       return { ok: false, message: "The email could not be sent. Please try again tomorrow or contact the pro directly." };
     }
   });
+
+/** Called by the pro's Documents tab after an upload; sends the one-time receipt once the required set is in. */
+export const notifyMyDocumentsUploaded = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { notifyDocumentsReceived } = await import("@/lib/provider-onboarding.server");
+    await notifyDocumentsReceived(supabaseAdmin, context.userId);
+    return { ok: true };
+  });
