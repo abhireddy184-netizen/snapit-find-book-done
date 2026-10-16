@@ -22,8 +22,8 @@ const Email = ({ businessName, siteUrl = SITE_URL }: Props) => (
           details and our team is reviewing them.
         </Text>
         <Text style={emailStyles.paragraph}>
-          Your profile is pending verification and approval. We&apos;ll email you as soon as there&apos;s
-          an update. If we need anything else, we&apos;ll reach out.
+          Your profile is pending verification and approval. We&apos;ll contact you once the review is
+          complete. If we need anything else in the meantime, we&apos;ll reach out.
         </Text>
         <Text style={emailStyles.paragraph}>Thank you for joining GetPros.</Text>
         <Text style={emailStyles.paragraph}>The GetPros Team</Text>
@@ -38,7 +38,7 @@ const Email = ({ businessName, siteUrl = SITE_URL }: Props) => (
 
 export const template = {
   component: Email,
-  subject: "We've received your GetPros provider profile",
+  subject: 'Thank You for Submitting Your GetPros Provider Profile',
   displayName: 'Provider profile submitted (pending review)',
   previewData: { businessName: 'KYNGSTON SERVICES', siteUrl: SITE_URL },
 } satisfies TemplateEntry
