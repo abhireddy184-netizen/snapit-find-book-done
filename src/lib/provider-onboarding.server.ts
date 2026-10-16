@@ -163,57 +163,52 @@ export async function sendProfileSubmittedConfirmation(
 }
 
 /**
- * Once-only "profile approved" email after an admin moves a pro to 'verified'.
- * Off unless PROVIDER_APPROVED_EMAIL_ENABLED === "true". Ledger kind "approved" means a pro gets
- * it at most once, even after revoke + re-approve. Re-checks the stored status before sending.
+ * Approval emails are queued by the database (admin_set_provider_verification inserts a
+ * kind "approved", status "pending" row in the same transaction as the change to verified).
+ * This drains that outbox. While PROVIDER_APPROVED_EMAIL_ENABLED !== "true", queued jobs are
+ * marked "skipped_disabled" and never sent later (no surprise backlog when switched on).
+ * Re-checks the pro is still verified before sending; at most once per pro, ever.
  */
-export async function sendProviderApproved(db: Admin, userId: string) {
-  try {
-    if (process.env["PROVIDER_APPROVED_EMAIL_ENABLED"] !== "true") return;
-    const { data: pp } = await db.from("provider_profiles")
-      .select("business_name, verification_status").eq("user_id", userId).maybeSingle();
-    if (!pp || pp.verification_status !== "verified") return; // never for unapproved pros
-    const { data: res } = await db.auth.admin.getUserById(userId);
-    const email = res?.user?.email;
-    if (!email || !res?.user?.email_confirmed_at) return;
-    const kind = "approved";
-    const { error } = await db.from("provider_onboarding_emails").insert({ user_id: userId, kind });
-    let attempts = 0;
-    if (error) {
-      if ((error as { code?: string }).code !== "23505") return;
-      const { data: row } = await db.from("provider_onboarding_emails")
-        .select("status, attempts").eq("user_id", userId).eq("kind", kind).maybeSingle();
-      if (!row || row.status === "sent" || row.status === "suppressed" || row.attempts >= MAX_ATTEMPTS) return;
-      attempts = row.attempts;
-    }
+export async function processApprovedEmails(db: Admin, onlyUserId?: string) {
+  let q = db.from("provider_onboarding_emails")
+    .select("user_id, attempts").eq("kind", "approved").in("status", ["pending", "failed"]).lt("attempts", MAX_ATTEMPTS).limit(100);
+  if (onlyUserId) q = q.eq("user_id", onlyUserId);
+  const { data: jobs } = await q;
+  const enabled = process.env["PROVIDER_APPROVED_EMAIL_ENABLED"] === "true";
+  for (const job of jobs ?? []) {
+    const done = (patch: Record<string, unknown>) =>
+      db.from("provider_onboarding_emails").update(patch).eq("user_id", job.user_id).eq("kind", "approved");
     try {
-      const r = await sendTemplateEmail("provider-profile-approved", email, {
-        templateData: { businessName: pp.business_name ?? undefined, siteUrl: SITE_URL },
-        idempotencyKey: `provider-profile-approved-${userId}`,
-      });
-      await db.from("provider_onboarding_emails")
-        .update({ status: r.sent ? "sent" : "suppressed", attempts: attempts + 1, last_error: null, sent_at: new Date().toISOString() })
-        .eq("user_id", userId).eq("kind", kind);
+      if (!enabled) { await done({ status: "skipped_disabled" }); continue; }
+      const { data: pp } = await db.from("provider_profiles")
+        .select("business_name, verification_status").eq("user_id", job.user_id).maybeSingle();
+      if (!pp || pp.verification_status !== "verified") { await done({ status: "skipped_not_verified" }); continue; }
+      const { data: res } = await db.auth.admin.getUserById(job.user_id);
+      const email = res?.user?.email;
+      if (!email || !res?.user?.email_confirmed_at) { await done({ status: "skipped_no_email" }); continue; }
+      try {
+        const r = await sendTemplateEmail("provider-profile-approved", email, {
+          templateData: { businessName: pp.business_name ?? undefined, siteUrl: SITE_URL },
+          idempotencyKey: `provider-profile-approved-${job.user_id}`,
+        });
+        await done({ status: r.sent ? "sent" : "suppressed", attempts: job.attempts + 1, last_error: null, sent_at: new Date().toISOString() });
+      } catch (err) {
+        await done({ status: "failed", attempts: job.attempts + 1, last_error: (err instanceof Error ? err.message : String(err)).slice(0, 300) });
+      }
     } catch (err) {
-      const msg = (err instanceof Error ? err.message : String(err)).slice(0, 300);
-      await db.from("provider_onboarding_emails")
-        .update({ status: "failed", attempts: attempts + 1, last_error: msg }).eq("user_id", userId).eq("kind", kind);
+      console.error("[provider-onboarding] approved:", err instanceof Error ? err.message : err);
     }
-  } catch (err) {
-    console.error("[provider-onboarding] approved:", err instanceof Error ? err.message : err);
   }
 }
 
-/** Hourly: retry failed submitted/approved confirmations (only rows already recorded; never backfills). */
+/** Hourly: drain approval outbox and retry failed submitted confirmations (never backfills). */
 export async function retryProviderConfirmations(db: Admin) {
+  await processApprovedEmails(db);
   const { data: rows } = await db.from("provider_onboarding_emails")
-    .select("user_id, kind").in("kind", ["approved", "profile_submitted"]).eq("status", "failed").lt("attempts", MAX_ATTEMPTS).limit(100);
+    .select("user_id").eq("kind", "profile_submitted").eq("status", "failed").lt("attempts", MAX_ATTEMPTS).limit(100);
   for (const r of rows ?? []) {
-    if (r.kind === "approved") await sendProviderApproved(db, r.user_id);
-    else {
-      const { data: pp } = await db.from("provider_profiles")
-        .select("business_name, service_category, service_zip").eq("user_id", r.user_id).maybeSingle();
-      if (pp) await sendProfileSubmittedConfirmation(db, r.user_id, pp);
-    }
+    const { data: pp } = await db.from("provider_profiles")
+      .select("business_name, service_category, service_zip").eq("user_id", r.user_id).maybeSingle();
+    if (pp) await sendProfileSubmittedConfirmation(db, r.user_id, pp);
   }
 }
