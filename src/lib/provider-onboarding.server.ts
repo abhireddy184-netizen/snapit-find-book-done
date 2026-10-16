@@ -176,7 +176,7 @@ export async function processApprovedEmails(db: Admin, onlyUserId?: string) {
   const { data: jobs } = await q;
   const enabled = process.env["PROVIDER_APPROVED_EMAIL_ENABLED"] === "true";
   for (const job of jobs ?? []) {
-    const done = (patch: Record<string, unknown>) =>
+    const done = (patch: { status: string; attempts?: number; last_error?: string | null; sent_at?: string }) =>
       db.from("provider_onboarding_emails").update(patch).eq("user_id", job.user_id).eq("kind", "approved");
     try {
       if (!enabled) { await done({ status: "skipped_disabled" }); continue; }
