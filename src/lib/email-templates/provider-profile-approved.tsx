@@ -40,7 +40,7 @@ const Email = ({ businessName, siteUrl = SITE_URL }: Props) => (
 
 export const template = {
   component: Email,
-  subject: 'Your GetPros provider profile has been approved',
+  subject: 'Your GetPros Provider Profile Has Been Approved',
   displayName: 'Provider profile approved',
   previewData: { businessName: 'KYNGSTON SERVICES', siteUrl: SITE_URL },
 } satisfies TemplateEntry
