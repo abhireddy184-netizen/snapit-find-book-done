@@ -117,3 +117,47 @@ export async function notifyProfileCompleted(
     submittedAt: new Date().toISOString(),
   });
 }
+
+/**
+ * Once-only "profile submitted / pending review" email to the provider.
+ * Disabled unless server env PROVIDER_SUBMITTED_EMAIL_ENABLED === "true" (default off).
+ * Recorded in provider_onboarding_emails (PK user_id+kind) before sending, so edits never resend.
+ */
+export async function sendProfileSubmittedConfirmation(
+  db: Admin,
+  userId: string,
+  p: { business_name?: string | null; service_category?: string | null; service_zip?: string | null },
+) {
+  try {
+    const { shouldSendSubmittedConfirmation } = await import("./provider-onboarding-rules");
+    if (!shouldSendSubmittedConfirmation(process.env["PROVIDER_SUBMITTED_EMAIL_ENABLED"], p)) return;
+    const { data: res } = await db.auth.admin.getUserById(userId);
+    const email = res?.user?.email;
+    if (!email || !res?.user?.email_confirmed_at) return;
+    const kind = "profile_submitted";
+    const { error } = await db.from("provider_onboarding_emails").insert({ user_id: userId, kind });
+    let attempts = 0;
+    if (error) {
+      if ((error as { code?: string }).code !== "23505") return;
+      const { data: row } = await db.from("provider_onboarding_emails")
+        .select("status, attempts").eq("user_id", userId).eq("kind", kind).maybeSingle();
+      if (!row || row.status === "sent" || row.status === "suppressed" || row.attempts >= MAX_ATTEMPTS) return;
+      attempts = row.attempts;
+    }
+    try {
+      const r = await sendTemplateEmail("provider-profile-submitted", email, {
+        templateData: { businessName: p.business_name ?? undefined, siteUrl: SITE_URL },
+        idempotencyKey: `provider-profile-submitted-${userId}`,
+      });
+      await db.from("provider_onboarding_emails")
+        .update({ status: r.sent ? "sent" : "suppressed", attempts: attempts + 1, last_error: null, sent_at: new Date().toISOString() })
+        .eq("user_id", userId).eq("kind", kind);
+    } catch (err) {
+      const msg = (err instanceof Error ? err.message : String(err)).slice(0, 300);
+      await db.from("provider_onboarding_emails")
+        .update({ status: "failed", attempts: attempts + 1, last_error: msg }).eq("user_id", userId).eq("kind", kind);
+    }
+  } catch (err) {
+    console.error("[provider-onboarding] submitted:", err instanceof Error ? err.message : err);
+  }
+}
