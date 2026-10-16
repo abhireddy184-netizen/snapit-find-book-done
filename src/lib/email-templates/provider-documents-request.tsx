@@ -1,11 +1,12 @@
 import React from 'react'
 import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from '@react-email/components'
 import type { TemplateEntry } from './registry'
-import { EmailFooter, EmailHeader, SITE_URL, SUPPORT_EMAIL, brand, emailStyles } from './brand'
+import { EmailFooter, EmailHeader, EmailVideoSlot, SITE_URL, SUPPORT_EMAIL, brand, emailStyles } from './brand'
 
 interface Props {
   businessName?: string
   siteUrl?: string
+  variant?: 'request' | 'reminder'
 }
 
 const step = { ...emailStyles.paragraph, margin: '0 0 6px' }
@@ -22,7 +23,7 @@ const note = {
   margin: '18px 0',
 }
 
-const Email = ({ businessName, siteUrl = SITE_URL }: Props) => {
+const Email = ({ businessName, siteUrl = SITE_URL, variant = 'request' }: Props) => {
   const link = `${siteUrl}/provider-dashboard?tab=documents`
   return (
     <Html lang="en" dir="ltr">
@@ -31,7 +32,7 @@ const Email = ({ businessName, siteUrl = SITE_URL }: Props) => {
       <Body style={emailStyles.main}>
         <Container style={emailStyles.container}>
           <EmailHeader siteUrl={siteUrl} />
-          <Heading style={emailStyles.heading}>Documents for your provider profile review</Heading>
+          <Heading style={emailStyles.heading}>{variant === 'reminder' ? 'Reminder: documents for your provider profile review' : 'Documents for your provider profile review'}</Heading>
           <Text style={emailStyles.paragraph}>Hi {businessName?.trim() || 'there'},</Text>
           <Text style={emailStyles.paragraph}>
             Thank you for submitting your GetPros provider profile. To continue our review, please
@@ -52,6 +53,7 @@ const Email = ({ businessName, siteUrl = SITE_URL }: Props) => {
           <Button style={emailStyles.button} href={link}>
             Securely Upload Documents
           </Button>
+          <EmailVideoSlot />
           <Section style={note}>
             <Text style={{ ...emailStyles.paragraph, margin: 0 }}>
               <strong>For your security:</strong> please do not reply to this email with documents, and do
@@ -76,7 +78,10 @@ const Email = ({ businessName, siteUrl = SITE_URL }: Props) => {
 
 export const template = {
   component: Email,
-  subject: 'Action Needed: Upload Documents for Your GetPros Provider Profile',
+  subject: (d: Record<string, any>) =>
+    d['variant'] === 'reminder'
+      ? 'Reminder: Upload Documents for Your GetPros Provider Profile'
+      : 'Action Needed: Upload Documents for Your GetPros Provider Profile',
   displayName: 'Provider documents request',
   previewData: { businessName: 'KYNGSTON SERVICES', siteUrl: SITE_URL },
 } satisfies TemplateEntry

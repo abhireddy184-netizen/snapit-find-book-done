@@ -40,6 +40,7 @@ import { Route as ProviderIdRouteImport } from './routes/provider.$id'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as TrackingIdRouteImport } from './routes/tracking.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminProviderDocsDemoRouteImport } from './routes/_authenticated/admin.provider-docs-demo'
 import { Route as AuthenticatedAdminProvidersRouteImport } from './routes/_authenticated/admin.providers'
 import { Route as AuthenticatedJobIdRouteImport } from './routes/_authenticated/job.$id'
 import { Route as ServicesCategoryIndexRouteImport } from './routes/services.$category.index'
@@ -207,6 +208,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminProviderDocsDemoRoute =
+  AuthenticatedAdminProviderDocsDemoRouteImport.update({
+    id: '/provider-docs-demo',
+    path: '/provider-docs-demo',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminProvidersRoute =
   AuthenticatedAdminProvidersRouteImport.update({
     id: '/providers',
@@ -297,6 +304,7 @@ export interface FileRoutesByFullPath {
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services/': typeof ServicesIndexRoute
+  '/admin/provider-docs-demo': typeof AuthenticatedAdminProviderDocsDemoRoute
   '/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
@@ -338,6 +346,7 @@ export interface FileRoutesByTo {
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services': typeof ServicesIndexRoute
+  '/admin/provider-docs-demo': typeof AuthenticatedAdminProviderDocsDemoRoute
   '/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
@@ -383,6 +392,7 @@ export interface FileRoutesById {
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services/': typeof ServicesIndexRoute
+  '/_authenticated/admin/provider-docs-demo': typeof AuthenticatedAdminProviderDocsDemoRoute
   '/_authenticated/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/_authenticated/job/$id': typeof AuthenticatedJobIdRoute
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
@@ -428,6 +438,7 @@ export interface FileRouteTypes {
     | '/provider/$id'
     | '/tracking/$id'
     | '/services/'
+    | '/admin/provider-docs-demo'
     | '/admin/providers'
     | '/job/$id'
     | '/services/$category/$service'
@@ -469,6 +480,7 @@ export interface FileRouteTypes {
     | '/provider/$id'
     | '/tracking/$id'
     | '/services'
+    | '/admin/provider-docs-demo'
     | '/admin/providers'
     | '/job/$id'
     | '/services/$category/$service'
@@ -513,6 +525,7 @@ export interface FileRouteTypes {
     | '/provider/$id'
     | '/tracking/$id'
     | '/services/'
+    | '/_authenticated/admin/provider-docs-demo'
     | '/_authenticated/admin/providers'
     | '/_authenticated/job/$id'
     | '/services/$category/$service'
@@ -781,6 +794,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/provider-docs-demo': {
+      id: '/_authenticated/admin/provider-docs-demo'
+      path: '/provider-docs-demo'
+      fullPath: '/admin/provider-docs-demo'
+      preLoaderRoute: typeof AuthenticatedAdminProviderDocsDemoRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/providers': {
       id: '/_authenticated/admin/providers'
       path: '/providers'
@@ -862,12 +882,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminProviderDocsDemoRoute: typeof AuthenticatedAdminProviderDocsDemoRoute
   AuthenticatedAdminProvidersRoute: typeof AuthenticatedAdminProvidersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
   AuthenticatedAdminProvidersIdRoute: typeof AuthenticatedAdminProvidersIdRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminProviderDocsDemoRoute:
+    AuthenticatedAdminProviderDocsDemoRoute,
   AuthenticatedAdminProvidersRoute: AuthenticatedAdminProvidersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
   AuthenticatedAdminProvidersIdRoute: AuthenticatedAdminProvidersIdRoute,

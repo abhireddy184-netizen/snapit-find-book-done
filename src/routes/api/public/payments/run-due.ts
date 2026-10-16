@@ -32,6 +32,8 @@ export const Route = createFileRoute("/api/public/payments/run-due")({
             onboarding = await processProviderOnboarding(supabaseAdmin);
             const { retryProviderConfirmations } = await import("@/lib/provider-onboarding.server");
             await retryProviderConfirmations(supabaseAdmin);
+            const { processDocumentEmails } = await import("@/lib/provider-onboarding.server");
+            await processDocumentEmails(supabaseAdmin);
           } catch (err) {
             console.error("[run-due] provider onboarding failed:", err instanceof Error ? err.message : err);
           }

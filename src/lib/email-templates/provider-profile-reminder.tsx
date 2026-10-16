@@ -1,7 +1,7 @@
 import React from 'react'
 import { Body, Button, Container, Head, Heading, Html, Preview, Text } from '@react-email/components'
 import type { TemplateEntry } from './registry'
-import { EmailFooter, EmailHeader, SITE_URL, emailStyles } from './brand'
+import { EmailFooter, EmailHeader, EmailVideoSlot, SITE_URL, emailStyles } from './brand'
 
 interface Props {
   name?: string
@@ -33,6 +33,7 @@ const Email = ({ name, siteUrl = SITE_URL, variant = 'welcome' }: Props) => (
         <Button style={emailStyles.button} href={`${siteUrl}/provider-dashboard?tab=profile`}>
           Complete your profile
         </Button>
+        <EmailVideoSlot />
         <EmailFooter
           siteUrl={siteUrl}
           reason="You're receiving this because you created a provider account on GetPros.ai."

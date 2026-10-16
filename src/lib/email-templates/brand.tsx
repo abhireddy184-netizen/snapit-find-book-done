@@ -1,6 +1,6 @@
 import React from 'react'
 import { Hr, Link, Section, Text } from '@react-email/components'
-import { BRAND_COLORS, CONTACT_EMAIL, SITE_URL as BRAND_SITE_URL } from '@/lib/brand'
+import { BRAND_COLORS, CONTACT_EMAIL, PROVIDER_TUTORIAL_VIDEO_URL, SITE_URL as BRAND_SITE_URL } from '@/lib/brand'
 
 /**
  * Shared GetPros email branding: text wordmark header + standardized footer.
@@ -101,5 +101,17 @@ export function EmailFooter({
         </Text>
       ) : null}
     </>
+  )
+}
+
+/** Optional tutorial-video link. Renders nothing until PROVIDER_TUTORIAL_VIDEO_URL is set. */
+export function EmailVideoSlot({ url = PROVIDER_TUTORIAL_VIDEO_URL }: { url?: string }) {
+  if (!url || !/^https:\/\//.test(url)) return null
+  return (
+    <Section style={{ margin: '18px 0' }}>
+      <Link href={url} style={{ color: brand.primary, fontWeight: 700, fontSize: '14px' }}>
+        ▶ Watch the 2-minute GetPros setup video
+      </Link>
+    </Section>
   )
 }

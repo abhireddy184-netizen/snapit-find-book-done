@@ -88,6 +88,7 @@ function AdminProviders() {
       <div className="mx-auto max-w-4xl py-4">
         <h1 className="text-2xl font-black">Approve pros</h1>
         <p className="mt-1 text-sm text-muted-foreground">New pros can't be booked until you approve them here.</p>
+        <Link to="/admin/provider-docs-demo" className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-primary">See what pros see on their Documents screen (sample data) →</Link>
         {error && <p className="mt-3 rounded-xl bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>}
         <RefundBox />
         {list.isLoading && <Center><Loader2 className="h-5 w-5 animate-spin" /></Center>}

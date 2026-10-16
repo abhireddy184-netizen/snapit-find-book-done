@@ -41,6 +41,8 @@ export const saveProviderProfile = createServerFn({ method: "POST" })
       await notifyProfileCompleted(context.userId, data);
       const { sendProfileSubmittedConfirmation } = await import("@/lib/provider-onboarding.server");
       await sendProfileSubmittedConfirmation(supabaseAdmin, context.userId, data);
+      const { queueDocumentsRequest } = await import("@/lib/provider-onboarding.server");
+      await queueDocumentsRequest(supabaseAdmin, context.userId, data);
     } catch (err) {
       console.error("[provider-profile] completion alert failed:", err instanceof Error ? err.message : err);
     }
