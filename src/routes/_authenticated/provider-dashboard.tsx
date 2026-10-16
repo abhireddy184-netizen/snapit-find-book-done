@@ -3,7 +3,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { CalendarDays, User, Wrench, Check, X, Loader2, MapPin, LogOut, ShieldAlert, Inbox, ShieldCheck, Clock3, BadgeCheck, Trash2 } from "lucide-react";
+import { CalendarDays, User, Wrench, Check, X, Loader2, MapPin, LogOut, ShieldAlert, Inbox, ShieldCheck, Clock3, BadgeCheck, Trash2, FileText } from "lucide-react";
+import { ProviderDocuments } from "@/components/getpros/ProviderDocuments";
 import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
 import { Wordmark } from "@/components/getpros/Logo";
 
@@ -51,13 +52,14 @@ export const Route = createFileRoute("/_authenticated/provider-dashboard")({
   component: ProviderDashboard,
 });
 
-const TAB_IDS = ["requests", "schedule", "work", "profile"];
+const TAB_IDS = ["requests", "schedule", "work", "profile", "documents"];
 
 const tabs = [
   { id: "requests", label: "Requests", icon: Wrench },
   { id: "schedule", label: "Schedule", icon: CalendarDays },
   { id: "work", label: "Hours & time off", icon: Clock3 },
   { id: "profile", label: "Business profile", icon: User },
+  { id: "documents", label: "Documents", icon: FileText },
 ];
 
 function ProviderDashboard() {
@@ -110,6 +112,7 @@ function ProviderDashboard() {
         {tab === "schedule" && <Schedule userId={user?.id} />}
         {tab === "work" && <ProviderWorkSettings userId={user?.id} />}
         {tab === "profile" && <BusinessProfile />}
+        {tab === "documents" && <ProviderDocuments userId={user?.id} />}
       </div>
     </AppShell>
   );

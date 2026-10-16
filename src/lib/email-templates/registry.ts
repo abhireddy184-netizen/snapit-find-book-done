@@ -7,6 +7,7 @@ import { template as paymentAlertTemplate } from './payment-alert'
 import { template as providerProfileReminderTemplate } from './provider-profile-reminder'
 import { template as providerProfileSubmittedTemplate } from './provider-profile-submitted'
 import { template as providerProfileApprovedTemplate } from './provider-profile-approved'
+import { template as providerDocumentsRequestTemplate } from './provider-documents-request'
 
 export interface TemplateEntry {
   component: ComponentType<any>
@@ -29,4 +30,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'provider-profile-reminder': providerProfileReminderTemplate,
   'provider-profile-submitted': providerProfileSubmittedTemplate,
   'provider-profile-approved': providerProfileApprovedTemplate,
+  'provider-documents-request': providerDocumentsRequestTemplate,
 }

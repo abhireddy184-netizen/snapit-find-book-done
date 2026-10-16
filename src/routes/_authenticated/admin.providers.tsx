@@ -145,7 +145,7 @@ function Row({ r, children }: { r: ProviderRow; children: React.ReactNode }) {
           {r.starting_price != null && <span>From ${Number(r.starting_price).toFixed(0)}</span>}
         </div>
         {r.bio && <p className="line-clamp-3 text-muted-foreground">{r.bio}</p>}
-        <Link to="/provider/$id" params={{ id: r.user_id }} className="inline-block text-xs font-semibold text-primary">View public page</Link>
+        <Link to="/admin/providers/$id" params={{ id: r.user_id }} className="inline-flex min-h-11 items-center text-sm font-semibold text-primary">{r.verification_status === "verified" ? "Review profile & documents" : "Preview profile & documents"}</Link>
       </div>
       <div className="shrink-0">{children}</div>
     </div>
