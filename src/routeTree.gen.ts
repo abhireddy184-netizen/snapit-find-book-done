@@ -44,6 +44,7 @@ import { Route as AuthenticatedAdminProvidersRouteImport } from './routes/_authe
 import { Route as AuthenticatedJobIdRouteImport } from './routes/_authenticated/job.$id'
 import { Route as ServicesCategoryIndexRouteImport } from './routes/services.$category.index'
 import { Route as ServicesCategoryServiceRouteImport } from './routes/services.$category.$service'
+import { Route as AuthenticatedAdminProvidersIdRouteImport } from './routes/_authenticated/admin.providers_.$id'
 import { Route as ApiPublicPaymentsRunDueRouteImport } from './routes/api/public/payments/run-due'
 import { Route as ApiPublicStripeConnectWebhookRouteImport } from './routes/api/public/stripe/connect-webhook'
 import { Route as ApiPublicStripeWebhookRouteImport } from './routes/api/public/stripe/webhook'
@@ -227,6 +228,12 @@ const ServicesCategoryServiceRoute = ServicesCategoryServiceRouteImport.update({
   path: '/$category/$service',
   getParentRoute: () => ServicesRoute,
 } as any)
+const AuthenticatedAdminProvidersIdRoute =
+  AuthenticatedAdminProvidersIdRouteImport.update({
+    id: '/providers_/$id',
+    path: '/providers/$id',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const ApiPublicPaymentsRunDueRoute = ApiPublicPaymentsRunDueRouteImport.update({
   id: '/api/public/payments/run-due',
   path: '/api/public/payments/run-due',
@@ -295,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/services/$category/': typeof ServicesCategoryIndexRoute
+  '/admin/providers/$id': typeof AuthenticatedAdminProvidersIdRoute
   '/api/public/payments/run-due': typeof ApiPublicPaymentsRunDueRoute
   '/api/public/stripe/connect-webhook': typeof ApiPublicStripeConnectWebhookRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
@@ -335,6 +343,7 @@ export interface FileRoutesByTo {
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/services/$category': typeof ServicesCategoryIndexRoute
+  '/admin/providers/$id': typeof AuthenticatedAdminProvidersIdRoute
   '/api/public/payments/run-due': typeof ApiPublicPaymentsRunDueRoute
   '/api/public/stripe/connect-webhook': typeof ApiPublicStripeConnectWebhookRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
@@ -379,6 +388,7 @@ export interface FileRoutesById {
   '/services/$category/$service': typeof ServicesCategoryServiceRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/services/$category/': typeof ServicesCategoryIndexRoute
+  '/_authenticated/admin/providers_/$id': typeof AuthenticatedAdminProvidersIdRoute
   '/api/public/payments/run-due': typeof ApiPublicPaymentsRunDueRoute
   '/api/public/stripe/connect-webhook': typeof ApiPublicStripeConnectWebhookRoute
   '/api/public/stripe/webhook': typeof ApiPublicStripeWebhookRoute
@@ -423,6 +433,7 @@ export interface FileRouteTypes {
     | '/services/$category/$service'
     | '/admin/'
     | '/services/$category/'
+    | '/admin/providers/$id'
     | '/api/public/payments/run-due'
     | '/api/public/stripe/connect-webhook'
     | '/api/public/stripe/webhook'
@@ -463,6 +474,7 @@ export interface FileRouteTypes {
     | '/services/$category/$service'
     | '/admin'
     | '/services/$category'
+    | '/admin/providers/$id'
     | '/api/public/payments/run-due'
     | '/api/public/stripe/connect-webhook'
     | '/api/public/stripe/webhook'
@@ -506,6 +518,7 @@ export interface FileRouteTypes {
     | '/services/$category/$service'
     | '/_authenticated/admin/'
     | '/services/$category/'
+    | '/_authenticated/admin/providers_/$id'
     | '/api/public/payments/run-due'
     | '/api/public/stripe/connect-webhook'
     | '/api/public/stripe/webhook'
@@ -796,6 +809,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServicesCategoryServiceRouteImport
       parentRoute: typeof ServicesRoute
     }
+    '/_authenticated/admin/providers_/$id': {
+      id: '/_authenticated/admin/providers_/$id'
+      path: '/providers/$id'
+      fullPath: '/admin/providers/$id'
+      preLoaderRoute: typeof AuthenticatedAdminProvidersIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/api/public/payments/run-due': {
       id: '/api/public/payments/run-due'
       path: '/api/public/payments/run-due'
@@ -844,11 +864,13 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminProvidersRoute: typeof AuthenticatedAdminProvidersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedAdminProvidersIdRoute: typeof AuthenticatedAdminProvidersIdRoute
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminProvidersRoute: AuthenticatedAdminProvidersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedAdminProvidersIdRoute: AuthenticatedAdminProvidersIdRoute,
 }
 
 const AuthenticatedAdminRouteWithChildren =
