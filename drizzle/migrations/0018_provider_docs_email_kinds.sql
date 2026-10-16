@@ -1,0 +1,2 @@
+ALTER TABLE public.provider_onboarding_emails DROP CONSTRAINT IF EXISTS provider_onboarding_emails_kind_check;
+ALTER TABLE public.provider_onboarding_emails ADD CONSTRAINT provider_onboarding_emails_kind_check CHECK (kind = ANY (ARRAY['welcome','reminder_24h','reminder_48h','profile_submitted','approved','documents_request','documents_received','documents_reminder_24h','documents_reminder_48h']::text[]));
