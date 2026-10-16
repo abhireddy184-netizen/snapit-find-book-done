@@ -99,6 +99,20 @@
       "when": 1791684372134,
       "tag": "0013_onboarding_reminder_24h",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792124332059,
+      "tag": "0014_provider_confirmation_kinds_and_approval_outbox",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1792124341485,
+      "tag": "0015_fix_approval_outbox_found_check",
+      "breakpoints": true
     }
   ]
 }
