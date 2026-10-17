@@ -100,7 +100,7 @@ export function AuthForm({
         return;
       }
     }
-    const target = data?.role === "provider" ? "/provider-dashboard" : "/dashboard";
+    const target = data?.role === "provider" ? "/provider-setup" : "/dashboard";
     await navigate({ to: target });
   }
 

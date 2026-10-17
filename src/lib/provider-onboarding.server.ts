@@ -17,10 +17,11 @@ async function loadState(db: Admin, userId: string) {
   if (!user?.email) return null;
   const [{ data: profile }, { data: pp }, { data: del }] = await Promise.all([
     db.from("profiles").select("full_name, role, is_provider").eq("id", userId).maybeSingle(),
-    db.from("provider_profiles").select("business_name, service_category, service_zip").eq("user_id", userId).maybeSingle(),
+    db.from("provider_profiles").select("business_name, service_category, service_zip, verification_status").eq("user_id", userId).maybeSingle(),
     db.from("account_deletion_requests").select("id").eq("user_id", userId).limit(1),
   ]);
   if (!profile || !(profile.is_provider || profile.role === "provider")) return null;
+  const { data: setup } = await db.from("provider_setup").select("state").eq("user_id", userId).maybeSingle();
   const eligible = isOnboardingEligible({
     created_at: user.created_at,
     email_confirmed_at: user.email_confirmed_at ?? null,
@@ -32,7 +33,7 @@ async function loadState(db: Admin, userId: string) {
     signupAt: user.created_at,
     firstName: (profile.full_name || "").trim().split(/\s+/)[0] || undefined,
     eligible,
-    complete: isProfileComplete(pp),
+    complete: setup ? setup.state !== "pending_setup" || pp?.verification_status === "pending" || pp?.verification_status === "verified" : isProfileComplete(pp),
   };
 }
 
@@ -130,6 +131,8 @@ export async function sendProfileSubmittedConfirmation(
   p: { business_name?: string | null; service_category?: string | null; service_zip?: string | null },
 ) {
   try {
+    const { data: setup } = await db.from("provider_setup").select("state").eq("user_id", userId).maybeSingle();
+    if (setup) return; // Unified setup queues its confirmation only on explicit, complete submission.
     const { shouldSendSubmittedConfirmation } = await import("./provider-onboarding-rules");
     if (!shouldSendSubmittedConfirmation(process.env["PROVIDER_SUBMITTED_EMAIL_ENABLED"], p)) return;
     const { data: res } = await db.auth.admin.getUserById(userId);
@@ -205,6 +208,7 @@ export async function processApprovedEmails(db: Admin, onlyUserId?: string) {
 /** Hourly: drain approval outbox and retry failed submitted confirmations (never backfills). */
 export async function retryProviderConfirmations(db: Admin) {
   await processApprovedEmails(db);
+  await processUnifiedSubmissionEmails(db);
   const { data: rows } = await db.from("provider_onboarding_emails")
     .select("user_id").eq("kind", "profile_submitted").eq("status", "failed").lt("attempts", MAX_ATTEMPTS).limit(100);
   for (const r of rows ?? []) {
@@ -231,7 +235,9 @@ async function docsContext(db: Admin, userId: string) {
     db.from("provider_document_requests").select("id", { count: "exact", head: true }).eq("user_id", userId),
   ]);
   const u = res?.user;
+  const { data: setup } = await db.from("provider_setup").select("state").eq("user_id", userId).maybeSingle();
   return {
+    unified: Boolean(setup),
     email: u?.email_confirmed_at ? u.email ?? null : null,
     signupAt: u?.created_at ?? null,
     pp,
@@ -271,6 +277,7 @@ export async function queueDocumentsRequest(db: Admin, userId: string, p: Profil
     const { shouldQueueDocumentsRequest } = await import("./provider-onboarding-rules");
     if (!isProfileComplete(p)) return;
     const c = await docsContext(db, userId);
+    if (c.unified) return;
     if (!shouldQueueDocumentsRequest({ signupAt: c.signupAt, complete: true, priorManualRequests: c.manualRequests })) return;
     const { error } = await db.from("provider_onboarding_emails").insert({ user_id: userId, kind: "documents_request", status: "pending" });
     if (error && (error as { code?: string }).code !== "23505") console.error("[provider-onboarding] queue docs:", error.message);
@@ -285,6 +292,7 @@ export async function notifyDocumentsReceived(db: Admin, userId: string) {
     const { hasRequiredDocs, isDocsAutomationEligible, isDocsEmailEnabled } = await import("./provider-onboarding-rules");
     if (!isDocsEmailEnabled(process.env["PROVIDER_DOCUMENTS_EMAIL_ENABLED"])) return;
     const c = await docsContext(db, userId);
+    if (c.unified) return;
     if (!c.email || !isDocsAutomationEligible(c.signupAt) || c.manualRequests > 0) return;
     if (!c.pp || c.pp.verification_status === "verified" || !hasRequiredDocs(c.docs)) return;
     const attempts = await claim(db, userId, "documents_received");
@@ -313,6 +321,7 @@ export async function processDocumentEmails(db: Admin) {
     try {
       if (!enabled) { await done(job.user_id, "documents_request", { status: "skipped_disabled" }); continue; }
       const c = await docsContext(db, job.user_id);
+      if (c.unified) { await done(job.user_id, "documents_request", { status: "skipped_unified_setup" }); continue; }
       if (!c.email) { await done(job.user_id, "documents_request", { status: "skipped_no_email" }); continue; }
       if (c.manualRequests > 0) { await done(job.user_id, "documents_request", { status: "skipped_manual" }); continue; }
       if (!c.pp || c.pp.verification_status === "verified") { await done(job.user_id, "documents_request", { status: "skipped_verified" }); continue; }
@@ -333,6 +342,7 @@ export async function processDocumentEmails(db: Admin) {
   for (const a of active ?? []) {
     try {
       const c = await docsContext(db, a.user_id);
+      if (c.unified) continue;
       if (!c.email || !c.pp || c.pp.verification_status === "verified" || c.manualRequests > 0) continue;
       if (rules.hasRequiredDocs(c.docs)) { await notifyDocumentsReceived(db, a.user_id); continue; }
       const { data: have } = await db.from("provider_onboarding_emails").select("kind, status, attempts").eq("user_id", a.user_id);
@@ -353,4 +363,29 @@ export async function processDocumentEmails(db: Admin) {
     }
   }
   return { sent };
+}
+
+/** Complete explicit submissions only; no backfill, no send after drafts or individual uploads. */
+export async function processUnifiedSubmissionEmails(db: Admin, onlyUserId?: string) {
+  if (process.env['PROVIDER_SUBMITTED_EMAIL_ENABLED'] !== 'true') return;
+  let query = db.from('provider_onboarding_emails').select('user_id, attempts').eq('kind', 'profile_submitted').in('status', ['pending', 'failed']).lt('attempts', MAX_ATTEMPTS).limit(100);
+  if (onlyUserId) query = query.eq('user_id', onlyUserId);
+  const { data: jobs } = await query;
+  for (const job of jobs || []) {
+    const { data: setup } = await db.from('provider_setup').select('state, submitted_at').eq('user_id', job.user_id).maybeSingle();
+    if (setup?.state !== 'under_verification' || !setup.submitted_at) continue;
+    const { data: user } = await db.auth.admin.getUserById(job.user_id);
+    if (!user.user?.email || !user.user.email_confirmed_at) continue;
+    const { data: pp } = await db.from('provider_profiles').select('business_name, verification_status').eq('user_id', job.user_id).maybeSingle();
+    if (!pp || !['pending', 'verified'].includes(pp.verification_status)) continue;
+    try {
+      const result = await sendTemplateEmail('provider-setup-submitted', user.user.email, {
+        templateData: { businessName: pp.business_name, siteUrl: SITE_URL },
+        idempotencyKey: `provider-profile-submitted-${job.user_id}`,
+      });
+      await db.from('provider_onboarding_emails').update({ status: result.sent ? 'sent' : 'suppressed', attempts: job.attempts + 1, sent_at: new Date().toISOString(), last_error: null }).eq('user_id', job.user_id).eq('kind', 'profile_submitted');
+    } catch (err) {
+      await db.from('provider_onboarding_emails').update({ status: 'failed', attempts: job.attempts + 1, last_error: (err instanceof Error ? err.message : String(err)).slice(0, 300) }).eq('user_id', job.user_id).eq('kind', 'profile_submitted');
+    }
+  }
 }

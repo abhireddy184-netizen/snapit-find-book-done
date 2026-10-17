@@ -12,7 +12,7 @@ interface Props {
 const Email = ({ name, siteUrl = SITE_URL, variant = 'welcome' }: Props) => (
   <Html lang="en" dir="ltr">
     <Head />
-    <Preview>Finish your GetPros provider profile to start getting jobs.</Preview>
+    <Preview>Complete your secure GetPros setup and submit your profile for review.</Preview>
     <Body style={emailStyles.main}>
       <Container style={emailStyles.container}>
         <EmailHeader siteUrl={siteUrl} />
@@ -23,16 +23,17 @@ const Email = ({ name, siteUrl = SITE_URL, variant = 'welcome' }: Props) => (
         </Heading>
         <Text style={emailStyles.paragraph}>
           {variant === 'reminder'
-            ? 'Just a friendly reminder: your provider account is set up, but your business profile still needs a few details before customers can find you.'
-            : "Thanks for confirming your email. Your provider account is ready, but your business profile isn't finished yet."}
+            ? 'A friendly reminder to finish your saved GetPros setup. Your profile has not yet been submitted for review.'
+            : 'Welcome to GetPros. Your secure provider setup is ready for you to continue.'}
         </Text>
         <Text style={emailStyles.paragraph}>
-          Add your services, service area, availability and payout details so customers can find
-          and book you.
+          Add your services, service area, business details and applicable private documents in one place.
+          Save a draft and return whenever you are ready. GetPros admin approval is required before your profile can be listed or booked.
         </Text>
-        <Button style={emailStyles.button} href={`${siteUrl}/provider-dashboard?tab=profile`}>
-          Complete your profile
+        <Button style={emailStyles.button} href={`${siteUrl}/provider-setup`}>
+          Complete Your Setup
         </Button>
+        <Text style={emailStyles.paragraph}>Sign in with your Pro account to resume. Never reply to emails with documents or upload government photo IDs. Payout setup comes after approval and must be configured before paid bookings.</Text>
         <EmailVideoSlot />
         <EmailFooter
           siteUrl={siteUrl}
