@@ -35,6 +35,7 @@ import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedProviderDashboardRouteImport } from './routes/_authenticated/provider-dashboard'
+import { Route as AuthenticatedProviderSetupRouteImport } from './routes/_authenticated/provider-setup'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as ProviderIdRouteImport } from './routes/provider.$id'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
@@ -183,6 +184,12 @@ const AuthenticatedProviderDashboardRoute =
     path: '/provider-dashboard',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedProviderSetupRoute =
+  AuthenticatedProviderSetupRouteImport.update({
+    id: '/provider-setup',
+    path: '/provider-setup',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -300,6 +307,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
+  '/provider-setup': typeof AuthenticatedProviderSetupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
@@ -342,6 +350,7 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
+  '/provider-setup': typeof AuthenticatedProviderSetupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
@@ -388,6 +397,7 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/provider-dashboard': typeof AuthenticatedProviderDashboardRoute
+  '/_authenticated/provider-setup': typeof AuthenticatedProviderSetupRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
@@ -434,6 +444,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/dashboard'
     | '/provider-dashboard'
+    | '/provider-setup'
     | '/auth/callback'
     | '/provider/$id'
     | '/tracking/$id'
@@ -476,6 +487,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/dashboard'
     | '/provider-dashboard'
+    | '/provider-setup'
     | '/auth/callback'
     | '/provider/$id'
     | '/tracking/$id'
@@ -521,6 +533,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/dashboard'
     | '/_authenticated/provider-dashboard'
+    | '/_authenticated/provider-setup'
     | '/auth/callback'
     | '/provider/$id'
     | '/tracking/$id'
@@ -759,6 +772,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProviderDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/provider-setup': {
+      id: '/_authenticated/provider-setup'
+      path: '/provider-setup'
+      fullPath: '/provider-setup'
+      preLoaderRoute: typeof AuthenticatedProviderSetupRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/auth/callback': {
       id: '/auth/callback'
       path: '/auth/callback'
@@ -903,6 +923,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedProviderDashboardRoute: typeof AuthenticatedProviderDashboardRoute
+  AuthenticatedProviderSetupRoute: typeof AuthenticatedProviderSetupRoute
   AuthenticatedJobIdRoute: typeof AuthenticatedJobIdRoute
 }
 
@@ -910,6 +931,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedProviderDashboardRoute: AuthenticatedProviderDashboardRoute,
+  AuthenticatedProviderSetupRoute: AuthenticatedProviderSetupRoute,
   AuthenticatedJobIdRoute: AuthenticatedJobIdRoute,
 }
 
