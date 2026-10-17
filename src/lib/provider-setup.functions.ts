@@ -1,16 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware';
-import { catalog } from './catalog';
-
-const schema = z.object({
-  full_name: z.string().trim().max(200), phone: z.string().trim().max(40),
-  business_name: z.string().trim().max(200), business_type: z.enum(['individual', 'registered_business']),
-  category_slugs: z.array(z.string()).max(40), service_slugs: z.array(z.string()).max(250),
-  service_area: z.string().trim().max(300), service_zip: z.string().regex(/^(\d{5})?$/),
-  service_radius_miles: z.number().int().min(1).max(200).nullable(),
-  bio: z.string().max(4000), trade_license_required: z.boolean(),
-}).strict().refine(d => d.category_slugs.every(s => catalog.some(c => c.slug === s)) && d.service_slugs.every(s => catalog.some(c => d.category_slugs.includes(c.slug) && c.services.some(v => v.slug === s))), 'Choose services from the GetPros catalog');
+import { providerSetupSchema } from './provider-setup-schema';
 
 export const getMyProviderSetup = createServerFn({ method: 'GET' })
   .middleware([requireSupabaseAuth])
@@ -35,16 +26,10 @@ export const getMyProviderSetup = createServerFn({ method: 'GET' })
 
 export const saveMyProviderSetup = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => schema.parse(d))
+  .inputValidator((d: unknown) => providerSetupSchema.parse(d))
   .handler(async ({ data, context }) => {
-    const { data: profile, error: profileError } = await context.supabase.from('profiles').select('role, is_provider').eq('id', context.userId).single();
-    if (profileError || !profile || !(profile.is_provider || profile.role === 'provider')) throw new Error('Only Pro accounts can save setup.');
-    const { supabaseAdmin: db } = await import('@/integrations/supabase/client.server');
-    const category = catalog.find(c => c.slug === data.category_slugs[0]);
-    // The UUID comes exclusively from verified auth middleware, never from client input or JWT mutation.
-    const { error } = await db.rpc('save_provider_setup_for_user', { _user_id: context.userId, _data: { ...data, service_category: category?.name || null } });
-    if (error) throw new Error('Your draft could not be saved. It may already be submitted. Please refresh and try again.');
-    return { saved: true };
+    const { saveBoundProviderSetup } = await import('./provider-setup-save.server');
+    return saveBoundProviderSetup(context, data);
   });
 
 export const submitMyProviderSetup = createServerFn({ method: 'POST' })
