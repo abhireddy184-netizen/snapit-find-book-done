@@ -625,6 +625,7 @@ export type Database = {
       provider_onboarding_emails: {
         Row: {
           attempts: number
+          claimed_at: string | null
           created_at: string
           kind: string
           last_error: string | null
@@ -634,6 +635,7 @@ export type Database = {
         }
         Insert: {
           attempts?: number
+          claimed_at?: string | null
           created_at?: string
           kind: string
           last_error?: string | null
@@ -643,6 +645,7 @@ export type Database = {
         }
         Update: {
           attempts?: number
+          claimed_at?: string | null
           created_at?: string
           kind?: string
           last_error?: string | null
@@ -1213,6 +1216,10 @@ export type Database = {
         Args: { _name: string }
         Returns: boolean
       }
+      claim_provider_submission_email: {
+        Args: { _user_id: string }
+        Returns: number
+      }
       extract_service_zip: { Args: { _address: string }; Returns: string }
       get_my_provider_profile: {
         Args: never
@@ -1263,6 +1270,10 @@ export type Database = {
         Returns: undefined
       }
       save_my_provider_setup: { Args: { _data: Json }; Returns: undefined }
+      save_provider_setup_for_user: {
+        Args: { _data: Json; _user_id: string }
+        Returns: undefined
+      }
       service_zone_for_zip: { Args: { _zip: string }; Returns: string }
       submit_my_provider_setup: { Args: never; Returns: Json }
     }

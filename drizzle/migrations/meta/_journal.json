@@ -148,6 +148,13 @@
       "when": 1792255010610,
       "tag": "0020_protect_submitted_pro_documents",
       "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1792255062020,
+      "tag": "0021_secure_provider_setup_writes_and_email_claim",
+      "breakpoints": true
     }
   ]
 }
