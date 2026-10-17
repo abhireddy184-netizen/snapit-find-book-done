@@ -16,6 +16,8 @@ export const Route = createFileRoute("/auth/callback")({
       { name: "twitter:title", content: "Signing you in — GetPros.ai" },
       { name: "twitter:description", content: "Finishing sign-in to GetPros.ai." },
       { name: "robots", content: "noindex" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: CallbackPage,
@@ -57,7 +59,7 @@ function CallbackPage() {
           window.location.replace(intent.redirect);
           return;
         }
-        await navigate({ to: role === "provider" ? "/provider-dashboard" : "/dashboard", replace: true });
+        await navigate({ to: role === "provider" ? "/provider-setup" : "/dashboard", replace: true });
       } catch (e) {
         setError(e instanceof Error ? e.message : "Could not finish sign-in.");
       }

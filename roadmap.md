@@ -1,5 +1,9 @@
 # Roadmap
 
+- [ ] Simplify Pro signup and add secure unified draft/resume setup
+- [ ] Atomically submit complete setup and queue under-verification email; reuse reminders without duplicate sequences
+- [ ] Verify onboarding with isolated tests and responsive preview; no real mail or deployment
+
 - [x] Replace app icons with approved GPA branding and verify head/manifest assets (preview only)
 
 - [x] Sign-up: show "account already exists" (with Log in / Reset password) instead of "check your email" for already-registered emails

@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AuthForm } from "@/components/getpros/AuthForm";
+import { ProSignup } from "@/components/getpros/ProSignup";
 
 export const Route = createFileRoute("/register")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -15,6 +16,8 @@ export const Route = createFileRoute("/register")({
       { name: "twitter:title", content: "Sign up — GetPros.ai" },
       { name: "twitter:description", content: "Create your GetPros account as a customer or service provider." },
       { name: "robots", content: "noindex" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: RegisterPage,
@@ -22,6 +25,7 @@ export const Route = createFileRoute("/register")({
 
 function RegisterPage() {
   const { redirect, role } = Route.useSearch();
+  if (role === "provider") return <ProSignup />;
   return (
     <AuthForm
       mode="register"

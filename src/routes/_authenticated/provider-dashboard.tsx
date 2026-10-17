@@ -80,6 +80,7 @@ function ProviderDashboard() {
             <p className="mt-1 text-sm text-muted-foreground">Manage incoming job requests and your business profile.</p>
           </div>
         </div>
+        {profile?.role === "provider" && <Link to="/provider-setup" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-primary">Complete or resume Pro setup →</Link>}
         {profile && profile.role !== "provider" && (
           <div className="mt-4 flex items-start gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-700 dark:text-amber-400">
             <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
