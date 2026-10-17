@@ -33,6 +33,7 @@ async function loadState(db: Admin, userId: string) {
     signupAt: user.created_at,
     firstName: (profile.full_name || "").trim().split(/\s+/)[0] || undefined,
     eligible,
+    unified: Boolean(setup),
     complete: setup ? setup.state !== "pending_setup" || pp?.verification_status === "pending" || pp?.verification_status === "verified" : isProfileComplete(pp),
   };
 }
@@ -49,7 +50,7 @@ export async function ensureProviderWelcome(db: Admin, userId: string) {
   if (developmentDeliveryBlocked()) return;
   try {
     const s = await loadState(db, userId);
-    if (!s || !s.eligible) return;
+    if (!s || !s.eligible || (s.complete && !s.unified)) return;
     await sendOnce(db, userId, "welcome", s.email, s.firstName);
   } catch (err) {
     console.error("[provider-onboarding] welcome:", err instanceof Error ? err.message : err);
@@ -68,7 +69,7 @@ export async function processProviderOnboarding(db: Admin) {
   for (const r of rows ?? []) {
     try {
       const s = await loadState(db, r.id);
-      if (!s || !s.eligible || !s.confirmedAt) continue;
+      if (!s || !s.eligible || !s.confirmedAt || (s.complete && !s.unified)) continue;
       checked++;
       await sendOnce(db, r.id, "welcome", s.email, s.firstName);
       if (s.complete) continue;
