@@ -39,6 +39,7 @@ export async function sendOwnerAlert(
   payload: Record<string, unknown>,
   replyTo?: string | null,
 ): Promise<void> {
+  if (import.meta.env.DEV) return;
   try {
     const db = await admin();
     const { error } = await db
