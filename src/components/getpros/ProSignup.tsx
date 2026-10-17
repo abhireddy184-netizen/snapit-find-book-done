@@ -42,7 +42,7 @@ export function ProSignup() {
       } else {
         const { error: authError } = await supabase.auth.signInWithOtp({ email: email.trim(), options: {
           emailRedirectTo: `${SITE_URL}/auth/callback?role=provider`,
-          data: { full_name: name.trim(), phone: phone.trim(), role: 'provider', terms_accepted_at: new Date().toISOString() },
+          data: { full_name: name.trim(), phone: phone.trim(), role: 'provider', signup_flow: 'unified_pro', terms_accepted_at: new Date().toISOString() },
         } });
         if (authError) throw authError;
         // No claim that a user/profile exists until authentication succeeds.
