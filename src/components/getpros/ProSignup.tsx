@@ -69,6 +69,14 @@ export function ProSignup() {
           {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="min-h-12 w-full" disabled={busy || loading}>{busy ? <Loader2 className="animate-spin" /> : <ArrowRight />} {sent ? 'Verify & continue setup' : 'Continue'}</Button>
           {sent && <Button type="button" variant="ghost" className="min-h-11 w-full" onClick={() => { setSent(false); setCode(''); }}>Use another email</Button>}
+          {sent && <Button type="button" variant="outline" className="min-h-11 w-full" disabled={busy} onClick={async () => {
+            setBusy(true); setError('');
+            try {
+              const { error } = await supabase.auth.signInWithOtp({ email: email.trim(), options: { shouldCreateUser: false, emailRedirectTo: `${SITE_URL}/auth/callback?role=provider` } });
+              if (error) throw error;
+            } catch { setError('We could not resend the sign-in email. Please wait a moment and try again.'); }
+            finally { setBusy(false); }
+          }}>Resend sign-in email</Button>}
         </form>
         <p className="mt-7 text-center text-sm text-muted-foreground">Already a Pro? <Link to="/login" search={{ next: '/provider-setup' }} className="font-semibold text-primary">Resume your setup</Link></p>
       </>}

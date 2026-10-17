@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useServerFn } from '@tanstack/react-start';
 import { Link } from '@tanstack/react-router';
@@ -28,9 +28,11 @@ export function ProviderSetup() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [missing, setMissing] = useState<string[]>([]);
+  const initializedFor = useRef<string | null>(null);
   useEffect(() => {
     const data = state.data;
-    if (!data) return;
+    if (!data || initializedFor.current === data.userId) return;
+    initializedFor.current = data.userId;
     const s = data.setup; const p = data.provider;
     const priorCategory = catalog.find(c => c.name === p?.service_category);
     setDraft({ ...emptyDraft, full_name: s?.full_name || data.profile.full_name, phone: s?.phone || p?.phone || data.profile.phone || '', business_name: p?.business_name || '', business_type: s?.business_type === 'registered_business' ? 'registered_business' : 'individual', category_slugs: s?.category_slugs.length ? s.category_slugs : priorCategory ? [priorCategory.slug] : [], service_slugs: s?.service_slugs || [], service_area: p?.service_area || '', service_zip: p?.service_zip || '', service_radius_miles: p?.service_radius_miles || null, bio: p?.bio || '', trade_license_required: s?.trade_license_required || false });
@@ -46,9 +48,11 @@ export function ProviderSetup() {
         if (items.length) { setMissing(items); return; }
       }
       await save({ data: draft });
+      if (final) setMessage('Draft saved. Submission is not complete until confirmation appears.');
       if (final) {
         const result = await submit();
         if (!result.submitted) { setMissing(result.missing); return; }
+        setMessage('');
         await qc.invalidateQueries({ queryKey: ['provider-setup', user?.id] });
       } else setMessage('Draft saved. Return to this page whenever you are ready.');
     } catch (err) { setError(err instanceof Error ? err.message : 'We could not save your setup.'); }

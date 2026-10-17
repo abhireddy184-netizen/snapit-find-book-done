@@ -6,6 +6,7 @@ import {
   validateDocFile, type DocType, type ProviderDocument,
 } from "@/lib/provider-documents";
 import { notifyMyDocumentsUploaded } from "@/lib/provider-documents.functions";
+import { Button } from '@/components/ui/button';
 
 export function DocStatus({ status }: { status: ProviderDocument["status"] }) {
   const map = {
@@ -102,11 +103,11 @@ export function ProviderDocuments({ userId, demoDocs, unified = false }: { userI
                 {d.admin_note && <div className="mt-1 text-xs">Note from GetPros: {d.admin_note}</div>}
               </div>
               <div className="flex gap-2">
-                <button disabled={demo} onClick={() => void openDocument(d).catch(() => setMsg({ ok: false, text: "Could not open the file." }))} className="inline-flex min-h-11 items-center gap-1 rounded-full border border-border px-4 text-sm font-semibold hover:bg-muted">
+                <Button type="button" variant="outline" disabled={demo} onClick={() => void openDocument(d).catch(() => setMsg({ ok: false, text: "Could not open the file." }))} className="min-h-11">
                   <FileText className="h-4 w-4" /> Open
-                </button>
+                </Button>
                 {d.status === "pending" && !demo && (
-                  <button
+                  <Button type="button" variant="outline"
                     onClick={async () => {
                       try { await removePendingDocument(d); await qc.invalidateQueries({ queryKey: ["my-documents", userId] }); }
                       catch { setMsg({ ok: false, text: "Could not remove the file." }); }
@@ -115,7 +116,7 @@ export function ProviderDocuments({ userId, demoDocs, unified = false }: { userI
                     aria-label={`Remove ${d.file_name}`}
                   >
                     <Trash2 className="h-4 w-4" />
-                  </button>
+                  </Button>
                 )}
               </div>
             </li>

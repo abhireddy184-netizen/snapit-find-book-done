@@ -41,9 +41,14 @@ describe('unified provider setup requirements', () => {
 });
 
 function fixture(state = 'under_verification') {
-  const ledger = { user_id: 'fixture-only', attempts: 0, status: 'pending' };
+  const ledger = { user_id: 'fixture-only', attempts: 0, status: 'pending', claim_token: '' };
   const setup = { state, submitted_at: state === 'under_verification' ? '2026-10-17T16:00:00Z' : null };
   const db = {
+    rpc: vi.fn(async () => {
+      if (!['pending', 'failed'].includes(ledger.status)) return { data: [] };
+      ledger.status = 'sending'; ledger.attempts++; ledger.claim_token = `lease-${ledger.attempts}`;
+      return { data: [{ token: ledger.claim_token, attempt: ledger.attempts }] };
+    }),
     auth: { admin: { getUserById: vi.fn(async () => ({ data: { user: { email: 'fixture@example.invalid', email_confirmed_at: '2026-10-17' } } })) } },
     from(table: string) {
       let patch: Record<string, unknown> | undefined;
@@ -83,6 +88,12 @@ describe('submission outbox with mocked email service only', () => {
     await processUnifiedSubmissionEmails(f.db as never);
     expect(f.ledger.status).toBe('sent');
     expect(send.mock.calls[0]?.[2].idempotencyKey).toBe(send.mock.calls[1]?.[2].idempotencyKey);
+  });
+  it('concurrent immediate and scheduled submission processing acquires only one lease', async () => {
+    const f = fixture();
+    await Promise.all([processUnifiedSubmissionEmails(f.db as never), processUnifiedSubmissionEmails(f.db as never)]);
+    expect(send).toHaveBeenCalledTimes(1);
+    expect(f.ledger.attempts).toBe(1);
   });
   it('disabled sending makes no outbound request and leaves the durable job pending', async () => {
     vi.stubEnv('PROVIDER_SUBMITTED_EMAIL_ENABLED', 'false'); const f = fixture();
