@@ -837,6 +837,48 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_setup: {
+        Row: {
+          business_type: string
+          category_slugs: string[]
+          created_at: string
+          full_name: string
+          phone: string
+          service_slugs: string[]
+          state: string
+          submitted_at: string | null
+          trade_license_required: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          business_type?: string
+          category_slugs?: string[]
+          created_at?: string
+          full_name?: string
+          phone?: string
+          service_slugs?: string[]
+          state?: string
+          submitted_at?: string | null
+          trade_license_required?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          business_type?: string
+          category_slugs?: string[]
+          created_at?: string
+          full_name?: string
+          phone?: string
+          service_slugs?: string[]
+          state?: string
+          submitted_at?: string | null
+          trade_license_required?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       provider_time_off: {
         Row: {
           created_at: string
@@ -1216,7 +1258,9 @@ export type Database = {
         Args: { _hours: Json }
         Returns: undefined
       }
+      save_my_provider_setup: { Args: { _data: Json }; Returns: undefined }
       service_zone_for_zip: { Args: { _zip: string }; Returns: string }
+      submit_my_provider_setup: { Args: never; Returns: Json }
     }
     Enums: {
       app_role: "customer" | "provider"
