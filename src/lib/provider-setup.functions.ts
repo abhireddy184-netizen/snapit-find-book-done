@@ -10,7 +10,7 @@ const schema = z.object({
   service_area: z.string().trim().max(300), service_zip: z.string().regex(/^(\d{5})?$/),
   service_radius_miles: z.number().int().min(1).max(200).nullable(),
   bio: z.string().max(4000), trade_license_required: z.boolean(),
-}).refine(d => d.category_slugs.every(s => catalog.some(c => c.slug === s)) && d.service_slugs.every(s => catalog.some(c => d.category_slugs.includes(c.slug) && c.services.some(v => v.slug === s))), 'Choose services from the GetPros catalog');
+}).strict().refine(d => d.category_slugs.every(s => catalog.some(c => c.slug === s)) && d.service_slugs.every(s => catalog.some(c => d.category_slugs.includes(c.slug) && c.services.some(v => v.slug === s))), 'Choose services from the GetPros catalog');
 
 export const getMyProviderSetup = createServerFn({ method: 'GET' })
   .middleware([requireSupabaseAuth])
@@ -37,8 +37,12 @@ export const saveMyProviderSetup = createServerFn({ method: 'POST' })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => schema.parse(d))
   .handler(async ({ data, context }) => {
+    const { data: profile, error: profileError } = await context.supabase.from('profiles').select('role, is_provider').eq('id', context.userId).single();
+    if (profileError || !profile || !(profile.is_provider || profile.role === 'provider')) throw new Error('Only Pro accounts can save setup.');
+    const { supabaseAdmin: db } = await import('@/integrations/supabase/client.server');
     const category = catalog.find(c => c.slug === data.category_slugs[0]);
-    const { error } = await context.supabase.rpc('save_my_provider_setup', { _data: { ...data, service_category: category?.name || null } });
+    // The UUID comes exclusively from verified auth middleware, never from client input or JWT mutation.
+    const { error } = await db.rpc('save_provider_setup_for_user', { _user_id: context.userId, _data: { ...data, service_category: category?.name || null } });
     if (error) throw new Error('Your draft could not be saved. It may already be submitted. Please refresh and try again.');
     return { saved: true };
   });

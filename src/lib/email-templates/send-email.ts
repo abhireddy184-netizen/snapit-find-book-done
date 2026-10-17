@@ -38,6 +38,8 @@ export async function sendTemplateEmail(
   to: string,
   options: SendTemplateEmailOptions = {}
 ): Promise<SendTemplateEmailResult> {
+  // Preview development must never emit transactional emails, even when production flags are enabled.
+  if (import.meta.env.DEV) throw new Error('Transactional sending is disabled in development preview');
   const apiKey = process.env['LOVABLE_API_KEY']
   if (!apiKey) {
     throw new Error('LOVABLE_API_KEY is not configured')

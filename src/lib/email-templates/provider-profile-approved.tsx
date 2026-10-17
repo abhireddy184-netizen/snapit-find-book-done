@@ -15,7 +15,7 @@ const Email = ({ businessName, siteUrl = SITE_URL }: Props) => (
     <Body style={emailStyles.main}>
       <Container style={emailStyles.container}>
         <EmailHeader siteUrl={siteUrl} />
-        <Heading style={emailStyles.heading}>Your provider profile has been approved</Heading>
+        <Heading style={emailStyles.heading}>Your Profile Is Approved</Heading>
         <Text style={emailStyles.paragraph}>Hi {businessName?.trim() || 'there'},</Text>
         <Text style={emailStyles.paragraph}>
           Good news: the GetPros team has reviewed and approved your provider business profile.
@@ -24,6 +24,7 @@ const Email = ({ businessName, siteUrl = SITE_URL }: Props) => (
           You can now sign in to your provider dashboard to keep your services, service area and
           availability up to date, and finish payout setup if you haven&apos;t already.
         </Text>
+        <Text style={emailStyles.paragraph}>We&apos;ll notify you when services become available in your area.</Text>
         <Button style={emailStyles.button} href={`${siteUrl}/provider-dashboard`}>
           Go to your dashboard
         </Button>
@@ -40,7 +41,7 @@ const Email = ({ businessName, siteUrl = SITE_URL }: Props) => (
 
 export const template = {
   component: Email,
-  subject: 'Your GetPros Provider Profile Has Been Approved',
+  subject: 'Your Profile Is Approved',
   displayName: 'Provider profile approved',
   previewData: { businessName: 'KYNGSTON SERVICES', siteUrl: SITE_URL },
 } satisfies TemplateEntry
