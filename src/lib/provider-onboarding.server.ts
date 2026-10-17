@@ -2,7 +2,7 @@
 // and the two reminders (24h, 48h after signup) and the one-time "profile completed" owner alert. Every provider email is
 // recorded in provider_onboarding_emails (PK user_id+kind) before sending, so it
 // is sent at most once; failures are retried hourly by run-due. Never throws.
-import { deliverProviderEmail } from "./provider-email-outbox.server";
+import { deliverProviderEmail, developmentDeliveryBlocked } from "./provider-email-outbox.server";
 import { SITE_URL } from "@/lib/brand";
 import { isOnboardingEligible, isProfileComplete, dueReminders, ONBOARDING_CUTOFF } from "./provider-onboarding-rules";
 
@@ -46,6 +46,7 @@ async function sendOnce(db: Admin, userId: string, kind: Kind, email: string, na
 
 /** Sends the welcome email if this verified provider's profile is still incomplete. */
 export async function ensureProviderWelcome(db: Admin, userId: string) {
+  if (developmentDeliveryBlocked()) return;
   try {
     const s = await loadState(db, userId);
     if (!s || !s.eligible) return;
@@ -57,6 +58,7 @@ export async function ensureProviderWelcome(db: Admin, userId: string) {
 
 /** Hourly: welcome backfill, 24h/48h reminders (incomplete profiles only), retries. */
 export async function processProviderOnboarding(db: Admin) {
+  if (developmentDeliveryBlocked()) return;
   let checked = 0;
   const { data: rows } = await db
     .from("profiles").select("id")
@@ -131,10 +133,11 @@ export async function sendProfileSubmittedConfirmation(
  * Approval emails are queued by the database (admin_set_provider_verification inserts a
  * kind "approved", status "pending" row in the same transaction as the change to verified).
  * This drains that outbox. While PROVIDER_APPROVED_EMAIL_ENABLED !== "true", queued jobs are
- * marked "skipped_disabled" and never sent later (no surprise backlog when switched on).
+ * left pending without sending or acquiring a lease.
  * Re-checks the pro is still verified before sending; at most once per pro, ever.
  */
 export async function processApprovedEmails(db: Admin, onlyUserId?: string) {
+  if (developmentDeliveryBlocked()) return;
   let q = db.from("provider_onboarding_emails")
     .select("user_id, attempts").eq("kind", "approved").in("status", ["pending", "failed", "sending"]).lt("attempts", MAX_ATTEMPTS).limit(100);
   if (onlyUserId) q = q.eq("user_id", onlyUserId);
@@ -161,6 +164,7 @@ export async function processApprovedEmails(db: Admin, onlyUserId?: string) {
 
 /** Hourly: drain approval outbox and retry failed submitted confirmations (never backfills). */
 export async function retryProviderConfirmations(db: Admin) {
+  if (developmentDeliveryBlocked()) return;
   await processApprovedEmails(db);
   await processUnifiedSubmissionEmails(db);
   const { data: rows } = await db.from("provider_onboarding_emails")
@@ -232,6 +236,7 @@ export async function queueDocumentsRequest(db: Admin, userId: string, p: Profil
 
 /** One "documents received" email once the required set is uploaded. Safe to call after every upload. */
 export async function notifyDocumentsReceived(db: Admin, userId: string) {
+  if (developmentDeliveryBlocked()) return;
   try {
     const { hasRequiredDocs, isDocsAutomationEligible, isDocsEmailEnabled } = await import("./provider-onboarding-rules");
     if (!isDocsEmailEnabled(process.env["PROVIDER_DOCUMENTS_EMAIL_ENABLED"])) return;
@@ -294,7 +299,7 @@ export async function processDocumentEmails(db: Admin) {
       // At most one reminder per run, so a late run never sends both at once.
       const next = rules.dueDocReminders(a.sent_at as string).find((k) => {
         const h = byKind.get(k);
-        return !h || (h.status === "failed" && h.attempts < MAX_ATTEMPTS);
+        return !h || (["pending", "failed", "sending"].includes(h.status) && h.attempts < MAX_ATTEMPTS);
       });
       if (!next) continue;
       const attempts = await claim(db, a.user_id, next);
@@ -311,6 +316,7 @@ export async function processDocumentEmails(db: Admin) {
 
 /** Complete explicit submissions only; no backfill, no send after drafts or individual uploads. */
 export async function processUnifiedSubmissionEmails(db: Admin, onlyUserId?: string) {
+  if (developmentDeliveryBlocked()) return;
   if (process.env['PROVIDER_SUBMITTED_EMAIL_ENABLED'] !== 'true') return;
   let query = db.from('provider_onboarding_emails').select('user_id, attempts').eq('kind', 'profile_submitted').in('status', ['pending', 'failed', 'sending']).lt('attempts', MAX_ATTEMPTS).limit(100);
   if (onlyUserId) query = query.eq('user_id', onlyUserId);
