@@ -4,11 +4,20 @@
 // is sent at most once; failures are retried hourly by run-due. Never throws.
 import { deliverProviderEmail, developmentDeliveryBlocked } from "./provider-email-outbox.server";
 import { SITE_URL } from "@/lib/brand";
-import { isOnboardingEligible, isProfileComplete, dueReminders, ONBOARDING_CUTOFF } from "./provider-onboarding-rules";
+import {
+  isOnboardingEligible,
+  isProfileComplete,
+  dueReminders,
+  ONBOARDING_CUTOFF,
+} from "./provider-onboarding-rules";
 
 type Admin = Awaited<typeof import("@/integrations/supabase/client.server")>["supabaseAdmin"];
 type Kind = "welcome" | "reminder_24h" | "reminder_48h";
-type ProfileInput = { business_name?: string | null; service_category?: string | null; service_zip?: string | null };
+type ProfileInput = {
+  business_name?: string | null;
+  service_category?: string | null;
+  service_zip?: string | null;
+};
 const MAX_ATTEMPTS = 6;
 
 async function loadState(db: Admin, userId: string) {
@@ -17,11 +26,19 @@ async function loadState(db: Admin, userId: string) {
   if (!user?.email) return null;
   const [{ data: profile }, { data: pp }, { data: del }] = await Promise.all([
     db.from("profiles").select("full_name, role, is_provider").eq("id", userId).maybeSingle(),
-    db.from("provider_profiles").select("business_name, service_category, service_zip, verification_status").eq("user_id", userId).maybeSingle(),
+    db
+      .from("provider_profiles")
+      .select("business_name, service_category, service_zip, verification_status")
+      .eq("user_id", userId)
+      .maybeSingle(),
     db.from("account_deletion_requests").select("id").eq("user_id", userId).limit(1),
   ]);
   if (!profile || !(profile.is_provider || profile.role === "provider")) return null;
-  const { data: setup } = await db.from("provider_setup").select("state").eq("user_id", userId).maybeSingle();
+  const { data: setup } = await db
+    .from("provider_setup")
+    .select("state")
+    .eq("user_id", userId)
+    .maybeSingle();
   const eligible = isOnboardingEligible({
     created_at: user.created_at,
     email_confirmed_at: user.email_confirmed_at ?? null,
@@ -34,15 +51,26 @@ async function loadState(db: Admin, userId: string) {
     firstName: (profile.full_name || "").trim().split(/\s+/)[0] || undefined,
     eligible,
     unified: Boolean(setup),
-    complete: setup ? setup.state !== "pending_setup" || pp?.verification_status === "pending" || pp?.verification_status === "verified" : isProfileComplete(pp),
+    complete: setup
+      ? setup.state !== "pending_setup" ||
+        pp?.verification_status === "pending" ||
+        pp?.verification_status === "verified"
+      : isProfileComplete(pp),
   };
 }
 
 async function sendOnce(db: Admin, userId: string, kind: Kind, email: string, name?: string) {
   const { error } = await db.from("provider_onboarding_emails").insert({ user_id: userId, kind });
-  if (error && (error as { code?: string }).code !== '23505') return;
-  await deliverProviderEmail(db, userId, kind, 'provider-profile-reminder', email,
-    { name, variant: kind === 'welcome' ? 'welcome' : 'reminder', siteUrl: SITE_URL }, `provider-${kind}-${userId}`);
+  if (error && (error as { code?: string }).code !== "23505") return;
+  await deliverProviderEmail(
+    db,
+    userId,
+    kind,
+    "provider-profile-reminder",
+    email,
+    { name, variant: kind === "welcome" ? "welcome" : "reminder", siteUrl: SITE_URL },
+    `provider-${kind}-${userId}`,
+  );
 }
 
 /** Sends the welcome email if this verified provider's profile is still incomplete. */
@@ -62,7 +90,8 @@ export async function processProviderOnboarding(db: Admin) {
   if (developmentDeliveryBlocked()) return;
   let checked = 0;
   const { data: rows } = await db
-    .from("profiles").select("id")
+    .from("profiles")
+    .select("id")
     .or("is_provider.eq.true,role.eq.provider")
     .gte("created_at", new Date(ONBOARDING_CUTOFF).toISOString())
     .limit(500);
@@ -74,9 +103,18 @@ export async function processProviderOnboarding(db: Admin) {
       await sendOnce(db, r.id, "welcome", s.email, s.firstName);
       if (s.complete) continue;
       // At most one reminder per run, so a late-detected account never gets both at once.
-      const { data: sentRows } = await db.from("provider_onboarding_emails").select("kind, status").eq("user_id", r.id);
+      const { data: sentRows } = await db
+        .from("provider_onboarding_emails")
+        .select("kind, status")
+        .eq("user_id", r.id);
       const have = new Set((sentRows ?? []).map((x) => x.kind));
-      const next = dueReminders(s.signupAt).find((k) => !have.has(k) || sentRows?.some(row => row.kind === k && ["pending", "failed", "sending"].includes(row.status)));
+      const next = dueReminders(s.signupAt).find(
+        (k) =>
+          !have.has(k) ||
+          sentRows?.some(
+            (row) => row.kind === k && ["pending", "failed", "sending"].includes(row.status),
+          ),
+      );
       if (next) await sendOnce(db, r.id, next, s.email, s.firstName);
     } catch (err) {
       console.error("[provider-onboarding] process:", err instanceof Error ? err.message : err);
@@ -88,7 +126,11 @@ export async function processProviderOnboarding(db: Admin) {
 /** One owner alert when the required business-profile fields are first complete. */
 export async function notifyProfileCompleted(
   userId: string,
-  p: { business_name?: string | null; service_category?: string | null; service_zip?: string | null },
+  p: {
+    business_name?: string | null;
+    service_category?: string | null;
+    service_zip?: string | null;
+  },
 ) {
   if (!isProfileComplete(p)) return;
   const { sendOwnerAlert } = await import("@/lib/owner-notify.server");
@@ -110,21 +152,37 @@ export async function notifyProfileCompleted(
 export async function sendProfileSubmittedConfirmation(
   db: Admin,
   userId: string,
-  p: { business_name?: string | null; service_category?: string | null; service_zip?: string | null },
+  p: {
+    business_name?: string | null;
+    service_category?: string | null;
+    service_zip?: string | null;
+  },
 ) {
   try {
-    const { data: setup } = await db.from("provider_setup").select("state").eq("user_id", userId).maybeSingle();
+    const { data: setup } = await db
+      .from("provider_setup")
+      .select("state")
+      .eq("user_id", userId)
+      .maybeSingle();
     if (setup) return; // Unified setup queues its confirmation only on explicit, complete submission.
     const { shouldSendSubmittedConfirmation } = await import("./provider-onboarding-rules");
-    if (!shouldSendSubmittedConfirmation(process.env["PROVIDER_SUBMITTED_EMAIL_ENABLED"], p)) return;
+    if (!shouldSendSubmittedConfirmation(process.env["PROVIDER_SUBMITTED_EMAIL_ENABLED"], p))
+      return;
     const { data: res } = await db.auth.admin.getUserById(userId);
     const email = res?.user?.email;
     if (!email || !res?.user?.email_confirmed_at) return;
     const kind = "profile_submitted";
     const { error } = await db.from("provider_onboarding_emails").insert({ user_id: userId, kind });
-    if (error && (error as { code?: string }).code !== '23505') return;
-    await deliverProviderEmail(db, userId, kind, 'provider-profile-submitted', email,
-      { businessName: p.business_name ?? undefined, siteUrl: SITE_URL }, `provider-profile-submitted-${userId}`);
+    if (error && (error as { code?: string }).code !== "23505") return;
+    await deliverProviderEmail(
+      db,
+      userId,
+      kind,
+      "provider-profile-submitted",
+      email,
+      { businessName: p.business_name ?? undefined, siteUrl: SITE_URL },
+      `provider-profile-submitted-${userId}`,
+    );
   } catch (err) {
     console.error("[provider-onboarding] submitted:", err instanceof Error ? err.message : err);
   }
@@ -139,24 +197,54 @@ export async function sendProfileSubmittedConfirmation(
  */
 export async function processApprovedEmails(db: Admin, onlyUserId?: string) {
   if (developmentDeliveryBlocked()) return;
-  let q = db.from("provider_onboarding_emails")
-    .select("user_id, attempts").eq("kind", "approved").in("status", ["pending", "failed", "sending"]).lt("attempts", MAX_ATTEMPTS).limit(100);
+  let q = db
+    .from("provider_onboarding_emails")
+    .select("user_id, attempts")
+    .eq("kind", "approved")
+    .in("status", ["pending", "failed", "sending"])
+    .lt("attempts", MAX_ATTEMPTS)
+    .limit(100);
   if (onlyUserId) q = q.eq("user_id", onlyUserId);
   const { data: jobs } = await q;
   const enabled = process.env["PROVIDER_APPROVED_EMAIL_ENABLED"] === "true";
   for (const job of jobs ?? []) {
-    const done = (patch: { status: string; attempts?: number; last_error?: string | null; sent_at?: string }) =>
-      db.from("provider_onboarding_emails").update(patch).eq("user_id", job.user_id).eq("kind", "approved");
+    const done = (patch: {
+      status: string;
+      attempts?: number;
+      last_error?: string | null;
+      sent_at?: string;
+    }) =>
+      db
+        .from("provider_onboarding_emails")
+        .update(patch)
+        .eq("user_id", job.user_id)
+        .eq("kind", "approved");
     try {
       if (!enabled) continue;
-      const { data: pp } = await db.from("provider_profiles")
-        .select("business_name, verification_status").eq("user_id", job.user_id).maybeSingle();
-      if (!pp || pp.verification_status !== "verified") { await done({ status: "skipped_not_verified" }); continue; }
+      const { data: pp } = await db
+        .from("provider_profiles")
+        .select("business_name, verification_status")
+        .eq("user_id", job.user_id)
+        .maybeSingle();
+      if (!pp || pp.verification_status !== "verified") {
+        await done({ status: "skipped_not_verified" });
+        continue;
+      }
       const { data: res } = await db.auth.admin.getUserById(job.user_id);
       const email = res?.user?.email;
-      if (!email || !res?.user?.email_confirmed_at) { await done({ status: "skipped_no_email" }); continue; }
-      await deliverProviderEmail(db, job.user_id, 'approved', 'provider-profile-approved', email,
-        { businessName: pp.business_name ?? undefined, siteUrl: SITE_URL }, `provider-profile-approved-${job.user_id}`);
+      if (!email || !res?.user?.email_confirmed_at) {
+        await done({ status: "skipped_no_email" });
+        continue;
+      }
+      await deliverProviderEmail(
+        db,
+        job.user_id,
+        "approved",
+        "provider-profile-approved",
+        email,
+        { businessName: pp.business_name ?? undefined, siteUrl: SITE_URL },
+        `provider-profile-approved-${job.user_id}`,
+      );
     } catch (err) {
       console.error("[provider-onboarding] approved:", err instanceof Error ? err.message : err);
     }
@@ -168,11 +256,19 @@ export async function retryProviderConfirmations(db: Admin) {
   if (developmentDeliveryBlocked()) return;
   await processApprovedEmails(db);
   await processUnifiedSubmissionEmails(db);
-  const { data: rows } = await db.from("provider_onboarding_emails")
-    .select("user_id").eq("kind", "profile_submitted").eq("status", "failed").lt("attempts", MAX_ATTEMPTS).limit(100);
+  const { data: rows } = await db
+    .from("provider_onboarding_emails")
+    .select("user_id")
+    .eq("kind", "profile_submitted")
+    .eq("status", "failed")
+    .lt("attempts", MAX_ATTEMPTS)
+    .limit(100);
   for (const r of rows ?? []) {
-    const { data: pp } = await db.from("provider_profiles")
-      .select("business_name, service_category, service_zip").eq("user_id", r.user_id).maybeSingle();
+    const { data: pp } = await db
+      .from("provider_profiles")
+      .select("business_name, service_category, service_zip")
+      .eq("user_id", r.user_id)
+      .maybeSingle();
     if (pp) await sendProfileSubmittedConfirmation(db, r.user_id, pp);
   }
 }
@@ -184,20 +280,35 @@ export async function retryProviderConfirmations(db: Admin) {
 // admin request are never emailed by the automation. Gated by PROVIDER_DOCUMENTS_EMAIL_ENABLED.
 // ---------------------------------------------------------------------------
 
-type DocKind = "documents_request" | "documents_received" | "documents_reminder_24h" | "documents_reminder_48h";
+type DocKind =
+  | "documents_request"
+  | "documents_received"
+  | "documents_reminder_24h"
+  | "documents_reminder_48h";
 
 async function docsContext(db: Admin, userId: string) {
   const [{ data: res }, { data: pp }, { data: docs }, { count: manual }] = await Promise.all([
     db.auth.admin.getUserById(userId),
-    db.from("provider_profiles").select("business_name, service_category, service_zip, verification_status").eq("user_id", userId).maybeSingle(),
+    db
+      .from("provider_profiles")
+      .select("business_name, service_category, service_zip, verification_status")
+      .eq("user_id", userId)
+      .maybeSingle(),
     db.from("provider_documents").select("doc_type, status").eq("user_id", userId),
-    db.from("provider_document_requests").select("id", { count: "exact", head: true }).eq("user_id", userId),
+    db
+      .from("provider_document_requests")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId),
   ]);
   const u = res?.user;
-  const { data: setup } = await db.from("provider_setup").select("state").eq("user_id", userId).maybeSingle();
+  const { data: setup } = await db
+    .from("provider_setup")
+    .select("state")
+    .eq("user_id", userId)
+    .maybeSingle();
   return {
     unified: Boolean(setup),
-    email: u?.email_confirmed_at ? u.email ?? null : null,
+    email: u?.email_confirmed_at ? (u.email ?? null) : null,
     signupAt: u?.created_at ?? null,
     pp,
     docs: docs ?? [],
@@ -206,17 +317,40 @@ async function docsContext(db: Admin, userId: string) {
 }
 
 /** Sends one ledger-tracked document email. Row must already exist (pending/failed). */
-async function sendDocEmail(db: Admin, userId: string, kind: DocKind, attempts: number, template: string, email: string, data: Record<string, unknown>) {
+async function sendDocEmail(
+  db: Admin,
+  userId: string,
+  kind: DocKind,
+  attempts: number,
+  template: string,
+  email: string,
+  data: Record<string, unknown>,
+) {
   await deliverProviderEmail(db, userId, kind, template, email, data, `provider-${kind}-${userId}`);
 }
 
 /** Claims a ledger row (insert, or reuse a retryable failed one). Returns attempts so far, or null to skip. */
 async function claim(db: Admin, userId: string, kind: DocKind): Promise<number | null> {
-  const { error } = await db.from("provider_onboarding_emails").insert({ user_id: userId, kind, status: "pending" });
+  const { error } = await db
+    .from("provider_onboarding_emails")
+    .insert({ user_id: userId, kind, status: "pending" });
   if (!error) return 0;
-  if ((error as { code?: string }).code !== "23505") { console.error("[provider-onboarding] claim:", error.message); return null; }
-  const { data: row } = await db.from("provider_onboarding_emails").select("status, attempts").eq("user_id", userId).eq("kind", kind).maybeSingle();
-  if (!row || !["pending", "failed", "sending"].includes(row.status) || row.attempts >= MAX_ATTEMPTS) return null;
+  if ((error as { code?: string }).code !== "23505") {
+    console.error("[provider-onboarding] claim:", error.message);
+    return null;
+  }
+  const { data: row } = await db
+    .from("provider_onboarding_emails")
+    .select("status, attempts")
+    .eq("user_id", userId)
+    .eq("kind", kind)
+    .maybeSingle();
+  if (
+    !row ||
+    !["pending", "failed", "sending"].includes(row.status) ||
+    row.attempts >= MAX_ATTEMPTS
+  )
+    return null;
   return row.attempts;
 }
 
@@ -227,9 +361,19 @@ export async function queueDocumentsRequest(db: Admin, userId: string, p: Profil
     if (!isProfileComplete(p)) return;
     const c = await docsContext(db, userId);
     if (c.unified) return;
-    if (!shouldQueueDocumentsRequest({ signupAt: c.signupAt, complete: true, priorManualRequests: c.manualRequests })) return;
-    const { error } = await db.from("provider_onboarding_emails").insert({ user_id: userId, kind: "documents_request", status: "pending" });
-    if (error && (error as { code?: string }).code !== "23505") console.error("[provider-onboarding] queue docs:", error.message);
+    if (
+      !shouldQueueDocumentsRequest({
+        signupAt: c.signupAt,
+        complete: true,
+        priorManualRequests: c.manualRequests,
+      })
+    )
+      return;
+    const { error } = await db
+      .from("provider_onboarding_emails")
+      .insert({ user_id: userId, kind: "documents_request", status: "pending" });
+    if (error && (error as { code?: string }).code !== "23505")
+      console.error("[provider-onboarding] queue docs:", error.message);
   } catch (err) {
     console.error("[provider-onboarding] queue docs:", err instanceof Error ? err.message : err);
   }
@@ -239,7 +383,8 @@ export async function queueDocumentsRequest(db: Admin, userId: string, p: Profil
 export async function notifyDocumentsReceived(db: Admin, userId: string) {
   if (developmentDeliveryBlocked()) return;
   try {
-    const { hasRequiredDocs, isDocsAutomationEligible, isDocsEmailEnabled } = await import("./provider-onboarding-rules");
+    const { hasRequiredDocs, isDocsAutomationEligible, isDocsEmailEnabled } =
+      await import("./provider-onboarding-rules");
     if (!isDocsEmailEnabled(process.env["PROVIDER_DOCUMENTS_EMAIL_ENABLED"])) return;
     const c = await docsContext(db, userId);
     if (c.unified) return;
@@ -247,8 +392,15 @@ export async function notifyDocumentsReceived(db: Admin, userId: string) {
     if (!c.pp || c.pp.verification_status === "verified" || !hasRequiredDocs(c.docs)) return;
     const attempts = await claim(db, userId, "documents_received");
     if (attempts === null) return;
-    await sendDocEmail(db, userId, "documents_received", attempts, "provider-documents-received", c.email,
-      { businessName: c.pp.business_name ?? undefined, siteUrl: SITE_URL });
+    await sendDocEmail(
+      db,
+      userId,
+      "documents_received",
+      attempts,
+      "provider-documents-received",
+      c.email,
+      { businessName: c.pp.business_name ?? undefined, siteUrl: SITE_URL },
+    );
   } catch (err) {
     console.error("[provider-onboarding] docs received:", err instanceof Error ? err.message : err);
   }
@@ -264,52 +416,105 @@ export async function processDocumentEmails(db: Admin) {
 
   // 1) Queued checklist emails.
   const before = new Date(Date.now() - rules.DOCS_REQUEST_DELAY_MS).toISOString();
-  const { data: queued } = await db.from("provider_onboarding_emails")
-    .select("user_id, attempts").eq("kind", "documents_request").in("status", ["pending", "failed", "sending"])
-    .lt("attempts", MAX_ATTEMPTS).lt("created_at", before).limit(100);
+  const { data: queued } = await db
+    .from("provider_onboarding_emails")
+    .select("user_id, attempts")
+    .eq("kind", "documents_request")
+    .in("status", ["pending", "failed", "sending"])
+    .lt("attempts", MAX_ATTEMPTS)
+    .lt("created_at", before)
+    .limit(100);
   for (const job of queued ?? []) {
     try {
-      if (!enabled) { await done(job.user_id, "documents_request", { status: "skipped_disabled" }); continue; }
+      if (!enabled) {
+        await done(job.user_id, "documents_request", { status: "skipped_disabled" });
+        continue;
+      }
       const c = await docsContext(db, job.user_id);
-      if (c.unified) { await done(job.user_id, "documents_request", { status: "skipped_unified_setup" }); continue; }
-      if (!c.email) { await done(job.user_id, "documents_request", { status: "skipped_no_email" }); continue; }
-      if (c.manualRequests > 0) { await done(job.user_id, "documents_request", { status: "skipped_manual" }); continue; }
-      if (!c.pp || c.pp.verification_status === "verified") { await done(job.user_id, "documents_request", { status: "skipped_verified" }); continue; }
-      if (rules.hasRequiredDocs(c.docs)) { await done(job.user_id, "documents_request", { status: "skipped_has_docs" }); continue; }
-      await sendDocEmail(db, job.user_id, "documents_request", job.attempts, "provider-documents-request", c.email,
-        { businessName: c.pp.business_name ?? undefined, siteUrl: SITE_URL });
+      if (c.unified) {
+        await done(job.user_id, "documents_request", { status: "skipped_unified_setup" });
+        continue;
+      }
+      if (!c.email) {
+        await done(job.user_id, "documents_request", { status: "skipped_no_email" });
+        continue;
+      }
+      if (c.manualRequests > 0) {
+        await done(job.user_id, "documents_request", { status: "skipped_manual" });
+        continue;
+      }
+      if (!c.pp || c.pp.verification_status === "verified") {
+        await done(job.user_id, "documents_request", { status: "skipped_verified" });
+        continue;
+      }
+      if (rules.hasRequiredDocs(c.docs)) {
+        await done(job.user_id, "documents_request", { status: "skipped_has_docs" });
+        continue;
+      }
+      await sendDocEmail(
+        db,
+        job.user_id,
+        "documents_request",
+        job.attempts,
+        "provider-documents-request",
+        c.email,
+        { businessName: c.pp.business_name ?? undefined, siteUrl: SITE_URL },
+      );
       sent++;
     } catch (err) {
-      console.error("[provider-onboarding] docs request:", err instanceof Error ? err.message : err);
+      console.error(
+        "[provider-onboarding] docs request:",
+        err instanceof Error ? err.message : err,
+      );
     }
   }
 
   if (!enabled) return { sent };
 
   // 2) Reminders + receipt backstop, only for pros whose automatic checklist was sent.
-  const { data: active } = await db.from("provider_onboarding_emails")
-    .select("user_id, sent_at").eq("kind", "documents_request").eq("status", "sent").not("sent_at", "is", null).limit(500);
+  const { data: active } = await db
+    .from("provider_onboarding_emails")
+    .select("user_id, sent_at")
+    .eq("kind", "documents_request")
+    .eq("status", "sent")
+    .not("sent_at", "is", null)
+    .limit(500);
   for (const a of active ?? []) {
     try {
       const c = await docsContext(db, a.user_id);
       if (c.unified) continue;
-      if (!c.email || !c.pp || c.pp.verification_status === "verified" || c.manualRequests > 0) continue;
-      if (rules.hasRequiredDocs(c.docs)) { await notifyDocumentsReceived(db, a.user_id); continue; }
-      const { data: have } = await db.from("provider_onboarding_emails").select("kind, status, attempts").eq("user_id", a.user_id);
+      if (!c.email || !c.pp || c.pp.verification_status === "verified" || c.manualRequests > 0)
+        continue;
+      if (rules.hasRequiredDocs(c.docs)) {
+        await notifyDocumentsReceived(db, a.user_id);
+        continue;
+      }
+      const { data: have } = await db
+        .from("provider_onboarding_emails")
+        .select("kind, status, attempts")
+        .eq("user_id", a.user_id);
       const byKind = new Map((have ?? []).map((h) => [h.kind, h]));
       // At most one reminder per run, so a late run never sends both at once.
       const next = rules.dueDocReminders(a.sent_at as string).find((k) => {
         const h = byKind.get(k);
-        return !h || (["pending", "failed", "sending"].includes(h.status) && h.attempts < MAX_ATTEMPTS);
+        return (
+          !h || (["pending", "failed", "sending"].includes(h.status) && h.attempts < MAX_ATTEMPTS)
+        );
       });
       if (!next) continue;
       const attempts = await claim(db, a.user_id, next);
       if (attempts === null) continue;
-      await sendDocEmail(db, a.user_id, next, attempts, "provider-documents-request", c.email,
-        { businessName: c.pp.business_name ?? undefined, siteUrl: SITE_URL, variant: "reminder" });
+      await sendDocEmail(db, a.user_id, next, attempts, "provider-documents-request", c.email, {
+        businessName: c.pp.business_name ?? undefined,
+        siteUrl: SITE_URL,
+        variant: "reminder",
+      });
       sent++;
     } catch (err) {
-      console.error("[provider-onboarding] docs reminder:", err instanceof Error ? err.message : err);
+      console.error(
+        "[provider-onboarding] docs reminder:",
+        err instanceof Error ? err.message : err,
+      );
     }
   }
   return { sent };
@@ -318,18 +523,39 @@ export async function processDocumentEmails(db: Admin) {
 /** Complete explicit submissions only; no backfill, no send after drafts or individual uploads. */
 export async function processUnifiedSubmissionEmails(db: Admin, onlyUserId?: string) {
   if (developmentDeliveryBlocked()) return;
-  if (process.env['PROVIDER_SUBMITTED_EMAIL_ENABLED'] !== 'true') return;
-  let query = db.from('provider_onboarding_emails').select('user_id, attempts').eq('kind', 'profile_submitted').in('status', ['pending', 'failed', 'sending']).lt('attempts', MAX_ATTEMPTS).limit(100);
-  if (onlyUserId) query = query.eq('user_id', onlyUserId);
+  if (process.env["PROVIDER_SUBMITTED_EMAIL_ENABLED"] !== "true") return;
+  let query = db
+    .from("provider_onboarding_emails")
+    .select("user_id, attempts")
+    .eq("kind", "profile_submitted")
+    .in("status", ["pending", "failed", "sending"])
+    .lt("attempts", MAX_ATTEMPTS)
+    .limit(100);
+  if (onlyUserId) query = query.eq("user_id", onlyUserId);
   const { data: jobs } = await query;
   for (const job of jobs || []) {
-    const { data: setup } = await db.from('provider_setup').select('state, submitted_at').eq('user_id', job.user_id).maybeSingle();
-    if (setup?.state !== 'under_verification' || !setup.submitted_at) continue;
+    const { data: setup } = await db
+      .from("provider_setup")
+      .select("state, submitted_at")
+      .eq("user_id", job.user_id)
+      .maybeSingle();
+    if (setup?.state !== "under_verification" || !setup.submitted_at) continue;
     const { data: user } = await db.auth.admin.getUserById(job.user_id);
     if (!user.user?.email || !user.user.email_confirmed_at) continue;
-    const { data: pp } = await db.from('provider_profiles').select('business_name, verification_status').eq('user_id', job.user_id).maybeSingle();
-    if (!pp || !['pending', 'verified'].includes(pp.verification_status)) continue;
-    await deliverProviderEmail(db, job.user_id, 'profile_submitted', 'provider-setup-submitted', user.user.email,
-      { businessName: pp.business_name, siteUrl: SITE_URL }, `provider-profile-submitted-${job.user_id}`);
+    const { data: pp } = await db
+      .from("provider_profiles")
+      .select("business_name, verification_status")
+      .eq("user_id", job.user_id)
+      .maybeSingle();
+    if (!pp || !["pending", "verified"].includes(pp.verification_status)) continue;
+    await deliverProviderEmail(
+      db,
+      job.user_id,
+      "profile_submitted",
+      "provider-setup-submitted",
+      user.user.email,
+      { businessName: pp.business_name, siteUrl: SITE_URL },
+      `provider-profile-submitted-${job.user_id}`,
+    );
   }
 }
