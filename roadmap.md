@@ -1,18 +1,18 @@
 # Roadmap
 
-- [ ] Reconcile service-only setup saving without JWT mutation and fence concurrent email claims
-- [ ] Verify simplified signup, drafts, uploads, submission, reminders and approval with isolated tests and device checks
-- [ ] Report exact readiness and remaining blockers without sending real mail or publishing
+- [x] Reconcile service-only setup saving without JWT mutation and fence concurrent email claims
+- [ ] Verify authenticated signup/draft/upload/submission/approval and setup device layouts (blocked: isolated auth/service-only database test access unavailable; no real accounts or emails allowed)
+- [x] Report exact readiness and remaining blockers without sending real mail or publishing
 
-- [ ] Simplify Pro signup and add secure unified draft/resume setup
-- [ ] Atomically submit complete setup and queue under-verification email; reuse reminders without duplicate sequences
-- [ ] Verify onboarding with isolated tests and responsive preview; no real mail or deployment
+- [x] Simplify Pro signup and add secure unified draft/resume setup
+- [x] Atomically submit complete setup and queue under-verification email; reuse reminders without duplicate sequences
+- [x] Run isolated mocked onboarding tests and public responsive preview checks; detailed remaining verification above
 
 - [x] Replace app icons with approved GPA branding and verify head/manifest assets (preview only)
 
 - [x] Sign-up: show "account already exists" (with Log in / Reset password) instead of "check your email" for already-registered emails
 - [x] Remove old brand/domain everywhere (code, emails, legal pages, booking messages)
-- [ ] Verify notify.getpros.ai email sender domain (blocked: DNS setup by owner)
+- [x] Verify notify.getpros.ai email sender domain
 - [ ] Set sign-in Site URL to https://getpros.ai + allowed redirects (blocked: settings not changeable from code)
 - [x] Central brand config (src/lib/brand.ts); info@getpros.ai as contact + owner alerts; text wordmark in emails
 - [x] Owner alert for new customer/provider accounts
@@ -21,7 +21,7 @@
 - [x] Payments part 1: payment tables + money-field protection, Stripe test client, pro "Set up payouts" onboarding, webhook at /api/public/stripe/webhook
 - [x] Payments part 2: card step on /book, 2-day hold, approve/auto-capture after 48h, late-cancel fee, admin refund, bookings blocked until pro payouts + price, draft payment terms
 - [ ] Payments: end-to-end test with a real test pro (blocked: needs a verified pro with active Stripe payouts and a price)
-- [ ] Payments: hourly scheduler calling /api/public/payments/run-due (blocked: no scheduler enabled; dashboards run due work on load meanwhile)
+- [x] Payments: hourly scheduler calling /api/public/payments/run-due exists and is active (execution not invoked during onboarding tests)
 - [x] Connect webhook handles account.updated (re-reads Stripe; shared helper)
 - [x] Durable owner alerts (recorded, hourly retry, missed-signup backfill)
 - [ ] Stripe Connected-accounts destination in the same test-mode account as the app's key (blocked: owner, Stripe dashboard)
