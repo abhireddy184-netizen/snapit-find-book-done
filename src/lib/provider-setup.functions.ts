@@ -29,16 +29,14 @@ export const getMyProviderSetup = createServerFn({ method: "GET" })
       pp?.verification_status !== "verified" &&
       pp?.verification_status !== "pending"
     ) {
-      const { error: createError } = await db
-        .from("provider_setup")
-        .upsert(
-          {
-            user_id: context.userId,
-            full_name: profile.full_name,
-            phone: profile.phone || String(auth.user?.user_metadata["phone"] || ""),
-          },
-          { onConflict: "user_id", ignoreDuplicates: true },
-        );
+      const { error: createError } = await db.from("provider_setup").upsert(
+        {
+          user_id: context.userId,
+          full_name: profile.full_name,
+          phone: profile.phone || String(auth.user?.user_metadata["phone"] || ""),
+        },
+        { onConflict: "user_id", ignoreDuplicates: true },
+      );
       if (createError) throw new Error("We could not start your setup. Please try again.");
     }
     const { data: setup, error: setupError } = await context.supabase
