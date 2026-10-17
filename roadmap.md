@@ -1,5 +1,9 @@
 # Roadmap
 
+- [ ] Reconcile service-only setup saving without JWT mutation and fence concurrent email claims
+- [ ] Verify simplified signup, drafts, uploads, submission, reminders and approval with isolated tests and device checks
+- [ ] Report exact readiness and remaining blockers without sending real mail or publishing
+
 - [ ] Simplify Pro signup and add secure unified draft/resume setup
 - [ ] Atomically submit complete setup and queue under-verification email; reuse reminders without duplicate sequences
 - [ ] Verify onboarding with isolated tests and responsive preview; no real mail or deployment
