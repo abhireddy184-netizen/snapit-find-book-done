@@ -9,12 +9,12 @@ const canCreateIsolatedUsers = capability[0]?.auth_access === true;
 afterAll(async () => { if (sql) await sql.end(); });
 const draft = { full_name: 'Synthetic Pro', phone: '5551234567', business_name: 'Synthetic Services', business_type: 'individual', category_slugs: ['cleaning'], service_slugs: ['standard-cleaning'], service_category: 'Cleaning', service_area: 'Chicago', service_zip: '60601', service_radius_miles: 25, bio: '', trade_license_required: false };
 
-async function isolated(check: (tx: postgres.TransactionSql, id: string) => Promise<void>) {
+async function isolated(check: (tx: postgres.TransactionSql, id: string) => Promise<void>, createUser = true) {
   if (!sql) throw new Error('Rollback-only database connection unavailable');
   const id = crypto.randomUUID();
   try {
     await sql.begin(async tx => {
-      await tx`INSERT INTO auth.users(id, email, raw_user_meta_data, created_at) VALUES(${id}, ${`${id}@example.invalid`}, '{"role":"provider","signup_flow":"unified_pro","full_name":"Synthetic Pro","phone":"5551234567"}'::jsonb, '2020-01-01')`;
+      if (createUser) await tx`INSERT INTO auth.users(id, email, raw_user_meta_data, created_at) VALUES(${id}, ${`${id}@example.invalid`}, '{"role":"provider","signup_flow":"unified_pro","full_name":"Synthetic Pro","phone":"5551234567"}'::jsonb, '2020-01-01')`;
       await tx`SELECT set_config('request.jwt.claims', ${JSON.stringify({ role: 'service_role' })}, true), set_config('request.jwt.claim.role','service_role',true)`;
       await check(tx, id);
       throw new Error('ROLLBACK_SYNTHETIC_FIXTURE');
@@ -56,17 +56,6 @@ describe.skipIf(!canCreateIsolatedUsers)('applied provider setup database safegu
     const [profile] = await tx`SELECT verification_status FROM public.provider_profiles WHERE user_id=${id}`;
     expect(row.count).toBe(1); expect(row.status).toBe('pending'); expect(profile.verification_status).toBe('pending');
   }));
-  it('lease blocks duplicate workers, recovers after ten minutes, and fences the old worker', async () => isolated(async (tx,id) => {
-    await tx`INSERT INTO public.provider_onboarding_emails(user_id,kind) VALUES(${id},'profile_submitted')`;
-    const first = await tx`SELECT * FROM public.claim_provider_email(${id}::uuid,'profile_submitted')`;
-    const duplicate = await tx`SELECT * FROM public.claim_provider_email(${id}::uuid,'profile_submitted')`;
-    expect(first).toHaveLength(1); expect(duplicate).toHaveLength(0);
-    await tx`UPDATE public.provider_onboarding_emails SET claimed_at=now()-interval '11 minutes' WHERE user_id=${id}`;
-    const second = await tx`SELECT * FROM public.claim_provider_email(${id}::uuid,'profile_submitted')`;
-    expect(second[0].attempt).toBe(2); expect(second[0].token).not.toBe(first[0].token);
-    const stale = await tx`UPDATE public.provider_onboarding_emails SET status='sent' WHERE user_id=${id} AND claim_token=${first[0].token}::uuid RETURNING user_id`;
-    expect(stale).toHaveLength(0);
-  }));
   it('admin approval queues one approved email only on a real transition', async () => isolated(async (tx,id) => {
     await tx`SELECT public.save_provider_setup_for_user(${id}::uuid,${JSON.stringify(draft)}::jsonb)`;
     await tx`INSERT INTO public.user_roles(user_id,role) VALUES(${id},'admin')`;
@@ -84,4 +73,18 @@ describe.skipIf(!sql)('applied RPC privilege boundaries (read only)', () => {
     const [row] = await sql`SELECT has_function_privilege('authenticated','public.save_provider_setup_for_user(uuid,jsonb)','execute') AS save,has_function_privilege('anon','public.claim_provider_email(uuid,text)','execute') AS claim,has_function_privilege('authenticated','public.submit_my_provider_setup()','execute') AS submit`;
     expect(row.save).toBe(false); expect(row.claim).toBe(false); expect(row.submit).toBe(true);
   });
+});
+
+describe.skipIf(!sql)('email lease database recovery (synthetic rollback only)', () => {
+  it('blocks duplicate workers, recovers after ten minutes and fences the old worker', async () => isolated(async (tx,id) => {
+    await tx`INSERT INTO public.provider_onboarding_emails(user_id,kind) VALUES(${id},'profile_submitted')`;
+    const first = await tx`SELECT * FROM public.claim_provider_email(${id}::uuid,'profile_submitted')`;
+    const duplicate = await tx`SELECT * FROM public.claim_provider_email(${id}::uuid,'profile_submitted')`;
+    expect(first).toHaveLength(1); expect(duplicate).toHaveLength(0);
+    await tx`UPDATE public.provider_onboarding_emails SET claimed_at=now()-interval '11 minutes' WHERE user_id=${id}`;
+    const second = await tx`SELECT * FROM public.claim_provider_email(${id}::uuid,'profile_submitted')`;
+    expect(second[0].attempt).toBe(2); expect(second[0].token).not.toBe(first[0].token);
+    const stale = await tx`UPDATE public.provider_onboarding_emails SET status='sent' WHERE user_id=${id} AND claim_token=${first[0].token}::uuid RETURNING user_id`;
+    expect(stale).toHaveLength(0);
+  }, false));
 });
