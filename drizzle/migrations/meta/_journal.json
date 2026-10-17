@@ -155,6 +155,13 @@
       "when": 1792255062020,
       "tag": "0021_secure_provider_setup_writes_and_email_claim",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1792255957843,
+      "tag": "0022_provider_setup_bound_save_and_fenced_email_claims",
+      "breakpoints": true
     }
   ]
 }

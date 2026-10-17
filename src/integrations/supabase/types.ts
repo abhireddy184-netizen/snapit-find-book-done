@@ -625,6 +625,7 @@ export type Database = {
       provider_onboarding_emails: {
         Row: {
           attempts: number
+          claim_token: string | null
           claimed_at: string | null
           created_at: string
           kind: string
@@ -635,6 +636,7 @@ export type Database = {
         }
         Insert: {
           attempts?: number
+          claim_token?: string | null
           claimed_at?: string | null
           created_at?: string
           kind: string
@@ -645,6 +647,7 @@ export type Database = {
         }
         Update: {
           attempts?: number
+          claim_token?: string | null
           claimed_at?: string | null
           created_at?: string
           kind?: string
@@ -1215,6 +1218,13 @@ export type Database = {
       can_remove_provider_document_file: {
         Args: { _name: string }
         Returns: boolean
+      }
+      claim_provider_email: {
+        Args: { _kind: string; _user_id: string }
+        Returns: {
+          attempt: number
+          token: string
+        }[]
       }
       claim_provider_submission_email: {
         Args: { _user_id: string }
