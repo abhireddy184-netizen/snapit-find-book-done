@@ -15,6 +15,8 @@ export const startPayoutOnboarding = createServerFn({ method: "POST" })
       if (!profile || !(profile.is_provider || profile.role === "provider")) {
         return { error: "Only service providers can set up payouts." };
       }
+      const { data: provider, error: verificationError } = await context.supabase.from('provider_profiles').select('verification_status').eq('user_id', context.userId).maybeSingle();
+      if (verificationError || provider?.verification_status !== 'verified') return { error: 'GetPros must approve your profile before you can set up payouts.' };
       const { getStripe, siteOrigin } = await import("./stripe.server");
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
       const stripe = getStripe();
