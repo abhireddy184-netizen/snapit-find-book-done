@@ -1209,6 +1209,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      can_remove_provider_document_file: {
+        Args: { _name: string }
+        Returns: boolean
+      }
       extract_service_zip: { Args: { _address: string }; Returns: string }
       get_my_provider_profile: {
         Args: never
