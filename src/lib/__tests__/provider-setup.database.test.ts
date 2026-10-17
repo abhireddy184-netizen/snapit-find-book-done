@@ -4,7 +4,7 @@ import postgres from 'postgres';
 // All synthetic rows, auth claims and storage metadata are rolled back; no HTTP/email calls.
 const url = process.env['SUPABASE_DB_URL'];
 const sql = url ? postgres(url, { max: 1, prepare: false }) : null;
-const capability = sql ? await sql`SELECT has_schema_privilege(current_user,'auth','USAGE') AS auth_access` : [];
+const capability = sql ? await sql`SELECT has_schema_privilege(current_user,'auth','USAGE') AS auth_access,has_function_privilege(current_user,'public.claim_provider_email(uuid,text)','EXECUTE') AS claim_access` : [];
 const canCreateIsolatedUsers = capability[0]?.auth_access === true;
 afterAll(async () => { if (sql) await sql.end(); });
 const draft = { full_name: 'Synthetic Pro', phone: '5551234567', business_name: 'Synthetic Services', business_type: 'individual', category_slugs: ['cleaning'], service_slugs: ['standard-cleaning'], service_category: 'Cleaning', service_area: 'Chicago', service_zip: '60601', service_radius_miles: 25, bio: '', trade_license_required: false };
@@ -75,7 +75,7 @@ describe.skipIf(!sql)('applied RPC privilege boundaries (read only)', () => {
   });
 });
 
-describe.skipIf(!sql)('email lease database recovery (synthetic rollback only)', () => {
+describe.skipIf(!capability[0]?.claim_access)('email lease database recovery (synthetic rollback only)', () => {
   it('blocks duplicate workers, recovers after ten minutes and fences the old worker', async () => isolated(async (tx,id) => {
     await tx`INSERT INTO public.provider_onboarding_emails(user_id,kind) VALUES(${id},'profile_submitted')`;
     const first = await tx`SELECT * FROM public.claim_provider_email(${id}::uuid,'profile_submitted')`;
