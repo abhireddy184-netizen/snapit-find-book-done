@@ -19,7 +19,7 @@ export function DocStatus({ status }: { status: ProviderDocument["status"] }) {
 
 /** Provider's own private document uploads (Documents tab). */
 /** With `demoDocs`, renders a read-only sample (admin demo): no uploads, no file access, no real data. */
-export function ProviderDocuments({ userId, demoDocs }: { userId: string | undefined; demoDocs?: ProviderDocument[] }) {
+export function ProviderDocuments({ userId, demoDocs, unified = false }: { userId: string | undefined; demoDocs?: ProviderDocument[]; unified?: boolean }) {
   const demo = !!demoDocs;
   const qc = useQueryClient();
   const [docType, setDocType] = useState<DocType>("business_registration");
@@ -28,7 +28,7 @@ export function ProviderDocuments({ userId, demoDocs }: { userId: string | undef
   const docs = useQuery({
     queryKey: ["my-documents", userId],
     enabled: !!userId && !demo,
-    queryFn: () => listDocuments(userId!),
+    queryFn: () => userId ? listDocuments(userId) : Promise.resolve([]),
   });
 
   async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -42,7 +42,7 @@ export function ProviderDocuments({ userId, demoDocs }: { userId: string | undef
     try {
       await uploadDocument(userId, docType, file);
       setMsg({ ok: true, text: "Uploaded. The GetPros team will review it." });
-      void notifyMyDocumentsUploaded().catch(() => {});
+      if (!unified) void notifyMyDocumentsUploaded().catch(() => {});
       await qc.invalidateQueries({ queryKey: ["my-documents", userId] });
     } catch (err) {
       setMsg({ ok: false, text: err instanceof Error ? err.message : "Upload failed. Please try again." });
