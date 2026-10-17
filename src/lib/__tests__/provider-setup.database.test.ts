@@ -4,6 +4,8 @@ import postgres from 'postgres';
 // All synthetic rows, auth claims and storage metadata are rolled back; no HTTP/email calls.
 const url = process.env['SUPABASE_DB_URL'];
 const sql = url ? postgres(url, { max: 1, prepare: false }) : null;
+const capability = sql ? await sql`SELECT has_schema_privilege(current_user,'auth','USAGE') AS auth_access` : [];
+const canCreateIsolatedUsers = capability[0]?.auth_access === true;
 afterAll(async () => { if (sql) await sql.end(); });
 const draft = { full_name: 'Synthetic Pro', phone: '5551234567', business_name: 'Synthetic Services', business_type: 'individual', category_slugs: ['cleaning'], service_slugs: ['standard-cleaning'], service_category: 'Cleaning', service_area: 'Chicago', service_zip: '60601', service_radius_miles: 25, bio: '', trade_license_required: false };
 
@@ -22,7 +24,7 @@ async function isolated(check: (tx: postgres.TransactionSql, id: string) => Prom
   }
 }
 
-describe.skipIf(!sql)('applied provider setup database safeguards (rollback only)', () => {
+describe.skipIf(!canCreateIsolatedUsers)('applied provider setup database safeguards (rollback only)', () => {
   it('same signup initializes one setup; service save preserves JWT subject and resumes draft', async () => isolated(async (tx, id) => {
     const [before] = await tx`SELECT current_setting('request.jwt.claim.sub',true) AS sub`;
     await tx`SELECT public.save_provider_setup_for_user(${id}::uuid,${JSON.stringify(draft)}::jsonb)`;
@@ -74,4 +76,12 @@ describe.skipIf(!sql)('applied provider setup database safeguards (rollback only
     const [row] = await tx`SELECT count(*)::int AS count,max(status) AS status FROM public.provider_onboarding_emails WHERE user_id=${id} AND kind='approved'`;
     expect(row.count).toBe(1); expect(row.status).toBe('pending');
   }));
+});
+
+describe.skipIf(!sql)('applied RPC privilege boundaries (read only)', () => {
+  it('privileged save and email leases reject client roles, submission remains authenticated', async () => {
+    if (!sql) throw new Error('Database unavailable');
+    const [row] = await sql`SELECT has_function_privilege('authenticated','public.save_provider_setup_for_user(uuid,jsonb)','execute') AS save,has_function_privilege('anon','public.claim_provider_email(uuid,text)','execute') AS claim,has_function_privilege('authenticated','public.submit_my_provider_setup()','execute') AS submit`;
+    expect(row.save).toBe(false); expect(row.claim).toBe(false); expect(row.submit).toBe(true);
+  });
 });
