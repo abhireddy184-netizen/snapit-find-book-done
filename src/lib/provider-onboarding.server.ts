@@ -158,13 +158,14 @@ export async function sendProfileSubmittedConfirmation(
     service_zip?: string | null;
   },
 ) {
+  if (developmentDeliveryBlocked()) return;
   try {
-    const { data: setup } = await db
+    const { data: setup, error: setupError } = await db
       .from("provider_setup")
       .select("state")
       .eq("user_id", userId)
       .maybeSingle();
-    if (setup) return; // Unified setup queues its confirmation only on explicit, complete submission.
+    if (setupError || setup) return; // Fail closed; unified setup sends only after explicit submission.
     const { shouldSendSubmittedConfirmation } = await import("./provider-onboarding-rules");
     if (!shouldSendSubmittedConfirmation(process.env["PROVIDER_SUBMITTED_EMAIL_ENABLED"], p))
       return;
@@ -301,13 +302,13 @@ async function docsContext(db: Admin, userId: string) {
       .eq("user_id", userId),
   ]);
   const u = res?.user;
-  const { data: setup } = await db
+  const { data: setup, error: setupError } = await db
     .from("provider_setup")
     .select("state")
     .eq("user_id", userId)
     .maybeSingle();
   return {
-    unified: Boolean(setup),
+    unified: Boolean(setup) || Boolean(setupError),
     email: u?.email_confirmed_at ? (u.email ?? null) : null,
     signupAt: u?.created_at ?? null,
     pp,
@@ -408,6 +409,7 @@ export async function notifyDocumentsReceived(db: Admin, userId: string) {
 
 /** Hourly: send queued checklists (after a short delay), 24h/48h document reminders, receipt backstop. */
 export async function processDocumentEmails(db: Admin) {
+  if (developmentDeliveryBlocked()) return { sent: 0 };
   const rules = await import("./provider-onboarding-rules");
   const enabled = rules.isDocsEmailEnabled(process.env["PROVIDER_DOCUMENTS_EMAIL_ENABLED"]);
   let sent = 0;

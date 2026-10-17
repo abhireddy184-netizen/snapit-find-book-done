@@ -15,7 +15,7 @@ export const getMyProviderSetup = createServerFn({ method: "GET" })
       throw new Error("This setup is for Pro accounts. Please sign in with your Pro account.");
     const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
     const { data: auth } = await context.supabase.auth.getUser();
-    const [{ data: pp }, { data: existing }] = await Promise.all([
+    const [{ data: pp, error: providerError }, { data: existing, error: existingError }] = await Promise.all([
       db.from("provider_profiles").select("*").eq("user_id", context.userId).maybeSingle(),
       context.supabase
         .from("provider_setup")
@@ -23,6 +23,7 @@ export const getMyProviderSetup = createServerFn({ method: "GET" })
         .eq("user_id", context.userId)
         .maybeSingle(),
     ]);
+    if (providerError || existingError) throw new Error('We could not load your saved setup. Please try again.');
     // Explicit setup entry, never backfill existing profiles or change their ownership/status.
     if (
       !existing &&
