@@ -153,10 +153,9 @@ function AuthNav() {
       <Link
         to="/register"
         search={{ redirect: undefined, role: undefined }}
-        className="inline-flex min-h-10 shrink-0 items-center rounded-full px-4 py-2 text-sm font-bold text-white shadow-card transition-all hover:scale-[1.01] hover:shadow-elevated sm:px-4"
-        style={{ background: "var(--gradient-primary)", boxShadow: "0 10px 24px -12px color-mix(in oklab, var(--primary) 55%, transparent)" }}
+        className="gp-cta-3d inline-flex min-h-10 shrink-0 items-center rounded-full px-4 py-2 text-sm font-bold tracking-tight"
       >
-        Sign up
+        <span className="relative">Sign up</span>
       </Link>
     </>
   );
