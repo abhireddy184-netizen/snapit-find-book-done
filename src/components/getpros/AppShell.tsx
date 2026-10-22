@@ -160,8 +160,8 @@ function AuthNav() {
         className="gp-cta-prism inline-flex h-11 shrink-0 items-center gap-1 rounded-full px-4 text-sm font-extrabold tracking-tight"
       >
         <span className="relative">Sign up</span>
-        <Sparkles className="gp-sparkle-loop right-1.5 top-1 h-2.5 w-2.5" aria-hidden="true" />
-        <Sparkles className="gp-sparkle-loop bottom-1 left-2 h-2 w-2 [animation-delay:-1.4s]" aria-hidden="true" />
+        <span className="gp-sparkle-loop right-1.5 top-1 h-2.5 w-2.5" aria-hidden="true"><Sparkles className="block h-full w-full" /></span>
+        <span className="gp-sparkle-loop bottom-1 left-2 h-2 w-2" style={{ animationDelay: "-1.4s" }} aria-hidden="true"><Sparkles className="block h-full w-full" /></span>
       </Link>
     </>
   );
