@@ -4,6 +4,7 @@ import { Home, Search, CalendarDays, User, Camera, ShieldAlert, LogOut, LayoutDa
 import { Logo } from "./Logo";
 import { Footer } from "./SiteFooter";
 import { SupportChat } from "./SupportChat";
+import { FloatingProCta } from "./FloatingProCta";
 import { ThemeToggle } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
 import {
@@ -30,7 +31,7 @@ export function AppShell({ children, hideBottomNav = false }: { children: ReactN
         id="main"
         className={cn(
           "gpb-shell pt-4 md:pt-6",
-          hideBottomNav ? "pb-10 md:pb-16" : "pb-[calc(7.5rem+env(safe-area-inset-bottom))] md:pb-16"
+          hideBottomNav ? "pb-10 md:pb-16" : "pb-[calc(11rem+env(safe-area-inset-bottom))] md:pb-16"
         )}
       >
         {children}
@@ -38,6 +39,7 @@ export function AppShell({ children, hideBottomNav = false }: { children: ReactN
       </main>
 
       {!hideBottomNav && <BottomNav />}
+      {!hideBottomNav && <FloatingProCtaWithKeyboard />}
       <SupportChat />
 
     </div>
@@ -266,6 +268,11 @@ function useKeyboardOpen() {
     };
   }, []);
   return open;
+}
+
+function FloatingProCtaWithKeyboard() {
+  const keyboardOpen = useKeyboardOpen();
+  return <FloatingProCta keyboardOpen={keyboardOpen} />;
 }
 
 function BottomNav() {

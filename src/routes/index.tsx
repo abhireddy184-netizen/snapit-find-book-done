@@ -103,9 +103,10 @@ function Landing() {
                 id="hero-provider-interest-cta"
                 data-analytics-id="provider_signup_cta"
                 data-analytics-location="hero"
-                className="gp-cta-shine inline-flex min-h-11 items-center gap-1.5 rounded-full border-2 border-primary/70 bg-card px-4 py-2 text-sm font-bold text-primary shadow-sm transition-colors hover:border-primary hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className="gp-cta-shine inline-flex min-h-11 items-center gap-1.5 rounded-full border-2 border-primary/70 bg-card px-4 py-2 text-sm font-bold text-primary shadow-sm transition-colors hover:border-primary hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary md:gp-pro-sparkle md:border md:px-5 md:hover:bg-transparent"
               >
                 <Briefcase className="h-4 w-4" /> Join as a Pro
+                <Sparkles className="gp-sparkle-dot right-2 top-1 hidden h-3 w-3 md:block" aria-hidden="true" />
               </Link>
             </div>
           </div>
