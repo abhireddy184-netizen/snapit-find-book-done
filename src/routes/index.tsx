@@ -72,8 +72,8 @@ function Landing() {
               >
                 <Briefcase className="h-5 w-5" aria-hidden="true" /> Join as a Pro
                 <Sparkles className="gp-sparkle-loop right-2.5 top-1.5 h-3 w-3" aria-hidden="true" />
-                <Sparkles className="gp-sparkle-loop bottom-1.5 left-3 h-2.5 w-2.5 [animation-delay:1.4s]" aria-hidden="true" />
-                <Sparkles className="gp-sparkle-loop right-8 bottom-1 h-2 w-2 [animation-delay:2.8s]" aria-hidden="true" />
+                <Sparkles className="gp-sparkle-loop bottom-1.5 left-3 h-2.5 w-2.5 [animation-delay:-0.9s]" aria-hidden="true" />
+                <Sparkles className="gp-sparkle-loop right-8 bottom-1 h-2 w-2 [animation-delay:-1.8s]" aria-hidden="true" />
               </Link>
               <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary">
                 <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> No lead fees. Keep 85% of every job.
