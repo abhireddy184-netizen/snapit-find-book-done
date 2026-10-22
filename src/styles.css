@@ -605,3 +605,97 @@
     font-size: 1.125rem; /* 18px */
   }
 }
+
+/* Premium raised Sign up CTA: one-time entrance pop + single sheen. */
+@keyframes gp-cta-pop {
+  0% { opacity: 0; transform: translateY(4px) scale(0.92); }
+  60% { opacity: 1; transform: translateY(0) scale(1.04); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes gp-cta-sheen {
+  0% { transform: translateX(-130%) skewX(-20deg); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateX(230%) skewX(-20deg); opacity: 0; }
+}
+@utility gp-cta-3d {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: var(--primary-foreground);
+  background: var(--gradient-primary);
+  border: 1px solid color-mix(in oklab, var(--primary-foreground) 22%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--primary-foreground) 38%, transparent),
+    inset 0 -2px 0 color-mix(in oklab, var(--foreground) 22%, transparent),
+    0 1px 2px color-mix(in oklab, var(--primary) 30%, transparent),
+    0 8px 20px -8px color-mix(in oklab, var(--primary) 60%, transparent);
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+  animation: gp-cta-pop 600ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms both;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 50% 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(to bottom, color-mix(in oklab, var(--primary-foreground) 28%, transparent), transparent);
+    pointer-events: none;
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 45%;
+    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--primary-foreground) 55%, transparent), transparent);
+    transform: translateX(-130%) skewX(-20deg);
+    opacity: 0;
+    animation: gp-cta-sheen 900ms ease-out 900ms 1 both;
+    pointer-events: none;
+  }
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.06) saturate(1.05);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklab, var(--primary-foreground) 45%, transparent),
+      inset 0 -2px 0 color-mix(in oklab, var(--foreground) 22%, transparent),
+      0 2px 4px color-mix(in oklab, var(--primary) 30%, transparent),
+      0 14px 28px -10px color-mix(in oklab, var(--primary) 70%, transparent);
+  }
+  &:active {
+    transform: translateY(1px) scale(0.98);
+    box-shadow:
+      inset 0 2px 4px color-mix(in oklab, var(--foreground) 25%, transparent),
+      0 2px 6px -2px color-mix(in oklab, var(--primary) 50%, transparent);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    transition: none;
+    &::after { animation: none; display: none; }
+    &:hover, &:active { transform: none; }
+  }
+}
+
+/* Quiet one-time shine for the hero Join as a Pro outline CTA. */
+@utility gp-cta-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    z-index: -1;
+    background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--primary) 16%, transparent), transparent);
+    transform: translateX(-130%) skewX(-20deg);
+    opacity: 0;
+    animation: gp-cta-sheen 1100ms ease-out 1600ms 1 both;
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    &::after { animation: none; display: none; }
+  }
+}
