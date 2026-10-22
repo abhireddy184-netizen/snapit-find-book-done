@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { subscribeToUpdates } from "@/lib/subscribe.functions";
 import {
-  ArrowRight, Briefcase, Camera, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
+  ArrowRight, Briefcase, Sparkles, Camera, CheckCircle2, ShieldAlert, Zap, Droplet, Wind, Lock,
 } from "lucide-react";
 import { AppShell } from "@/components/getpros/AppShell";
 import { Logo } from "@/components/getpros/Logo";
