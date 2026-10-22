@@ -820,27 +820,34 @@
   22% { transform: translateX(260%) skewX(-20deg); opacity: 0; }
   100% { transform: translateX(260%) skewX(-20deg); opacity: 0; }
 }
-/* Continuous soft twinkle: never fully disappears, so it always reads as alive.
-   Opacity/transform only (GPU-composited, no layout). */
+/* Continuous staggered twinkle, applied to an HTML <span> wrapper (not the
+   SVG itself) so iOS Safari composites it reliably. Opacity/transform only;
+   no idle gaps — every frame is mid-motion. */
 @keyframes gp-sparkle-loop {
-  0%, 100% { opacity: 0.3; transform: scale(0.6) rotate(0deg); }
-  25% { opacity: 0.95; transform: scale(1.05) rotate(45deg); }
-  50% { opacity: 0.45; transform: scale(0.75) rotate(90deg); }
-  75% { opacity: 0.85; transform: scale(0.95) rotate(135deg); }
+  0%, 100% { opacity: 0.2; transform: scale(0.55) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(90deg); }
 }
 @utility gp-sparkle-loop {
   position: absolute;
+  z-index: 1;
+  display: block;
   pointer-events: none;
   color: oklch(1 0 0);
   opacity: 0.6;
-  transform-origin: center;
-  transform-box: fill-box;
-  will-change: opacity, transform;
-  filter: drop-shadow(0 0 2px oklch(1 0 0 / 0.6));
-  animation: gp-sparkle-loop 2.8s ease-in-out infinite both;
+  line-height: 0;
+  transform-origin: 50% 50%;
+  -webkit-animation: gp-sparkle-loop 2.4s ease-in-out infinite;
+  animation: gp-sparkle-loop 2.4s ease-in-out infinite;
+  & > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
   @media (prefers-reduced-motion: reduce) {
+    -webkit-animation: none;
     animation: none;
-    opacity: 0.8;
+    opacity: 0.85;
     transform: none;
   }
 }
