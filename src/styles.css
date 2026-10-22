@@ -799,3 +799,80 @@
     &:active { transform: none; }
   }
 }
+
+/* Vivid multicolor prism CTA (header Sign up + hero Join as a Pro).
+   Arrival: pop, one light sweep, sparkle twinkles; then static. */
+:root {
+  --prism-purple: oklch(0.5 0.26 300);
+  --prism-magenta: oklch(0.55 0.25 345);
+  --prism-royal: oklch(0.45 0.2 264);
+  --prism-teal: oklch(0.55 0.13 195);
+  --gradient-prism: linear-gradient(115deg, var(--prism-purple) 0%, var(--prism-magenta) 30%, var(--prism-royal) 66%, var(--prism-teal) 100%);
+}
+@keyframes gp-prism-shift {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@utility gp-cta-prism {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  color: oklch(1 0 0);
+  text-shadow: 0 1px 1px oklch(0.2 0.1 290 / 0.45);
+  background: var(--gradient-prism);
+  border: 1px solid oklch(1 0 0 / 0.35);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.55),
+    inset 0 -3px 0 oklch(0.25 0.15 285 / 0.55),
+    0 0 0 1px color-mix(in oklab, var(--prism-magenta) 40%, transparent),
+    0 4px 0 -1px oklch(0.3 0.17 280 / 0.55),
+    0 12px 28px -8px color-mix(in oklab, var(--prism-magenta) 70%, transparent),
+    0 0 22px -4px color-mix(in oklab, var(--prism-teal) 55%, transparent);
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+  animation: gp-cta-pop 650ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms both;
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 1px 1px 52% 1px;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(to bottom, oklch(1 0 0 / 0.42), oklch(1 0 0 / 0));
+    pointer-events: none;
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 50%;
+    background: linear-gradient(90deg, transparent, oklch(1 0 0 / 0.75), transparent);
+    transform: translateX(-130%) skewX(-20deg);
+    opacity: 0;
+    animation: gp-cta-sheen 1000ms ease-out 900ms 1 both;
+    pointer-events: none;
+  }
+  &:hover, &:focus-visible {
+    transform: translateY(-2px);
+    filter: brightness(1.1) saturate(1.1);
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 0.6),
+      inset 0 -3px 0 oklch(0.25 0.15 285 / 0.55),
+      0 0 0 3px color-mix(in oklab, var(--prism-magenta) 30%, transparent),
+      0 6px 0 -1px oklch(0.3 0.17 280 / 0.5),
+      0 18px 36px -10px color-mix(in oklab, var(--prism-magenta) 80%, transparent),
+      0 0 30px -4px color-mix(in oklab, var(--prism-teal) 70%, transparent);
+  }
+  &:hover::after { animation: gp-cta-sheen 850ms ease-out 0ms 1 both; }
+  &:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px; }
+  &:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow:
+      inset 0 2px 5px oklch(0.2 0.12 285 / 0.5),
+      0 2px 8px -2px color-mix(in oklab, var(--prism-magenta) 60%, transparent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+    transition: none;
+    &::after { display: none; }
+    &:hover, &:focus-visible, &:active { transform: none; }
+  }
+}

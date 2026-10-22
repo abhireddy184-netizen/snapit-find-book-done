@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { Home, Search, CalendarDays, User, Camera, ShieldAlert, LogOut, LayoutDashboard, Menu, Wrench } from "lucide-react";
+import { Home, Search, CalendarDays, User, Camera, ShieldAlert, LogOut, LayoutDashboard, Menu, Wrench, Sparkles } from "lucide-react";
 import { Logo } from "./Logo";
 import { Footer } from "./SiteFooter";
 import { SupportChat } from "./SupportChat";
@@ -154,10 +154,13 @@ function AuthNav() {
       </Link>
       <Link
         to="/register"
-        search={{ redirect: undefined, role: undefined }}
-        className="gp-cta-3d inline-flex min-h-10 shrink-0 items-center rounded-full px-4 py-2 text-sm font-bold tracking-tight"
+        search={{ redirect: undefined, role: "provider" }}
+        data-analytics-id="provider_signup_cta"
+        data-analytics-location="header"
+        className="gp-cta-prism inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full px-4 py-2 text-sm font-extrabold tracking-tight"
       >
         <span className="relative">Sign up</span>
+        <Sparkles className="gp-sparkle-dot right-1.5 top-1 h-2.5 w-2.5" aria-hidden="true" />
       </Link>
     </>
   );
