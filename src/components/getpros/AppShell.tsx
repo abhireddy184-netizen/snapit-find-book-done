@@ -157,7 +157,7 @@ function AuthNav() {
         search={{ redirect: undefined, role: "provider" }}
         data-analytics-id="provider_signup_cta"
         data-analytics-location="header"
-        className="gp-cta-prism inline-flex h-10 shrink-0 items-center gap-1 rounded-full px-4 text-sm font-extrabold tracking-tight md:h-11"
+        className="gp-cta-prism inline-flex h-11 shrink-0 items-center gap-1 rounded-full px-4 text-sm font-extrabold tracking-tight"
       >
         <span className="relative">Sign up</span>
         <Sparkles className="gp-sparkle-loop right-1.5 top-1 h-2.5 w-2.5" aria-hidden="true" />
