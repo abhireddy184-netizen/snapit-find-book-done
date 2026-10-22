@@ -161,7 +161,7 @@ function AuthNav() {
       >
         <span className="relative">Sign up</span>
         <Sparkles className="gp-sparkle-loop right-1.5 top-1 h-2.5 w-2.5" aria-hidden="true" />
-        <Sparkles className="gp-sparkle-loop bottom-1 left-2 h-2 w-2 [animation-delay:2.1s]" aria-hidden="true" />
+        <Sparkles className="gp-sparkle-loop bottom-1 left-2 h-2 w-2 [animation-delay:-1.4s]" aria-hidden="true" />
       </Link>
     </>
   );
