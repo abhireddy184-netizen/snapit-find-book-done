@@ -61,12 +61,23 @@ function Landing() {
             <p className="mt-3 max-w-[36ch] text-[clamp(1rem,1.15vw,1.15rem)] leading-relaxed text-muted-foreground">
               Show it. Get matched. Start without an account — sign in when you book.
             </p>
-            <Link
-              to="/provider-interest"
-              className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary hover:bg-primary/15"
-            >
-              <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> For pros: No lead fees. Keep 85% of every job.
-            </Link>
+            <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+              <Link
+                to="/register"
+                search={{ redirect: undefined, role: "provider" }}
+                id="hero-provider-interest-cta"
+                data-analytics-id="provider_signup_cta"
+                data-analytics-location="hero"
+                className="gp-cta-prism inline-flex min-h-12 items-center gap-2 rounded-full px-6 py-3 text-base font-extrabold tracking-tight"
+              >
+                <Briefcase className="h-5 w-5" aria-hidden="true" /> Join as a Pro
+                <Sparkles className="gp-sparkle-dot right-2.5 top-1.5 h-3 w-3" aria-hidden="true" />
+                <Sparkles className="gp-sparkle-dot bottom-1.5 left-3 h-2.5 w-2.5 [animation-delay:500ms]" aria-hidden="true" />
+              </Link>
+              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-primary">
+                <CheckCircle2 className="h-3.5 w-3.5 shrink-0" /> No lead fees. Keep 85% of every job.
+              </span>
+            </div>
 
 
             {/* Camera-first: primary photo CTA on every screen size. */}
@@ -75,7 +86,7 @@ function Landing() {
               id="hero-show-gpb-cta"
               data-analytics-id="show_gpb_cta"
               data-analytics-location="hero_primary"
-              className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-bold text-white shadow-elevated transition-transform duration-200 hover:scale-[1.01] sm:w-auto sm:text-sm"
+              className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-base font-bold text-white shadow-elevated transition-transform duration-200 hover:scale-[1.01] sm:w-auto sm:text-sm"
               style={{ background: "var(--gradient-primary)" }}
             >
               <Camera className="h-5 w-5" /> Show GP the problem
@@ -97,17 +108,6 @@ function Landing() {
               >
                 Get early access
               </a>
-              <Link
-                to="/register"
-                search={{ redirect: undefined, role: "provider" }}
-                id="hero-provider-interest-cta"
-                data-analytics-id="provider_signup_cta"
-                data-analytics-location="hero"
-                className="gp-cta-shine inline-flex min-h-11 items-center gap-1.5 rounded-full border-2 border-primary/70 bg-card px-4 py-2 text-sm font-bold text-primary shadow-sm transition-colors hover:border-primary hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary md:gp-pro-sparkle md:border md:px-5 md:hover:bg-transparent"
-              >
-                <Briefcase className="h-4 w-4" /> Join as a Pro
-                <Sparkles className="gp-sparkle-dot right-2 top-1 hidden h-3 w-3 md:block" aria-hidden="true" />
-              </Link>
             </div>
           </div>
 
