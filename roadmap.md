@@ -27,3 +27,8 @@
 - [ ] Stripe Connected-accounts destination in the same test-mode account as the app's key (blocked: owner, Stripe dashboard)
 - [ ] Publish + real signed event + Outlook inbox check (blocked: owner approval to publish)
 - [x] Search: friendly "coming to your area" message + Notify Me signup when no pro serves the area
+
+- [x] ProConnect admin-only AI Calling Agent dashboard (leads, DFW filters, consent/DNC, EN/ES scripts, history, follow-ups, metrics, simulation mode)
+- [ ] ProConnect live calling (blocked: no authorized phone/voice provider chosen; compliance sign-off needed)
+- [x] One-time-per-session rising entrance animation using the GPA icon
+- [ ] Confirm what "Bata" refers to (blocked: owner answer — no bot/mascot asset in the project)

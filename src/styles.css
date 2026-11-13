@@ -915,3 +915,53 @@
     &::after { display: none; }
   }
 }
+
+/* Entrance flourish: GPA icon rises and flies upward once per session.
+   Fixed overlay, no layout impact, never intercepts input. */
+.gp-rise-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  overflow: hidden;
+}
+.gp-rise {
+  position: absolute;
+  left: 50%;
+  bottom: 18%;
+  width: 56px;
+  height: 56px;
+  margin-left: -28px;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: gp-rise-fly 1.7s cubic-bezier(0.22, 0.8, 0.3, 1) forwards;
+}
+.gp-rise-icon {
+  position: relative;
+  display: block;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px -8px color-mix(in oklab, var(--primary) 55%, transparent);
+}
+.gp-rise-trail {
+  position: absolute;
+  left: 50%;
+  top: 70%;
+  width: 18px;
+  height: 90px;
+  margin-left: -9px;
+  border-radius: 999px;
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--secondary) 55%, transparent), transparent);
+  filter: blur(6px);
+  opacity: 0.8;
+}
+@keyframes gp-rise-fly {
+  0%   { opacity: 0; transform: translate3d(0, 40px, 0) scale(0.6); }
+  18%  { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  45%  { opacity: 1; transform: translate3d(0, -14px, 0) scale(1); }
+  100% { opacity: 0; transform: translate3d(0, -70vh, 0) scale(0.7); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gp-rise-layer { display: none; }
+}

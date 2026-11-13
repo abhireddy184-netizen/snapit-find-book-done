@@ -41,6 +41,7 @@ import { Route as ProviderIdRouteImport } from './routes/provider.$id'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as TrackingIdRouteImport } from './routes/tracking.$id'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin.index'
+import { Route as AuthenticatedAdminProconnectRouteImport } from './routes/_authenticated/admin.proconnect'
 import { Route as AuthenticatedAdminProviderDocsDemoRouteImport } from './routes/_authenticated/admin.provider-docs-demo'
 import { Route as AuthenticatedAdminProvidersRouteImport } from './routes/_authenticated/admin.providers'
 import { Route as AuthenticatedJobIdRouteImport } from './routes/_authenticated/job.$id'
@@ -215,6 +216,12 @@ const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminProconnectRoute =
+  AuthenticatedAdminProconnectRouteImport.update({
+    id: '/proconnect',
+    path: '/proconnect',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminProviderDocsDemoRoute =
   AuthenticatedAdminProviderDocsDemoRouteImport.update({
     id: '/provider-docs-demo',
@@ -312,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services/': typeof ServicesIndexRoute
+  '/admin/proconnect': typeof AuthenticatedAdminProconnectRoute
   '/admin/provider-docs-demo': typeof AuthenticatedAdminProviderDocsDemoRoute
   '/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/job/$id': typeof AuthenticatedJobIdRoute
@@ -355,6 +363,7 @@ export interface FileRoutesByTo {
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services': typeof ServicesIndexRoute
+  '/admin/proconnect': typeof AuthenticatedAdminProconnectRoute
   '/admin/provider-docs-demo': typeof AuthenticatedAdminProviderDocsDemoRoute
   '/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/job/$id': typeof AuthenticatedJobIdRoute
@@ -402,6 +411,7 @@ export interface FileRoutesById {
   '/provider/$id': typeof ProviderIdRoute
   '/tracking/$id': typeof TrackingIdRoute
   '/services/': typeof ServicesIndexRoute
+  '/_authenticated/admin/proconnect': typeof AuthenticatedAdminProconnectRoute
   '/_authenticated/admin/provider-docs-demo': typeof AuthenticatedAdminProviderDocsDemoRoute
   '/_authenticated/admin/providers': typeof AuthenticatedAdminProvidersRoute
   '/_authenticated/job/$id': typeof AuthenticatedJobIdRoute
@@ -449,6 +459,7 @@ export interface FileRouteTypes {
     | '/provider/$id'
     | '/tracking/$id'
     | '/services/'
+    | '/admin/proconnect'
     | '/admin/provider-docs-demo'
     | '/admin/providers'
     | '/job/$id'
@@ -492,6 +503,7 @@ export interface FileRouteTypes {
     | '/provider/$id'
     | '/tracking/$id'
     | '/services'
+    | '/admin/proconnect'
     | '/admin/provider-docs-demo'
     | '/admin/providers'
     | '/job/$id'
@@ -538,6 +550,7 @@ export interface FileRouteTypes {
     | '/provider/$id'
     | '/tracking/$id'
     | '/services/'
+    | '/_authenticated/admin/proconnect'
     | '/_authenticated/admin/provider-docs-demo'
     | '/_authenticated/admin/providers'
     | '/_authenticated/job/$id'
@@ -814,6 +827,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/proconnect': {
+      id: '/_authenticated/admin/proconnect'
+      path: '/proconnect'
+      fullPath: '/admin/proconnect'
+      preLoaderRoute: typeof AuthenticatedAdminProconnectRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/provider-docs-demo': {
       id: '/_authenticated/admin/provider-docs-demo'
       path: '/provider-docs-demo'
@@ -902,6 +922,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedAdminRouteChildren {
+  AuthenticatedAdminProconnectRoute: typeof AuthenticatedAdminProconnectRoute
   AuthenticatedAdminProviderDocsDemoRoute: typeof AuthenticatedAdminProviderDocsDemoRoute
   AuthenticatedAdminProvidersRoute: typeof AuthenticatedAdminProvidersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -909,6 +930,7 @@ interface AuthenticatedAdminRouteChildren {
 }
 
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
+  AuthenticatedAdminProconnectRoute: AuthenticatedAdminProconnectRoute,
   AuthenticatedAdminProviderDocsDemoRoute:
     AuthenticatedAdminProviderDocsDemoRoute,
   AuthenticatedAdminProvidersRoute: AuthenticatedAdminProvidersRoute,

@@ -169,6 +169,13 @@
       "when": 1792256360604,
       "tag": "0023_provider_email_claim_latest_state_guards",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1794590267154,
+      "tag": "0024_proconnect_admin_calling_agent",
+      "breakpoints": true
     }
   ]
 }

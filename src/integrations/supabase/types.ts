@@ -406,6 +406,164 @@ export type Database = {
           },
         ]
       }
+      proconnect_call_logs: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          follow_up_at: string | null
+          id: string
+          kind: string
+          language: string
+          lead_id: string
+          outcome: string
+          summary: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          follow_up_at?: string | null
+          id?: string
+          kind: string
+          language?: string
+          lead_id: string
+          outcome: string
+          summary?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          follow_up_at?: string | null
+          id?: string
+          kind?: string
+          language?: string
+          lead_id?: string
+          outcome?: string
+          summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proconnect_call_logs_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "proconnect_leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proconnect_leads: {
+        Row: {
+          business_name: string
+          category_slug: string
+          city: string
+          consent_at: string | null
+          consent_source: string | null
+          consent_status: string
+          contact_name: string | null
+          created_at: string
+          created_by: string | null
+          do_not_call: boolean
+          email: string | null
+          id: string
+          is_demo: boolean
+          next_follow_up_at: string | null
+          notes: string | null
+          opted_out_at: string | null
+          phone: string | null
+          preferred_language: string
+          provider_interest_id: string | null
+          signed_up_user_id: string | null
+          source: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_name: string
+          category_slug: string
+          city: string
+          consent_at?: string | null
+          consent_source?: string | null
+          consent_status?: string
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          do_not_call?: boolean
+          email?: string | null
+          id?: string
+          is_demo?: boolean
+          next_follow_up_at?: string | null
+          notes?: string | null
+          opted_out_at?: string | null
+          phone?: string | null
+          preferred_language?: string
+          provider_interest_id?: string | null
+          signed_up_user_id?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_name?: string
+          category_slug?: string
+          city?: string
+          consent_at?: string | null
+          consent_source?: string | null
+          consent_status?: string
+          contact_name?: string | null
+          created_at?: string
+          created_by?: string | null
+          do_not_call?: boolean
+          email?: string | null
+          id?: string
+          is_demo?: boolean
+          next_follow_up_at?: string | null
+          notes?: string | null
+          opted_out_at?: string | null
+          phone?: string | null
+          preferred_language?: string
+          provider_interest_id?: string | null
+          signed_up_user_id?: string | null
+          source?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      proconnect_settings: {
+        Row: {
+          ai_disclosure_script: boolean
+          calling_hours_policy: boolean
+          dnc_registry_scrub: boolean
+          id: boolean
+          recording_consent_policy: boolean
+          tcpa_reviewed: boolean
+          updated_at: string
+          updated_by: string | null
+          written_consent_capture: boolean
+        }
+        Insert: {
+          ai_disclosure_script?: boolean
+          calling_hours_policy?: boolean
+          dnc_registry_scrub?: boolean
+          id?: boolean
+          recording_consent_policy?: boolean
+          tcpa_reviewed?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          written_consent_capture?: boolean
+        }
+        Update: {
+          ai_disclosure_script?: boolean
+          calling_hours_policy?: boolean
+          dnc_registry_scrub?: boolean
+          id?: boolean
+          recording_consent_policy?: boolean
+          tcpa_reviewed?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          written_consent_capture?: boolean
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -1268,6 +1426,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: never; Returns: boolean }
+      proconnect_sync_leads: { Args: never; Returns: Json }
       provider_busy_intervals: {
         Args: { _from: string; _provider_id: string; _to: string }
         Returns: {

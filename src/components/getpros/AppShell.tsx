@@ -5,6 +5,7 @@ import { Logo } from "./Logo";
 import { Footer } from "./SiteFooter";
 import { SupportChat } from "./SupportChat";
 import { FloatingProCta } from "./FloatingProCta";
+import { EntranceRise } from "./EntranceRise";
 import { ThemeToggle } from "@/lib/theme";
 import { useAuth } from "@/lib/auth";
 import {
@@ -41,6 +42,7 @@ export function AppShell({ children, hideBottomNav = false }: { children: ReactN
       {!hideBottomNav && <BottomNav />}
       {!hideBottomNav && <FloatingProCtaWithKeyboard />}
       <SupportChat />
+      <EntranceRise />
 
     </div>
   );
