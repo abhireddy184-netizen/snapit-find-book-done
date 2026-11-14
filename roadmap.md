@@ -32,3 +32,5 @@
 - [ ] ProConnect live calling (blocked: no authorized phone/voice provider chosen; compliance sign-off needed)
 - [x] One-time-per-session rising entrance animation using the GPA icon
 - [ ] Confirm what "Bata" refers to (blocked: owner answer — no bot/mascot asset in the project)
+
+- [x] Upgrade the floating support chat in place to GPA Pulse (GPA mark + heartbeat launcher, EN/ES toggle, quick-action chips wired to Show GP / categories / Pro signup, human-support menu)

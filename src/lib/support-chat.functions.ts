@@ -4,12 +4,12 @@ import { streamText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "./ai-gateway.server";
 import {
-  FALLBACK_FAQ,
   SUPPORT_SYSTEM_PROMPT,
   allowRequest,
-  matchFaq,
+  fallbackReply,
+  languageInstruction,
+  limitedReply,
 } from "./support-chat.server";
-import { CONTACT_EMAIL } from "./brand";
 
 /** Same model family the planner already uses through the existing gateway provider. */
 const SUPPORT_MODEL = "google/gemini-3.7-flash";
@@ -33,6 +33,7 @@ export const askSupport = createServerFn({ method: "POST" })
           )
           .min(1)
           .max(20),
+        lang: z.enum(["en", "es"]).default("en"),
       })
       .parse(input),
   )
@@ -43,23 +44,12 @@ export const askSupport = createServerFn({ method: "POST" })
       req?.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
       "anon";
     if (!allowRequest(ip)) {
-      return {
-        source: "limited",
-        reply: `You've sent a lot of messages in a short time. Please wait a few minutes, or email ${CONTACT_EMAIL}.`,
-      };
+      return { source: "limited", reply: limitedReply(data.lang) };
     }
 
     const messages = data.messages.slice(-10);
     const last = messages[messages.length - 1].content;
-    const fallback = (): SupportReply => {
-      const k = matchFaq(last);
-      return {
-        source: "faq",
-        reply: k
-          ? FALLBACK_FAQ[k]
-          : `Our AI assistant isn't available right now. Please email ${CONTACT_EMAIL} and we'll help.`,
-      };
-    };
+    const fallback = (): SupportReply => ({ source: "faq", reply: fallbackReply(last, data.lang) });
 
     const key = process.env["LOVABLE_API_KEY"];
     if (!key) return fallback();
@@ -68,7 +58,7 @@ export const askSupport = createServerFn({ method: "POST" })
       const gateway = createLovableAiGatewayProvider(key);
       const result = streamText({
         model: gateway(SUPPORT_MODEL),
-        system: SUPPORT_SYSTEM_PROMPT,
+        system: `${SUPPORT_SYSTEM_PROMPT}\n\n${languageInstruction(data.lang)}`,
         messages,
         maxOutputTokens: 600,
         maxRetries: 0,

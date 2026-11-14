@@ -76,6 +76,9 @@
   --color-brand-navy: var(--brand-navy);
   --color-brand-teal: var(--brand-teal);
   --color-brand-slate: var(--brand-slate);
+  --color-pulse-ink: var(--pulse-ink);
+  --color-pulse-deep: var(--pulse-deep);
+  --color-pulse-online: var(--pulse-online);
   --color-coral: var(--coral);
   --color-lavender: var(--lavender);
   --color-lemon: var(--lemon);
@@ -165,6 +168,10 @@
   --input: oklch(0.934 0.008 240);
   --ring: oklch(0.395 0.125 264);
   --gradient-primary: linear-gradient(135deg, oklch(0.360 0.120 264) 0%, oklch(0.470 0.125 240) 55%, oklch(0.600 0.118 199) 100%);
+  --gradient-pulse: linear-gradient(135deg, oklch(0.285 0.105 264) 0%, oklch(0.365 0.110 248) 52%, oklch(0.470 0.095 205) 100%);
+  --pulse-ink: oklch(1 0 0);
+  --pulse-deep: oklch(0.285 0.105 264);
+  --pulse-online: oklch(0.760 0.190 150);
   --gradient-secondary: linear-gradient(135deg, oklch(0.585 0.118 199), oklch(0.360 0.115 258));
   --gradient-accent: linear-gradient(135deg, oklch(0.640 0.118 195), oklch(0.420 0.125 254));
   --gradient-hero: linear-gradient(135deg, oklch(0.280 0.090 266) 0%, oklch(0.420 0.128 250) 50%, oklch(0.620 0.118 197) 100%);
@@ -241,6 +248,10 @@
   --input: oklch(0.334 0.036 262);
   --ring: oklch(0.735 0.105 232);
   --gradient-primary: linear-gradient(135deg, oklch(0.470 0.125 262) 0%, oklch(0.580 0.120 236) 55%, oklch(0.720 0.115 198) 100%);
+  --gradient-pulse: linear-gradient(135deg, oklch(0.285 0.105 264) 0%, oklch(0.365 0.110 248) 52%, oklch(0.470 0.095 205) 100%);
+  --pulse-ink: oklch(1 0 0);
+  --pulse-deep: oklch(0.285 0.105 264);
+  --pulse-online: oklch(0.790 0.180 150);
   --gradient-secondary: linear-gradient(135deg, oklch(0.720 0.115 198), oklch(0.320 0.095 262));
   --gradient-accent: linear-gradient(135deg, oklch(0.760 0.110 196), oklch(0.520 0.125 250));
   --gradient-hero: linear-gradient(135deg, oklch(0.320 0.095 266) 0%, oklch(0.500 0.125 246) 50%, oklch(0.720 0.115 197) 100%);
@@ -964,4 +975,61 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .gp-rise-layer { display: none; }
+}
+
+/* ---------- GPA Pulse support chat ---------- */
+@keyframes gp-pulse-ring {
+  0% { transform: scale(1); opacity: 0.55; }
+  70% { transform: scale(1.55); opacity: 0; }
+  100% { transform: scale(1.55); opacity: 0; }
+}
+@keyframes gp-pulse-ekg {
+  0% { stroke-dashoffset: 60; opacity: 0; }
+  12% { opacity: 0.9; }
+  60% { stroke-dashoffset: 0; opacity: 0.9; }
+  100% { stroke-dashoffset: -60; opacity: 0; }
+}
+@keyframes gp-pulse-panel-in {
+  0% { opacity: 0; transform: translateY(16px) scale(0.94); }
+  60% { opacity: 1; transform: translateY(-3px) scale(1.008); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes gp-pulse-panel-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(14px) scale(0.96); }
+}
+@keyframes gp-pulse-msg-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes gp-pulse-dot {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+  40% { transform: translateY(-4px); opacity: 1; }
+}
+@utility gp-pulse-ring {
+  animation: gp-pulse-ring 2.4s cubic-bezier(0.22, 0.61, 0.36, 1) infinite;
+  @media (prefers-reduced-motion: reduce) { animation: none; opacity: 0; }
+}
+@utility gp-pulse-ekg {
+  stroke-dasharray: 60;
+  animation: gp-pulse-ekg 2.4s ease-in-out infinite;
+  @media (prefers-reduced-motion: reduce) { animation: none; stroke-dasharray: none; opacity: 0.8; }
+}
+@utility gp-pulse-panel-in {
+  transform-origin: bottom right;
+  animation: gp-pulse-panel-in 420ms cubic-bezier(0.34, 1.4, 0.64, 1) both;
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+@utility gp-pulse-panel-out {
+  transform-origin: bottom right;
+  animation: gp-pulse-panel-out 180ms ease-in both;
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+@utility gp-pulse-msg-in {
+  animation: gp-pulse-msg-in 260ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  @media (prefers-reduced-motion: reduce) { animation: none; }
+}
+@utility gp-pulse-dot {
+  animation: gp-pulse-dot 1.2s ease-in-out infinite;
+  @media (prefers-reduced-motion: reduce) { animation: none; opacity: 0.8; }
 }
