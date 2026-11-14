@@ -42,6 +42,8 @@ const MAIN_CHIPS: ChipKey[] = ["findPro", "showProblem", "becomePro", "askPulse"
 const PRO_TOPICS: ChipKey[] = ["proSignup", "pro85", "proNeeds"];
 
 let nextId = 1;
+/** Set after the launcher first mounts in this page load, so its entrance never replays. */
+let launcherEntered = false;
 
 /** Circular navy→teal avatar carrying the real GPA mark. */
 function PulseAvatar({ className = "h-8 w-8" }: { className?: string }) {
@@ -74,6 +76,9 @@ export function SupportChat() {
   const listRef = useRef<HTMLDivElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+  // Launcher fades in gently once per page load only; never replays on navigation.
+  const [launcherEnter] = useState(() => !launcherEntered);
+  useEffect(() => { launcherEntered = true; }, []);
   const t = PULSE_COPY[lang];
 
   const hidden = HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/") || pathname.startsWith(p + "."));
@@ -518,7 +523,7 @@ export function SupportChat() {
             onClick={openChat}
             aria-label={t.open}
             aria-expanded={false}
-            className="group pointer-events-auto relative grid h-14 w-14 place-items-center rounded-full text-pulse-ink shadow-[0_14px_34px_-12px_color-mix(in_oklab,var(--brand-navy)_65%,transparent)] ring-[3px] ring-card transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-brand-teal motion-safe:animate-in motion-safe:zoom-in-75 motion-safe:fade-in motion-reduce:hover:scale-100 md:h-[60px] md:w-[60px]"
+            className={cn("group pointer-events-auto relative grid h-14 w-14 place-items-center rounded-full text-pulse-ink shadow-[0_14px_34px_-12px_color-mix(in_oklab,var(--brand-navy)_65%,transparent)] ring-[3px] ring-card transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-brand-teal motion-reduce:hover:scale-100 md:h-[60px] md:w-[60px]", launcherEnter && "motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95 motion-safe:duration-500")}
             style={{ background: "var(--gradient-pulse)" }}
           >
             <span aria-hidden="true" className="gp-pulse-ring pointer-events-none absolute inset-0 rounded-full border-2 border-brand-teal" />

@@ -48,7 +48,7 @@ function Landing() {
       {/* Hero — outcome-first composer. One clean surface: no gradient orbs,
           no mesh. The composer is the single action on phones. */}
       <section
-        className="gpb-bleed fade-up relative -mt-4 overflow-hidden border-b border-border/50 py-10 sm:py-14 lg:py-20 xl:py-24 md:-mt-6"
+        className="gpb-bleed relative -mt-4 overflow-hidden border-b border-border/50 py-10 sm:py-14 lg:py-20 xl:py-24 md:-mt-6"
         style={{ backgroundColor: "color-mix(in oklab, var(--card) 92%, var(--background))" }}
       >
         <div className="gpb-shell relative grid items-center gap-8 lg:grid-cols-[1fr_1fr] lg:gap-14 xl:gap-20">
