@@ -1007,6 +1007,7 @@ export type Database = {
           category_slugs: string[]
           created_at: string
           full_name: string
+          other_service_description: string | null
           phone: string
           service_slugs: string[]
           state: string
@@ -1020,6 +1021,7 @@ export type Database = {
           category_slugs?: string[]
           created_at?: string
           full_name?: string
+          other_service_description?: string | null
           phone?: string
           service_slugs?: string[]
           state?: string
@@ -1033,6 +1035,7 @@ export type Database = {
           category_slugs?: string[]
           created_at?: string
           full_name?: string
+          other_service_description?: string | null
           phone?: string
           service_slugs?: string[]
           state?: string

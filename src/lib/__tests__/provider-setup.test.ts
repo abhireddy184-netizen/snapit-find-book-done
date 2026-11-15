@@ -58,6 +58,16 @@ describe("unified provider setup requirements", () => {
       "Services",
     );
   });
+  it("Other Services with a description satisfies Services without a listed service", () => {
+    const otherOnly = { ...draft, category_slugs: [], service_slugs: [], other_service_description: "Home tutoring" };
+    expect(missingSetupItems(otherOnly, documents, { otherSelected: true })).toEqual([]);
+  });
+  it("Other Services checked but left empty asks for a description", () => {
+    expect(missingSetupItems({ ...draft, other_service_description: "  " }, documents, { otherSelected: true })).toContain(
+      "Describe your service (Other services)",
+    );
+    expect(missingSetupItems({ ...draft, category_slugs: [], service_slugs: [] }, documents)).toContain("Services");
+  });
   it("reminders stop for submitted, pending review or active profiles", () => {
     expect(setupRemindersAllowed("pending_setup", "unverified")).toBe(true);
     expect(setupRemindersAllowed("under_verification", "pending")).toBe(false);
@@ -170,5 +180,15 @@ describe("submission outbox with mocked email service only", () => {
     await processUnifiedSubmissionEmails(f.db as never);
     expect(send).not.toHaveBeenCalled();
     expect(f.ledger.status).toBe("pending");
+  });
+});
+
+describe("setup schema Other Services", () => {
+  it("accepts a custom service with no catalog services and rejects overly long text", async () => {
+    const { providerSetupSchema } = await import("../provider-setup-schema");
+    const base = { ...draft, category_slugs: [], service_slugs: [] };
+    expect(providerSetupSchema.parse({ ...base, other_service_description: " Online classes " }).other_service_description).toBe("Online classes");
+    expect(providerSetupSchema.parse(base).other_service_description).toBe("");
+    expect(() => providerSetupSchema.parse({ ...base, other_service_description: "x".repeat(301) })).toThrow();
   });
 });

@@ -7,6 +7,7 @@ import { AppShell, Avatar } from "@/components/getpros/AppShell";
 import { DocStatus } from "@/components/getpros/ProviderDocuments";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
+import { catalog } from "@/lib/catalog";
 import { docTypeLabel, listDocuments, openDocument } from "@/lib/provider-documents";
 import { adminRequestProviderDocuments } from "@/lib/provider-documents.functions";
 import {
@@ -103,11 +104,52 @@ function AdminProviderReview() {
                 <p className="mt-5 text-xs font-semibold text-muted-foreground">Booking button hidden in admin preview.</p>
               </div>
             </section>
+            <AdminSetupServices userId={id} />
             <AdminDocuments userId={id} />
           </>
         )}
       </div>
     </AppShell>
+  );
+}
+
+function AdminSetupServices({ userId }: { userId: string }) {
+  const setup = useQuery({
+    queryKey: ["admin-setup-services", userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("provider_setup")
+        .select("service_slugs, other_service_description")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
+  const s = setup.data;
+  if (!s) return null;
+  const names = s.service_slugs
+    .map((slug) => catalog.flatMap((c) => c.services).find((v) => v.slug === slug)?.name)
+    .filter((n): n is string => Boolean(n));
+  const other = s.other_service_description?.trim();
+  if (!names.length && !other) return null;
+  return (
+    <section className="mt-4 surface-card p-5" aria-label="Services selected in setup">
+      <h2 className="text-base font-bold">Services selected</h2>
+      {names.length > 0 && (
+        <ul className="mt-3 flex flex-wrap gap-2">
+          {names.map((n) => (
+            <li key={n} className="rounded-full bg-muted px-3 py-1 text-xs font-semibold">{n}</li>
+          ))}
+        </ul>
+      )}
+      {other && (
+        <div className="mt-3 rounded-xl border border-border p-3 text-sm">
+          <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Other Services (custom)</div>
+          <p className="mt-1 whitespace-pre-line break-words">{other}</p>
+        </div>
+      )}
+    </section>
   );
 }
 

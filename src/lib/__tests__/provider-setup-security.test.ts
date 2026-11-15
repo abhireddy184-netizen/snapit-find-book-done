@@ -41,7 +41,7 @@ describe("secure setup server binding with isolated auth fixtures", () => {
     await invoke({ data: draft, context: context() });
     expect(mocks.rpc).toHaveBeenCalledWith("save_provider_setup_for_user", {
       _user_id: "authenticated-provider-a",
-      _data: { ...draft, service_category: catalog.find((c) => c.slug === "cleaning")?.name },
+      _data: { ...draft, other_service_description: "", service_category: catalog.find((c) => c.slug === "cleaning")?.name },
     });
   });
   it("rejects forged owner UUID fields rather than forwarding them", async () => {

@@ -176,6 +176,13 @@
       "when": 1794590267154,
       "tag": "0024_proconnect_admin_calling_agent",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1794763197987,
+      "tag": "0025_provider_setup_other_service",
+      "breakpoints": true
     }
   ]
 }

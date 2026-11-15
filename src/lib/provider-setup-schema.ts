@@ -9,6 +9,7 @@ export const providerSetupSchema = z
     business_type: z.enum(["individual", "registered_business"]),
     category_slugs: z.array(z.string()).max(40),
     service_slugs: z.array(z.string()).max(250),
+    other_service_description: z.string().trim().max(300).optional().default(""),
     service_area: z.string().trim().max(300),
     service_zip: z.string().regex(/^(\d{5})?$/),
     service_radius_miles: z.number().int().min(1).max(200).nullable(),

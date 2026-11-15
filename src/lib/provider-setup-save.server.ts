@@ -19,7 +19,11 @@ export async function saveBoundProviderSetup(
   const category = catalog.find((c) => c.slug === data.category_slugs[0]);
   const { error } = await db.rpc("save_provider_setup_for_user", {
     _user_id: context.userId,
-    _data: { ...data, service_category: category?.name || null },
+    _data: {
+      ...data,
+      // Pros offering only an unlisted service still get a readable category for admin review.
+      service_category: category?.name || (data.other_service_description ? "Other services" : null),
+    },
   });
   if (error)
     throw new Error(

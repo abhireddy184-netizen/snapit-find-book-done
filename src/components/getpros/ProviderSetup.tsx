@@ -32,6 +32,7 @@ const emptyDraft: SetupDraft = {
   service_radius_miles: null,
   bio: "",
   trade_license_required: false,
+  other_service_description: "",
 };
 
 export function ProviderSetup() {
@@ -56,6 +57,7 @@ export function ProviderSetup() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [missing, setMissing] = useState<string[]>([]);
+  const [otherSelected, setOtherSelected] = useState(false);
   const initializedFor = useRef<string | null>(null);
   useEffect(() => {
     const data = state.data;
@@ -82,7 +84,9 @@ export function ProviderSetup() {
       service_radius_miles: p?.service_radius_miles || null,
       bio: p?.bio || "",
       trade_license_required: s?.trade_license_required || false,
+      other_service_description: s?.other_service_description || "",
     });
+    setOtherSelected(Boolean(s?.other_service_description?.trim()));
     void welcome({ data: undefined }).catch(() => {});
   }, [state.data, welcome]);
 
@@ -91,16 +95,21 @@ export function ProviderSetup() {
     setError("");
     setMessage("");
     setMissing([]);
+    // An unchecked "Other services" box never sends leftover text.
+    const payload: SetupDraft = {
+      ...draft,
+      other_service_description: otherSelected ? (draft.other_service_description ?? "").trim() : "",
+    };
     try {
       if (final) {
         const latest = user ? await listDocuments(user.id) : [];
-        const items = missingSetupItems(draft, latest);
+        const items = missingSetupItems(payload, latest, { otherSelected });
         if (items.length) {
           setMissing(items);
           return;
         }
       }
-      await save({ data: draft });
+      await save({ data: payload });
       if (final) setMessage("Draft saved. Submission is not complete until confirmation appears.");
       if (final) {
         const result = await submit();
@@ -236,6 +245,36 @@ export function ProviderSetup() {
                 </div>
               </details>
             ))}
+            <div className="pt-1">
+              <label className="flex items-start gap-2 text-sm font-semibold">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 shrink-0 accent-primary"
+                  checked={otherSelected}
+                  onChange={(e) => setOtherSelected(e.target.checked)}
+                />
+                Other Services
+                {otherSelected && (draft.other_service_description ?? "").trim() && (
+                  <span className="text-primary">✓</span>
+                )}
+              </label>
+              <p className="ml-6 mt-1 text-xs text-muted-foreground">
+                Offer something not listed above? Tell us about it.
+              </p>
+              {otherSelected && (
+                <label className="ml-6 mt-3 block text-sm font-semibold">
+                  Describe your service
+                  <input
+                    type="text"
+                    value={draft.other_service_description ?? ""}
+                    onChange={(e) => set("other_service_description", e.target.value)}
+                    maxLength={300}
+                    placeholder="e.g. Home tutoring, online classes, teaching assistant"
+                    className="mt-2 min-h-11 w-full rounded-md border border-input bg-background px-3 font-normal outline-none focus:ring-2 focus:ring-ring"
+                  />
+                </label>
+              )}
+            </div>
           </div>
         </SetupSection>
         <SetupSection title="Service area" open>
