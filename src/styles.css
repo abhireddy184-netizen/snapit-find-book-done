@@ -76,6 +76,11 @@
   --color-brand-navy: var(--brand-navy);
   --color-brand-teal: var(--brand-teal);
   --color-brand-slate: var(--brand-slate);
+  --color-promo: var(--promo);
+  --color-promo-foreground: var(--promo-foreground);
+  --color-promo-gold: var(--promo-gold);
+  --color-promo-gold-foreground: var(--promo-gold-foreground);
+  --color-promo-teal: var(--promo-teal);
   --color-pulse-ink: var(--pulse-ink);
   --color-pulse-deep: var(--pulse-deep);
   --color-pulse-online: var(--pulse-online);
@@ -150,6 +155,12 @@
   --brand-navy: oklch(0.315 0.115 264);
   --brand-teal: oklch(0.640 0.128 199);
   --brand-slate: oklch(0.560 0.032 258);
+  /* Seasonal promo strip: fixed navy/teal/gold in both themes (not overridden in .dark). */
+  --promo: oklch(0.270 0.095 264);
+  --promo-foreground: oklch(0.985 0.004 240);
+  --promo-gold: oklch(0.830 0.140 85);
+  --promo-gold-foreground: oklch(0.240 0.060 264);
+  --promo-teal: oklch(0.780 0.115 195);
   --coral: oklch(0.700 0.135 42);
   --lavender: oklch(0.620 0.120 232);
   --lemon: oklch(0.860 0.080 88);

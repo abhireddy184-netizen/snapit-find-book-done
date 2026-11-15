@@ -34,3 +34,7 @@
 - [ ] Confirm what "Bata" refers to (blocked: owner answer — no bot/mascot asset in the project)
 
 - [x] Upgrade the floating support chat in place to GPA Pulse (GPA mark + heartbeat launcher, EN/ES toggle, quick-action chips wired to Show GP / categories / Pro signup, human-support menu)
+
+- [x] Site-wide Founding Pros offer banner (BLACK FRIDAY → HOLIDAY OFFER Nov 28, countdown to Dec 31 11:59 PM Chicago, session dismiss, auto-stop)
+- [ ] Apply "keep 100% of first 3 jobs" in payments (blocked: owner decision — payments still take 15%)
+- [ ] First ad campaign (DFW Pro recruiting, Facebook/Instagram): connect Facebook ad account, then creative (blocked: owner must connect Facebook)

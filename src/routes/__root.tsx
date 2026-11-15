@@ -27,6 +27,7 @@ function CanonicalTags() {
 }
 import { useEffect, type ReactNode } from "react";
 import { AppShell } from "../components/getpros/AppShell";
+import { PromoBanner } from "../components/getpros/PromoBanner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -171,6 +172,7 @@ function RootComponent() {
       <ThemeProvider>
         <AuthProvider>
           {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+          <PromoBanner />
           <Outlet />
         </AuthProvider>
       </ThemeProvider>
