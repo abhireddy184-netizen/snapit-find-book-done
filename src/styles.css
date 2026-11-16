@@ -78,8 +78,9 @@
   --color-brand-slate: var(--brand-slate);
   --color-promo: var(--promo);
   --color-promo-foreground: var(--promo-foreground);
-  --color-promo-gold: var(--promo-gold);
-  --color-promo-gold-foreground: var(--promo-gold-foreground);
+  --color-promo-ink: var(--promo-ink);
+  --color-promo-lime: var(--promo-lime);
+  --color-promo-lime-foreground: var(--promo-lime-foreground);
   --color-promo-teal: var(--promo-teal);
   --color-pulse-ink: var(--pulse-ink);
   --color-pulse-deep: var(--pulse-deep);
@@ -155,12 +156,15 @@
   --brand-navy: oklch(0.315 0.115 264);
   --brand-teal: oklch(0.640 0.128 199);
   --brand-slate: oklch(0.560 0.032 258);
-  /* Seasonal promo strip: fixed navy/teal/gold in both themes (not overridden in .dark). */
-  --promo: oklch(0.270 0.095 264);
+  /* Seasonal promo banner: fixed black/midnight navy with teal + lime in both themes (not overridden in .dark). */
+  --promo: oklch(0.205 0.070 264);
+  --promo-ink: oklch(0.135 0.030 262);
   --promo-foreground: oklch(0.985 0.004 240);
-  --promo-gold: oklch(0.830 0.140 85);
-  --promo-gold-foreground: oklch(0.240 0.060 264);
-  --promo-teal: oklch(0.780 0.115 195);
+  --promo-lime: oklch(0.905 0.205 128);
+  --promo-lime-hi: oklch(0.975 0.090 120);
+  --promo-lime-deep: oklch(0.520 0.150 138);
+  --promo-lime-foreground: oklch(0.200 0.060 140);
+  --promo-teal: oklch(0.800 0.130 192);
   --coral: oklch(0.700 0.135 42);
   --lavender: oklch(0.620 0.120 232);
   --lemon: oklch(0.860 0.080 88);
@@ -993,4 +997,134 @@
 @utility gp-pulse-dot {
   animation: gp-pulse-dot 1.2s ease-in-out infinite;
   @media (prefers-reduced-motion: reduce) { animation: none; opacity: 0.8; }
+}
+
+/* ---------- Seasonal promo banner (PromoBanner.tsx) ----------
+   Ambient light only: no entrance motion (see AGENTS.md: no flying/load motion). */
+.promo-cine {
+  background:
+    radial-gradient(60% 90% at 12% 0%, color-mix(in oklab, var(--promo-teal) 22%, transparent), transparent 60%),
+    radial-gradient(45% 70% at 38% 100%, color-mix(in oklab, var(--promo-lime) 12%, transparent), transparent 70%),
+    linear-gradient(115deg, var(--promo-ink) 0%, var(--promo) 55%, var(--promo-ink) 100%);
+  isolation: isolate;
+}
+.promo-cine-grid {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--promo-foreground) 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--promo-foreground) 5%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(80% 90% at 30% 50%, #000 20%, transparent 75%);
+  -webkit-mask-image: radial-gradient(80% 90% at 30% 50%, #000 20%, transparent 75%);
+}
+.promo-cine-beam {
+  background: conic-gradient(from 200deg at 50% 50%, transparent 0deg, color-mix(in oklab, var(--promo-teal) 18%, transparent) 40deg, transparent 90deg, color-mix(in oklab, var(--promo-lime) 10%, transparent) 160deg, transparent 220deg);
+  filter: blur(40px);
+  animation: promo-beam 18s ease-in-out infinite alternate;
+}
+@keyframes promo-beam {
+  from { transform: rotate(-8deg) scale(1); opacity: 0.7; }
+  to { transform: rotate(8deg) scale(1.08); opacity: 1; }
+}
+.promo-hairline {
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--promo-teal) 70%, transparent), color-mix(in oklab, var(--promo-lime) 70%, transparent), transparent);
+}
+
+/* Dimensional "100%": extruded back layer + metallic lime face with a slow light pass. */
+.promo-100 {
+  position: relative;
+  display: inline-block;
+  font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  font-weight: 800;
+  line-height: 0.86;
+  letter-spacing: -0.055em;
+  filter: drop-shadow(0 0 28px color-mix(in oklab, var(--promo-lime) 32%, transparent));
+}
+.promo-100-depth {
+  position: absolute;
+  user-select: none;
+  pointer-events: none;
+  inset: 0;
+  z-index: -1;
+  color: var(--promo-lime-deep);
+  text-shadow:
+    1px 1px 0 var(--promo-lime-deep),
+    2px 2px 0 color-mix(in oklab, var(--promo-lime-deep) 92%, var(--promo-ink)),
+    3px 3px 0 color-mix(in oklab, var(--promo-lime-deep) 84%, var(--promo-ink)),
+    4px 4px 0 color-mix(in oklab, var(--promo-lime-deep) 76%, var(--promo-ink)),
+    5px 5px 0 color-mix(in oklab, var(--promo-lime-deep) 68%, var(--promo-ink)),
+    6px 6px 0 color-mix(in oklab, var(--promo-lime-deep) 60%, var(--promo-ink)),
+    7px 7px 0 color-mix(in oklab, var(--promo-lime-deep) 50%, var(--promo-ink)),
+    10px 14px 22px color-mix(in oklab, var(--promo-ink) 85%, transparent);
+}
+.promo-100-face {
+  display: block;
+  background-image:
+    linear-gradient(105deg, transparent 38%, color-mix(in oklab, var(--promo-lime-hi) 90%, transparent) 48%, transparent 58%),
+    linear-gradient(180deg, var(--promo-lime-hi) 0%, var(--promo-lime) 38%, color-mix(in oklab, var(--promo-lime) 80%, var(--promo-lime-deep)) 62%, var(--promo-lime) 82%, var(--promo-lime-hi) 100%);
+  background-size: 250% 100%, 100% 100%;
+  background-position: 120% 0, 0 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in oklab, var(--promo-lime-hi) 55%, transparent);
+  animation: promo-sheen 7s ease-in-out infinite;
+}
+@keyframes promo-sheen {
+  0%, 55% { background-position: 120% 0, 0 0; }
+  85%, 100% { background-position: -40% 0, 0 0; }
+}
+.promo-chrome {
+  background: linear-gradient(180deg, var(--promo-foreground) 0%, color-mix(in oklab, var(--promo-foreground) 70%, var(--promo-teal)) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.promo-tile {
+  background: linear-gradient(180deg, color-mix(in oklab, var(--promo-foreground) 10%, transparent), color-mix(in oklab, var(--promo-foreground) 3%, transparent));
+  border: 1px solid color-mix(in oklab, var(--promo-foreground) 14%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, var(--promo-foreground) 18%, transparent), 0 10px 24px -14px color-mix(in oklab, var(--promo-ink) 90%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.promo-tick { animation: promo-tick 380ms ease-out; }
+@keyframes promo-tick {
+  from { opacity: 0.35; }
+  to { opacity: 1; }
+}
+
+.promo-cta {
+  background: linear-gradient(180deg, var(--promo-lime-hi) 0%, var(--promo-lime) 55%, color-mix(in oklab, var(--promo-lime) 85%, var(--promo-lime-deep)) 100%);
+  color: var(--promo-lime-foreground);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--promo-foreground) 70%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--promo-lime-deep) 50%, transparent),
+    0 10px 30px -10px color-mix(in oklab, var(--promo-lime) 60%, transparent);
+  transition: box-shadow 0.25s ease, filter 0.25s ease;
+}
+.promo-cta:hover {
+  filter: brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--promo-foreground) 70%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--promo-lime-deep) 50%, transparent),
+    0 0 36px -4px color-mix(in oklab, var(--promo-lime) 70%, transparent);
+}
+.promo-cta:focus-visible {
+  outline: 2px solid var(--promo-teal);
+  outline-offset: 3px;
+}
+
+.promo-photo {
+  mask-image: linear-gradient(90deg, transparent 0%, #000 28%), linear-gradient(180deg, #000 70%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 28%), linear-gradient(180deg, #000 70%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+.promo-photo-rim {
+  background: radial-gradient(60% 70% at 70% 40%, color-mix(in oklab, var(--promo-teal) 28%, transparent), transparent 70%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .promo-cine-beam, .promo-100-face, .promo-tick { animation: none; }
 }
