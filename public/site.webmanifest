@@ -1,6 +1,6 @@
 {
-  "name": "GetPros",
-  "short_name": "GetPros",
+  "name": "GPA GetPros.ai",
+  "short_name": "GPA GetPros",
   "description": "Show, say or type the service you need. GetPros finds the right local pro.",
   "start_url": "/",
   "scope": "/",
