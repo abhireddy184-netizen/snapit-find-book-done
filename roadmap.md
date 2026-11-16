@@ -40,3 +40,4 @@
 - [ ] First ad campaign (DFW Pro recruiting, Facebook/Instagram): connect Facebook ad account, then creative (blocked: owner must connect Facebook)
 
 - [x] Banner: use the new Black Friday artwork's team photo as the background (artwork text cropped out; live offer, countdown and button stay)
+- [x] Pro signup form: English / Español switch (all form text, errors and screen-reader labels; entered values kept)
