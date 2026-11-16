@@ -3,7 +3,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
-import { CalendarDays, User, Wrench, Check, X, Loader2, MapPin, LogOut, ShieldAlert, Inbox, ShieldCheck, Clock3, BadgeCheck, Trash2, FileText } from "lucide-react";
+import { CalendarDays, User, Wrench, Check, X, Loader2, MapPin, LogOut, ShieldAlert, Inbox, ShieldCheck, Clock3, BadgeCheck, Trash2, FileText, ArrowRight, AlertCircle } from "lucide-react";
+import { isProviderSetupIncomplete } from "@/lib/provider-setup-rules";
 import { ProviderDocuments } from "@/components/getpros/ProviderDocuments";
 import { AppShell, Avatar, GradientButton } from "@/components/getpros/AppShell";
 import { Wordmark } from "@/components/getpros/Logo";
@@ -80,7 +81,7 @@ function ProviderDashboard() {
             <p className="mt-1 text-sm text-muted-foreground">Manage incoming job requests and your business profile.</p>
           </div>
         </div>
-        {profile?.role === "provider" && <Link to="/provider-setup" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-primary">Complete or resume Pro setup →</Link>}
+        {profile?.role === "provider" && <ResumeSetupCta userId={user?.id} />}
         {profile && profile.role !== "provider" && (
           <div className="mt-4 flex items-start gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-700 dark:text-amber-400">
             <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0" />
@@ -118,6 +119,39 @@ function ProviderDashboard() {
         {tab === "documents" && <ProviderDocuments userId={user?.id} />}
       </div>
     </AppShell>
+  );
+}
+
+/**
+ * Prominent "Resume & Complete Setup" call to action, shown only while the
+ * pro's setup is unfinished. Read-only: it never creates or changes setup rows.
+ */
+function ResumeSetupCta({ userId }: { userId: string | undefined }) {
+  const { data } = useQuery({
+    queryKey: ["provider-setup-status", userId],
+    queryFn: async () => {
+      const [{ data: setup }, { data: provider }] = await Promise.all([
+        supabase.from("provider_setup").select("state").eq("user_id", userId as string).maybeSingle(),
+        supabase.from("provider_profiles").select("verification_status").eq("user_id", userId as string).maybeSingle(),
+      ]);
+      return isProviderSetupIncomplete(setup?.state, provider?.verification_status);
+    },
+    enabled: Boolean(userId),
+  });
+  if (data !== true) return null;
+  return (
+    <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+      <span className="setup-incomplete-chip inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold">
+        <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" /> Setup Incomplete
+      </span>
+      <Link
+        to="/provider-setup"
+        className="setup-resume-cta inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full px-6 text-base font-bold sm:w-auto"
+      >
+        Resume &amp; Complete Setup
+        <ArrowRight className="h-5 w-5" aria-hidden="true" />
+      </Link>
+    </div>
   );
 }
 

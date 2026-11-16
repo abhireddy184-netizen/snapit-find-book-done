@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  isProviderSetupIncomplete,
   missingSetupItems,
   requiredSetupDocuments,
   setupRemindersAllowed,
@@ -191,4 +192,12 @@ describe("setup schema Other Services", () => {
     expect(providerSetupSchema.parse(base).other_service_description).toBe("");
     expect(() => providerSetupSchema.parse({ ...base, other_service_description: "x".repeat(301) })).toThrow();
   });
+});
+
+describe('Resume & Complete Setup visibility', () => {
+  it('shows for an unreviewed pro still in pending setup', () => expect(isProviderSetupIncomplete('pending_setup', 'unverified')).toBe(true));
+  it('shows for an unreviewed pro with no setup row yet', () => expect(isProviderSetupIncomplete(null, null)).toBe(true));
+  it('hides once setup is submitted for verification', () => expect(isProviderSetupIncomplete('under_verification', 'unverified')).toBe(false));
+  it('hides while admin review is pending', () => expect(isProviderSetupIncomplete('pending_setup', 'pending')).toBe(false));
+  it('hides for an approved pro', () => expect(isProviderSetupIncomplete(null, 'verified')).toBe(false));
 });

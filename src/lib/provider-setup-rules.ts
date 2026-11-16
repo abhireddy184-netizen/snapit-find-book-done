@@ -32,3 +32,14 @@ export function missingSetupItems(draft: SetupDraft, docs: Array<{ doc_type: str
 export function setupRemindersAllowed(state: string, verification: string): boolean {
   return state === 'pending_setup' && verification === 'unverified';
 }
+/**
+ * True while a Pro still has setup to finish: not yet submitted for review and
+ * not already pending or approved. Mirrors the "pending / approved" checks on
+ * the setup page so the two never disagree. A missing setup row counts as
+ * incomplete only for an unreviewed pro.
+ */
+export function isProviderSetupIncomplete(setupState: string | null | undefined, verification: string | null | undefined): boolean {
+  if (verification === 'verified' || verification === 'pending') return false;
+  if (setupState === 'under_verification') return false;
+  return setupState == null || setupState === 'pending_setup';
+}
