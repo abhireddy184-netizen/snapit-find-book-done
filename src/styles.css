@@ -1115,9 +1115,19 @@
   outline-offset: 3px;
 }
 
-.promo-photo {
-  mask-image: linear-gradient(90deg, transparent 0%, #000 28%), linear-gradient(180deg, #000 70%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 28%), linear-gradient(180deg, #000 70%, transparent 100%);
+/* Founding Pros team photo: all five pros kept whole; edges dissolve into the navy */
+.promo-team-region {
+  left: calc(max(0px, (100% - 80rem) / 2) + min(58%, 38.5rem));
+}
+.promo-team-photo {
+  mask-image: linear-gradient(90deg, transparent 0%, #000 14%), linear-gradient(180deg, transparent 0%, #000 4%, #000 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%), linear-gradient(180deg, transparent 0%, #000 4%, #000 80%, transparent 100%);
+  mask-composite: intersect;
+  -webkit-mask-composite: source-in;
+}
+.promo-team-photo-stack {
+  mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 4%, #000 82%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 4%, #000 82%, transparent 100%);
   mask-composite: intersect;
   -webkit-mask-composite: source-in;
 }

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 import { ArrowRight, X } from "lucide-react";
-import { GpaMark } from "@/components/getpros/GpaMark";
-import proPortrait from "@/assets/promo-pro-portrait.jpg";
+import teamPhoto from "@/assets/getpros-founding-pros-team.jpg.asset.json";
+import teamPhotoSmall from "@/assets/getpros-founding-pros-team-960.jpg.asset.json";
 import {
   PROMO_CTA_URL,
   PROMO_DISMISS_KEY,
@@ -83,6 +83,24 @@ function DismissButton({ onDismiss, className = "" }: { onDismiss: () => void; c
   );
 }
 
+const TEAM_ALT =
+  "Five GetPros pros: a handyman, a cleaner, an HVAC technician, a painter and a beautician";
+
+function TeamPhoto({ className, sizes }: { className: string; sizes: string }) {
+  return (
+    <img
+      src={teamPhoto.url}
+      srcSet={`${teamPhotoSmall.url} 960w, ${teamPhoto.url} 1672w`}
+      sizes={sizes}
+      alt={TEAM_ALT}
+      width={1672}
+      height={941}
+      decoding="async"
+      className={className}
+    />
+  );
+}
+
 function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps) {
   return (
     <aside
@@ -94,7 +112,16 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
       <div aria-hidden className="promo-cine-beam pointer-events-none absolute -left-1/4 -top-1/2 -z-10 h-[200%] w-[90%]" />
       <div aria-hidden className="promo-hairline pointer-events-none absolute inset-x-0 top-0 h-px" />
 
-      <div className="relative mx-auto grid max-w-7xl md:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
+      {/* Laptop/desktop: the full team on the right, blended into the navy */}
+      <div className="promo-team-region pointer-events-none absolute inset-y-0 right-0 hidden lg:block">
+        <div aria-hidden className="promo-photo-rim absolute inset-0" />
+        <TeamPhoto
+          sizes="(min-width: 1024px) 60vw, 100vw"
+          className="promo-team-photo absolute bottom-0 right-0 h-auto max-h-full w-auto max-w-full"
+        />
+      </div>
+
+      <div className="relative mx-auto grid max-w-7xl lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
         <div className="relative z-10 px-4 pb-6 pt-5 sm:px-6 md:pb-10 md:pt-9 lg:px-8 lg:pb-12 lg:pt-11">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 pr-10 md:pr-0">
             <span className="rounded-full border border-promo-lime/60 bg-promo-lime/10 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.2em] text-promo-lime sm:text-[11px]">
@@ -118,18 +145,6 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
                 of your first 3 jobs
               </span>
             </p>
-            {/* Phone/tablet portrait: framed, never cropped by text */}
-            <div className="relative w-[34%] max-w-[168px] shrink-0 md:hidden">
-              <div aria-hidden className="promo-photo-rim absolute -inset-3 rounded-[1.75rem]" />
-              <img
-                src={proPortrait}
-                alt="A GetPros home-service professional"
-                width={1024}
-                height={1152}
-                decoding="async"
-                className="relative aspect-[4/5] w-full rounded-2xl border border-promo-teal/30 object-cover object-top shadow-2xl"
-              />
-            </div>
           </div>
 
           <p className="mt-4 text-sm font-semibold text-promo-foreground/90 sm:text-base md:mt-6 md:text-lg">
@@ -137,7 +152,7 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
           </p>
           <p className="mt-1 text-xs text-promo-foreground/60 sm:text-sm">Offer valid through December 31, 2026.</p>
 
-          <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5 md:mt-7 md:flex-col md:items-start lg:flex-row lg:items-center">
+          <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5 md:mt-7">
             <div role="timer" aria-label="Time left in offer" className="grid grid-cols-4 gap-2 sm:flex">
               <span className="sr-only">Offer ends in {countdown.days} days</span>
               {units(countdown).map(([v, l]) => (
@@ -165,28 +180,15 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
             </a>
           </div>
         </div>
+      </div>
 
-        {/* Desktop/laptop: cinematic portrait on the right */}
-        <div className="relative hidden md:block">
-          <div aria-hidden className="promo-photo-rim absolute inset-0" />
-          <img
-            src={proPortrait}
-            alt="A GetPros home-service professional"
-            width={1024}
-            height={1152}
-            decoding="async"
-            className="promo-photo absolute inset-0 h-full w-full object-cover object-[60%_18%]"
-          />
-          <div className="promo-tile absolute bottom-6 left-10 flex items-center gap-3 rounded-2xl px-4 py-3 lg:bottom-8 lg:left-14">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-promo/80 p-1.5">
-              <GpaMark className="h-auto w-full" />
-            </span>
-            <span className="leading-tight">
-              <span className="block text-sm font-bold text-promo-foreground">GetPros.ai</span>
-              <span className="block text-[11px] font-medium uppercase tracking-[0.14em] text-promo-teal">Founding Pros</span>
-            </span>
-          </div>
-        </div>
+      {/* Phone/tablet: the full team below the offer, never over the text or button */}
+      <div className="relative lg:hidden">
+        <div aria-hidden className="promo-photo-rim absolute inset-0" />
+        <TeamPhoto
+          sizes="(min-width: 768px) 768px, 100vw"
+          className="promo-team-photo-stack relative mx-auto block h-auto w-full max-w-2xl"
+        />
       </div>
 
       <DismissButton onDismiss={onDismiss} className="right-2 top-2 bg-promo-ink/40 backdrop-blur-sm md:right-3 md:top-3" />
