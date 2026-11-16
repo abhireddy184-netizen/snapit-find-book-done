@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Briefcase, Sparkles } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
+import { usePromoOpen } from "@/lib/promo-open";
 
 /** Pages where a floating "Join as a Pro" would be redundant or cover a form/camera/checkout. */
 const HIDDEN_PREFIXES = [
@@ -20,6 +21,8 @@ export function FloatingProCta({ keyboardOpen }: { keyboardOpen: boolean }) {
   const { user, loading } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [heroVisible, setHeroVisible] = useState(false);
+  // The promo banner already carries a Join as a Pro button; don't show a second one.
+  const promoOpen = usePromoOpen();
 
   useEffect(() => setMounted(true), []);
 
@@ -35,7 +38,7 @@ export function FloatingProCta({ keyboardOpen }: { keyboardOpen: boolean }) {
   }, [mounted, pathname]);
 
   const hidden =
-    !mounted || loading || !!user || keyboardOpen || heroVisible ||
+    !mounted || loading || !!user || keyboardOpen || heroVisible || promoOpen ||
     HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`) || pathname.startsWith(`${p}.`));
   if (!mounted || loading || user || HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return null;
 

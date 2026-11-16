@@ -1115,21 +1115,63 @@
   outline-offset: 3px;
 }
 
-/* Founding Pros team photo: all five pros kept whole; edges dissolve into the navy */
+/* Founding Pros team photo as the banner background: all five pros kept whole; the top and
+   inner edges dissolve into the navy through eased (seam-free) gradient stops */
 .promo-team-region {
   left: calc(max(0px, (100% - 80rem) / 2) + min(58%, 38.5rem));
+  container-type: size;
+}
+/* Box with the photo's exact proportions, as large as the region allows, anchored bottom-right */
+.promo-team-frame {
+  width: min(100cqw, calc(100cqh * 1672 / 941));
+  aspect-ratio: 1672 / 941;
 }
 .promo-team-photo {
-  mask-image: linear-gradient(90deg, transparent 0%, #000 14%), linear-gradient(180deg, transparent 0%, #000 4%, #000 80%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 14%), linear-gradient(180deg, transparent 0%, #000 4%, #000 80%, transparent 100%);
+  --fade-x: linear-gradient(90deg, transparent 0%, rgb(0 0 0 / 0.5) 5%, #000 13%);
+  --fade-y: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 0.5) 4%, #000 10%);
+  mask-image: var(--fade-x), var(--fade-y);
+  -webkit-mask-image: var(--fade-x), var(--fade-y);
   mask-composite: intersect;
   -webkit-mask-composite: source-in;
 }
 .promo-team-photo-stack {
-  mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 4%, #000 82%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 5%, #000 95%, transparent 100%), linear-gradient(180deg, transparent 0%, #000 4%, #000 82%, transparent 100%);
+  --fade-x: linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
+  --fade-y: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 0.5) 4%, #000 10%);
+  mask-image: var(--fade-x), var(--fade-y);
+  -webkit-mask-image: var(--fade-x), var(--fade-y);
   mask-composite: intersect;
   -webkit-mask-composite: source-in;
+}
+/* Deep navy wash: solid at the top edge, eased to clear before the faces; light grounding at the foot */
+.promo-team-shade {
+  --ink: color-mix(in oklab, var(--promo-ink) 70%, var(--promo));
+  background:
+    linear-gradient(180deg,
+      var(--ink) 0%,
+      color-mix(in oklab, var(--ink) 92%, transparent) 6%,
+      color-mix(in oklab, var(--ink) 70%, transparent) 11%,
+      color-mix(in oklab, var(--ink) 38%, transparent) 16%,
+      color-mix(in oklab, var(--ink) 12%, transparent) 21%,
+      transparent 25%,
+      transparent 82%,
+      color-mix(in oklab, var(--ink) 35%, transparent) 100%);
+}
+.promo-team-shade-wide {
+  --ink: color-mix(in oklab, var(--promo-ink) 70%, var(--promo));
+  background:
+    linear-gradient(90deg,
+      var(--ink) 0%,
+      color-mix(in oklab, var(--ink) 60%, transparent) 6%,
+      color-mix(in oklab, var(--ink) 20%, transparent) 12%,
+      transparent 18%),
+    linear-gradient(180deg,
+      var(--ink) 0%,
+      color-mix(in oklab, var(--ink) 82%, transparent) 5%,
+      color-mix(in oklab, var(--ink) 52%, transparent) 10%,
+      color-mix(in oklab, var(--ink) 22%, transparent) 15%,
+      transparent 21%,
+      transparent 82%,
+      color-mix(in oklab, var(--ink) 35%, transparent) 100%);
 }
 .promo-photo-rim {
   background: radial-gradient(60% 70% at 70% 40%, color-mix(in oklab, var(--promo-teal) 28%, transparent), transparent 70%);

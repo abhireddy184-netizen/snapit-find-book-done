@@ -10,6 +10,7 @@ import {
   promoLabel,
   promoVisible,
 } from "@/lib/promo-banner";
+import { setPromoOpen } from "@/lib/promo-open";
 
 type Countdown = ReturnType<typeof promoCountdown>;
 
@@ -36,6 +37,12 @@ export function PromoBanner() {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
   }, []);
+
+  const open = hydrated && !dismissed && promoVisible(now);
+  useEffect(() => {
+    setPromoOpen(open);
+  }, [open]);
+  useEffect(() => () => setPromoOpen(false), []);
 
   if (dismissed || !promoVisible(now)) return null;
 
@@ -112,17 +119,20 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
       <div aria-hidden className="promo-cine-beam pointer-events-none absolute -left-1/4 -top-1/2 -z-10 h-[200%] w-[90%]" />
       <div aria-hidden className="promo-hairline pointer-events-none absolute inset-x-0 top-0 h-px" />
 
-      {/* Laptop/desktop: the full team on the right, blended into the navy */}
+      {/* Laptop/desktop: the team photo is the banner background on the right, under a navy gradient */}
       <div className="promo-team-region pointer-events-none absolute inset-y-0 right-0 hidden lg:block">
         <div aria-hidden className="promo-photo-rim absolute inset-0" />
-        <TeamPhoto
-          sizes="(min-width: 1024px) 60vw, 100vw"
-          className="promo-team-photo absolute bottom-0 right-0 h-auto max-h-full w-auto max-w-full"
-        />
+        <div className="promo-team-frame promo-team-photo absolute bottom-0 right-0">
+          <TeamPhoto
+            sizes="(min-width: 1024px) 60vw, 100vw"
+            className="absolute inset-0 h-full w-full"
+          />
+          <div aria-hidden className="promo-team-shade promo-team-shade-wide absolute inset-0" />
+        </div>
       </div>
 
       <div className="relative mx-auto grid max-w-7xl lg:grid-cols-[minmax(0,1.12fr)_minmax(0,0.88fr)]">
-        <div className="relative z-10 px-4 pb-6 pt-5 sm:px-6 md:pb-10 md:pt-9 lg:px-8 lg:pb-12 lg:pt-11">
+        <div className="relative z-10 px-4 pb-4 pt-5 sm:px-6 md:pb-6 md:pt-9 lg:px-8 lg:pb-12 lg:pt-11">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 pr-10 md:pr-0">
             <span className="rounded-full border border-promo-lime/60 bg-promo-lime/10 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.2em] text-promo-lime sm:text-[11px]">
               {label}
@@ -152,7 +162,7 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
           </p>
           <p className="mt-1 text-xs text-promo-foreground/60 sm:text-sm">Offer valid through December 31, 2026.</p>
 
-          <div className="mt-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-5 md:mt-7">
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5 md:mt-7">
             <div role="timer" aria-label="Time left in offer" className="grid grid-cols-4 gap-2 sm:flex">
               <span className="sr-only">Offer ends in {countdown.days} days</span>
               {units(countdown).map(([v, l]) => (
@@ -174,7 +184,7 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
             </div>
             <a
               href={PROMO_CTA_URL}
-              className="promo-cta inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-full px-7 text-sm font-extrabold uppercase tracking-[0.12em] sm:min-h-[3.25rem]"
+              className="promo-cta inline-flex min-h-12 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full px-7 text-sm font-extrabold uppercase tracking-[0.12em] sm:min-h-[3.25rem]"
             >
               Join as a Pro <ArrowRight className="h-4 w-4" aria-hidden />
             </a>
@@ -182,13 +192,16 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
         </div>
       </div>
 
-      {/* Phone/tablet: the full team below the offer, never over the text or button */}
-      <div className="relative lg:hidden">
-        <div aria-hidden className="promo-photo-rim absolute inset-0" />
-        <TeamPhoto
-          sizes="(min-width: 768px) 768px, 100vw"
-          className="promo-team-photo-stack relative mx-auto block h-auto w-full max-w-2xl"
-        />
+      {/* Phone/tablet: the team photo is the banner background below the offer, rising behind it
+          through a navy gradient (no separate block, no hard seam) */}
+      <div className="pointer-events-none relative -mt-[5%] md:-mt-[6%] lg:hidden">
+        <div className="promo-team-photo-stack relative mx-auto w-full max-w-[52rem]">
+          <TeamPhoto
+            sizes="(min-width: 832px) 832px, 100vw"
+            className="relative block h-auto w-full"
+          />
+          <div aria-hidden className="promo-team-shade absolute inset-0" />
+        </div>
       </div>
 
       <DismissButton onDismiss={onDismiss} className="right-2 top-2 bg-promo-ink/40 backdrop-blur-sm md:right-3 md:top-3" />
