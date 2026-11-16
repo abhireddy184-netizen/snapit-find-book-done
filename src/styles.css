@@ -1005,6 +1005,7 @@
   background:
     radial-gradient(60% 90% at 12% 0%, color-mix(in oklab, var(--promo-teal) 22%, transparent), transparent 60%),
     radial-gradient(45% 70% at 38% 100%, color-mix(in oklab, var(--promo-lime) 12%, transparent), transparent 70%),
+    radial-gradient(70% 45% at 75% 100%, color-mix(in oklab, var(--promo-teal) 16%, transparent), transparent 70%),
     linear-gradient(115deg, var(--promo-ink) 0%, var(--promo) 55%, var(--promo-ink) 100%);
   isolation: isolate;
 }
@@ -1123,55 +1124,46 @@
 }
 /* Box with the photo's exact proportions, as large as the region allows, anchored bottom-right */
 .promo-team-frame {
-  width: min(100cqw, calc(100cqh * 1672 / 941));
-  aspect-ratio: 1672 / 941;
+  width: min(100cqw, calc(100cqh * 1086 / 628));
+  aspect-ratio: 1086 / 628;
 }
 .promo-team-photo {
-  --fade-x: linear-gradient(90deg, transparent 0%, rgb(0 0 0 / 0.5) 5%, #000 13%);
-  --fade-y: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 0.5) 4%, #000 10%);
+  --fade-x: linear-gradient(90deg, transparent 0%, rgb(0 0 0 / 0.5) 2%, #000 5%);
+  --fade-y: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 0.5) 2%, #000 6%);
   mask-image: var(--fade-x), var(--fade-y);
   -webkit-mask-image: var(--fade-x), var(--fade-y);
   mask-composite: intersect;
   -webkit-mask-composite: source-in;
 }
 .promo-team-photo-stack {
-  --fade-x: linear-gradient(90deg, transparent 0%, #000 4%, #000 96%, transparent 100%);
-  --fade-y: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 0.5) 4%, #000 10%);
+  --fade-x: linear-gradient(90deg, transparent 0%, #000 3%, #000 97%, transparent 100%);
+  --fade-y: linear-gradient(180deg, transparent 0%, rgb(0 0 0 / 0.5) 2%, #000 6%);
   mask-image: var(--fade-x), var(--fade-y);
   -webkit-mask-image: var(--fade-x), var(--fade-y);
   mask-composite: intersect;
   -webkit-mask-composite: source-in;
 }
-/* Deep navy wash: solid at the top edge, eased to clear before the faces; light grounding at the foot */
+/* Navy wash only above the faces (the artwork's own navy/teal swoosh carries the rest) */
 .promo-team-shade {
   --ink: color-mix(in oklab, var(--promo-ink) 70%, var(--promo));
-  background:
-    linear-gradient(180deg,
-      var(--ink) 0%,
-      color-mix(in oklab, var(--ink) 92%, transparent) 6%,
-      color-mix(in oklab, var(--ink) 70%, transparent) 11%,
-      color-mix(in oklab, var(--ink) 38%, transparent) 16%,
-      color-mix(in oklab, var(--ink) 12%, transparent) 21%,
-      transparent 25%,
-      transparent 82%,
-      color-mix(in oklab, var(--ink) 35%, transparent) 100%);
+  background: linear-gradient(180deg,
+    var(--ink) 0%,
+    color-mix(in oklab, var(--ink) 70%, transparent) 3%,
+    color-mix(in oklab, var(--ink) 30%, transparent) 6%,
+    transparent 9%);
 }
 .promo-team-shade-wide {
   --ink: color-mix(in oklab, var(--promo-ink) 70%, var(--promo));
   background:
     linear-gradient(90deg,
       var(--ink) 0%,
-      color-mix(in oklab, var(--ink) 60%, transparent) 6%,
-      color-mix(in oklab, var(--ink) 20%, transparent) 12%,
-      transparent 18%),
+      color-mix(in oklab, var(--ink) 55%, transparent) 2.5%,
+      transparent 6%),
     linear-gradient(180deg,
       var(--ink) 0%,
-      color-mix(in oklab, var(--ink) 82%, transparent) 5%,
-      color-mix(in oklab, var(--ink) 52%, transparent) 10%,
-      color-mix(in oklab, var(--ink) 22%, transparent) 15%,
-      transparent 21%,
-      transparent 82%,
-      color-mix(in oklab, var(--ink) 35%, transparent) 100%);
+      color-mix(in oklab, var(--ink) 70%, transparent) 3%,
+      color-mix(in oklab, var(--ink) 30%, transparent) 6%,
+      transparent 9%);
 }
 .promo-photo-rim {
   background: radial-gradient(60% 70% at 70% 40%, color-mix(in oklab, var(--promo-teal) 28%, transparent), transparent 70%);

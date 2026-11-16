@@ -38,3 +38,5 @@
 - [x] Site-wide Founding Pros offer banner (BLACK FRIDAY → HOLIDAY OFFER Nov 28, countdown to Dec 31 11:59 PM Chicago, session dismiss, auto-stop)
 - [ ] Apply "keep 100% of first 3 jobs" in payments (blocked: owner decision — payments still take 15%)
 - [ ] First ad campaign (DFW Pro recruiting, Facebook/Instagram): connect Facebook ad account, then creative (blocked: owner must connect Facebook)
+
+- [x] Banner: use the new Black Friday artwork's team photo as the background (artwork text cropped out; live offer, countdown and button stay)

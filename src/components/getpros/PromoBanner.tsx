@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 import { ArrowRight, X } from "lucide-react";
-import teamPhoto from "@/assets/getpros-founding-pros-team.jpg.asset.json";
-import teamPhotoSmall from "@/assets/getpros-founding-pros-team-960.jpg.asset.json";
+import teamPhoto from "@/assets/getpros-black-friday-team.jpg.asset.json";
+import teamPhotoSmall from "@/assets/getpros-black-friday-team-720.jpg.asset.json";
 import {
   PROMO_CTA_URL,
   PROMO_DISMISS_KEY,
@@ -91,17 +91,17 @@ function DismissButton({ onDismiss, className = "" }: { onDismiss: () => void; c
 }
 
 const TEAM_ALT =
-  "Five GetPros pros: a handyman, a cleaner, an HVAC technician, a painter and a beautician";
+  "Five GetPros pros in front of a home: a handyman, a cleaner, an HVAC technician, a painter and a beautician";
 
 function TeamPhoto({ className, sizes }: { className: string; sizes: string }) {
   return (
     <img
       src={teamPhoto.url}
-      srcSet={`${teamPhotoSmall.url} 960w, ${teamPhoto.url} 1672w`}
+      srcSet={`${teamPhotoSmall.url} 720w, ${teamPhoto.url} 1086w`}
       sizes={sizes}
       alt={TEAM_ALT}
-      width={1672}
-      height={941}
+      width={1086}
+      height={628}
       decoding="async"
       className={className}
     />
@@ -124,7 +124,7 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
         <div aria-hidden className="promo-photo-rim absolute inset-0" />
         <div className="promo-team-frame promo-team-photo absolute bottom-0 right-0">
           <TeamPhoto
-            sizes="(min-width: 1024px) 60vw, 100vw"
+            sizes="(min-width: 1024px) 50vw, 100vw"
             className="absolute inset-0 h-full w-full"
           />
           <div aria-hidden className="promo-team-shade promo-team-shade-wide absolute inset-0" />
@@ -137,12 +137,12 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
             <span className="rounded-full border border-promo-lime/60 bg-promo-lime/10 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-[0.2em] text-promo-lime sm:text-[11px]">
               {label}
             </span>
-            <span className="text-[10px] font-bold uppercase tracking-[0.28em] text-promo-teal sm:text-xs">
+            <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-promo-teal sm:text-xs sm:tracking-[0.28em]">
               Founding Pros Special
             </span>
           </div>
 
-          <div className="mt-4 flex items-end justify-between gap-3 md:mt-5">
+          <div className="mt-3 flex items-end justify-between gap-3 sm:mt-4 md:mt-5">
             <p className="min-w-0">
               <span className="promo-chrome block brand-font text-[clamp(1.6rem,8vw,2.25rem)] font-extrabold uppercase leading-none tracking-tight md:text-5xl lg:text-6xl">
                 Keep
@@ -194,7 +194,7 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
 
       {/* Phone/tablet: the team photo is the banner background below the offer, rising behind it
           through a navy gradient (no separate block, no hard seam) */}
-      <div className="pointer-events-none relative -mt-[5%] md:-mt-[6%] lg:hidden">
+      <div className="pointer-events-none relative -mt-[2%] lg:hidden">
         <div className="promo-team-photo-stack relative mx-auto w-full max-w-[52rem]">
           <TeamPhoto
             sizes="(min-width: 832px) 832px, 100vw"
