@@ -41,3 +41,5 @@
 
 - [x] Banner: use the new Black Friday artwork's team photo as the background (artwork text cropped out; live offer, countdown and button stay)
 - [x] Pro signup form: English / Español switch (all form text, errors and screen-reader labels; entered values kept)
+
+- [x] Add "Keep 1000n your first 3 jobs. Keep 85 0x0p+0fter that." to the homepage banner (preview only)

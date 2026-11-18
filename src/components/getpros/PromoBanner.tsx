@@ -157,7 +157,10 @@ function CinematicBanner({ label, countdown, hydrated, onDismiss }: BannerProps)
             </p>
           </div>
 
-          <p className="mt-4 text-sm font-semibold text-promo-foreground/90 sm:text-base md:mt-6 md:text-lg">
+          <p className="mt-4 text-sm font-bold text-promo-lime sm:text-base md:mt-6 md:text-lg">
+            Keep 100% on your first 3 jobs. Keep 85% after that.
+          </p>
+          <p className="mt-1 text-sm font-semibold text-promo-foreground/90 sm:text-base md:text-lg">
             No Lead Fees. Free Sign-Up. More Opportunities.
           </p>
           <p className="mt-1 text-xs text-promo-foreground/60 sm:text-sm">Offer valid through December 31, 2026.</p>
