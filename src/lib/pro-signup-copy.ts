@@ -54,7 +54,7 @@ export const SIGNUP_COPY: Record<SignupLang, SignupCopy> = {
   en: {
     langGroupLabel: "Form language",
     langNames: { en: "English", es: "Español" },
-    tagline: "No lead fees. Keep 85% of every job.",
+    tagline: "Keep 100% on your first 3 jobs. Keep 85% after that.",
     title: "Join GetPros as a Pro",
     customerAccount:
       "Your signed-in account is a customer account. Sign out and use your Pro account to continue.",
