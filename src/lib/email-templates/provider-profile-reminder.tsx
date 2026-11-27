@@ -37,7 +37,7 @@ const copy = {
     stepsTitle: 'Your next steps',
     steps: [
       'Add your services, service city, ZIP code, travel radius and business details.',
-      'Upload your required documents privately in setup: liability insurance for everyone, plus business registration if you are a registered business and a trade license if your trade requires one.',
+      'No credential uploads are required for basic profile review. You may optionally upload business registration, liability insurance or a trade license privately in setup. Service-specific license and insurance requirements still apply before doing that work.',
       "Submit your profile. Our team reviews it. You can't be listed or booked until GetPros approves you.",
       'After approval, set up payouts before you take paid bookings.',
     ],
@@ -53,7 +53,7 @@ const copy = {
     stepsTitle: 'Tus próximos pasos',
     steps: [
       'Agrega tus servicios, ciudad, código postal, distancia que cubres y los datos de tu negocio.',
-      'Sube tus documentos requeridos de forma privada en el registro: seguro de responsabilidad civil para todos, más el registro de tu empresa si es un negocio registrado y una licencia de oficio si tu trabajo la requiere.',
+      'No necesitas subir credenciales para la revisión de tu perfil básico. Si quieres, puedes subir el registro de tu negocio, tu seguro de responsabilidad civil o tu licencia de oficio de forma privada. Los requisitos de licencia y seguro de cada servicio siguen vigentes antes de realizar ese trabajo.',
       'Envía tu perfil. Nuestro equipo lo revisará. No podrás aparecer en el sitio ni recibir reservas hasta que GetPros te apruebe.',
       'Después de la aprobación, configura tus pagos antes de aceptar trabajos pagados.',
     ],

@@ -31,28 +31,26 @@ const documents = [
 ];
 
 describe("unified provider setup requirements", () => {
-  it("incomplete contact or profile and missing documents remain Pending Setup", () => {
+  it("phone and name remain required even without documents", () => {
     expect(missingSetupItems({ ...draft, full_name: "", phone: "" }, [])).toEqual(
-      ["Name", "Phone number", "business registration", "liability insurance"].sort((a, b) => {
-        const order = ["Name", "Phone number", "liability insurance", "business registration"];
-        return order.indexOf(a) - order.indexOf(b);
-      }),
+      ["Name", "Phone number"],
     );
   });
-  it("registered business requires registration and insurance; applicable trade license adds a requirement", () => {
-    expect(requiredSetupDocuments(draft)).toEqual(["liability_insurance", "business_registration"]);
-    expect(
-      requiredSetupDocuments({ business_type: "individual", trade_license_required: true }),
-    ).toEqual(["liability_insurance", "trade_license"]);
+  it("registered businesses can submit a basic profile with no uploads", () => {
+    expect(requiredSetupDocuments(draft)).toEqual([]);
+    expect(missingSetupItems(draft, [])).toEqual([]);
   });
-  it("full profile and required non-rejected documents can be submitted", () => {
+  it("existing drafts with applicable trade license selected can submit without that license or insurance", () => {
+    expect(missingSetupItems({ ...draft, business_type: "individual", trade_license_required: true }, [])).toEqual([]);
+  });
+  it("optional pending, accepted or rejected uploads do not block review", () => {
     expect(missingSetupItems(draft, documents)).toEqual([]);
     expect(
       missingSetupItems(
         draft,
         documents.map((d) => ({ ...d, status: "rejected" })),
       ),
-    ).toContain("liability insurance");
+    ).toEqual([]);
   });
   it("unknown services cannot satisfy setup", () => {
     expect(missingSetupItems({ ...draft, service_slugs: ["not-a-service"] }, documents)).toContain(

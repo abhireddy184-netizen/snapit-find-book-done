@@ -70,15 +70,11 @@ describe.skipIf(!canCreateIsolatedUsers)(
         expect(row.claim).toBe(false);
         expect(row.legacy).toBe(false);
       }));
-    it("missing stored documents prevents submit; upload alone creates no outbox; explicit submission is atomic and repeat-safe", async () =>
+    it("existing registered-business draft with trade flag submits without uploads and stays pending, repeat-safe", async () =>
       isolated(async (tx, id) => {
-        await tx`SELECT public.save_provider_setup_for_user(${id}::uuid,${JSON.stringify(draft)}::jsonb)`;
+        await tx`SELECT public.save_provider_setup_for_user(${id}::uuid,${JSON.stringify({ ...draft, business_type: 'registered_business', trade_license_required: true })}::jsonb)`;
+        await tx`SELECT public.save_provider_setup_for_user(${id}::uuid,${JSON.stringify({ ...draft, business_type: 'registered_business', trade_license_required: true, bio: 'Resumed draft' })}::jsonb)`;
         await tx`SELECT set_config('request.jwt.claims',${JSON.stringify({ sub: id, role: "authenticated" })},true),set_config('request.jwt.claim.sub',${id},true),set_config('request.jwt.claim.role','authenticated',true)`;
-        const [missing] = await tx`SELECT public.submit_my_provider_setup() AS result`;
-        expect(missing.result).toEqual({ submitted: false, missing: ["liability insurance"] });
-        const path = `${id}/synthetic.pdf`;
-        await tx`INSERT INTO storage.objects(bucket_id,name) VALUES('provider-documents',${path})`;
-        await tx`INSERT INTO public.provider_documents(user_id,doc_type,storage_path,file_name,mime_type,size_bytes) VALUES(${id},'liability_insurance',${path},'synthetic.pdf','application/pdf',100)`;
         const [early] =
           await tx`SELECT count(*)::int AS count FROM public.provider_onboarding_emails WHERE user_id=${id}`;
         expect(early.count).toBe(0);
@@ -92,6 +88,13 @@ describe.skipIf(!canCreateIsolatedUsers)(
         expect(row.count).toBe(1);
         expect(row.status).toBe("pending");
         expect(profile.verification_status).toBe("pending");
+      }));
+    it("phone is still a backend submission blocker without credential uploads", async () =>
+      isolated(async (tx, id) => {
+        await tx`SELECT public.save_provider_setup_for_user(${id}::uuid,${JSON.stringify({ ...draft, phone: '' })}::jsonb)`;
+        await tx`SELECT set_config('request.jwt.claims',${JSON.stringify({ sub: id, role: "authenticated" })},true),set_config('request.jwt.claim.sub',${id},true),set_config('request.jwt.claim.role','authenticated',true)`;
+        const [result] = await tx`SELECT public.submit_my_provider_setup() AS result`;
+        expect(result?.result).toEqual({ submitted: false, missing: ['Phone number'] });
       }));
     it("admin approval queues one approved email only on a real transition", async () =>
       isolated(async (tx, id) => {

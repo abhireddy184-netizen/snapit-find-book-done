@@ -183,6 +183,13 @@
       "when": 1794763197987,
       "tag": "0025_provider_setup_other_service",
       "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1795746349988,
+      "tag": "0026_provider_basic_profile_review_optional_credentials",
+      "breakpoints": true
     }
   ]
 }

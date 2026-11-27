@@ -8,8 +8,9 @@ export type SetupDraft = {
   other_service_description?: string;
 };
 
-export function requiredSetupDocuments(draft: Pick<SetupDraft, 'business_type' | 'trade_license_required'>): string[] {
-  return ['liability_insurance', ...(draft.business_type === 'registered_business' ? ['business_registration'] : []), ...(draft.trade_license_required ? ['trade_license'] : [])];
+export function requiredSetupDocuments(_draft: Pick<SetupDraft, 'business_type' | 'trade_license_required'>): string[] {
+  // Initial profile review is independent of credentials needed for particular work.
+  return [];
 }
 
 export function missingSetupItems(draft: SetupDraft, docs: Array<{ doc_type: string; status: string }>, opts: { otherSelected?: boolean } = {}): string[] {

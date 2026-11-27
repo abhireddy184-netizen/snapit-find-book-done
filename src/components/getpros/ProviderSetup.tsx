@@ -11,10 +11,8 @@ import {
 import { ensureProviderOnboardingEmail } from "@/lib/provider-profile.functions";
 import {
   missingSetupItems,
-  requiredSetupDocuments,
   type SetupDraft,
 } from "@/lib/provider-setup-rules";
-import { listDocuments } from "@/lib/provider-documents";
 import { catalog } from "@/lib/catalog";
 import { useAuth } from "@/lib/auth";
 import { ProviderDocuments } from "./ProviderDocuments";
@@ -45,11 +43,6 @@ export function ProviderSetup() {
   const state = useQuery({
     queryKey: ["provider-setup", user?.id],
     queryFn: () => load(),
-    enabled: Boolean(user),
-  });
-  const docs = useQuery({
-    queryKey: ["my-documents", user?.id],
-    queryFn: () => (user ? listDocuments(user.id) : Promise.resolve([])),
     enabled: Boolean(user),
   });
   const [draft, setDraft] = useState<SetupDraft>(emptyDraft);
@@ -102,8 +95,7 @@ export function ProviderSetup() {
     };
     try {
       if (final) {
-        const latest = user ? await listDocuments(user.id) : [];
-        const items = missingSetupItems(payload, latest, { otherSelected });
+        const items = missingSetupItems(payload, [], { otherSelected });
         if (items.length) {
           setMissing(items);
           return;
@@ -153,7 +145,7 @@ export function ProviderSetup() {
         <p className="mt-4 text-muted-foreground">
           {approved
             ? "Manage your business and set up payouts in your dashboard before taking paid bookings."
-            : "Your profile and documentation have been received. The GetPros team is reviewing your submission. Approval is a separate admin decision."}
+            : "Your profile has been received. The GetPros team is reviewing your submission. Approval is a separate admin decision and does not confirm identity, licensing or insurance."}
         </p>
         <Button asChild className="mt-6 min-h-11">
           <Link to="/provider-dashboard">Open dashboard</Link>
@@ -344,13 +336,17 @@ export function ProviderSetup() {
             </span>
           </label>
         </SetupSection>
-        <SetupSection title="Private documents" open>
+        <SetupSection title="Optional private documents · Documentos privados opcionales">
           <p className="mb-4 text-sm text-muted-foreground">
-            Required for this submission:{" "}
-            {requiredSetupDocuments(draft)
-              .map((s) => s.replaceAll("_", " "))
-              .join(", ")}
-            . Do not upload government photo IDs or reply to emails with documents.
+            No documents are required to submit your basic profile for review. You may optionally
+            upload credentials here. Any license or insurance needed for a specific service must be
+            addressed before doing that work. Do not upload government photo IDs or email documents.
+          </p>
+          <p lang="es" className="mb-4 text-sm text-muted-foreground">
+            No se requieren documentos para enviar tu perfil básico a revisión. Si quieres, puedes
+            subir tus credenciales aquí. Debes cumplir con los requisitos de licencia o seguro de cada
+            servicio antes de realizar ese trabajo. No subas identificaciones oficiales con foto ni
+            envíes documentos por correo electrónico.
           </p>
           <ProviderDocuments userId={user?.id} unified />
         </SetupSection>
@@ -384,7 +380,7 @@ export function ProviderSetup() {
           >
             <Save /> Save draft
           </Button>
-          <Button type="submit" className="min-h-12 flex-1" disabled={busy || docs.isLoading}>
+          <Button type="submit" className="min-h-12 flex-1" disabled={busy}>
             {busy ? <Loader2 className="animate-spin" /> : <Send />} Submit for verification
           </Button>
         </div>

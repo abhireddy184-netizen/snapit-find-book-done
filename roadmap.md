@@ -1,5 +1,7 @@
 # Roadmap
 
+- [x] Make initial Pro review document-free in client/backend, preserve drafts/phone/statuses and update EN/ES required lists. Verified disposable signed-in Pro: backend rejects missing phone, registered-business draft with trade flag resumes and submits with zero uploads, remains under verification on reload, repeated submit succeeds without duplication; 375/768/1280px no overflow. Focused tests: 36 passed, 6 rollback-only tests skipped due restricted database role; build OK. Backend change applied to shared database; page/email changes not published; test email ledger remained pending with zero attempts.
+
 - [x] Reproduce live photo-only failure; repair media deadlines and homepage handoff; verify real plumbing/cleaning uploads and text fallback in preview.
 - [x] Publish scanner repair and repeat live photo-only verification: public /snap identified under-sink plumbing from a photo with no text and offered pipe repair, leak detection, drain clearing and faucet replacement.
 
