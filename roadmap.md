@@ -1,7 +1,7 @@
 # Roadmap
 
 - [x] Reproduce live photo-only failure; repair media deadlines and homepage handoff; verify real plumbing/cleaning uploads and text fallback in preview.
-- [ ] Publish scanner repair and repeat live photo-only verification (blocked: explicit publishing approval required).
+- [x] Publish scanner repair and repeat live photo-only verification: public /snap identified under-sink plumbing from a photo with no text and offered pipe repair, leak detection, drain clearing and faucet replacement.
 
 - [x] Reconcile service-only setup saving without JWT mutation and fence concurrent email claims
 - [ ] Verify authenticated signup/draft/upload/submission/approval and setup device layouts (blocked: isolated auth/service-only database test access unavailable; no real accounts or emails allowed)
