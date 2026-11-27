@@ -1,5 +1,8 @@
 # Roadmap
 
+- [x] Reproduce live photo-only failure; repair media deadlines and homepage handoff; verify real plumbing/cleaning uploads and text fallback in preview.
+- [ ] Publish scanner repair and repeat live photo-only verification (blocked: explicit publishing approval required).
+
 - [x] Reconcile service-only setup saving without JWT mutation and fence concurrent email claims
 - [ ] Verify authenticated signup/draft/upload/submission/approval and setup device layouts (blocked: isolated auth/service-only database test access unavailable; no real accounts or emails allowed)
 - [x] Report exact readiness and remaining blockers without sending real mail or publishing

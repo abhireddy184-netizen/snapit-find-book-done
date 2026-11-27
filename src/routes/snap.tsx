@@ -54,10 +54,8 @@ import {
   Users,
 } from "lucide-react";
 
-/** Hard ceiling for a single AI diagnosis request before we bail out. */
-// Text-only requests are fast (no visual pipeline); media needs more room.
-// Server caps vision at ~14s across providers; this is only a network safety net.
-const ANALYSIS_TIMEOUT_MS = 20_000;
+// Preserve the text-only safety net; image inference must finish rather than
+// discard a successful paid result on an artificial deadline.
 const TEXT_ANALYSIS_TIMEOUT_MS = 6_000;
 
 type SnapSearch = { q?: string; loc?: string };
@@ -75,6 +73,8 @@ export const Route = createFileRoute("/snap")({
       { name: "description", content: "Snap a photo or video of any problem. GetPros's AI explains what it likely needs, builds a standardized job scope and helps you compare quotes from service pros." },
       { property: "og:title", content: "Snap a photo — GetPros.ai" },
       { property: "og:description", content: "Point your camera. Get an instant diagnosis, estimate and matched pros." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Snap a photo — GetPros.ai" },
       { name: "twitter:description", content: "Point your camera. Get an instant diagnosis, estimate and matched pros." },
     ],
@@ -138,8 +138,13 @@ function SnapPage() {
   // A photo handed over from the home composer's camera button runs through
   // the exact same diagnosis flow as a photo captured here.
   useEffect(() => {
-    const file = takePendingPhoto();
-    if (file) void handleFile(file, "photo");
+    // Wait until mount effects settle before consuming the one-shot handoff.
+    // Effect replay otherwise invalidates the async run after taking its File.
+    const scheduled = requestAnimationFrame(() => {
+      const file = takePendingPhoto();
+      if (file) void handleFile(file, "photo");
+    });
+    return () => cancelAnimationFrame(scheduled);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => () => {
@@ -183,9 +188,10 @@ function SnapPage() {
         ...(opts?.skipVision ? { skipVision: true } : {}),
         ...(simulate === "primary" || simulate === "all" ? { simulateFail: simulate } : {}),
       };
-      const result = await withTimeout(
-        analyze({ data: payload }),
-        frames.length ? ANALYSIS_TIMEOUT_MS : TEXT_ANALYSIS_TIMEOUT_MS,
+      const request = analyze({ data: payload });
+      const result = frames.length ? await request : await withTimeout(
+        request,
+        TEXT_ANALYSIS_TIMEOUT_MS,
         "The AI is taking longer than usual. Please retry or send it again.",
       );
       if (runRef.current !== token) return;
@@ -193,7 +199,8 @@ function SnapPage() {
       setPhase("matching");
       setAnalysis(result);
       if (result.clarifyingQuestions?.length) {
-        setAskedQuestions((prev) => [...new Set([...prev, ...result.clarifyingQuestions!])].slice(0, 12));
+        const questions = result.clarifyingQuestions;
+        setAskedQuestions((prev) => [...new Set([...prev, ...questions])].slice(0, 12));
       }
     } catch (e) {
       if (runRef.current !== token) return;

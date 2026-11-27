@@ -64,7 +64,7 @@ export const analyzeSnap = createServerFn({ method: "POST" })
     try {
       const { text } = await runVision(
         { system: SYSTEM_PROMPT, text: buildUserPrompt(note, hasMedia, images.length, ctx), images },
-        { totalBudgetMs: hasMedia ? 14_000 : 5_500, simulateFail },
+        { ...(!hasMedia ? { totalBudgetMs: 5_500 } : {}), simulateFail },
       );
       return normalizeAnalysis(text, Boolean(note), hasMedia, note, ctx);
     } catch (err) {

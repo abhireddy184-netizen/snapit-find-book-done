@@ -6,6 +6,7 @@
  * has a per-isolate circuit breaker so a known-dead provider (no credits, bad
  * key) is skipped instantly instead of making the customer wait again.
  */
+import { collectVisionStream } from "./vision-stream.server";
 
 export type VisionFailureKind =
   | "quota"        // credits / billing exhausted (402, RESOURCE_EXHAUSTED quota)
@@ -86,8 +87,8 @@ function classifyThrown(provider: string, err: unknown): VisionError {
 
 function splitDataUrl(dataUrl: string) {
   const m = /^data:([^;,]+);base64,(.*)$/s.exec(dataUrl);
-  if (!m) throw new VisionError("input", "bad_payload", null, "image is not a base64 data URL");
-  return { mime: m[1]!, data: m[2]! };
+  if (!m?.[1] || !m[2]) throw new VisionError("input", "bad_payload", null, "image is not a base64 data URL");
+  return { mime: m[1], data: m[2] };
 }
 
 /* ---------------- providers ---------------- */
@@ -137,6 +138,8 @@ const lovableGateway: Provider = {
   name: "lovable-gateway",
   configured: () => Boolean(process.env["LOVABLE_API_KEY"]),
   async call(c, signal) {
+    const key = process.env["LOVABLE_API_KEY"];
+    if (!key) throw new VisionError(this.name, "not_configured", null, "provider key missing");
     const content: unknown[] = [{ type: "text", text: c.text }];
     for (const img of c.images) {
       splitDataUrl(img); // validate before spending a request
@@ -147,25 +150,20 @@ const lovableGateway: Provider = {
       signal,
       headers: {
         "Content-Type": "application/json",
-        "Lovable-API-Key": process.env["LOVABLE_API_KEY"]!,
+        "Lovable-API-Key": key,
         "X-Lovable-AIG-SDK": "fetch",
       },
       body: JSON.stringify({
         model: "google/gemini-3.6-flash",
+        stream: true,
         messages: [
           { role: "system", content: c.system },
           { role: "user", content },
         ],
       }),
     });
-    const body = await res.text();
-    if (!res.ok) throw classifyHttp(this.name, res.status, body);
-    let text = "";
-    try {
-      text = JSON.parse(body)?.choices?.[0]?.message?.content ?? "";
-    } catch {
-      /* handled below */
-    }
+    if (!res.ok) throw classifyHttp(this.name, res.status, await res.text());
+    const text = await collectVisionStream(res);
     if (!text.trim()) throw new VisionError(this.name, "model", res.status, "empty response");
     return text;
   },
@@ -183,7 +181,7 @@ export function visionProviderStatus() {
  */
 export async function runVision(
   c: VisionContent,
-  opts: { totalBudgetMs: number; simulateFail?: "primary" | "all" },
+  opts: { totalBudgetMs?: number; simulateFail?: "primary" | "all" },
 ): Promise<{ text: string; provider: string }> {
   const started = Date.now();
   const failures: VisionError[] = [];
@@ -191,22 +189,27 @@ export async function runVision(
   if (!candidates.length) throw [new VisionError("all", "not_configured", null, "no vision provider key")];
 
   for (let i = 0; i < candidates.length; i += 1) {
-    const p = candidates[i]!;
+    const p = candidates[i];
+    if (!p) continue;
     if (isOpen(p.name) && !opts.simulateFail) {
       failures.push(new VisionError(p.name, "upstream", null, "skipped: circuit open"));
       continue;
     }
-    const remaining = opts.totalBudgetMs - (Date.now() - started);
-    if (remaining < 1500) break;
+    const remaining = opts.totalBudgetMs === undefined ? undefined : opts.totalBudgetMs - (Date.now() - started);
+    if (remaining !== undefined && remaining < 1500) break;
     const healthyLeft = candidates.slice(i + 1).filter((q) => !isOpen(q.name)).length;
     // Leave room for one quick failover when another provider is available.
-    const slice = healthyLeft ? Math.min(remaining - 4000, Math.round(opts.totalBudgetMs * 0.6)) : remaining;
+    const slice = remaining === undefined ? undefined : healthyLeft
+      ? Math.min(remaining - 4000, Math.round((opts.totalBudgetMs ?? remaining) * 0.6)) : remaining;
     const t0 = Date.now();
     try {
       if (opts.simulateFail === "all" || (opts.simulateFail === "primary" && i === 0)) {
         throw new VisionError(p.name, "upstream", 503, "simulated failure (dev only)");
       }
-      const text = await p.call(c, AbortSignal.timeout(Math.max(1500, slice)));
+      // Media inference can legitimately exceed 14 seconds. Never abandon billed
+      // work on an artificial deadline; keep the existing text-only budget.
+      const signal = slice === undefined ? new AbortController().signal : AbortSignal.timeout(Math.max(1500, slice));
+      const text = await p.call(c, signal);
       console.info(`[vision] ok provider=${p.name} ms=${Date.now() - t0}`);
       return { text, provider: p.name };
     } catch (err) {
